@@ -34,6 +34,14 @@ import {
   ejecutarCobertura,
   ejecutarCatalogo,
   ejecutarRiesgo,
+  ejecutarFundamental,
+  ejecutarWacc,
+  ejecutarValorMetodos,
+  ejecutarFichaDecision,
+  ejecutarContextoMacro,
+  ejecutarCicloEconomico,
+  ejecutarPerformanceSectorial,
+  ejecutarValuacionSectorial,
   type ResultadoConocimiento,
 } from "@/lib/agents/ejecutores";
 import type { ConfiguracionOrquestacion } from "@/lib/model-orchestration";
@@ -394,6 +402,38 @@ export async function ejecutarTool(
     }
     case "analizar_riesgo": {
       const res = await ejecutarRiesgo(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "analizar_fundamental": {
+      const res = await ejecutarFundamental(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "calcular_wacc": {
+      const res = await ejecutarWacc(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "valor_por_metodos": {
+      const res = await ejecutarValorMetodos(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "ficha_de_decision": {
+      const res = await ejecutarFichaDecision(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "contexto_macro": {
+      const res = await ejecutarContextoMacro();
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "ciclo_economico": {
+      const res = await ejecutarCicloEconomico();
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "performance_sectorial": {
+      const res = await ejecutarPerformanceSectorial(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "valuacion_sectorial": {
+      const res = await ejecutarValuacionSectorial(argsRaw);
       return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
     }
     default:

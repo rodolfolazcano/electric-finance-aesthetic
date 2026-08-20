@@ -100,7 +100,8 @@ const SKILLS: Skill[] = [
       "Valoración por flujo de caja descontado: teórica (supuestos del usuario) y real (datos en vivo).",
     instrucciones: `[SKILL · Análisis DCF — réplica oficial]
 - Valoración teórica (calcular_dcf): usala SOLO cuando el usuario aporte sus propios supuestos (flujo de caja, crecimiento, WACC). Es un ejercicio educativo: el resultado depende de los supuestos y NO es recomendación ni promesa de rentabilidad.
-- Valoración real (valor_intrinseco_real): usala SIEMPRE para "cuánto vale X", "valor intrínseco de X", "analizá el valor de X" o "DCF de X". Obtiene datos en vivo de Yahoo Finance (FCF, deuda neta, beta vía CAPM, WACC, crecimiento de analistas), aplica la metodología del paper académico correspondiente y busca noticias de sustento.
+- Valoración real integral (ficha_de_decision(simbolo)): usala SIEMPRE para "cuánto vale X", "ficha de decisión de X", "analizá X con todas las capas" o "decime si compro X". Ejecuta en vivo: contexto macro + cualitativo (6 dimensiones, gate >= 5.0) + cuantitativo (M1-M15) + WACC + triangulación (DCF + múltiplos + valor libro/APV) y devuelve decisión final con margen de seguridad.
+- Valoración por métodos (valor_por_metodos(simbolo)): triangula DCF + múltiplos del sector + valor libro/APV con pesos por perfil (crecimiento/madura/distress) y devuelve valor ponderado, rango y decisión. Alternativa cruzada: valor_intrinseco_real(simbolo) (FCF, beta vía CAPM, WACC, crecimiento de analistas).
 - Regla anti-fabricación: PROHIBIDO inventar supuestos ni cifras de FCF, WACC, deuda, precio o valor por acción. Si el dato en vivo no está disponible, decilo con honestidad y ofrecé reintentar.
 - Cuando el DCF calcule un valor, validalo siempre contra la cotización real de mercado y explicá la diferencia (o la falta de ella).`,
   },
@@ -125,7 +126,13 @@ const SKILLS: Skill[] = [
 - Clasificación y herramienta correspondiente:
   · "beta de X", "capm", "alpha", "benchmark" → analizar_capm(simbolo) (auto-detecta el mejor benchmark por R²).
   · matriz de betas/correlaciones entre varios activos → matriz_capm(simbolos[]).
+  · WACC / costo de capital / Ke / Kd de X → calcular_wacc(simbolo) (CAPM + riesgo país + tamaño, calibrado a ARS si es .BA).
+  · fundamental (cualitativo + 15 ratios con alertas) → analizar_fundamental(simbolo).
   · exposición sectorial / "cómo se comporta X vs el sector" → analizar_sectores(simbolo).
+  · ranking de sectores (11 ETFs) → performance_sectorial(periodo).
+  · valuación de un sector (P/E, percentiles, WACC, solvencia) → valuacion_sectorial(sector).
+  · régimen macro / inflación / riesgo país / dólares / tasas reales → contexto_macro().
+  · etapa del ciclo económico intermarket → ciclo_economico().
   · distribución de retornos (media anual, volatilidad, Sharpe, VaR 95%, skewness, kurtosis, Jarque-Bera, normalidad) → estadisticas_retornos(simbolo).
   · optimización (min-varianza, Markowitz, igual-peso, vol-weighted, PCA, frontera eficiente, covarianza) → optimizar_portafolio(activos[{ticker,montoUSD}]).
   · cobertura / hedge / "cuánto necesito para cubrir X" → calcular_cobertura(posiciones[{ticker,valorUSD}]).
@@ -146,7 +153,7 @@ const SKILLS: Skill[] = [
 - Regla de decisión rápida:
   · "por qué subió/bajó X" → buscar_noticias(X, "hoy") SIEMPRE primero.
   · cotizaciones y tasas → consultar_mercado.
-  · valoración de empresas → valor_intrinseco_real(simbolo).
+  · valoración de empresas → ficha_de_decision(simbolo) (completa) o valor_por_metodos(simbolo) (triangulación).
   · normativa/verificación → buscar_web.
   · concepto/servicio del sitio → consultar_base_conocimiento.
 - No cierres el análisis sin haber ejecutado las herramientas que correspondan. Si la herramienta devuelve SIN RESULTADOS, reportalo: no inventes datos.`,

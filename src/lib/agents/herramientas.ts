@@ -461,6 +461,157 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "analizar_fundamental",
+      description:
+        "Analiza el fundamental de un activo con datos reales en vivo (estados contables anuales de Yahoo Finance) replicando la metodología de la app Clarity: (a) análisis CUALITATIVO con 6 dimensiones (modelo de negocio 20%, management 25%, ventaja competitiva 30%, gobierno corporativo 15%, Porter 10% y círculo de competencia) con score 0-10 ponderado y gate: si < 5.0 el análisis cuantitativo queda BLOQUEADO; (b) análisis CUANTITATIVO con 15 métricas (M1 ingresos, M2 EBITDA, M3 resultado neto, M4 EPS, M5 margen EBITDA, M6 margen neto, M7 activo, M8 pasivo, M9 patrimonio, M10 deuda financiera neta, M11 capital de trabajo, M12 ROE, M13 ROA, M14 Deuda/EBITDA, M15 P/E, más EV/EBITDA) y alertas de riesgo (rojas y amarillas). Para preguntas como 'analizá el fundamental de X', 'ratios financieros de X', 'métricas M1-M15', 'qué salud financiera tiene X', 'ROE, ROA, deuda de X'. Acepta ticker o nombre.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description:
+              "Ticker o nombre del activo (ej. 'AAPL', 'MSFT', 'YPF', 'GGAL.BA', 'MercadoLibre').",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "calcular_wacc",
+      description:
+        "Calcula el WACC de un activo con datos reales en vivo (metodología CAPM de la app Clarity): tasa libre de riesgo UST 10Y (^TNX en vivo), beta por regresión logarítmica 1 año contra el benchmark correspondiente (^MERV para tickers .BA, SPY para el resto), prima de riesgo de mercado (6% ARG / 5.5% US), riesgo país vía ArgentinaDatos, size premium por capitalización (<USD 300M), costo de deuda (interés/deuda, mín 3%), tasa impositiva (35% ARG / 25% US), pesos de capital y deuda y WACC USD. Para tickers .BA además calibra a ARS con Fisher usando la inflación del BCRA (devaluación esperada y WACC nominal ARS). Para preguntas como 'cuál es el WACC de X', 'costo de capital de X', 'cuánto es el Ke y Kd de X'. Acepta ticker o nombre.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description: "Ticker o nombre del activo (ej. 'AAPL', 'MSFT', 'GGAL.BA', 'YPF').",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "valor_por_metodos",
+      description:
+        "Valora un activo con TRES métodos con datos reales en vivo (Yahoo Finance) y triangula la decisión, replicando la metodología de la app Clarity: (1) DCF por proyección de márgenes (FCFF 5 años con CAGR de ingresos, valor terminal Gordon, WACC real calculado, deuda neta y caja); (2) Múltiplos (EV/EBITDA, P/E, P/BV, EV/Revenue) comparados contra medianas del sector; (3) Valor libro ajustado + APV (VAN unlevered + PV escudo fiscal). Luego combina los 3 con pesos según el perfil (crecimiento / madura / distress) y devuelve valor ponderado, rango y decisión (COMPRAR, MANTENER/ACUMULAR, MANTENER, REDUCIR o VENDER) por margen de seguridad. Para preguntas como 'valorame X por los tres métodos', 'cuánto vale X según DCF, múltiplos y valor libro', 'triangulación de valor de X'. Acepta ticker o nombre.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description:
+              "Ticker o nombre del activo a valorar (ej. 'AAPL', 'MSFT', 'GGAL.BA', 'YPF', 'MercadoLibre').",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "ficha_de_decision",
+      description:
+        "Genera la FICHA DE DECISIÓN COMPLETA de un activo con datos reales en vivo, replicando la metodología de la app Clarity (todas las capas): Capa 1 Macro (régimen, riesgo país, tasa libre de riesgo local), Capa 3 Cualitativo (6 dimensiones con gate >= 5.0), Capa 4 Cuantitativo (15 métricas + alertas), Capa 5 WACC (CAPM), Capas 6-9 Valuación triangulada (DCF + múltiplos + valor libro/APV con pesos por perfil), Paso 10 Margen de seguridad calibrado por score cualitativo (MOS 20%/35%/50%) con precio máximo de entrada, target y upside, y la DECISIÓN FINAL (COMPRAR / ESPERAR / NO COMPRAR / bloqueada por cualitativo). Para preguntas como 'haceme la ficha de decisión de X', 'analizá X con todas las capas', 'ficha completa de X', 'decime si compro X'. Es el análisis más completo: ejecuta macro + fundamental + wacc + valuación. Acepta ticker o nombre.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description:
+              "Ticker o nombre del activo (ej. 'AAPL', 'MSFT', 'GGAL.BA', 'YPF', 'MercadoLibre').",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "contexto_macro",
+      description:
+        "Obtiene el contexto macroeconómico actual en vivo: inflación mensual y tasa pasiva (BCRA), tipo de cambio oficial de referencia, riesgo país (ArgentinaDatos, serie y último), dólar oficial/blue/MEP/CCL (CriptoYa), precios y variación de SPY, DXY y Treasury 10Y (Yahoo Finance), tasas reales Fisher (mensual y anual compuesta), spread soberano implícito, clasificación de régimen macro (FAVORABLE / NEUTRO / ADVERSO con score y señales) y tasa libre de riesgo local calibrada. Usala cuando el usuario pregunte por el panorama macro, régimen, inflación, riesgo país, dólares, tasas reales o costos de capital en contexto. No requiere parámetros.",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "ciclo_economico",
+      description:
+        "Detecta la etapa actual del ciclo económico con el método intermarket de Pring/Stovall (6 etapas), con datos reales de Yahoo Finance: calcula los ratios 200 días DBC/TLT (commodities vs bonos), TLT/SPY, DIA/GLD y XLP/XLY (defensivos vs cíclicos) y la pendiente de las medias de 200 días de DBC, TLT, SPY y GLD para clasificar en Recuperación Inicial (1), Expansión Temprana (2), Expansión Tardía Inflacionaria (3), Pico/Euforia (4), Contracción/Flight-to-Quality (5) o Recesión Plena (6), con activos y sectores favorecidos y riesgos. Para preguntas como 'en qué etapa del ciclo estamos', 'dónde estamos en el ciclo económico', 'régimen intermarket'. No requiere parámetros.",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "performance_sectorial",
+      description:
+        "Devuelve la performance de los 11 ETFs sectoriales de EE.UU. (XLK, XLF, XLV, XLE, XLC, XLY, XLP, XLI, XLB, XLRE, XLU) con datos reales de Yahoo Finance: variación porcentual del período y tendencia (cruce de precio vs SMA5) ordenado de mayor a menor rendimiento. Acepta un período opcional (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y). Para preguntas como 'qué sector rindió más', 'performance sectorial', 'cómo le fue a tecnología vs energía', 'rotación sectorial'. El parámetro es opcional (default 5d).",
+      parameters: {
+        type: "object",
+        properties: {
+          periodo: {
+            type: "string",
+            description:
+              "Período de la performance (opcional). Opciones: '1d', '5d', '1mo', '3mo', '6mo', '1y', '2y'. Default '5d'.",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "valuacion_sectorial",
+      description:
+        "Analiza la valuación de un sector de EE.UU. con datos reales en vivo (Yahoo Finance): toma los componentes principales del ETF sectorial, calcula P/E y P/BV promedio y percentiles por ticker, WACC estimado por empresa (CAPM simplificado con deuda/activos del balance) y solvencia (patrimonio/activos, saludable si >= 0.4), e identifica si el sector es frágil. Para preguntas como 'valuación del sector tecnología', 'en qué precio está el sector salud', 'WACC y solvencia del sector energía', 'es barato o caro el sector X'. Acepta el nombre del sector en inglés o español de la app Clarity: Technology, Healthcare, Financial Services, Energy, Consumer Defensive, Consumer Cyclical, Industrials, Basic Materials, Utilities, Communication Services, Real Estate.",
+      parameters: {
+        type: "object",
+        properties: {
+          sector: {
+            type: "string",
+            description:
+              "Sector a analizar (ej. 'Technology', 'Healthcare', 'Energy', 'Financial Services', 'Communication Services', 'Consumer Discretionary'/'Consumer Cyclical', 'Real Estate', 'Utilities', 'Industrials', 'Basic Materials', 'Consumer Defensive').",
+          },
+          periodo: {
+            type: "string",
+            description: "Período opcional de los datos (default '1y').",
+          },
+        },
+        required: ["sector"],
+        additionalProperties: false,
+      },
+    },
+  },
 ];
 
 export type EstadoHerramienta =
@@ -500,6 +651,18 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
       return "portafolio";
     case "analizar_riesgo":
       return "riesgo";
+    case "analizar_fundamental":
+    case "valor_por_metodos":
+    case "ficha_de_decision":
+      return "valoracion";
+    case "calcular_wacc":
+      return "capm";
+    case "contexto_macro":
+      return "mercado";
+    case "ciclo_economico":
+    case "performance_sectorial":
+    case "valuacion_sectorial":
+      return "portafolio";
     default:
       return "searching";
   }

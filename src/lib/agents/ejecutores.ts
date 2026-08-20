@@ -890,3 +890,235 @@ export async function ejecutarRiesgo(argsRaw: string): Promise<{
     };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Análisis portados de la app "Clarity" (server.py): cualitativo, cuantitativo,
+// WACC, DCF, múltiplos, valor libro/APV, triangulación, ficha de decisión,
+// contexto macro, ciclo intermarket y análisis sectorial. Todos con datos
+// reales en vivo (Yahoo Finance + BCRA + ArgentinaDatos + CriptoYa).
+// ---------------------------------------------------------------------------
+
+import {
+  claCualitativo,
+  textoCualitativo,
+  claCuantitativo,
+  textoCuantitativo,
+  claWacc,
+  textoWacc,
+  claTriangulacion,
+  textoTriangulacion,
+  claFicha,
+  textoFicha,
+  claContextoMacro,
+  textoMacro,
+  claCiclo,
+  textoCiclo,
+  claPerformanceSectorial,
+  textoPerformanceSectorial,
+  claValuacionSectorial,
+  textoValuacionSectorial,
+} from "@/lib/clarity-analysis";
+
+function parseArgsClarity(argsRaw: string): { simbolo?: string; periodo?: string; sector?: string } {
+  try {
+    const j = JSON.parse(argsRaw) as {
+      simbolo?: unknown;
+      periodo?: unknown;
+      sector?: unknown;
+    };
+    if (!j || typeof j !== "object") return {};
+    const str = (v: unknown): string => (typeof v === "string" ? v : typeof v === "number" ? String(v) : "");
+    return { simbolo: str(j.simbolo), periodo: str(j.periodo), sector: str(j.sector) };
+  } catch {
+    return {};
+  }
+}
+
+/** Cualitativo (6 dimensiones) + Cuantitativo (15 métricas + alertas). */
+export async function ejecutarFundamental(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  const simbolo = (parseArgsClarity(argsRaw).simbolo ?? "").toString().trim();
+  if (!simbolo) {
+    return {
+      texto:
+        "SIN RESULTADOS: no recibí el símbolo. Reinvocá la herramienta con el parámetro simbolo (ej. 'AAPL', 'GGAL.BA', 'YPF').",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    const [cuali, cuanti] = await Promise.all([claCualitativo(simbolo), claCuantitativo(simbolo)]);
+    return {
+      texto: `${textoCualitativo(cuali)}\n\n---\n\n${textoCuantitativo(cuanti)}`,
+      fuentes: [],
+      ok: true,
+    };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: error en el análisis fundamental de ${simbolo} (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+/** WACC (CAPM + riesgo país + tamaño) con datos en vivo. */
+export async function ejecutarWacc(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  const simbolo = (parseArgsClarity(argsRaw).simbolo ?? "").toString().trim();
+  if (!simbolo) {
+    return {
+      texto:
+        "SIN RESULTADOS: no recibí el símbolo. Reinvocá con el parámetro simbolo (ej. 'AAPL', 'GGAL.BA').",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    return { texto: textoWacc(await claWacc(simbolo)), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: error al calcular el WACC de ${simbolo} (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+/** Valoración por DCF + múltiplos + valor libro/APV triangulados. */
+export async function ejecutarValorMetodos(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  const simbolo = (parseArgsClarity(argsRaw).simbolo ?? "").toString().trim();
+  if (!simbolo) {
+    return {
+      texto:
+        "SIN RESULTADOS: no recibí el símbolo. Reinvocá con el parámetro simbolo (ej. 'AAPL', 'YPF', 'GGAL.BA').",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    return { texto: textoTriangulacion(await claTriangulacion(simbolo)), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: error en la valoración por métodos de ${simbolo} (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+/** Ficha de decisión completa (todas las capas). */
+export async function ejecutarFichaDecision(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  const simbolo = (parseArgsClarity(argsRaw).simbolo ?? "").toString().trim();
+  if (!simbolo) {
+    return {
+      texto:
+        "SIN RESULTADOS: no recibí el símbolo. Reinvocá con el parámetro simbolo (ej. 'AAPL', 'YPF', 'MSFT').",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    return { texto: textoFicha(await claFicha(simbolo)), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: no se pudo generar la ficha de decisión de ${simbolo} (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+/** Contexto macro completo (BCRA + ArgentinaDatos + CriptoYa + Yahoo). */
+export async function ejecutarContextoMacro(): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  try {
+    return { texto: textoMacro(await claContextoMacro()), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: error al obtener el contexto macro (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+/** Ciclo económico intermarket (Pring/Stovall 6 etapas). */
+export async function ejecutarCicloEconomico(): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  try {
+    return { texto: textoCiclo(await claCiclo()), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: error al detectar el ciclo económico (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+/** Performance de los ETFs sectoriales de EE.UU. */
+export async function ejecutarPerformanceSectorial(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  const periodo = (parseArgsClarity(argsRaw).periodo ?? "").toString().trim() || "5d";
+  try {
+    return { texto: textoPerformanceSectorial(await claPerformanceSectorial(periodo)), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: error en la performance sectorial (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+/** Valuación de un sector (P/E, percentiles, WACC, solvencia). */
+export async function ejecutarValuacionSectorial(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  const d = parseArgsClarity(argsRaw);
+  const sector = (d.sector ?? "").toString().trim();
+  const periodo = (d.periodo ?? "").toString().trim() || "1y";
+  if (!sector) {
+    return {
+      texto:
+        "SIN RESULTADOS: no recibí el sector. Reinvocá con el parámetro sector (ej. 'Technology', 'Energy', 'Healthcare').",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    return { texto: textoValuacionSectorial(await claValuacionSectorial(sector, periodo)), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: error en la valuación del sector ${sector} (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
