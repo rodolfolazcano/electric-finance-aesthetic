@@ -218,12 +218,21 @@ export function ChatWidget() {
     window.addEventListener("pointerup", onUp);
   }
 
+  /** Aplica un cambio al historial de forma SÍNCRONA a messagesRef y a React.
+   *  Si se escribe en messagesRef dentro del updater de setMessages, React lo
+   *  difiere hasta el siguiente render y streamTurn recibe un historial viejo
+   *  (le falta el mensaje actual) → el servidor responde "Faltan mensajes". */
+  function commit(mutator: (prev: Msg[]) => Msg[]) {
+    const next = mutator(messagesRef.current);
+    messagesRef.current = next;
+    setMessages(next);
+  }
+
   function updateLast(patch: Partial<Msg>) {
-    setMessages((prev) => {
+    commit((prev) => {
       const next = [...prev];
       const last = next[next.length - 1];
       if (last) next[next.length - 1] = { ...last, ...patch };
-      messagesRef.current = next;
       return next;
     });
   }
@@ -261,11 +270,8 @@ export function ChatWidget() {
   async function process(question: string) {
     const q = question.trim();
     if (!q) return;
-    setMessages((prev) => {
-      const next = [...prev, { role: "user" as const, content: q }];
-      messagesRef.current = next;
-      return next;
-    });
+    // Se agrega de forma síncrona: streamTurn arranca con el mensaje actual ya presente.
+    commit((prev) => [...prev, { role: "user" as const, content: q }]);
     setInput("");
     await streamTurn();
   }
@@ -279,11 +285,7 @@ export function ChatWidget() {
     const history = messagesRef.current
       .filter((m) => m !== WELCOME && !(m.role === "assistant" && !m.content.trim()))
       .map((m) => ({ role: m.role, content: m.content }));
-    setMessages((prev) => {
-      const next = [...prev, { role: "assistant" as const, content: "" }];
-      messagesRef.current = next;
-      return next;
-    });
+    commit((prev) => [...prev, { role: "assistant" as const, content: "" }]);
     setLoading(true);
 
     const controller = new AbortController();
@@ -460,11 +462,7 @@ export function ChatWidget() {
     // Si el turno se interrumpió sin respuesta, quitamos la burbuja vacía
     // para que el hilo continúe limpio con la nueva pregunta.
     if (interrumpido) {
-      const sinVacios = messagesRef.current.filter(
-        (m) => !(m.role === "assistant" && m.content.trim() === ""),
-      );
-      messagesRef.current = sinVacios;
-      setMessages(sinVacios);
+      commit((prev) => prev.filter((m) => !(m.role === "assistant" && m.content.trim() === "")));
     }
     // Preguntas en cola: se procesan en orden, manteniendo el hilo acumulado.
     if (queueRef.current.length > 0) {
@@ -532,8 +530,7 @@ export function ChatWidget() {
     }
     const next = prev.slice(0, index);
     next.push({ role: "user", content: text });
-    messagesRef.current = next;
-    setMessages(next);
+    commit(() => next);
     void streamTurn();
   }
 
@@ -558,8 +555,7 @@ export function ChatWidget() {
       setQueue([]);
     }
     const next = prev.slice(0, ui + 1);
-    messagesRef.current = next;
-    setMessages(next);
+    commit(() => next);
     void streamTurn();
   }
 
@@ -652,9 +648,7 @@ export function ChatWidget() {
                 /* sin backend de memoria */
               }
               limpiarSessionId();
-              const reset: Msg[] = [WELCOME];
-              messagesRef.current = reset;
-              setMessages(reset);
+              commit(() => [WELCOME]);
             }}
             aria-label="Reestablecer conversación"
             title="Reestablecer la conversación"

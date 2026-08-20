@@ -3,7 +3,13 @@ import { SITE_CONTEXT } from "@/lib/site-context";
 import { buscarEnBase } from "@/lib/knowledge-base";
 import { buscarAcademico } from "@/lib/kb-academic";
 import { orquestarModelos } from "@/lib/model-orchestration";
-import { orquestarTurno, type Msg, type ApiMsg } from "@/lib/agents/orquestador";
+import { construirPromptSkills } from "@/lib/skills";
+import {
+  orquestarTurno,
+  detectarIntencionSkill,
+  type Msg,
+  type ApiMsg,
+} from "@/lib/agents/orquestador";
 import { MemoriaDeSesion } from "@/lib/agents/memory";
 import { esAcademico, type ResultadoConocimiento } from "@/lib/agents/ejecutores";
 import { NVIDIA_API_KEY } from "@/lib/agents/nvidia-key";
@@ -193,6 +199,23 @@ export const Route = createFileRoute("/api/chat")({
 
         const ultimoUser = [...historial].reverse().find((m) => m.role === "user");
         const pregunta = ultimoUser?.content ?? "";
+
+        // Detección de intención: sumar skills metodológicas al prompt, además
+        // de las skills base que ya aporta la orquestación por modelo.
+        const skillsDetectadas = detectarIntencionSkill(pregunta);
+        if (skillsDetectadas.length > 0) {
+          console.log("[PASO3] skills detectadas:", skillsDetectadas);
+        }
+        const promptSkillsSalidaFinal = construirPromptSkills([
+          ...(orquestacion.modeloSalida.skills ?? []),
+          ...skillsDetectadas,
+        ]);
+        const promptSkillsPlannerFinal = construirPromptSkills([
+          ...(orquestacion.modeloPlanner.skills ?? []),
+          ...skillsDetectadas,
+        ]);
+        orquestacion.promptSkillsSalida = promptSkillsSalidaFinal;
+        orquestacion.promptSkillsPlanner = promptSkillsPlannerFinal;
 
         const memoria = MemoriaDeSesion.obtener(sessionId);
         memoria.nuevoTurno();

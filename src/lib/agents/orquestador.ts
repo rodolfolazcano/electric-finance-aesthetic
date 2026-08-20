@@ -200,6 +200,50 @@ export function enrutar(pregunta: string): Set<RolAgente> {
   return activos;
 }
 
+/**
+ * Detector complementario de intención para elegir las SKILLS que se inyectan
+ * al prompt del redactor/planner (NO reemplaza a enrutar()).
+ * - enrutar() decide qué AGENTES trabajan (y por ende qué herramientas se ejecutan).
+ * - detectarIntencionSkill() decide qué framework de razonamiento se usa para
+ *   interpretar esos resultados (marco metodológico específico por tipo de análisis).
+ */
+function detectarIntencionSkill(pregunta: string): string[] {
+  const p = pregunta.toLowerCase();
+  const skills: string[] = [];
+
+  if (
+    /sem[aá]foro|rsi|macd|sma|indicador t[eé]cnico|soporte|resistencia|an[aá]lisis t[eé]cnico/.test(
+      p,
+    )
+  ) {
+    skills.push("analisis-tecnico-senal");
+  }
+  if (
+    /fundamental|moat|porter|gobierno corporativo|ventaja competitiva|management|modelo de negocio/.test(
+      p,
+    )
+  ) {
+    skills.push("analisis-fundamental-6d");
+  }
+  if (/raz[oó]n financiera|ratio|dupont|liquidez|endeudamiento|rentabilidad|roe|roa/.test(p)) {
+    skills.push("razones-financieras-dupont");
+  }
+  if (
+    /planificaci[oó]n|presupuesto|flujo de caja|proyecci[oó]n financiera|objetivo financiero/.test(
+      p,
+    )
+  ) {
+    skills.push("planificacion-financiera");
+  }
+  if (/backtest|desempe[ñn]o pasado|se[ñn]ales pasadas|rendimiento hist[oó]rico/.test(p)) {
+    skills.push("backtesting-senales");
+  }
+
+  return skills;
+}
+
+export { detectarIntencionSkill };
+
 type AgentResult = {
   rol: RolAgente;
   texto: string;
@@ -298,6 +342,7 @@ export async function ejecutarTool(
   baseUrl?: string,
 ): Promise<{ texto: string; fuentes: FuenteMercado[]; ok: boolean }> {
   const { query, periodo, simbolo } = extraerDatosTool(argsRaw);
+  console.log(`[TOOL] ${name} ${argsRaw.slice(0, 220)}`); // TEMP PASO4
   switch (name) {
     case "consultar_mercado":
       return { ...(await ejecutarMercado(query)), ok: true };
@@ -371,7 +416,7 @@ async function trabajarAgente(
 ): Promise<AgentResult> {
   const agente = obtenerAgente(rol);
   enviar({ t: "status", v: agente.status, q: pregunta });
-  const esAnalisis = rol === "valoracion" || rol === "semaforo";
+  const esAnalisis = rol === "valoracion" || rol === "semaforo" || rol === "noticias";
   const modeloAgente = esAnalisis ? orquestacion.modeloPlanner : MODELO_AGENTES;
   const mensajes: ApiMsg[] = [
     { role: "system", content: agente.sistema },
@@ -568,6 +613,12 @@ function extraerActivo(pregunta: string): string {
   return palabras.trim() || "mercado argentino";
 }
 
+/** True si un texto de herramienta trae contenido real (no el marcador de vacío). */
+function esTextoConDato(texto: string): boolean {
+  const limpio = (texto ?? "").trim();
+  return limpio.length > 0 && !/^SIN RESULTADOS/i.test(limpio);
+}
+
 /** Ejecuta el turno completo del sistema multi-agente. */
 export async function orquestarTurno(opts: OpcionesOrquestador): Promise<ResultadoTurno> {
   const {
@@ -585,6 +636,10 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   } = opts;
 
   const fuentes: FuenteMercado[] = [];
+  // Registra si en este turno se obtuvo contenido REAL de noticias (no el
+  // marcador "SIN RESULTADOS"). Sin esto, una pregunta de causa no se puede
+  // responder con honestidad y se fuerza el fallback determinístico.
+  let huboDatoNoticias = false;
   const cola = new ColaDeTareas(3);
 
   // 1) Router: qué agentes convocar.
@@ -594,6 +649,7 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   // 2) Despacho en paralelo a través de la cola de tareas.
   if (roles.length > 1) enviar({ t: "status", v: "cola", q: roles.length });
   const agentes: AgentResult[] = [];
+  const agentResultados: AgentResult[] = [];
   await Promise.all(
     roles.map((rol) =>
       cola.enqueue(() =>
@@ -613,10 +669,15 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
     ),
   ).then((resultados) => {
     for (const r of resultados) {
+      agentResultados.push(r);
       if (r.texto) agentes.push(r);
       fuentes.push(...r.fuentes);
     }
   });
+  // El agente de noticias solo trae fuentes cuando encontró titulares reales.
+  if (agentResultados.some((r) => r.rol === "noticias" && r.fuentes.length > 0)) {
+    huboDatoNoticias = true;
+  }
 
   const notasPizarra = memoria.leerPizarra();
   const notasTexto = notasPizarra
@@ -729,6 +790,9 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
         });
         const ejecucion = await ejecutarTool(name, argsRaw, baseUrl);
         fuentes.push(...ejecucion.fuentes);
+        if (name === "buscar_noticias" && esTextoConDato(ejecucion.texto)) {
+          huboDatoNoticias = true;
+        }
         if (ejecucion.fuentes.length) enviar({ t: "sources", v: ejecucion.fuentes });
         if (!ejecucion.ok && esValoracion) {
           valoracionFallida = true;
@@ -804,6 +868,7 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
       tool_calls: [{ id: callId, function: { name: "consultar_mercado", arguments: args } }],
     });
     enviar({ t: "status", v: "mercado", q: pregunta });
+    console.log(`[TOOL] consultar_mercado (red-seguridad) ${args.slice(0, 160)}`); // TEMP PASO4
     const resultado = await ejecutarMercado(pregunta);
     fuentes.push(...resultado.fuentes);
     if (resultado.fuentes.length) enviar({ t: "sources", v: resultado.fuentes });
@@ -835,7 +900,9 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
       ],
     });
     enviar({ t: "status", v: "noticias", q: activo });
+    console.log(`[TOOL] buscar_noticias (red-seguridad) query=${activo} periodo=hoy`); // TEMP PASO4
     const noticias = await ejecutarNoticias(activo, "hoy");
+    if (esTextoConDato(noticias.texto)) huboDatoNoticias = true;
     fuentes.push(...noticias.fuentes);
     if (noticias.fuentes.length) enviar({ t: "sources", v: noticias.fuentes });
     messages.push({
@@ -898,6 +965,7 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
         ],
       });
       enviar({ t: "status", v: "valoracion", q: simboloExtraido });
+      console.log(`[TOOL] valor_intrinseco_real (red-seguridad) ${argsVal.slice(0, 160)}`); // TEMP PASO4
       const resultado = await ejecutarValorIntrinseco(argsVal);
       if (!resultado.ok) {
         valoracionFallida = true;
@@ -928,6 +996,7 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
         tool_calls: [{ id: callId, function: { name: "analizar_semaforo", arguments: argsSem } }],
       });
       enviar({ t: "status", v: "semaforo", q: simboloSemaforo });
+      console.log(`[TOOL] analizar_semaforo (red-seguridad) ${argsSem.slice(0, 160)}`); // TEMP PASO4
       const resultado = await ejecutarSemaforo(argsSem);
       if (!resultado.ok) {
         semaforoFallido = true;
@@ -1008,7 +1077,12 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   }
 
   // 4) Redactor: respuesta final, con acceso a las mismas herramientas.
-  const modeloSalida = orquestacion.modeloSalida;
+  // Para preguntas que enrutaron al agente de noticias (causa / "qué pasó con X"),
+  // se usa el modelo de razonamiento (planner): disciplina de tool calling y
+  // anti-alucinación aunque el dato sea ambiguo.
+  const modeloSalida = roles.includes("noticias")
+    ? orquestacion.modeloPlanner
+    : orquestacion.modeloSalida;
   let final = "";
   for (let intento = 0; intento < 3; intento++) {
     const opcionesInfladas: Record<string, number | boolean> = {
@@ -1057,6 +1131,9 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
         const argsRaw = call.function?.arguments ?? "";
         const ejecucion = await ejecutarTool(name, argsRaw, baseUrl);
         fuentes.push(...ejecucion.fuentes);
+        if (name === "buscar_noticias" && esTextoConDato(ejecucion.texto)) {
+          huboDatoNoticias = true;
+        }
         if (ejecucion.fuentes.length) enviar({ t: "sources", v: ejecucion.fuentes });
         messages.push({
           role: "tool",
@@ -1075,6 +1152,16 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   const ROTULOS_ESTRUCTURA =
     /PARTE\s*\(\s*[abc]\)|\bDatos\s+concretos\b|\bConexi[oó]n\s+con\s+el\s+servicio\b|\bCierre\s+suave\b/i;
   if (final && ROTULOS_ESTRUCTURA.test(final)) final = "";
+
+  // ---- Red de seguridad: causa sin dato real de noticias → honestidad forzada ----
+  // Si la pregunta es "qué pasó/por qué se movió X" y en TODO el turno no se
+  // obtuvo contenido real de noticias (SIN RESULTADOS o búsqueda vacía), no se
+  // deja que el modelo improvise una causa sobre el historial/RAG: se devuelve
+  // un texto determinístico honesto (mismo patrón que valoración/semáforo).
+  if (esPreguntaDeCausa(pregunta) && !huboDatoNoticias) {
+    const activo = extraerActivo(pregunta);
+    final = `Busqué en las fuentes de noticias y no encontré una razón puntual confirmada para ${activo} en las últimas horas. No te voy a inventar una causa. Si querés, puedo ampliar el período, consultarte por otro activo o pasarte el contacto de Cintia por WhatsApp para revisarlo en detalle.`;
+  }
 
   if (!final) {
     final =

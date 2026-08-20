@@ -191,6 +191,69 @@ const SKILLS: Skill[] = [
 - Recomendá la skill correcta por nombre y motivo; no inventes skills que no existen.
 - Si la consulta no corresponde a ninguna skill de NVIDIA, seguí con la guía general del asistente sin forzar una skill.`,
   },
+  {
+    id: "analisis-tecnico-senal",
+    nombre: "Análisis Técnico por Señal",
+    descripcion:
+      "Señal técnica de compra/venta con indicadores reales (RSI, MACD, SMA) y soportes/resistencias.",
+    instrucciones: `[SKILL · Análisis Técnico por Señal]
+- Ejecutá SIEMPRE consultar_mercado con el ticker del activo ANTES de responder.
+- Calculá RSI(14), MACD(12,26,9) y SMA(50,200) con los datos reales devueltos por la herramienta.
+- Analizá soportes y resistencias a partir de la serie real.
+- Clasificá la señal: COMPRA (puntaje ≥ 4), COMPRA CON CAUTELA (2-3), MANTENER (-1 a 1), REDUCIR (-3 a -1), VENTA (< -3).
+- NUNCA inventes valores ni indicadores: si los datos reales no están disponibles en este turno, decilo con honestidad.
+- El análisis es educativo: no es recomendación de inversión.`,
+  },
+  {
+    id: "analisis-fundamental-6d",
+    nombre: "Análisis Fundamental en 6 Dimensiones",
+    descripcion:
+      "Score fundamental en 6 dimensiones con datos reales de la base de conocimiento y valoración en vivo.",
+    instrucciones: `[SKILL · Análisis Fundamental en 6 Dimensiones]
+- Ejecutá SIEMPRE consultar_base_conocimiento + valor_intrinseco_real con el ticker/empresa antes de responder.
+- Evaluá 6 dimensiones con estos pesos: Modelo de Negocio (20%), Management (25%), Ventaja Competitiva (30%), Gobierno Corporativo (15%), Porter 5 Fuerzas (10%) y Círculo de Competencia (incluido en el total).
+- Reportá un scoreTotal de 0 a 100 y la clasificación: none / weak / moderate / strong.
+- NUNCA completes ni inventes datos que no hayan sido verificados por una herramienta en este turno; si falta información, decilo con honestidad.
+- El análisis es educativo: no es recomendación de inversión.`,
+  },
+  {
+    id: "razones-financieras-dupont",
+    nombre: "Razones Financieras y DuPont",
+    descripcion:
+      "Razones de liquidez, actividad, endeudamiento y rentabilidad con descomposición del ROE vía DuPont, citando la fuente.",
+    instrucciones: `[SKILL · Razones Financieras y DuPont]
+- Ejecutá SIEMPRE consultar_mercado con el ticker antes de responder.
+- Calculá las razones de liquidez, actividad, endeudamiento y rentabilidad con los datos reales devueltos por la herramienta.
+- Descomponé el ROE vía DuPont: ROE = Margen Neto × Rotación de Activos × Multiplicador de Patrimonio.
+- Citá la fuente (Yahoo Finance) en cada cifra reportada.
+- NUNCA inventes razones: si un dato no está disponible en este turno, decilo con honestidad.
+- El análisis es educativo: no es recomendación de inversión.`,
+  },
+  {
+    id: "planificacion-financiera",
+    nombre: "Planificación Financiera",
+    descripcion:
+      "Presupuesto y proyecciones a partir de inputs de ventas, producción, inversión, financiamiento y caja.",
+    instrucciones: `[SKILL · Planificación Financiera]
+- Recibí los inputs del usuario: ventas, producción, inversión, financiamiento y caja.
+- Calculá el presupuesto de ventas, el presupuesto de producción y el flujo de caja libre.
+- Reportá ratios forward: margen neto promedio, ROI, cobertura de deuda, días de caja y apalancamiento.
+- Redactá el informe con estas secciones: resumen ejecutivo, rentabilidad, liquidez, endeudamiento, proyecciones, recomendaciones y alertas.
+- NUNCA inventes cifras: los cálculos se basan exclusivamente en los inputs provistos por el usuario y en los datos reales obtenidos en este turno.`,
+  },
+  {
+    id: "backtesting-senales",
+    nombre: "Backtesting de Señales",
+    descripcion:
+      "Backtest de la señal de semáforo técnico sobre el rango histórico: win rate, retornos y confiabilidad.",
+    instrucciones: `[SKILL · Backtesting de Señales]
+- Recibí el ticker y el rango histórico (1Y, 3Y, 5Y o MAX).
+- Generá la serie histórica del semáforo técnico con ventana móvil de mínimo 220 velas.
+- Detectá las señales de cambio de clasificación a lo largo de la serie.
+- Calculá las métricas: winRate20d, retorno promedio y mediano a 20 días, y mejor/peor caso.
+- Clasificá la confiabilidad: Alta (winRate > 55% y ≥ 10 ocurrencias), Media (winRate > 50% y ≥ 5 ocurrencias), Baja (resto).
+- NUNCA inventes resultados: todo se calcula con la serie real obtenida en este turno y se aclara que es un análisis educativo.`,
+  },
 ];
 
 const POR_ID = new Map(SKILLS.map((s) => [s.id, s]));

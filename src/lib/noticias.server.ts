@@ -1,3 +1,5 @@
+import { buscar, type Result } from "@/lib/search.server";
+
 export type FuenteNoticia = { dominio: string; url: string; title: string };
 
 export type Noticia = {
@@ -430,7 +432,7 @@ export async function consultarNoticias(
   ]);
 
   const vistos = new Set<string>();
-  const unicas = [...itemsFeeds, ...itemsGoogle]
+  let unicas = [...itemsFeeds, ...itemsGoogle]
     .filter((n) => enRango(n) && coincideTema(n))
     .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
     .filter((n) => {
@@ -440,6 +442,52 @@ export async function consultarNoticias(
       return true;
     })
     .slice(0, 12);
+
+  // Fallback 1: si el período acotado (ej. "hoy") no devolvió titulares,
+  // Google Noticias sin la restricción when (más recall) filtrado por una
+  // ventana ampliada de 7 días. Cubre demoras de indexación de los feeds.
+  let viaWeb = false;
+  if (!unicas.length) {
+    const desdeAmplio = Math.max(desdeTs, Date.now() - 7 * 86400000);
+    const gUrlAmplia = `https://news.google.com/rss/search?q=${encodeURIComponent(
+      termino,
+    )}&hl=es-419&gl=AR&ceid=AR:es-419`;
+    const itemsAmplios = await obtenerRss(gUrlAmplia, parseGoogleNews);
+    unicas = itemsAmplios
+      .filter((n) => {
+        const ts = Date.parse(n.publishedAt);
+        return !isNaN(ts) && ts >= desdeAmplio && ts <= hastaTs && coincideTema(n);
+      })
+      .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+      .filter((n) => {
+        const key = n.url.split("?")[0] ?? n.url;
+        if (vistos.has(key)) return false;
+        vistos.add(key);
+        return true;
+      })
+      .slice(0, 12);
+  }
+
+  // Fallback 2: búsqueda web (SearXNG / DuckDuckGo) como respaldo si ninguna
+  // fuente RSS devuelve nada. Cubre empresas internacionales (ej. Meta) que los
+  // feeds argentinos casi nunca tilden y RSS caídos o bloqueados.
+  if (!unicas.length) {
+    const web = await buscar(`${termino} noticias`).catch(() => [] as Result[]);
+    if (web.length) {
+      unicas = web
+        .filter((r) => r.url && r.title && !/wikipedia/i.test(r.url))
+        .slice(0, 12)
+        .map((r, i) => ({
+          id: `web-${i}`,
+          title: r.title,
+          summary: r.snippet || "",
+          source: "Búsqueda web",
+          url: r.url,
+          publishedAt: new Date().toISOString(),
+        }));
+      viaWeb = true;
+    }
+  }
 
   const mapaFuentes = new Map<string, FuenteNoticia>();
   for (const n of unicas) {
@@ -461,6 +509,9 @@ export async function consultarNoticias(
     };
   }
 
+  const fuentesTexto = viaWeb
+    ? "Fuentes externas: al no haber titulares en los RSS de noticias, se usaron resultados de búsqueda web reales (SearXNG / DuckDuckGo) sobre el tema."
+    : "Fuentes externas: RSS de Ámbito, El Cronista e Infobae Economía, y Google Noticias. La fecha corresponde a la publicación de la nota.";
   const lineas = [
     `Noticias${palabras.length ? ` sobre "${termino}"` : ""} (período: ${rango.etiqueta}):`,
     ...unicas.map(
@@ -470,7 +521,7 @@ export async function consultarNoticias(
         }`,
     ),
     "",
-    "Fuentes externas: RSS de Ámbito, El Cronista e Infobae Economía, y Google Noticias. La fecha corresponde a la publicación de la nota.",
+    fuentesTexto,
   ];
   return {
     texto: lineas.join("\n"),
