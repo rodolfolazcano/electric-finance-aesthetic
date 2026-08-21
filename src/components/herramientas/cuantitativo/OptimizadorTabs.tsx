@@ -1619,7 +1619,18 @@ function PortafolioPage() {
     detectCurrencies,
   ]);
 
-  const sectoresData = (universoCompleto as any).sectores ?? universoCompleto;
+  const _rawSectores = (universoCompleto as any).sectores ?? universoCompleto;
+  const sectoresData = useMemo(() => {
+    const out: Record<string, Record<string, any[]>> = {};
+    for (const [sec, val] of Object.entries(_rawSectores as Record<string, any>)) {
+      if (sec === "version" || sec === "lastUpdated") continue;
+      const industrias = (val as any)?.industrias ?? val;
+      if (industrias && typeof industrias === "object" && !Array.isArray(industrias)) {
+        out[sec] = industrias as Record<string, any[]>;
+      }
+    }
+    return out;
+  }, []);
 
   // Precompute which sectors/industrias have CEDEARs (para filtrar los dropdowns)
   const cedearSectorsMap = useMemo(() => {
@@ -2584,10 +2595,13 @@ function AllOptimizerResult({
                   // buscar sector/industria para un ticker en sectores.json
                   const getSectorInd = (ticker: string): { sector: string; industria: string } => {
                     const buscaTicker = (t: string) => {
-                      const sectoresLocal = (universoCompleto as any).sectores ?? universoCompleto;
-                      for (const [sector, industrias] of Object.entries(sectoresLocal)) {
+                      const _rawSectoresLocal = (universoCompleto as any).sectores ?? universoCompleto;
+                      for (const [sector, sectorVal] of Object.entries(_rawSectoresLocal)) {
+                        if (sector === "version" || sector === "lastUpdated") continue;
+                        if (typeof sectorVal !== "object" || sectorVal === null) continue;
+                        const industrias = (sectorVal as any).industrias ?? sectorVal;
                         if (typeof industrias !== "object") continue;
-                        for (const [industria, tickers] of Object.entries(industrias)) {
+                        for (const [industria, tickers] of Object.entries(industrias as Record<string, any[]>)) {
                           if (
                             Array.isArray(tickers) &&
                             tickers.some(
