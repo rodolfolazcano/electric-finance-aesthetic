@@ -15,6 +15,8 @@ dist-ssr
 .tanstack/**
 .nitro
 *.local
+__pycache__/
+*.pyc
 
 # Wrangler / Cloudflare
 .wrangler/
@@ -31,11 +33,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# Local data — no commitear
-.norte-memoria/
+# Local data — pt excluido por peso (110 MB), .norte-memoria ahora versionado para trazabilidad
 pt/
 
-# Env — credenciales (BotFather, API keys)
-.env
+# Env — repo privado: .env con credenciales SI se versiona; .env.local/.dev.vars siguen ignorados
 .env.local
 .dev.vars
