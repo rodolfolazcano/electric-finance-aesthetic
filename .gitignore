@@ -34,3 +34,8 @@ dist-ssr
 # Local data — no commitear
 .norte-memoria/
 pt/
+
+# Env — credenciales (BotFather, API keys)
+.env
+.env.local
+.dev.vars

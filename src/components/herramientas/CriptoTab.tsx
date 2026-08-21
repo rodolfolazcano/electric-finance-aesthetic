@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BinancePairsPanel } from "./BinancePairsPanel";
 import { ArbitrajeP2PPanel } from "./ArbitrajeP2PPanel";
 import { BinanceAccountPanel } from "./BinanceAccountPanel";
+import { EstrategiasPanel } from "./cripto/EstrategiasPanel";
 
 export function CriptoTab() {
   const [subTab, setSubTab] = useState("pares");
@@ -29,6 +30,12 @@ export function CriptoTab() {
         >
           Cuenta Binance
         </TabsTrigger>
+        <TabsTrigger
+          value="estrategias"
+          className="relative rounded-none border-b-2 border-transparent px-4 py-2 text-xs font-medium text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground"
+        >
+          Estrategias
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="pares" className="mt-4">
         <BinancePairsPanel />
@@ -38,6 +45,9 @@ export function CriptoTab() {
       </TabsContent>
       <TabsContent value="cuenta" className="mt-4">
         <BinanceAccountPanel />
+      </TabsContent>
+      <TabsContent value="estrategias" className="mt-4">
+        <EstrategiasPanel />
       </TabsContent>
     </Tabs>
   );
