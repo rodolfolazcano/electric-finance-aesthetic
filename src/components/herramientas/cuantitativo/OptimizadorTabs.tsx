@@ -1619,7 +1619,7 @@ function PortafolioPage() {
     detectCurrencies,
   ]);
 
-  const sectoresData = sectores;
+  const sectoresData = (universoCompleto as any).sectores ?? universoCompleto;
 
   // Precompute which sectors/industrias have CEDEARs (para filtrar los dropdowns)
   const cedearSectorsMap = useMemo(() => {
@@ -2584,7 +2584,8 @@ function AllOptimizerResult({
                   // buscar sector/industria para un ticker en sectores.json
                   const getSectorInd = (ticker: string): { sector: string; industria: string } => {
                     const buscaTicker = (t: string) => {
-                      for (const [sector, industrias] of Object.entries(sectores)) {
+                      const sectoresLocal = (universoCompleto as any).sectores ?? universoCompleto;
+                      for (const [sector, industrias] of Object.entries(sectoresLocal)) {
                         if (typeof industrias !== "object") continue;
                         for (const [industria, tickers] of Object.entries(industrias)) {
                           if (
