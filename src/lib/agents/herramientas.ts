@@ -830,6 +830,59 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "analisis_tecnico",
+      description:
+        "Análisis técnico completo de un activo con serie real de Yahoo Finance (1 año): precio actual y variación diaria, medias móviles MA20/MA50/MA200, EMA9, RSI14, MACD(12,26,9) con histograma, soporte y resistencia por pivotes, volatilidad anualizada y rango de 52 semanas, más una interpretación textual de tendencia y momentum. Usar cuando el usuario pida 'análisis técnico', 'medias móviles', 'RSI/MACD', 'soportes y resistencias' o la ficha técnica de un ticker.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description: "Ticker de Yahoo Finance (ej. AAPL, GGAL.BA, SPY, BTC-USD).",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "analizar_portafolio_clarity",
+      description:
+        "Analiza un portafolio con la metodología clarity: precio y valorizado reales por activo, peso sobre el total, clasificación por categoría macro (Renta Variable / Renta Fija / CEDEAR), retorno y volatilidad anualizados por activo, capital separado en ARS y USD, y distribución por categoría. Acepta items [{ticker,cantidad}] explícitos; si no vienen y hay sesión IOL activa (iol_login), usa automáticamente las posiciones reales del portafolio IOL del usuario. Usar para 'analizá mi cartera', 'distribución de mi portafolio', 'cuánto tengo en ARS vs USD'.",
+      parameters: {
+        type: "object",
+        properties: {
+          items: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                ticker: {
+                  type: "string",
+                  description: "Ticker local o de Yahoo (GGAL, GGAL.BA, AAPL, AAPL.D).",
+                },
+                cantidad: { type: "number", description: "Cantidad de títulos." },
+              },
+              required: ["ticker", "cantidad"],
+            },
+            description: "Posiciones del portafolio. Opcional si hay sesión IOL activa.",
+          },
+          period: {
+            type: "number",
+            description: "Días de historia para retorno/volatilidad (default 365).",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
   // -------------------------------------------------------------------------
   // Fuentes públicas genéricas
   // -------------------------------------------------------------------------
@@ -1179,6 +1232,10 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
     case "iol_operar":
     case "iol_asesor":
       return "iol";
+    case "analisis_tecnico":
+      return "semaforo";
+    case "analizar_portafolio_clarity":
+      return "portafolio";
     case "datos_financieros":
       return "mercado";
     case "grafico_chat":

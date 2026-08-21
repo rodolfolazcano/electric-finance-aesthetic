@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  ArrowLeft,
   Gauge,
   LineChart,
   Layers,
@@ -13,9 +12,9 @@ import {
   Activity,
   Menu,
   X,
+  Phone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { IOLLoginButton } from "@/components/shared/IOLLoginButton";
 import { IOLProvider } from "@/lib/herramientas/iol-context";
 import { ContextoTab } from "@/components/herramientas/ContextoTab";
@@ -23,6 +22,11 @@ import { AnalisisTab } from "@/components/herramientas/AnalisisTab";
 import { CuantitativoTab } from "@/components/herramientas/CuantitativoTab";
 import { SectoresTab } from "@/components/herramientas/SectoresTab";
 import { PlaceholderTab } from "@/components/herramientas/PlaceholderTab";
+import bgImage from "@/assets/bg-skyline.jpg";
+import retratoCintia from "@/assets/cintia-boos.png";
+
+const WHATSAPP =
+  "https://wa.me/541162355944?text=Hola%20Cintia%2C%20quiero%20asesoramiento%20sobre%20inversiones";
 
 export const Route = createFileRoute("/herramientas")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -60,6 +64,8 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
+const CONTAINER = "mx-auto w-full max-w-[1240px] px-5 sm:px-8 lg:px-12";
+
 function HerramientasPage() {
   return (
     <IOLProvider>
@@ -71,45 +77,143 @@ function HerramientasPage() {
 function HerramientasContenido() {
   const { tab } = Route.useSearch();
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const activo = (TABS.some((t) => t.id === tab) ? tab : "contexto") as TabId;
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-3 px-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            onClick={() => setMenuAbierto((v) => !v)}
-            aria-label="Menú de herramientas"
-          >
-            {menuAbierto ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
-          <Link
-            to="/"
-            className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Inicio</span>
-          </Link>
-          <div className="h-5 w-px bg-border" />
-          <h1 className="font-mono text-sm font-semibold tracking-widest uppercase text-foreground">
-            Herramientas
-          </h1>
-          <div className="ml-auto flex items-center gap-2">
+    <div className="relative min-h-screen text-foreground">
+      {/* ============ FONDO GLOBAL (idéntico al inicio) ============ */}
+      <div aria-hidden className="fixed inset-0 -z-10">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${bgImage})` }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(56rem 34rem at 82% 8%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 62%), radial-gradient(46rem 30rem at -5% 92%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%), linear-gradient(180deg, rgba(6,9,18,0.72) 0%, rgba(6,9,18,0.45) 45%, rgba(6,9,18,0.62) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(56rem 34rem at 82% 8%, color-mix(in oklab, var(--primary) 12%, transparent), transparent 62%)",
+          }}
+        />
+      </div>
+
+      {/* ============ HEADER (mismo diseño que el inicio) ============ */}
+      <header
+        className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${
+          scrolled || menuAbierto
+            ? "border-b border-border/60 bg-background/55 backdrop-blur-xl"
+            : "border-b border-transparent bg-transparent"
+        }`}
+      >
+        <div
+          className={`${CONTAINER} flex items-center justify-between gap-4 py-4 transition-all ${
+            scrolled ? "py-3" : ""
+          }`}
+        >
+          <div className="flex min-w-0 items-center gap-4">
+            <Link to="/" className="flex shrink-0 items-center gap-2.5">
+              <span className="h-9 w-9 overflow-hidden rounded-full border border-primary/40">
+                <img src={retratoCintia} alt="Cintia Boos" className="h-full w-full object-cover" />
+              </span>
+              <span className="font-display text-[17px] font-semibold leading-none">
+                Cintia <em className="italic text-primary">Boos</em>
+              </span>
+            </Link>
+            <div aria-hidden className="hidden h-5 w-px bg-border/60 sm:block" />
+            <p className="hidden items-center gap-2 eyebrow sm:flex">Herramientas</p>
+          </div>
+
+          <div className="flex items-center gap-2">
             <IOLLoginButton />
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-[12.5px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 md:inline-flex"
+            >
+              Consultar por WhatsApp
+            </a>
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Consultar por WhatsApp"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 md:hidden"
+            >
+              <Phone className="h-4 w-4" />
+            </a>
+            <button
+              onClick={() => setMenuAbierto((v) => !v)}
+              aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={menuAbierto}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground lg:hidden"
+            >
+              {menuAbierto ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </button>
           </div>
         </div>
+
+        {menuAbierto && (
+          <nav className="border-t border-border/60 bg-background/70 px-5 pb-6 pt-3 backdrop-blur-xl lg:hidden">
+            <ul className="flex flex-col">
+              {TABS.map((t) => (
+                <li key={t.id}>
+                  <Link
+                    to="/herramientas"
+                    search={{ tab: t.id }}
+                    onClick={() => setMenuAbierto(false)}
+                    className={`flex items-center gap-3 py-3 text-[13px] uppercase tracking-[0.16em] transition-colors ${
+                      t.id === activo ? "text-primary" : "text-muted-foreground"
+                    }`}
+                  >
+                    <t.icon className="h-4 w-4 flex-none" />
+                    {t.label}
+                    {t.tipo === "proximamente" && (
+                      <span className="rounded-full bg-gold/10 px-2 py-0.5 text-[9px] font-semibold tracking-[0.08em] text-gold">
+                        PRONTO
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
       </header>
 
-      <div className="mx-auto flex max-w-[1600px] gap-6 px-4 py-6">
+      {/* ============ INTRODUCCIÓN ============ */}
+      <div className={`${CONTAINER} pt-28 pb-8`}>
+        <p className="eyebrow">Panel de análisis financiero</p>
+        <h1 className="mt-4 max-w-3xl font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight chrome-text">
+          Probá el panel de análisis financiero
+        </h1>
+        <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground lg:text-[17px]">
+          Datos en vivo de Yahoo Finance, IOL, BCRA, ArgentinaDatos y CriptoYa. Si opera con
+          InvertirOnline, inicie sesión desde el botón «IOL» para analizar{" "}
+          <em className="text-foreground/90">su</em> portafolio real.
+        </p>
+        <div aria-hidden className="electric-line mt-8 max-w-2xl" />
+      </div>
+
+      <div className="mx-auto flex w-full max-w-[1600px] gap-6 px-5 pb-16 sm:px-8 lg:px-12">
         {/* Sidebar desktop */}
-        <aside className="hidden w-56 shrink-0 lg:block">
-          <nav className="sticky top-20 space-y-1">
+        <aside className="hidden w-60 shrink-0 lg:block">
+          <nav className="sticky top-24 space-y-1.5">
             {TABS.map((t) => {
-              const Icon = t.icon;
               const esActivo = t.id === activo;
               return (
                 <Link
@@ -117,16 +221,16 @@ function HerramientasContenido() {
                   to="/herramientas"
                   search={{ tab: t.id }}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                    "flex items-center gap-3 rounded-xl border px-4 py-3 text-[13px] transition-colors",
                     esActivo
-                      ? "bg-primary/10 font-medium text-primary"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                      ? "border-primary/40 bg-primary/[0.07] font-semibold text-primary"
+                      : "border-border/70 bg-secondary/20 text-muted-foreground hover:border-primary/40 hover:text-foreground",
                   )}
                 >
-                  <Icon className="h-4 w-4 shrink-0" />
+                  <t.icon className="h-4 w-4 flex-none" />
                   <span className="flex-1">{t.label}</span>
                   {t.tipo === "proximamente" && (
-                    <span className="rounded-full border border-border px-1.5 py-0.5 font-mono text-[9px] tracking-wide text-muted-foreground uppercase">
+                    <span className="rounded-full bg-gold/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-gold ring-1 ring-gold/30">
                       pronto
                     </span>
                   )}
@@ -135,32 +239,6 @@ function HerramientasContenido() {
             })}
           </nav>
         </aside>
-
-        {/* Tabs mobile */}
-        {menuAbierto && (
-          <nav className="fixed inset-x-4 top-16 z-50 space-y-1 rounded-xl border border-border bg-card p-2 shadow-xl lg:hidden">
-            {TABS.map((t) => {
-              const Icon = t.icon;
-              return (
-                <Link
-                  key={t.id}
-                  to="/herramientas"
-                  search={{ tab: t.id }}
-                  onClick={() => setMenuAbierto(false)}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm",
-                    t.id === activo
-                      ? "bg-primary/10 font-medium text-primary"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {t.label}
-                </Link>
-              );
-            })}
-          </nav>
-        )}
 
         {/* Contenido */}
         <main className="min-w-0 flex-1">
@@ -198,6 +276,11 @@ function HerramientasContenido() {
               descripcion="Calculadoras de jubilación, hipoteca, inversiones, objetivos, presupuesto, pasivos y patrimonio neto."
             />
           )}
+
+          <p className="mt-8 text-[11px] leading-snug text-muted-foreground">
+            Herramientas informativas con datos de terceros. No constituyen recomendación de
+            inversión.
+          </p>
         </main>
       </div>
     </div>

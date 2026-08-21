@@ -22,6 +22,11 @@ import {
 } from "@/lib/clarity-analysis";
 import { analizarSemaforo } from "@/lib/semaforo.server";
 import { consultarNoticias } from "@/lib/noticias.server";
+import { analisisTecnico } from "@/lib/herramientas/analisis-tecnico.functions";
+import {
+  analizarPortafolioClarity,
+  analizarPortafolioClarityInput,
+} from "@/lib/herramientas/analisis-portafolio-clarity.functions";
 
 const tickerInput = z.object({ ticker: z.string().min(1).max(20) });
 const periodoInput = z.object({ periodo: z.string().max(10).optional().default("5d") });
@@ -30,6 +35,56 @@ const sectorInput = z.object({ sector: z.string().min(2).max(60) });
 export const contextoMacroFn = createServerFn({ method: "POST" }).handler(async () => {
   return claContextoMacro();
 });
+
+/** Análisis técnico completo (MA/EMA/RSI/MACD/S-R/52w + interpretación). */
+export const analisisTecnicoFn = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => tickerInput.parse(input))
+  .handler(async ({ data }) => {
+    return analisisTecnico(data.ticker.trim());
+  });
+
+/**
+ * Análisis de portafolio estilo clarity: clasificación por categoría macro,
+ * capital ARS/USD y distribución. Si no vienen items y hay sesión IOL activa,
+ * usa las posiciones reales del portafolio IOL del usuario.
+ */
+export const analizarPortafolioClarityFn = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        items: z
+          .array(z.object({ ticker: z.string(), cantidad: z.number() }))
+          .max(60)
+          .optional(),
+        period: z.number().min(30).max(1825).optional().default(365),
+        sessionId: z.string().max(80).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    let items = data.items;
+    if ((!items || !items.length) && data.sessionId) {
+      const { iolSesionActiva, iolPortafolio } = await import("@/lib/iol.server");
+      if (!iolSesionActiva(data.sessionId)) {
+        throw new Error(
+          "Sin posiciones y sin sesión IOL activa. Pasá items [{ticker,cantidad}] o iniciá sesión con iol_login.",
+        );
+      }
+      const [ar, us] = await Promise.all([
+        iolPortafolio(data.sessionId, "argentina"),
+        iolPortafolio(data.sessionId, "estados_Unidos"),
+      ]);
+      items = [...(ar.data?.activos ?? []), ...(us.data?.activos ?? [])]
+        .filter((a) => (a.cantidad ?? 0) > 0 && a.titulo?.simbolo)
+        .map((a) => ({ ticker: a.titulo!.simbolo as string, cantidad: a.cantidad as number }));
+      if (!items.length) throw new Error("El portafolio IOL no tiene posiciones abiertas.");
+    }
+    if (!items?.length) {
+      throw new Error("Faltan items [{ticker,cantidad}] o una sesión IOL activa.");
+    }
+    const parsed = analizarPortafolioClarityInput.parse({ items, period: data.period });
+    return analizarPortafolioClarity(parsed.items, parsed.period);
+  });
 
 export const cicloEconomicoFn = createServerFn({ method: "POST" }).handler(async () => {
   return claCiclo();

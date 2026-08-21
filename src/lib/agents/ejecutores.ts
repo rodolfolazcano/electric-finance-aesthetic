@@ -2673,6 +2673,60 @@ export async function ejecutarMatrizBenchmarks(): Promise<ResTool> {
 
 // --- iol_asesor (cuentas asesoradas) ---------------------------------------
 
+import { analisisTecnico } from "@/lib/herramientas/analisis-tecnico.functions";
+
+/** Análisis técnico completo (portado de clarity/insight-hub): MA/EMA/RSI/MACD/S-R/52w. */
+export async function ejecutarAnalisisTecnico(argsRaw: string): Promise<ResultadoToolConEventos> {
+  const args = (() => {
+    try {
+      return (JSON.parse(argsRaw) ?? {}) as Record<string, unknown>;
+    } catch {
+      return {} as Record<string, unknown>;
+    }
+  })();
+  const simbolo = String(args["simbolo"] ?? "").trim();
+  if (!simbolo)
+    return {
+      texto: "SIN RESULTADOS: falta el símbolo. Reinvocá con simbolo (ej. AAPL, GGAL.BA).",
+      fuentes: [],
+      ok: false,
+    };
+  const r = await analisisTecnico(simbolo);
+  if (!r)
+    return {
+      texto: `SIN RESULTADOS: sin datos suficientes de ${simbolo} en Yahoo Finance.`,
+      fuentes: [],
+      ok: false,
+    };
+  const nf = (v: number | null | undefined, d = 2) =>
+    typeof v === "number" && isFinite(v) ? v.toFixed(d) : "s/d";
+  return {
+    texto: [
+      `Análisis técnico de ${r.nombre} (${r.simbolo}) — moneda ${r.moneda}:`,
+      `- Precio: ${nf(r.precio)} · Variación diaria: ${nf(r.variacion)}%`,
+      `- MA20 ${nf(r.ma20)} · MA50 ${nf(r.ma50)} · MA200 ${nf(r.ma200)} · EMA9 ${nf(r.ema9)}`,
+      `- RSI14: ${nf(r.rsi14, 1)} · MACD ${r.macd ? `${nf(r.macd.macd, 3)} / señal ${nf(r.macd.signal, 3)} / hist ${nf(r.macd.hist, 3)}` : "s/d"}`,
+      `- Soporte ${nf(r.soporte)} · Resistencia ${nf(r.resistencia)}`,
+      `- Volatilidad anual: ${nf(r.volatilidadAnual)}% · Rango 52s: ${nf(r.minimo52)} – ${nf(r.maximo52)}`,
+      `- Interpretación: ${r.interpretacion}`,
+      `- Serie: ${r.serie.length} cierres (último ${r.serie[r.serie.length - 1]?.fecha ?? "s/d"}).`,
+    ].join("\n"),
+    fuentes: [],
+    ok: true,
+    eventos: [
+      {
+        t: "chart",
+        v: {
+          tipo: "linea",
+          titulo: `${r.simbolo} · técnico`,
+          unidad: r.moneda,
+          serie: r.serie.map((p) => ({ f: p.fecha, v: p.cierre })),
+        },
+      },
+    ],
+  };
+}
+
 export async function ejecutarIolAsesor(
   argsRaw: string,
   sessionId: string,

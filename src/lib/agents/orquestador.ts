@@ -55,6 +55,7 @@ import {
   ejecutarIolMercado,
   ejecutarIolOperar,
   ejecutarIolAsesor,
+  ejecutarAnalisisTecnico,
   ejecutarDatosFinancieros,
   ejecutarGraficoChat,
   ejecutarGenerarInforme,
@@ -543,6 +544,34 @@ export async function ejecutarTool(
       return await ejecutarIolOperar(argsRaw, sessionId);
     case "iol_asesor":
       return await ejecutarIolAsesor(argsRaw, sessionId);
+    case "analisis_tecnico":
+    case "analizar_portafolio_clarity": {
+      const mod = await import("@/lib/herramientas/clara.functions");
+      const fn =
+        name === "analisis_tecnico" ? mod.analisisTecnicoFn : mod.analizarPortafolioClarityFn;
+      try {
+        const data =
+          name === "analisis_tecnico"
+            ? await (fn as typeof mod.analisisTecnicoFn)({ data: { ticker: simbolo || query } })
+            : await (fn as typeof mod.analizarPortafolioClarityFn)({
+                data: {
+                  ...(argsRaw.trim() ? (JSON.parse(argsRaw) as Record<string, unknown>) : {}),
+                  sessionId,
+                },
+              });
+        return {
+          texto: `Datos reales de ${name}:\n\n${JSON.stringify(data, null, 1).slice(0, 6000)}`,
+          fuentes: [],
+          ok: true,
+        };
+      } catch (e) {
+        return {
+          texto: `SIN RESULTADOS: ${name} falló (${e instanceof Error ? e.message : "error"}).`,
+          fuentes: [],
+          ok: false,
+        };
+      }
+    }
     case "datos_financieros":
       return await ejecutarDatosFinancieros(argsRaw);
     case "grafico_chat":
@@ -743,6 +772,23 @@ function extraerTickerPregunta(pregunta: string): string | null {
     "ESO",
     "ESTA",
     "EMPREZA",
+    "HACEME",
+    "ANALISIS",
+    "ANALIZA",
+    "ANALIZAR",
+    "TECNICO",
+    "TECNICA",
+    "PASAME",
+    "DAME",
+    "MOSTRAME",
+    "GRAFICO",
+    "FICHA",
+    "DECISION",
+    "COMPLETO",
+    "PORTAFOLIO",
+    "CARTERA",
+    "DATOS",
+    "INDICADORES",
   ]);
   const limpio = normalizarSinAcentos(pregunta).replace(/[¿?¡!.,;:()]/g, " ");
   const tokens = limpio.match(/\b([A-Z][A-Z0-9]{0,7}(?:\.[A-Z]{1,4})?)\b/g) ?? [];
@@ -1152,34 +1198,61 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
     }
   }
 
-  // ---- Red de seguridad 4: semáforo pedido pero no calculado ----
+  // ---- Red de seguridad 4: análisis técnico pedido pero no calculado ----
   if (esPreguntaSemaforo(pregunta) && !semaforoCalculado) {
     const simboloSemaforo = extraerTickerPregunta(pregunta);
     if (simboloSemaforo) {
       semaforoCalculado = true;
-      const callId = `semaforo_${Date.now()}`;
-      const argsSem = JSON.stringify({ simbolo: simboloSemaforo });
-      messages.push({
-        role: "assistant",
-        content: "",
-        tool_calls: [{ id: callId, function: { name: "analizar_semaforo", arguments: argsSem } }],
-      });
-      enviar({ t: "status", v: "semaforo", q: simboloSemaforo });
-      console.log(`[TOOL] analizar_semaforo (red-seguridad) ${argsSem.slice(0, 160)}`); // TEMP PASO4
-      const resultado = await ejecutarSemaforo(argsSem);
-      if (!resultado.ok) {
-        semaforoFallido = true;
-        semaforoFallidoDetalle = resultado.textoUsuario;
+      // Preguntas puramente técnicas → analisis_tecnico (sin crumb, más robusto).
+      const esSoloTecnico =
+        /tecnico|rsi|macd|media|m[óo]vil|ema|soporte|resistencia/i.test(pregunta) &&
+        !/sem[aá]foro|comprar|vender|se[ñn]al|conviene|ficha/i.test(pregunta);
+      if (esSoloTecnico) {
+        const callId = `tecnico_${Date.now()}`;
+        const argsTec = JSON.stringify({ simbolo: simboloSemaforo });
+        messages.push({
+          role: "assistant",
+          content: "",
+          tool_calls: [{ id: callId, function: { name: "analisis_tecnico", arguments: argsTec } }],
+        });
+        enviar({ t: "status", v: "grafico", q: simboloSemaforo });
+        const tec = await ejecutarAnalisisTecnico(argsTec);
+        enviarEventos(enviar, tec.eventos);
+        messages.push({
+          role: "tool",
+          tool_call_id: callId,
+          name: "analisis_tecnico",
+          content: tec.ok
+            ? `Análisis técnico real de ${simboloSemaforo} (Yahoo Finance). Presentá los indicadores tal cual y aclará que es educativo, no recomendación:\n\n${tec.texto}`
+            : `No se pudo completar el análisis técnico de ${simboloSemaforo}: ${tec.texto}`,
+        });
+        if (!tec.ok) semaforoFallido = true;
+        enviar({ t: "status", v: "searching" });
+      } else {
+        const callId = `semaforo_${Date.now()}`;
+        const argsSem = JSON.stringify({ simbolo: simboloSemaforo });
+        messages.push({
+          role: "assistant",
+          content: "",
+          tool_calls: [{ id: callId, function: { name: "analizar_semaforo", arguments: argsSem } }],
+        });
+        enviar({ t: "status", v: "semaforo", q: simboloSemaforo });
+        console.log(`[TOOL] analizar_semaforo (red-seguridad) ${argsSem.slice(0, 160)}`); // TEMP PASO4
+        const resultado = await ejecutarSemaforo(argsSem);
+        if (!resultado.ok) {
+          semaforoFallido = true;
+          semaforoFallidoDetalle = resultado.textoUsuario;
+        }
+        fuentes.push(...resultado.fuentes);
+        if (resultado.fuentes.length) enviar({ t: "sources", v: resultado.fuentes });
+        messages.push({
+          role: "tool",
+          tool_call_id: callId,
+          name: "analizar_semaforo",
+          content: `Semáforo técnico + fundamental con datos reales de Yahoo Finance (RSI, MACD, SMA, soportes/resistencias, anomalía, métricas fundamentales) y noticias de validación (fuentes externas). Presentá los indicadores y métricas tal cual figuran, explicá la coherencia entre la señal técnica y la fundamental, y aclará que es un análisis educativo y no una recomendación de inversión. No inventes cifras:\n\n${resultado.texto}`,
+        });
+        enviar({ t: "status", v: "searching" });
       }
-      fuentes.push(...resultado.fuentes);
-      if (resultado.fuentes.length) enviar({ t: "sources", v: resultado.fuentes });
-      messages.push({
-        role: "tool",
-        tool_call_id: callId,
-        name: "analizar_semaforo",
-        content: `Semáforo técnico + fundamental con datos reales de Yahoo Finance (RSI, MACD, SMA, soportes/resistencias, anomalía, métricas fundamentales) y noticias de validación (fuentes externas). Presentá los indicadores y métricas tal cual figuran, explicá la coherencia entre la señal técnica y la fundamental, y aclará que es un análisis educativo y no una recomendación de inversión. No inventes cifras:\n\n${resultado.texto}`,
-      });
-      enviar({ t: "status", v: "searching" });
     }
   }
 
