@@ -1,0 +1,203 @@
+// Social Media Content Generator for Investor Results
+// Genera copies para Twitter, LinkedIn, Instagram y WhatsApp
+// Validados con TAO + PAIDF + Physical AI patterns
+
+import { TaoInput, TaoScore, evaluateTao, taoRecommendations } from "./tao-validator";
+import { PaidfInput, PaidfScore, evaluatePaidf, paidfRecommendations } from "./paidf-validator";
+import {
+  PhysicalAiConfig,
+  FormattedPost,
+  detectPhysicalAiQuality,
+  formatForPlatform,
+  applyTone,
+} from "./physical-ai-formatter";
+
+export interface InvestorContentInput {
+  strategyName: string;
+  annualReturn: number;
+  annualVol: number;
+  sharpe: number;
+  pValue: number;
+  impliedP?: number;
+  impliedPRegression?: number;
+  topAllocations: { ticker: string; weight: number }[];
+  metrics?: Record<string, number>;
+  anomalyDetected?: boolean;
+}
+
+export interface GeneratedContent {
+  twitter: FormattedPost & { taoScore: TaoScore; paidfScore: PaidfScore; physicalAiScore: number };
+  linkedin: FormattedPost & { taoScore: TaoScore; paidfScore: PaidfScore; physicalAiScore: number };
+  instagram: FormattedPost & {
+    taoScore: TaoScore;
+    paidfScore: PaidfScore;
+    physicalAiScore: number;
+  };
+  whatsapp: FormattedPost & { taoScore: TaoScore; paidfScore: PaidfScore; physicalAiScore: number };
+}
+
+function getEmojiFlag(): string {
+  const flags = ["📈", "📊", "🎯", "💰", "🚀", "💎", "🔥", "⚡", "📉", "🛡️"];
+  return flags[Math.floor(Math.random() * flags.length)];
+}
+
+// TAO helpers: build input from content
+function buildTaoInput(text: string, hasNumbers: boolean): TaoInput {
+  return {
+    hasDataSources: true,
+    hasNumbers,
+    hasClearHook: text.length > 20 && (text.includes("?") || text.includes("!") || hasNumbers),
+    hasOpportunity: text.toLowerCase().includes("oportunidad") || hasNumbers,
+    hasVerifiableClaim: hasNumbers,
+    hasCallToAction:
+      text.toLowerCase().includes("dale") ||
+      text.toLowerCase().includes("chequea") ||
+      text.toLowerCase().includes("mira") ||
+      text.toLowerCase().includes("contacto"),
+    textLength: text.length,
+  };
+}
+
+function buildPaidfInput(text: string, hasNumbers: boolean): PaidfInput {
+  const lower = text.toLowerCase();
+  return {
+    hasProblem:
+      lower.includes("problema") ||
+      lower.includes("pierde") ||
+      lower.includes("pérdida") ||
+      lower.includes("volatilidad"),
+    hasUrgency:
+      lower.includes("última") ||
+      lower.includes("ahora") ||
+      lower.includes("hoy") ||
+      lower.includes("ventana"),
+    hasQuantifiedImpact: hasNumbers,
+    hasSolution:
+      lower.includes("portafolio") ||
+      lower.includes("estrategia") ||
+      lower.includes("optimiz") ||
+      lower.includes("inversión"),
+    hasFomoElement:
+      lower.includes("ya") || lower.includes("otros") || lower.includes("inversores") || hasNumbers,
+    hasTimeConstraint:
+      lower.includes("hoy") || lower.includes("esta semana") || lower.includes("último"),
+    hasSocialProof:
+      lower.includes("datos") ||
+      lower.includes("análisis") ||
+      lower.includes("backtest") ||
+      hasNumbers,
+    sentimentIsPositive:
+      lower.includes("ganancia") ||
+      lower.includes("creció") ||
+      lower.includes("oportunidad") ||
+      lower.includes("positivo"),
+  };
+}
+
+export function generateSocialContent(input: InvestorContentInput): GeneratedContent {
+  const returnPct = (input.annualReturn * 100).toFixed(1);
+  const volPct = (input.annualVol * 100).toFixed(1);
+  const sharpeStr = input.sharpe.toFixed(2);
+  const topStr = input.topAllocations
+    .slice(0, 3)
+    .map((a) => `${a.ticker} ${(a.weight * 100).toFixed(0)}%`)
+    .join(" • ");
+  const anomalyFlag = input.anomalyDetected ? "⚠️" : "✅";
+  const pLabel = input.impliedP ? `p=${input.impliedP.toFixed(2)}` : `p=${input.pValue}`;
+
+  // --- Twitter (280 chars, agresivo, directo) ---
+  const twitterBody = applyTone(
+    `${getEmojiFlag()} ${input.strategyName} ${anomalyFlag}\n` +
+      `Ret ${returnPct}% | Vol ${volPct}%\n` +
+      `Sharpe ${sharpeStr} | ${pLabel}\n` +
+      `Top: ${topStr}\n` +
+      (input.impliedPRegression ? `p_reg=${input.impliedPRegression.toFixed(2)}\n` : "") +
+      `👇 Dale?`,
+    "balanceado",
+  );
+
+  // --- LinkedIn (profesional, detallado) ---
+  const linkedinBody = applyTone(
+    `📊 **${input.strategyName} — Resumen de Inversión**\n\n` +
+      `🔹 Retorno Anual: ${returnPct}%\n` +
+      `🔹 Volatilidad: ${volPct}%\n` +
+      `🔹 Sharpe: ${sharpeStr}\n` +
+      `🔹 Medida de Riesgo: ${pLabel}\n` +
+      (input.impliedPRegression ? `🔹 p Regresión: ${input.impliedPRegression.toFixed(2)}\n` : "") +
+      `🔹 Top Holdings: ${topStr}\n\n` +
+      `🧠 **Análisis Labadie**: La p-variación mide el riesgo real del portafolio. ` +
+      `Con p=${input.pValue}, asumimos que los retornos ${input.pValue > 2 ? "son mean-reverting" : input.pValue < 2 ? "tienen tendencia" : "siguen un random walk"}.\n\n` +
+      (input.anomalyDetected
+        ? `⚠️ Se detectaron anomalías en los datos — se recomienda revisar el motor de cálculo.\n\n`
+        : `✅ Datos validados por el motor de detección de anomalías.\n\n`) +
+      `💡 ¿Querés optimizar tu portafolio con esta estrategia? Contactanos.`,
+    "conservador",
+  );
+
+  // --- Instagram (visual, bullet points, hashtags) ---
+  const instagramBody = applyTone(
+    `${getEmojiFlag()} **${input.strategyName}**\n\n` +
+      `📈 Retorno: ${returnPct}%\n` +
+      `📉 Riesgo: ${volPct}%\n` +
+      `⭐ Sharpe: ${sharpeStr}\n` +
+      `🎯 p-variación: ${pLabel}\n\n` +
+      `Portafolio:\n${input.topAllocations
+        .slice(0, 4)
+        .map((a) => `▫️ ${a.ticker} ${(a.weight * 100).toFixed(0)}%`)
+        .join("\n")}\n\n` +
+      `${input.anomalyDetected ? "⚠️ Datos con anomalías detectadas" : "✅ Datos validados"}\n\n` +
+      `#Inversiones #Finanzas #Portafolio #${input.strategyName.replace(/\s/g, "")} ` +
+      `#Análisis #CoronarInversiones #Labadie #pVariation`,
+    "balanceado",
+  );
+
+  // --- WhatsApp (directo, personal, conversacional) ---
+  const whatsappBody = applyTone(
+    `📊 *${input.strategyName}*\n\n` +
+      `${getEmojiFlag()} *Rendimiento:* ${returnPct}% anual\n` +
+      `${getEmojiFlag()} *Riesgo:* ${volPct}%\n` +
+      `⭐ *Sharpe:* ${sharpeStr}\n` +
+      `🎯 *p:* ${input.pValue}\n\n` +
+      `*Cartera:* ${topStr}\n\n` +
+      (input.anomalyDetected
+        ? `⚠️ Revisá los datos, hay anomalías detectadas.\n`
+        : `✅ Todo ok con los datos.\n`) +
+      `🗓️ Generado por Coronar Inversiones + Labadie Analytics`,
+    "balanceado",
+  );
+
+  // Parsear y validar cada plataforma
+  const twitterPost = formatForPlatform(twitterBody, "twitter");
+  const linkedinPost = formatForPlatform(linkedinBody, "linkedin");
+  const instagramPost = formatForPlatform(instagramBody, "instagram");
+  const whatsappPost = formatForPlatform(whatsappBody, "whatsapp");
+
+  const hasNumbers = input.topAllocations.length > 0 && input.annualReturn !== 0;
+
+  return {
+    twitter: {
+      ...twitterPost,
+      taoScore: evaluateTao(buildTaoInput(twitterBody, hasNumbers)),
+      paidfScore: evaluatePaidf(buildPaidfInput(twitterBody, hasNumbers)),
+      physicalAiScore: detectPhysicalAiQuality(twitterBody).score,
+    },
+    linkedin: {
+      ...linkedinPost,
+      taoScore: evaluateTao(buildTaoInput(linkedinBody, hasNumbers)),
+      paidfScore: evaluatePaidf(buildPaidfInput(linkedinBody, hasNumbers)),
+      physicalAiScore: detectPhysicalAiQuality(linkedinBody).score,
+    },
+    instagram: {
+      ...instagramPost,
+      taoScore: evaluateTao(buildTaoInput(instagramBody, hasNumbers)),
+      paidfScore: evaluatePaidf(buildPaidfInput(instagramBody, hasNumbers)),
+      physicalAiScore: detectPhysicalAiQuality(instagramBody).score,
+    },
+    whatsapp: {
+      ...whatsappPost,
+      taoScore: evaluateTao(buildTaoInput(whatsappBody, hasNumbers)),
+      paidfScore: evaluatePaidf(buildPaidfInput(whatsappBody, hasNumbers)),
+      physicalAiScore: detectPhysicalAiQuality(whatsappBody).score,
+    },
+  };
+}

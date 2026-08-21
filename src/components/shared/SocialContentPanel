@@ -1,0 +1,141 @@
+import { useState, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { generateSocialContent, InvestorContentInput, GeneratedContent } from "@/lib/social/social-content-generator";
+import { AnomalyReport } from "@/lib/social/anomaly-detector";
+
+interface SocialContentPanelProps {
+  input: InvestorContentInput;
+  anomalyReport?: AnomalyReport;
+}
+
+function TaoBadge({ score, label }: { score: number; label: string }) {
+  const color = score >= 0.7 ? "bg-green-500" : score >= 0.4 ? "bg-yellow-500" : "bg-red-500";
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <Badge className={`${color} text-white text-[10px] px-1.5 py-0`}>
+            {label}:{(score * 100).toFixed(0)}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="text-xs">{label} score: {(score * 100).toFixed(0)}/100</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+export function SocialContentPanel({ input, anomalyReport }: SocialContentPanelProps) {
+  const [generated, setGenerated] = useState<GeneratedContent | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const handleGenerate = useCallback(() => {
+    setGenerated(generateSocialContent(input));
+  }, [input]);
+
+  const handleCopy = useCallback((text: string, platform: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(platform);
+    setTimeout(() => setCopied(null), 2000);
+  }, []);
+
+  return (
+    <Card className="w-full">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm flex items-center justify-between">
+          <span>📱 Contenido para Redes Sociales</span>
+          <div className="flex gap-1 items-center">
+            {anomalyReport?.hasAnomaly && (
+              <Badge variant="destructive" className="text-[10px]">
+                ⚠️ {anomalyReport.flags.length} anomalía(s)
+              </Badge>
+            )}
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={handleGenerate}>
+              {generated ? "Regenerar" : "Generar contenido"}
+            </Button>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {!generated ? (
+          <p className="text-xs text-muted-foreground text-center py-4">
+            Hacé clic en "Generar contenido" para crear posts validados con TAO + PAIDF + Physical AI
+          </p>
+        ) : (
+          <Tabs defaultValue="twitter" className="w-full">
+            <TabsList className="grid grid-cols-4 h-8">
+              <TabsTrigger value="twitter" className="text-xs">🐦 Twitter</TabsTrigger>
+              <TabsTrigger value="linkedin" className="text-xs">💼 LinkedIn</TabsTrigger>
+              <TabsTrigger value="instagram" className="text-xs">📸 Instagram</TabsTrigger>
+              <TabsTrigger value="whatsapp" className="text-xs">💬 WhatsApp</TabsTrigger>
+            </TabsList>
+
+            {(["twitter", "linkedin", "instagram", "whatsapp"] as const).map((platform) => {
+              const post = generated[platform];
+              const taoColor = post.taoScore.overall >= 0.7 ? "text-green-600" : post.taoScore.overall >= 0.4 ? "text-yellow-600" : "text-red-600";
+              const paidfColor = post.paidfScore.overall >= 0.7 ? "text-green-600" : post.paidfScore.overall >= 0.4 ? "text-yellow-600" : "text-red-600";
+              const aiColor = post.physicalAiScore >= 0.7 ? "text-green-600" : post.physicalAiScore >= 0.4 ? "text-yellow-600" : "text-red-600";
+
+              return (
+                <TabsContent key={platform} value={platform} className="mt-2">
+                  <div className="bg-muted/30 rounded-md p-3 text-sm whitespace-pre-wrap font-mono text-xs leading-relaxed">
+                    {post.body}
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex gap-1 flex-wrap">
+                      <TaoBadge score={post.taoScore.overall} label="TAO" />
+                      <TaoBadge score={post.paidfScore.overall} label="PAIDF" />
+                      <TaoBadge score={post.physicalAiScore} label="AI-Físico" />
+                    </div>
+                    <div className="flex gap-1 items-center">
+                      <span className="text-[10px] text-muted-foreground">{post.charCount} chars</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 text-xs"
+                        onClick={() => handleCopy(post.body, platform)}
+                      >
+                        {copied === platform ? "✅ Copiado" : "📋 Copiar"}
+                      </Button>
+                    </div>
+                  </div>
+                  {/* TAO/PAIDF breakdown */}
+                  <details className="mt-2">
+                    <summary className="text-[10px] text-muted-foreground cursor-pointer hover:text-foreground">
+                      Ver validación completa
+                    </summary>
+                    <div className="mt-1 grid grid-cols-3 gap-2 text-[10px]">
+                      <div>
+                        <p className={`font-semibold ${taoColor}`}>TAO</p>
+                        <p>T:{(post.taoScore.trust * 100).toFixed(0)}</p>
+                        <p>A:{(post.taoScore.attention * 100).toFixed(0)}</p>
+                        <p>O:{(post.taoScore.opportunity * 100).toFixed(0)}</p>
+                      </div>
+                      <div>
+                        <p className={`font-semibold ${paidfColor}`}>PAIDF</p>
+                        <p>P:{(post.paidfScore.problem * 100).toFixed(0)}</p>
+                        <p>A:{(post.paidfScore.agitation * 100).toFixed(0)}</p>
+                        <p>I:{(post.paidfScore.impact * 100).toFixed(0)}</p>
+                        <p>D:{(post.paidfScore.desire * 100).toFixed(0)}</p>
+                        <p>F:{(post.paidfScore.fear * 100).toFixed(0)}</p>
+                      </div>
+                      <div>
+                        <p className={`font-semibold ${aiColor}`}>Physical AI</p>
+                        <p>Score:{(post.physicalAiScore * 100).toFixed(0)}/100</p>
+                      </div>
+                    </div>
+                  </details>
+                </TabsContent>
+              );
+            })}
+          </Tabs>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { supabase } from "./supabase-stub";
+import { supabase } from "../supabase-stub";
 import type { FuenteAPI } from "./types";
 
 // ── In-memory fallback cache (siempre disponible, sin dependencias externas) ──

@@ -1,0 +1,297 @@
+import { linregress, pearsonR, mean, std, computeHurst, computePVariance } from "./math/stats";
+
+export interface BetaResult {
+  beta: number;
+  alpha: number;
+  r2: number;
+  pValue: number;
+  stdErr: number;
+  correlation: number;
+  observations: number;
+}
+
+export function computeBeta(posReturns: number[], benchReturns: number[]): BetaResult {
+  const n = Math.min(posReturns.length, benchReturns.length);
+  if (n < 5) {
+    return {
+      beta: 0,
+      alpha: 0,
+      r2: 0,
+      pValue: 1,
+      stdErr: Infinity,
+      correlation: 0,
+      observations: n,
+    };
+  }
+  const x = benchReturns.slice(0, n);
+  const y = posReturns.slice(0, n);
+  const reg = linregress(x, y);
+  const r = pearsonR(x, y);
+  return {
+    beta: reg.slope,
+    alpha: reg.intercept,
+    r2: reg.r2,
+    pValue: reg.pValue,
+    stdErr: reg.stdErr,
+    correlation: r,
+    observations: n,
+  };
+}
+
+// ─── Labadie §3.2: p-variance beta ───
+// beta_p = Cov_p(r_i, r_m) / Var_p(r_m)
+// donde Cov_p usa p-variance conjunta en vez de covarianza estándar
+export function computeBetaPVariance(
+  posReturns: number[],
+  benchReturns: number[],
+  p: number = 2,
+): { betaP: number; alphaP: number; pVarianceAsset: number; pVarianceBench: number } {
+  const n = Math.min(posReturns.length, benchReturns.length);
+  if (n < 5) return { betaP: 0, alphaP: 0, pVarianceAsset: 0, pVarianceBench: 0 };
+
+  const x = benchReturns.slice(0, n);
+  const y = posReturns.slice(0, n);
+
+  // p-variance del benchmark y del activo
+  const varPx = computePVariance(x, p);
+  const varPy = computePVariance(y, p);
+
+  // p-covarianza: E[sign(x-μx) × |x-μx|^(p-1) × (y-μy)]  (forma simplificada)
+  const mx = mean(x);
+  const my = mean(y);
+  let covP = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = x[i] - mx;
+    const dy = y[i] - my;
+    const signX = dx >= 0 ? 1 : -1;
+    covP += signX * Math.pow(Math.abs(dx), p - 1) * dy;
+  }
+  covP /= n;
+
+  // beta_p = Cov_p / Var_p
+  const betaP = varPx > 0 ? covP / varPx : 0;
+  const alphaP = my - betaP * mx;
+
+  return { betaP, alphaP, pVarianceAsset: varPy, pVarianceBench: varPx };
+}
+
+export function computeLogReturns(prices: number[]): number[] {
+  const out: number[] = [];
+  for (let i = 1; i < prices.length; i++) {
+    if (prices[i - 1] > 0 && prices[i] > 0) {
+      out.push(Math.log(prices[i] / prices[i - 1]));
+    }
+  }
+  return out;
+}
+
+export function alignDates(
+  series: Record<string, { date: string; close: number }[]>,
+): Record<string, number[]> {
+  const tickers = Object.keys(series);
+  if (tickers.length === 0) return {};
+
+  const dateSets = tickers.map((t) => new Set(series[t].map((r) => r.date)));
+  const common = series[tickers[0]]
+    .map((r) => r.date)
+    .filter((d) => dateSets.every((s) => s.has(d)));
+
+  const result: Record<string, number[]> = {};
+  for (const t of tickers) {
+    const map: Record<string, number> = {};
+    for (const r of series[t]) map[r.date] = r.close;
+    result[t] = common.map((d) => map[d]);
+  }
+  return result;
+}
+
+export function dailyReturns(prices: number[]): number[] {
+  const out: number[] = [];
+  for (let i = 1; i < prices.length; i++) {
+    if (prices[i - 1] > 0) {
+      out.push((prices[i] - prices[i - 1]) / prices[i - 1]);
+    }
+  }
+  return out;
+}
+
+/**
+ * Proyección al simplex permitiendo long y short.
+ * A diferencia de la versión anterior (solo shorts), esta función preserva
+ * el signo de cada peso: positivo = largo (compra), negativo = corto (venta).
+ * Si la exposición bruta supera el budget, escala proporcionalmente.
+ */
+export function hedgeProjectSimplex(v: number[], budget: number): number[] {
+  const totalAbs = v.reduce((s, x) => s + Math.abs(x), 0);
+  if (totalAbs > budget && totalAbs > 1e-12) {
+    const scale = budget / totalAbs;
+    return v.map((x) => x * scale);
+  }
+  return [...v];
+}
+
+export function hedgeGradientDescent(
+  hedgeCandidates: Array<{ beta: number }>,
+  positionDeltaUSD: number,
+  positionBetaUSD: number,
+  availableCash: number,
+  lambda: number,
+  maxIter = 1500,
+): number[] {
+  const n = hedgeCandidates.length;
+  if (n === 0) return [];
+
+  let w = new Array(n).fill(0);
+  let lr = 0.05;
+  const decay = lr / maxIter;
+
+  for (let iter = 0; iter < maxIter; iter++) {
+    const sumW = w.reduce((s, v) => s + v, 0);
+    const sumBetaW = w.reduce((s, v, i) => s + v * hedgeCandidates[i].beta, 0);
+
+    const grad = w.map((_, i) => {
+      const deltaTerm = 2 * (sumW + positionDeltaUSD);
+      const betaTerm = 2 * (sumBetaW + positionBetaUSD) * hedgeCandidates[i].beta;
+      const regTerm = 2 * lambda * w[i];
+      return deltaTerm + betaTerm + regTerm;
+    });
+
+    for (let i = 0; i < n; i++) {
+      w[i] -= lr * grad[i];
+    }
+
+    w = hedgeProjectSimplex(w, availableCash);
+    lr -= decay;
+  }
+
+  return w;
+}
+
+/**
+ * Modo 2 — Neutralización + alfa vs el bestFactor de la posición.
+ *
+ * Mismo objetivo que hedgeGradientDescent() pero con un término adicional:
+ *   minimizar ||Σw + positionDelta||² + ||Σw×β + positionBeta||² + λ||w||² − γ·Σ(w_i × alpha_i)
+ *
+ * donde alpha_i es el intercepto CAPM vs el bestFactor de la posición.
+ * γ controla cuánto peso darle al alfa (default 0 = comportamiento idéntico a Modo 1).
+ */
+export function hedgeGradientDescentWithAlpha(
+  hedgeCandidates: Array<{ beta: number; alpha: number }>,
+  positionDeltaUSD: number,
+  positionBetaUSD: number,
+  availableCash: number,
+  lambda: number,
+  gamma: number,
+  maxIter = 1500,
+): number[] {
+  const n = hedgeCandidates.length;
+  if (n === 0) return [];
+
+  let w = new Array(n).fill(0);
+  let lr = 0.05;
+  const decay = lr / maxIter;
+
+  for (let iter = 0; iter < maxIter; iter++) {
+    const sumW = w.reduce((s, v) => s + v, 0);
+    const sumBetaW = w.reduce((s, v, i) => s + v * hedgeCandidates[i].beta, 0);
+
+    const grad = w.map((_, i) => {
+      const deltaTerm = 2 * (sumW + positionDeltaUSD);
+      const betaTerm = 2 * (sumBetaW + positionBetaUSD) * hedgeCandidates[i].beta;
+      const regTerm = 2 * lambda * w[i];
+      const alphaTerm = -gamma * hedgeCandidates[i].alpha; // −γ·α_i
+      return deltaTerm + betaTerm + regTerm + alphaTerm;
+    });
+
+    for (let i = 0; i < n; i++) {
+      w[i] -= lr * grad[i];
+    }
+
+    w = hedgeProjectSimplex(w, availableCash);
+    lr -= decay;
+  }
+
+  return w;
+}
+
+export function computePortfolioBeta(weights: number[], betas: number[]): number {
+  let total = 0;
+  let wSum = 0;
+  for (let i = 0; i < weights.length; i++) {
+    total += weights[i] * betas[i];
+    wSum += Math.abs(weights[i]);
+  }
+  return wSum > 0 ? total / wSum : 0;
+}
+
+export function computeImplicitCCL(precioCedearARS: number, precioADRUSD: number, ratio: number): number {
+  if (precioADRUSD <= 0 || ratio <= 0) return 0;
+  return precioCedearARS / (precioADRUSD / ratio);
+}
+
+export function computeLeverageBruto(hedgeAssets: { montoUSD: number }[], availableCash: number): number {
+  if (availableCash <= 0) return 0;
+  const totalExposure = hedgeAssets.reduce((s, a) => s + Math.abs(a.montoUSD), 0);
+  return totalExposure / availableCash;
+}
+
+export function computeLeverageNeto(
+  hedgeAssets: { montoUSD: number }[],
+  availableCash: number,
+  costosTransaccion: number,
+): number {
+  if (availableCash <= 0) return 0;
+  const totalExposure = hedgeAssets.reduce((s, a) => s + Math.abs(a.montoUSD), 0);
+  const neto = totalExposure - costosTransaccion;
+  return neto / availableCash;
+}
+
+export function computeMinimumViableCash(
+  hedgeAssets: { ticker: string; montoUSD: number; cantidadOperar?: number; tipo: string }[],
+  precioPorUnidad?: Record<string, number>,
+): number {
+  let total = 0;
+  for (const a of hedgeAssets) {
+    const cant = a.cantidadOperar ?? 0;
+    if (cant === 0) {
+      total += a.montoUSD;
+    } else {
+      const precioUnitario = precioPorUnidad?.[a.ticker] ?? (cant > 0 ? a.montoUSD / cant : a.montoUSD);
+      total += precioUnitario;
+    }
+  }
+  return total;
+}
+
+export function classifyHedgeReliability(r2: number): "alta" | "media" | "baja" {
+  if (r2 > 0.7) return "alta";
+  if (r2 >= 0.5) return "media";
+  return "baja";
+}
+
+export function consolidateHedgeOrders(
+  results: { ticker: string; montoUSD: number; cantidadOperar?: number; tipo: string; mercadoEjecucion?: string; noEjecutable?: boolean; posicionesQueLoUsan: string }[],
+): { ticker: string; montoUSDTotal: number; cantidadTotal: number; tipo: string; mercadoEjecucion: string; posicionesQueLoUsan: string[] }[] {
+  const map = new Map<string, { ticker: string; montoUSDTotal: number; cantidadTotal: number; tipo: string; mercadoEjecucion: string; posicionesQueLoUsan: string[] }>();
+  for (const a of results) {
+    const existing = map.get(a.ticker);
+    if (existing) {
+      existing.montoUSDTotal += a.montoUSD;
+      existing.cantidadTotal += a.cantidadOperar ?? 0;
+      if (!existing.posicionesQueLoUsan.includes(a.posicionesQueLoUsan)) {
+        existing.posicionesQueLoUsan.push(a.posicionesQueLoUsan);
+      }
+    } else {
+      map.set(a.ticker, {
+        ticker: a.ticker,
+        montoUSDTotal: a.montoUSD,
+        cantidadTotal: a.cantidadOperar ?? 0,
+        tipo: a.tipo,
+        mercadoEjecucion: a.mercadoEjecucion ?? "NYSE",
+        posicionesQueLoUsan: [a.posicionesQueLoUsan],
+      });
+    }
+  }
+  return [...map.values()];
+}

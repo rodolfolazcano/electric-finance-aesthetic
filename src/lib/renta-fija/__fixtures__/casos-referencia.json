@@ -1,0 +1,64 @@
+{
+  "GD30": {
+    "fechaSnapshot": "2026-06-27",
+    "precioIOL": 999.50,
+    "escalaPrecioIOL": null,
+    "publicado": {
+      "ytmMostradoEnHeader": 0.064,
+      "tir": 0.064,
+      "tna": 0.063,
+      "paridad": 0.909017,
+      "interesesAcumulados": 0.00258,
+      "valorTecnico": 0.72258,
+      "duration": 1.796323,
+      "macaulayDuration": 1.911317,
+      "convexity": 6.37062,
+      "durationNominalRate": 1.852928,
+      "currentYield": 0.0083
+    },
+    "datosConfirmados": {
+      "jurisdiccion": "NY",
+      "tipoCupon": "Fixed rate",
+      "moneda": "USD",
+      "frecuenciaPago": "Semiannual",
+      "residual": 72,
+      "convencionDias": "30/360",
+      "vencimiento": "2030-07-09",
+      "tipoAmortizacion": "Sinkable",
+      "montoEmision": 16090612053,
+      "cuponAnual": 0.75,
+      "valorParMostrado": 0.72
+    }
+  },
+  "BF40O": {
+    "fechaSnapshot": "2026-06-27",
+    "precioIOL": 1433.90,
+    "escalaPrecioIOL": null,
+    "publicado": {
+      "ytmMostradoEnHeader": 0.0486,
+      "tir": 0.0486,
+      "tna": 0.0481,
+      "paridad": 1.002413,
+      "interesesAcumulados": null,
+      "valorTecnico": null,
+      "duration": 1.245834,
+      "macaulayDuration": 1.306429,
+      "convexity": 2.766292,
+      "durationNominalRate": 1.276021,
+      "currentYield": 0.0499
+    },
+    "datosConfirmados": {
+      "jurisdiccion": "ARG",
+      "tipoCupon": "Fixed rate",
+      "moneda": "USD",
+      "frecuenciaPago": "Semiannual",
+      "residual": null,
+      "convencionDias": "REAL/365",
+      "vencimiento": "2027-08-27",
+      "tipoAmortizacion": "Bullet",
+      "montoEmision": 36503161,
+      "cuponAnual": null,
+      "valorParMostrado": null
+    }
+  }
+}

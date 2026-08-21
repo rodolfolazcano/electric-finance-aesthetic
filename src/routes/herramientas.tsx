@@ -28,6 +28,7 @@ import { EstimacionesTab } from "@/components/herramientas/EstimacionesTab";
 import { PlanificacionFinancieraTab } from "@/components/herramientas/PlanificacionFinancieraTab";
 import { PlaceholderTab } from "@/components/herramientas/PlaceholderTab";
 import { ArbitrajeP2PPanel } from "@/components/herramientas/ArbitrajeP2PPanel";
+import { OptionsPanel } from "@/components/options/OptionsPanel";
 import bgImage from "@/assets/bg-skyline.jpg";
 import retratoCintia from "@/assets/cintia-boos.png";
 
@@ -64,7 +65,7 @@ const TABS = [
   { id: "estimaciones", label: "Estimaciones", icon: Target, tipo: "core" },
   { id: "sectores", label: "Sectores", icon: Layers, tipo: "core" },
   { id: "planificacion", label: "Planificación", icon: Calculator, tipo: "core" },
-  { id: "opciones", label: "Opciones", icon: PieChart, tipo: "proximamente" },
+  { id: "opciones", label: "Opciones", icon: PieChart, tipo: "core" },
   { id: "renta-fija", label: "Renta Fija", icon: Landmark, tipo: "proximamente" },
   { id: "cripto", label: "Cripto", icon: Bitcoin, tipo: "proximamente" },
   { id: "arbitrador", label: "Arbitrador", icon: ArrowLeftRight, tipo: "proximamente" },
@@ -257,12 +258,7 @@ function HerramientasContenido() {
           {activo === "estimaciones" && <EstimacionesTab />}
           {activo === "sectores" && <SectoresTab />}
           {activo === "planificacion" && <PlanificacionFinancieraTab />}
-          {activo === "opciones" && (
-            <PlaceholderTab
-              titulo="Opciones"
-              descripcion="Cadena de opciones BCBA con pricing Black-Scholes, griegas y volatilidad implícita."
-            />
-          )}
+          {activo === "opciones" && <OptionsPanel />}
           {activo === "renta-fija" && (
             <PlaceholderTab
               titulo="Renta Fija"

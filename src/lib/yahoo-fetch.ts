@@ -2,8 +2,9 @@
  *  Expone `fetchYahooSummary` para el cliente; la lógica vive en `yahoo-http`. */
 
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import type { QuoteSummaryResult } from "./yahoo-types";
-import { fetchYahooQuoteSummaryJson } from "./yahoo-http";
+import { fetchYahooQuoteSummaryJson, fetchYahooChart } from "./yahoo-http";
 
 export const DEFAULT_MODULES = [
   "assetProfile",
@@ -76,4 +77,20 @@ export const fetchYahooSummary = createServerFn({ method: "GET" })
       console.error("fetchYahooSummary failed:", message);
       return { symbol: data.symbol, data: null, error: message };
     }
+  });
+
+/** Histórico de velas para el cliente (usado por el panel de opciones). */
+export const fetchYahooChartServer = createServerFn({ method: "GET" })
+  .validator((input: unknown) =>
+    z
+      .object({
+        symbol: z.string().min(1).max(24),
+        range: z.string().min(1).max(8).default("1y"),
+        interval: z.string().min(1).max(8).default("1d"),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const json = await fetchYahooChart(data.symbol, data.range, data.interval);
+    return { chart: json };
   });
