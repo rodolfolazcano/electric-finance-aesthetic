@@ -50,7 +50,10 @@ const SECTOR_ETF_MAP: Record<string, string> = {
 
 const SECTOR_MULTIPLOS_DEFAULT = { ev_ebitda: 12, pe: 18, pbv: 2, ev_revenue: 2.5 };
 
-const SECTOR_MULTIPLOS: Record<string, { ev_ebitda: number; pe: number; pbv: number; ev_revenue: number }> = {
+const SECTOR_MULTIPLOS: Record<
+  string,
+  { ev_ebitda: number; pe: number; pbv: number; ev_revenue: number }
+> = {
   technology: { ev_ebitda: 18, pe: 25, pbv: 6, ev_revenue: 4 },
   healthcare: { ev_ebitda: 16, pe: 22, pbv: 4, ev_revenue: 3 },
   "financial services": { ev_ebitda: 12, pe: 15, pbv: 1.5, ev_revenue: 3 },
@@ -65,17 +68,243 @@ const SECTOR_MULTIPLOS: Record<string, { ev_ebitda: number; pe: number; pbv: num
 };
 
 const SECTOR_TICKERS_FALLBACK: Record<string, string[]> = {
-  XLK: ["AAPL", "MSFT", "NVDA", "AVGO", "CRM", "ADBE", "CSCO", "ACN", "INTC", "AMD", "IBM", "NOW", "QCOM", "TXN", "AMAT", "ADI", "MU", "FIS", "ADP"],
-  XLV: ["UNH", "JNJ", "PFE", "ABBV", "MRK", "TMO", "ABT", "BMY", "DHR", "LLY", "AMGN", "MDT", "SYK", "BSX", "ISRG", "GILD", "REGN", "VRTX", "HUM", "CI"],
-  XLF: ["JPM", "BAC", "WFC", "C", "GS", "MS", "AXP", "V", "MA", "BLK", "SCHW", "SPGI", "CB", "MMC", "BK", "PNC", "USB", "COF", "TROW", "MET"],
-  XLE: ["XOM", "CVX", "COP", "EOG", "SLB", "OXY", "MPC", "VLO", "PSX", "HAL", "WMB", "HES", "DVN", "OKE", "KMI", "MRO", "FANG", "CTRA", "APA"],
-  XLP: ["PG", "KO", "PEP", "WMT", "COST", "MO", "PM", "CL", "KMB", "MDLZ", "SYY", "GIS", "ADM", "CAG", "KHC", "CPB", "CLX", "HRL", "K", "SJM"],
-  XLY: ["AMZN", "TSLA", "HD", "MCD", "NKE", "SBUX", "LOW", "BKNG", "TJX", "MAR", "GM", "F", "ROST", "DHI", "LEN", "HLT", "AZO", "ORLY", "EBAY", "YUM"],
-  XLI: ["UPS", "HON", "UNP", "CAT", "BA", "GE", "RTX", "MMM", "CSX", "NSC", "DE", "LMT", "ITW", "EMR", "NXPI", "GD", "CARR", "OTIS", "ETN", "PH"],
-  XLB: ["LIN", "SHW", "APD", "ECL", "NEM", "FCX", "DOW", "DD", "PPG", "NUE", "CTVA", "FMC", "EMN", "IP", "ALB", "CE", "CF", "IFF"],
-  XLU: ["NEE", "DUK", "SO", "D", "AEP", "SRE", "EXC", "XEL", "PEG", "ED", "WEC", "AWK", "ES", "DTE", "AEE", "PPL", "CMS", "CNP", "EIX", "ATO"],
-  XLC: ["META", "GOOGL", "GOOG", "NFLX", "DIS", "CMCSA", "VZ", "T", "CHTR", "TMUS", "EA", "TTWO", "FOXA", "FOX", "WBD", "PARA", "OMC", "IPG", "TME"],
-  XLRE: ["PLD", "AMT", "CCI", "EQIX", "SPG", "PSA", "WELL", "DLR", "O", "AVB", "EQR", "ELS", "HST", "ARE", "MAA", "ESS", "UDR", "VICI", "IRM", "INVH"],
+  XLK: [
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "AVGO",
+    "CRM",
+    "ADBE",
+    "CSCO",
+    "ACN",
+    "INTC",
+    "AMD",
+    "IBM",
+    "NOW",
+    "QCOM",
+    "TXN",
+    "AMAT",
+    "ADI",
+    "MU",
+    "FIS",
+    "ADP",
+  ],
+  XLV: [
+    "UNH",
+    "JNJ",
+    "PFE",
+    "ABBV",
+    "MRK",
+    "TMO",
+    "ABT",
+    "BMY",
+    "DHR",
+    "LLY",
+    "AMGN",
+    "MDT",
+    "SYK",
+    "BSX",
+    "ISRG",
+    "GILD",
+    "REGN",
+    "VRTX",
+    "HUM",
+    "CI",
+  ],
+  XLF: [
+    "JPM",
+    "BAC",
+    "WFC",
+    "C",
+    "GS",
+    "MS",
+    "AXP",
+    "V",
+    "MA",
+    "BLK",
+    "SCHW",
+    "SPGI",
+    "CB",
+    "MMC",
+    "BK",
+    "PNC",
+    "USB",
+    "COF",
+    "TROW",
+    "MET",
+  ],
+  XLE: [
+    "XOM",
+    "CVX",
+    "COP",
+    "EOG",
+    "SLB",
+    "OXY",
+    "MPC",
+    "VLO",
+    "PSX",
+    "HAL",
+    "WMB",
+    "HES",
+    "DVN",
+    "OKE",
+    "KMI",
+    "MRO",
+    "FANG",
+    "CTRA",
+    "APA",
+  ],
+  XLP: [
+    "PG",
+    "KO",
+    "PEP",
+    "WMT",
+    "COST",
+    "MO",
+    "PM",
+    "CL",
+    "KMB",
+    "MDLZ",
+    "SYY",
+    "GIS",
+    "ADM",
+    "CAG",
+    "KHC",
+    "CPB",
+    "CLX",
+    "HRL",
+    "K",
+    "SJM",
+  ],
+  XLY: [
+    "AMZN",
+    "TSLA",
+    "HD",
+    "MCD",
+    "NKE",
+    "SBUX",
+    "LOW",
+    "BKNG",
+    "TJX",
+    "MAR",
+    "GM",
+    "F",
+    "ROST",
+    "DHI",
+    "LEN",
+    "HLT",
+    "AZO",
+    "ORLY",
+    "EBAY",
+    "YUM",
+  ],
+  XLI: [
+    "UPS",
+    "HON",
+    "UNP",
+    "CAT",
+    "BA",
+    "GE",
+    "RTX",
+    "MMM",
+    "CSX",
+    "NSC",
+    "DE",
+    "LMT",
+    "ITW",
+    "EMR",
+    "NXPI",
+    "GD",
+    "CARR",
+    "OTIS",
+    "ETN",
+    "PH",
+  ],
+  XLB: [
+    "LIN",
+    "SHW",
+    "APD",
+    "ECL",
+    "NEM",
+    "FCX",
+    "DOW",
+    "DD",
+    "PPG",
+    "NUE",
+    "CTVA",
+    "FMC",
+    "EMN",
+    "IP",
+    "ALB",
+    "CE",
+    "CF",
+    "IFF",
+  ],
+  XLU: [
+    "NEE",
+    "DUK",
+    "SO",
+    "D",
+    "AEP",
+    "SRE",
+    "EXC",
+    "XEL",
+    "PEG",
+    "ED",
+    "WEC",
+    "AWK",
+    "ES",
+    "DTE",
+    "AEE",
+    "PPL",
+    "CMS",
+    "CNP",
+    "EIX",
+    "ATO",
+  ],
+  XLC: [
+    "META",
+    "GOOGL",
+    "GOOG",
+    "NFLX",
+    "DIS",
+    "CMCSA",
+    "VZ",
+    "T",
+    "CHTR",
+    "TMUS",
+    "EA",
+    "TTWO",
+    "FOXA",
+    "FOX",
+    "WBD",
+    "PARA",
+    "OMC",
+    "IPG",
+    "TME",
+  ],
+  XLRE: [
+    "PLD",
+    "AMT",
+    "CCI",
+    "EQIX",
+    "SPG",
+    "PSA",
+    "WELL",
+    "DLR",
+    "O",
+    "AVB",
+    "EQR",
+    "ELS",
+    "HST",
+    "ARE",
+    "MAA",
+    "ESS",
+    "UDR",
+    "VICI",
+    "IRM",
+    "INVH",
+  ],
 };
 
 /** Rounded helper: redondea a `DECIMALS` como lo hace el original (None -> null). */
@@ -167,6 +396,61 @@ async function bcraUltimo(url: string): Promise<number | null> {
   return typeof v === "number" ? v : typeof v === "string" ? parseFloat(v) : null;
 }
 
+/**
+ * Último valor de una variable de BCRA Estadísticas v4.0 (la v3 fue deprecada
+ * con HTTP 410). IDs conocidos: 27 = Inflación mensual, 12 = Tasa de interés
+ * de depósitos a 30 días (tasa pasiva), 5 = Tipo de cambio mayorista referencia.
+ */
+async function bcraV4Ultimo(idVariable: number): Promise<number | null> {
+  const data = (await fetchJson(
+    `https://api.bcra.gob.ar/estadisticas/v4.0/Monetarias/${idVariable}?Limit=60&Offset=0`,
+  )) as { results?: Array<{ detalle?: Array<{ fecha?: string; valor?: number }> }> } | null;
+  const detalle = data?.results?.[0]?.detalle ?? [];
+  for (let i = detalle.length - 1; i >= 0; i--) {
+    const v = detalle[i]?.valor;
+    if (typeof v === "number" && isFinite(v)) return v;
+  }
+  return null;
+}
+
+/**
+ * Panel MEP/CCL de CriptoYa: estructura anidada por ticker
+ * ({ al30: { "24hs": { price } }, ... }) — se elige el ticker preferido
+ * (AL30 → GD30 → letras → BPO27 → primero disponible).
+ */
+type CriptoYaPanelEntry = {
+  "24hs"?: { price?: number; bid?: number; ask?: number };
+  bid?: number;
+  ask?: number;
+};
+
+function panelCriptoYa(
+  panel: Record<string, CriptoYaPanelEntry> | undefined,
+): { compra: number | null; venta: number | null } | null {
+  if (!panel || typeof panel !== "object") return null;
+  const preferidos = ["al30", "gd30", "letras", "bpo27"];
+  const extraer = (e: CriptoYaPanelEntry | undefined) => {
+    const p24 = e?.["24hs"];
+    if (p24 && typeof p24.price === "number") return { compra: p24.price, venta: p24.price };
+    if (p24 && typeof p24.bid === "number")
+      return { compra: p24.bid, venta: typeof p24.ask === "number" ? p24.ask : p24.bid };
+    if (e && typeof e.bid === "number")
+      return { compra: e.bid, venta: typeof e.ask === "number" ? e.ask : e.bid };
+    return null;
+  };
+  for (const k of preferidos) {
+    if (panel[k]) {
+      const v = extraer(panel[k]);
+      if (v) return v;
+    }
+  }
+  for (const k of Object.keys(panel)) {
+    const v = extraer(panel[k]);
+    if (v) return v;
+  }
+  return null;
+}
+
 /** Retornos logarítmicos de una serie de cierres. */
 function logReturns(closes: number[]): number[] {
   const out: number[] = [];
@@ -204,7 +488,10 @@ function alinear(
 }
 
 /** Descarga cierres + fechas de un ticker para un rango. */
-async function cierresDe(simbolo: string, rango = "1y"): Promise<{ fechas: string[]; closes: number[] }> {
+async function cierresDe(
+  simbolo: string,
+  rango = "1y",
+): Promise<{ fechas: string[]; closes: number[] }> {
   const chart = await fetchYahooChart(simbolo, rango, "1d");
   const res = chart?.chart?.result?.[0];
   if (!res) return { fechas: [], closes: [] };
@@ -249,7 +536,9 @@ async function extraerDatos(simbolo: string): Promise<DatosClarity> {
   const precio =
     (precioChart != null && isFinite(precioChart) && precioChart > 0
       ? precioChart
-      : num(r?.financialData?.currentPrice)) ?? num(r?.price?.regularMarketPrice) ?? null;
+      : num(r?.financialData?.currentPrice)) ??
+    num(r?.price?.regularMarketPrice) ??
+    null;
   const marketCap = num(r?.price?.marketCap) ?? num(r?.summaryDetail?.marketCap);
   const acciones =
     num(r?.defaultKeyStatistics?.sharesOutstanding) ??
@@ -275,7 +564,7 @@ async function extraerDatos(simbolo: string): Promise<DatosClarity> {
     cashflow: r?.cashflowStatementHistory?.cashflowStatements ?? [],
     instOwn,
     error:
-      (!r && !precioChart)
+      !r && !precioChart
         ? `No hay datos de ${simbolo} (Yahoo ${resp.status || "auth solo"}${resp.json?.quoteSummary?.error?.description ? ` — ${resp.json.quoteSummary.error.description}` : ""})`
         : null,
   };
@@ -301,8 +590,10 @@ export async function claCualitativo(simbolo: string): Promise<ResultadoCualitat
 
   // D1 Modelo de negocio (20%)
   let d1 = 5.0;
-  if (["software", "insurance", "healthcare", "utilities"].some((k) => industry.includes(k))) d1 = 7.0;
-  else if (["technology", "healthcare", "consumer defensive"].some((k) => sector.includes(k))) d1 = 6.5;
+  if (["software", "insurance", "healthcare", "utilities"].some((k) => industry.includes(k)))
+    d1 = 7.0;
+  else if (["technology", "healthcare", "consumer defensive"].some((k) => sector.includes(k)))
+    d1 = 6.5;
   else if (["financial services"].some((k) => sector.includes(k))) d1 = 6.0;
   const revs = historialCampo(d.income, ["total revenue", "revenue", "operating revenue"]);
   const revUlt = revs[revs.length - 1];
@@ -317,7 +608,11 @@ export async function claCualitativo(simbolo: string): Promise<ResultadoCualitat
 
   // D2 Management (25%)
   let d2 = 5.0;
-  const pns = historialCampo(d.balance, ["stockholders equity", "total equity", "shareholders equity"]);
+  const pns = historialCampo(d.balance, [
+    "stockholders equity",
+    "total equity",
+    "shareholders equity",
+  ]);
   const nis = historialCampo(d.income, ["net income common", "net income"]);
   const deudas = historialCampo(d.balance, ["total debt", "long term debt"]);
   if (pns.length >= 2 && nis.length >= 2) {
@@ -349,13 +644,19 @@ export async function claCualitativo(simbolo: string): Promise<ResultadoCualitat
     else if (margin > 0.1) d3 = 6.0;
     else if (margin < 0) d3 = 2.0;
   }
-  dimensiones["ventaja_competitiva"] = { score: red(Math.min(10, Math.max(0, d3)), 1) ?? 0, peso: 0.3 };
+  dimensiones["ventaja_competitiva"] = {
+    score: red(Math.min(10, Math.max(0, d3)), 1) ?? 0,
+    peso: 0.3,
+  };
 
   // D4 Gobierno corporativo (15%)
   let d4 = 5.0;
   if (d.instOwn > 0.3) d4 += 1;
   else if (d.instOwn > 0.5) d4 += 1.5;
-  dimensiones["gobierno_corporativo"] = { score: red(Math.min(10, Math.max(0, d4)), 1) ?? 0, peso: 0.15 };
+  dimensiones["gobierno_corporativo"] = {
+    score: red(Math.min(10, Math.max(0, d4)), 1) ?? 0,
+    peso: 0.15,
+  };
 
   // D5 Porter (10%)
   const porterMap: Record<string, number> = {
@@ -456,10 +757,13 @@ export async function claCuantitativo(simbolo: string): Promise<ResultadoCuantit
   const niHist = historialCampo(incRows, ["net income common", "net income"]);
   const ebitdaHist = historialCampo(incRows, ["ebitda"]);
   const opHist = historialCampo(incRows, ["operating income", "operating income/loss"]);
-  const daHist = historialCampo(incRows, ["depreciation and amortization", "depreciation & amortization"]);
+  const daHist = historialCampo(incRows, [
+    "depreciation and amortization",
+    "depreciation & amortization",
+  ]);
 
   const rev = revHist.length ? revHist[0]! : null;
-  let ni = niHist.length ? niHist[0]! : null;
+  const ni = niHist.length ? niHist[0]! : null;
   let ebitda = ebitdaHist.length ? ebitdaHist[0]! : null;
   if (ebitda == null && opHist.length && daHist.length) ebitda = opHist[0]! + daHist[0]!;
 
@@ -497,7 +801,8 @@ export async function claCuantitativo(simbolo: string): Promise<ResultadoCuantit
   if (ni != null && activo != null && activo !== 0) m["M13_roa"] = red(ni / activo, 4) ?? 0;
   if (dfn != null && m["M2_ebitda"] != null && m["M2_ebitda"] !== 0)
     m["M14_deuda_ebitda"] = red(dfn / m["M2_ebitda"]!, 4) ?? 0;
-  if (precio > 0 && m["M4_eps"] != null && m["M4_eps"] !== 0) m["M15_pe"] = red(precio / m["M4_eps"]!, 2) ?? 0;
+  if (precio > 0 && m["M4_eps"] != null && m["M4_eps"] !== 0)
+    m["M15_pe"] = red(precio / m["M4_eps"]!, 2) ?? 0;
 
   if (mkt && m["M2_ebitda"] != null && m["M2_ebitda"] !== 0) {
     const ev = mkt + dfn;
@@ -508,7 +813,7 @@ export async function claCuantitativo(simbolo: string): Promise<ResultadoCuantit
   if (dE != null && dE > 4) rojas.push(`Deuda/EBITDA ${dE} x > 4x — Apalancamiento excesivo`);
   if (pn != null && pn < 0) rojas.push("Patrimonio Neto negativo — Riesgo de default técnico");
   const mn = m["M6_margen_neto"];
-  if (mn != null && mn < 0) rojas.push(`Margen neto ${(mn * 100)}% — Pérdida neta`);
+  if (mn != null && mn < 0) rojas.push(`Margen neto ${mn * 100}% — Pérdida neta`);
   const ct = m["M11_capital_trabajo"];
   if (ct != null && ct < 0) rojas.push("Capital de trabajo negativo — Problemas de liquidez");
   if (revHist.length >= 2 && revHist[1] !== 0) {
@@ -560,7 +865,7 @@ export async function claWacc(simbolo: string): Promise<ResultadoWacc> {
   }
 
   let beta = 1.0;
-  let benchmark = isBa ? "MERVAL" : "S&P 500";
+  const benchmark = isBa ? "MERVAL" : "S&P 500";
   try {
     const benchTicker = isBa ? "^MERV" : "SPY";
     const [activo, bench] = await Promise.all([
@@ -620,7 +925,7 @@ export async function claWacc(simbolo: string): Promise<ResultadoWacc> {
 
   const t = isBa ? 0.35 : 0.25;
 
-  let e = mkt || 1;
+  const e = mkt || 1;
   let dd = 0;
   try {
     const deudaV = valorCampo(d.balance, ["total debt"]);
@@ -641,7 +946,9 @@ export async function claWacc(simbolo: string): Promise<ResultadoWacc> {
   let waccArs: number | null = null;
   if (isBa) {
     let inflacionArs = 0.03;
-    const pi = await bcraUltimo("https://api.bcra.gob.ar/estadisticas/v3.0/monetarias/variacionIPC");
+    const pi = await bcraUltimo(
+      "https://api.bcra.gob.ar/estadisticas/v3.0/monetarias/variacionIPC",
+    );
     if (pi != null) inflacionArs = pi / 100;
     const devaluacion = (1 + inflacionArs) / (1 + 0.0025) - 1;
     devaluacionAnual = Math.pow(1 + devaluacion, 12) - 1;
@@ -710,7 +1017,10 @@ export async function claDcf(simbolo: string): Promise<ResultadoDcf> {
   let gCorto = 0.05;
   if (ingresosHist.length >= 3 && ingresosHist[ingresosHist.length - 1]! > 0) {
     const cagr =
-      Math.pow(ingresosHist[0]! / ingresosHist[ingresosHist.length - 1]!, 1 / Math.max(1, ingresosHist.length - 1)) - 1;
+      Math.pow(
+        ingresosHist[0]! / ingresosHist[ingresosHist.length - 1]!,
+        1 / Math.max(1, ingresosHist.length - 1),
+      ) - 1;
     gCorto = Math.max(0.01, Math.min(cagr, 0.3));
   }
 
@@ -731,7 +1041,10 @@ export async function claDcf(simbolo: string): Promise<ResultadoDcf> {
   let capexPct = 0.05;
   let daPct = 0.03;
   const capexVals = historialCampo(d.cashflow, ["capital expenditure", "capex"]);
-  const depreciacionVals = historialCampo(d.cashflow, ["depreciation and amortization", "depreciation & amortization"]);
+  const depreciacionVals = historialCampo(d.cashflow, [
+    "depreciation and amortization",
+    "depreciation & amortization",
+  ]);
   if (capexVals.length) capexPct = Math.abs(capexVals[0]!) / ingresosBase;
   if (depreciacionVals.length) daPct = Math.abs(depreciacionVals[0]!) / ingresosBase;
 
@@ -884,7 +1197,9 @@ export async function claMultiples(simbolo: string): Promise<ResultadoMultiples>
     industry,
     multiples_sector: med,
     valor_intrinseco_multi: viMulti ? red(viMulti, 2) : null,
-    rango_multi: viMulti ? { min: red(viMulti * 0.8, 2) ?? 0, max: red(viMulti * 1.2, 2) ?? 0 } : null,
+    rango_multi: viMulti
+      ? { min: red(viMulti * 0.8, 2) ?? 0, max: red(viMulti * 1.2, 2) ?? 0 }
+      : null,
     sector_key: sectorKey,
   };
 }
@@ -988,8 +1303,7 @@ export async function claTriangulacion(simbolo: string): Promise<ResultadoTriang
   const isGrowth =
     ["technology"].some((k) => sector.includes(k)) ||
     ["software", "internet", "biotechnology"].some((k) => industry.includes(k));
-  const isDistress =
-    dcf.decision === "VENDER / EVITAR" || (viDcf <= 0 && viMulti <= 0);
+  const isDistress = dcf.decision === "VENDER / EVITAR" || (viDcf <= 0 && viMulti <= 0);
 
   let wDcf: number, wMulti: number, wBook: number, perfil: string;
   if (isDistress) {
@@ -1084,27 +1398,33 @@ export async function claContextoMacro(): Promise<ResultadoMacro> {
     dolar_ccl: null as { compra: number | null; venta: number | null } | null,
   };
 
-  macro.inflacion_mensual = await bcraUltimo("https://api.bcra.gob.ar/estadisticas/v3.0/monetarias/variacionIPC");
-  macro.tipo_cambio_oficial = await bcraUltimo(
-    "https://api.bcra.gob.ar/estadisticas/v3.0/monetarias/tipoCambioReferencia",
-  );
-  macro.tasa_pasiva = await bcraUltimo("https://api.bcra.gob.ar/estadisticas/v3.0/monetarias/tasaPasivaBancaria");
+  // BCRA v4 (la v3 fue deprecada): 27 = IPC mensual, 5 = TC mayorista, 12 = tasa pasiva.
+  macro.inflacion_mensual = await bcraV4Ultimo(27);
+  macro.tipo_cambio_oficial = await bcraV4Ultimo(5);
+  macro.tasa_pasiva = await bcraV4Ultimo(12);
 
-  const rpData = (await fetchJson("https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais/ultimo")) as {
+  const rpData = (await fetchJson(
+    "https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais/ultimo",
+  )) as {
     valor?: number;
   } | null;
   if (rpData && typeof rpData.valor === "number") macro.riesgo_pais = rpData.valor;
 
-  const dol = (await fetchJson("https://criptoya.com/api/dolar")) as Record<string, { bid?: number; ask?: number }>;
+  const dol = (await fetchJson("https://criptoya.com/api/dolar")) as Record<
+    string,
+    { bid?: number; ask?: number } | Record<string, CriptoYaPanelEntry>
+  >;
   if (dol) {
     const toCompra = (v: { bid?: number; ask?: number }) => ({
       compra: typeof v?.bid === "number" ? v.bid : null,
       venta: typeof v?.ask === "number" ? v.ask : null,
     });
-    macro.dolar_oficial = dol["oficial"] ? toCompra(dol["oficial"]) : null;
-    macro.dolar_blue = dol["blue"] ? toCompra(dol["blue"]) : null;
-    macro.dolar_mep = dol["mep"] ? toCompra(dol["mep"]) : null;
-    macro.dolar_ccl = dol["ccl"] ? toCompra(dol["ccl"]) : null;
+    macro.dolar_oficial = dol["oficial"]
+      ? toCompra(dol["oficial"] as { bid?: number; ask?: number })
+      : null;
+    macro.dolar_blue = dol["blue"] ? toCompra(dol["blue"] as { bid?: number; ask?: number }) : null;
+    macro.dolar_mep = panelCriptoYa(dol["mep"] as Record<string, CriptoYaPanelEntry>);
+    macro.dolar_ccl = panelCriptoYa(dol["ccl"] as Record<string, CriptoYaPanelEntry>);
   }
 
   let precioTnx: number | null = null;
@@ -1116,7 +1436,9 @@ export async function claContextoMacro(): Promise<ResultadoMacro> {
       const closes = s.closes;
       if (!closes.length) continue;
       if (closes.length > 1) {
-        const v = ((closes[closes.length - 1]! - closes[closes.length - 2]!) / closes[closes.length - 2]!) * 100;
+        const v =
+          ((closes[closes.length - 1]! - closes[closes.length - 2]!) / closes[closes.length - 2]!) *
+          100;
         if (sym === "^TNX") variacionTnx = v;
         if (sym === "DX-Y.NYB") variacionDxy = v;
       }
@@ -1153,7 +1475,8 @@ export async function claContextoMacro(): Promise<ResultadoMacro> {
     else if (pi > 3) senales.push("Inflación elevada");
   }
   if (macro.riesgo_pais != null) {
-    if (macro.riesgo_pais > 1000) senales.push("Riesgo país >1000bps — descuento adicional en WACC");
+    if (macro.riesgo_pais > 1000)
+      senales.push("Riesgo país >1000bps — descuento adicional en WACC");
   }
   if (variacionDxy != null) {
     if (variacionDxy > 0) senales.push("DXY alcista — presión sobre emergentes");
@@ -1201,8 +1524,18 @@ export interface ResultadoFicha {
   ticker: string;
   fecha: string;
   precio_actual: number | null;
-  macro: { score_macro: string; tasa_libre_riesgo_local: number | null; riesgo_pais_bps: number | null };
-  cualitativo: { score_total: number; dimensiones: Record<string, { score: number; peso: number }>; continuar: boolean; sector: string; industry: string };
+  macro: {
+    score_macro: string;
+    tasa_libre_riesgo_local: number | null;
+    riesgo_pais_bps: number | null;
+  };
+  cualitativo: {
+    score_total: number;
+    dimensiones: Record<string, { score: number; peso: number }>;
+    continuar: boolean;
+    sector: string;
+    industry: string;
+  };
   cuantitativo: { metricas: MetricasCuantitativas; alertas: ResultadoCuantitativo["alertas"] };
   wacc: { wacc_usd: number | null; ke: number | null; kd: number | null; beta: number | null };
   valuacion: {
@@ -1223,7 +1556,15 @@ export interface ResultadoFicha {
   decision_final: string;
   bloqueado_por_cualitativo: boolean;
   notas_consistencia: string[];
-  resumen: { ticker: string; precio: number | null; vi_central: number; upside: number | null; decision: string; score_cualitativo: number; score_macro: string };
+  resumen: {
+    ticker: string;
+    precio: number | null;
+    vi_central: number;
+    upside: number | null;
+    decision: string;
+    score_cualitativo: number;
+    score_macro: string;
+  };
   empresa: string;
 }
 
@@ -1335,13 +1676,19 @@ export interface ResultadoCiclo {
   stage: number;
   label: string;
   categoria: string;
-  ratios: Record<string, { ratio: number | null; ma200: number | null; slope: number | null; trend: string }>;
+  ratios: Record<
+    string,
+    { ratio: number | null; ma200: number | null; slope: number | null; trend: string }
+  >;
   activosFavorecidos: string[];
   sectoresFavorecidos: string[];
   riesgos: string[];
 }
 
-async function descargar(tickers: string[], rango = "2y"): Promise<Map<string, { fechas: string[]; closes: number[] }>> {
+async function descargar(
+  tickers: string[],
+  rango = "2y",
+): Promise<Map<string, { fechas: string[]; closes: number[] }>> {
   const mapa = new Map<string, { fechas: string[]; closes: number[] }>();
   for (const t of tickers) {
     const s = await cierresDe(t, rango);
@@ -1378,16 +1725,30 @@ export async function claCiclo(): Promise<ResultadoCiclo> {
     if (!A || !B || !A.closes.length || !B.closes.length) continue;
     const al = alinear(A, B);
     if (!al.a.length) continue;
-    const ratioSerie = al.a.map((v, i) => (al.b[i]! !== 0 ? v / al.b[i]! : NaN)).filter((v) => isFinite(v));
+    const ratioSerie = al.a
+      .map((v, i) => (al.b[i]! !== 0 ? v / al.b[i]! : NaN))
+      .filter((v) => isFinite(v));
     if (!ratioSerie.length) continue;
     const ratioVal = ratioSerie[ratioSerie.length - 1]!;
     const ma = mediaVentana(ratioSerie, 200);
     const maUlt = isFinite(ma[ma.length - 1]!) ? ma[ma.length - 1]! : null;
     let slope: number | null = null;
-    if (maUlt != null && ma.length >= 201 && isFinite(ma[ma.length - 201]!) && ma[ma.length - 201]! > 0) {
+    if (
+      maUlt != null &&
+      ma.length >= 201 &&
+      isFinite(ma[ma.length - 201]!) &&
+      ma[ma.length - 201]! > 0
+    ) {
       slope = maUlt / ma[ma.length - 201]! - 1;
     }
-    const trend = slope != null ? (slope > 0.005 ? "bullish" : slope < -0.005 ? "bearish" : "neutral") : "neutral";
+    const trend =
+      slope != null
+        ? slope > 0.005
+          ? "bullish"
+          : slope < -0.005
+            ? "bearish"
+            : "neutral"
+        : "neutral";
     ratios[key] = { ratio: red(ratioVal, 4), ma200: red(maUlt, 4), slope: red(slope, 4), trend };
   }
 
@@ -1395,7 +1756,12 @@ export async function claCiclo(): Promise<ResultadoCiclo> {
     const s = datos.get(t);
     if (!s || !s.closes.length || s.closes.length < 200) return "neutral";
     const ma = mediaVentana(s.closes, 200);
-    if (ma.length < 201 || !isFinite(ma[ma.length - 1]!) || !isFinite(ma[ma.length - 201]!) || ma[ma.length - 201]! <= 0)
+    if (
+      ma.length < 201 ||
+      !isFinite(ma[ma.length - 1]!) ||
+      !isFinite(ma[ma.length - 201]!) ||
+      ma[ma.length - 201]! <= 0
+    )
       return "neutral";
     const slope = ma[ma.length - 1]! / ma[ma.length - 201]! - 1;
     return slope > 0.005 ? "bullish" : slope < -0.005 ? "bearish" : "neutral";
@@ -1410,37 +1776,51 @@ export async function claCiclo(): Promise<ResultadoCiclo> {
   let activos: string[], sectores: string[], riesgos: string[];
 
   if (bond === "bullish" && spx !== "bullish" && crb !== "bullish") {
-    stage = 1; label = "Recuperación Inicial"; cat = "recovery";
+    stage = 1;
+    label = "Recuperación Inicial";
+    cat = "recovery";
     activos = ["TLT (Bonos largos)", "SPY (S&P 500 gradual)"];
     sectores = ["XLK (Tecnología)", "XLY (Consumo Discrecional)", "XLF (Financieras)"];
     riesgos = ["Salir muy temprano", "No reconocer el cambio de régimen"];
   } else if (spx === "bullish" && gold !== "bearish" && crb !== "bearish") {
-    stage = 2; label = "Expansión Temprana"; cat = "expansion";
+    stage = 2;
+    label = "Expansión Temprana";
+    cat = "expansion";
     activos = ["SPY", "QQQ", "IWM (Small Caps)"];
     sectores = ["XLI (Industriales)", "XLB (Materiales)", "XLK (Tecnología)"];
     riesgos = ["Subestimar inflación rezagada", "Sobreponderar defensivos"];
   } else if (crb === "bullish" && bond === "bearish" && spx === "bullish") {
-    stage = 3; label = "Expansión Tardía (Inflacionaria)"; cat = "expansion";
+    stage = 3;
+    label = "Expansión Tardía (Inflacionaria)";
+    cat = "expansion";
     activos = ["DBC (Commodities)", "XLE (Energía)", "GLD (Oro)"];
     sectores = ["XLE (Energía)", "XLB (Materiales)", "XLV (Healthcare)"];
     riesgos = ["Inflación fuera de control", "Fin de ciclo alcista"];
   } else if (gold === "bullish" && spx !== "bullish" && crb !== "bearish") {
-    stage = 4; label = "Pico / Euforia"; cat = "peak";
+    stage = 4;
+    label = "Pico / Euforia";
+    cat = "peak";
     activos = ["GLD (Oro)", "SLV (Plata)", "Cash"];
     sectores = ["XLU (Utilities)", "XLP (Consumo Básico)", "XLV (Healthcare)"];
     riesgos = ["Máximos de mercado", "Corrección inminente"];
   } else if (bond === "bullish" && spx === "bearish" && crb !== "bullish") {
-    stage = 5; label = "Contracción / Flight-to-Quality"; cat = "contraction";
+    stage = 5;
+    label = "Contracción / Flight-to-Quality";
+    cat = "contraction";
     activos = ["TLT (Bonos)", "GLD (Oro)", "XLP (Defensivos)"];
     sectores = ["XLP (Cons. Básico)", "XLU (Utilities)", "XLV (Healthcare)"];
     riesgos = ["Vender en pánico", "Perder el rebote"];
   } else if (spx === "bearish" && crb === "bearish" && gold !== "bullish") {
-    stage = 6; label = "Recesión Plena"; cat = "recession";
+    stage = 6;
+    label = "Recesión Plena";
+    cat = "recession";
     activos = ["Cash", "GLD (Oro)", "SHY (Corto plazo)"];
     sectores = ["Ninguno — preservación de capital"];
     riesgos = ["Quedarse fuera del rebound"];
   } else {
-    stage = 2; label = "Expansión Temprana"; cat = "expansion";
+    stage = 2;
+    label = "Expansión Temprana";
+    cat = "expansion";
     activos = ["SPY", "QQQ"];
     sectores = ["Tecnología (XLK)", "Industriales (XLI)"];
     riesgos = ["Falsas señales", "Cambio abrupto de régimen"];
@@ -1460,7 +1840,14 @@ export async function claCiclo(): Promise<ResultadoCiclo> {
 // ───────────────────────────── Performance Sectorial ─────────────────────────────
 
 export interface ResultadoPerformanceSectorial {
-  items: Array<{ sector: string; etf: string; period: string; changePercent: number | null; trendScore: number; currentPrice: number | null }>;
+  items: Array<{
+    sector: string;
+    etf: string;
+    period: string;
+    changePercent: number | null;
+    trendScore: number;
+    currentPrice: number | null;
+  }>;
   period: string;
 }
 
@@ -1474,7 +1861,9 @@ const PERIODO_MAP: Record<string, string> = {
   "2y": "2y",
 };
 
-export async function claPerformanceSectorial(periodo = "5d"): Promise<ResultadoPerformanceSectorial> {
+export async function claPerformanceSectorial(
+  periodo = "5d",
+): Promise<ResultadoPerformanceSectorial> {
   const yfPeriod = PERIODO_MAP[periodo] ?? "5d";
   const items: ResultadoPerformanceSectorial["items"] = [];
   for (const [sector, etf] of Object.entries(SECTOR_ETF_MAP)) {
@@ -1590,8 +1979,17 @@ function percentilDe(valor: number | null, conjunto: number[]): number | null {
 export interface ResultadoValuacionSectorial {
   sector: string;
   etf: string | null;
-  metricas: { avgTrailingPE: number | null; avgPriceToBook: number | null; totalMarketCap: number | null };
-  solvencia: { averageSolvency: number | null; healthyCount: number; totalTickers: number; fragileSector: boolean | null };
+  metricas: {
+    avgTrailingPE: number | null;
+    avgPriceToBook: number | null;
+    totalMarketCap: number | null;
+  };
+  solvencia: {
+    averageSolvency: number | null;
+    healthyCount: number;
+    totalTickers: number;
+    fragileSector: boolean | null;
+  };
   wacc: { averageWacc: number | null; averageSpread: number | null };
   tickers: Array<{
     ticker: string;
@@ -1612,11 +2010,20 @@ export interface ResultadoValuacionSectorial {
   error: string | null;
 }
 
-export async function claValuacionSectorial(sector: string, _periodo = "1y"): Promise<ResultadoValuacionSectorial> {
+export async function claValuacionSectorial(
+  sector: string,
+  _periodo = "1y",
+): Promise<ResultadoValuacionSectorial> {
   const etf = SECTOR_ETF_MAP[sector.trim()];
-  if (!etf) return { sector, etf: null, error: `Sector "${sector}" no reconocido. Usar: ${Object.keys(SECTOR_ETF_MAP).join(", ")}` } as ResultadoValuacionSectorial;
+  if (!etf)
+    return {
+      sector,
+      etf: null,
+      error: `Sector "${sector}" no reconocido. Usar: ${Object.keys(SECTOR_ETF_MAP).join(", ")}`,
+    } as ResultadoValuacionSectorial;
   const tickerList = (SECTOR_TICKERS_FALLBACK[etf] ?? []).slice(0, 10);
-  if (!tickerList.length) return { sector, etf, error: "Sin componentes para el sector" } as ResultadoValuacionSectorial;
+  if (!tickerList.length)
+    return { sector, etf, error: "Sin componentes para el sector" } as ResultadoValuacionSectorial;
 
   const fundamentals = new Map<string, FundSectorial>();
   await Promise.all(
@@ -1692,7 +2099,12 @@ export async function claValuacionSectorial(sector: string, _periodo = "1y"): Pr
 
   const avgPe = peVals.length ? red(media(peVals), 2) : null;
   const avgPb = pbVals.length ? red(media(pbVals), 2) : null;
-  const totalMcap = mcapVals.length ? red(mcapVals.reduce((a, b) => a + b, 0), 2) : null;
+  const totalMcap = mcapVals.length
+    ? red(
+        mcapVals.reduce((a, b) => a + b, 0),
+        2,
+      )
+    : null;
   const avgSolvency = solvencias.length ? red(media(solvencias.map((s) => s.solvency)), 4) : null;
   const healthyCount = solvencias.filter((s) => s.healthy).length;
   const avgWacc = waccData.length ? red(media(waccData.map((w) => w.wacc)), 4) : null;
@@ -1754,14 +2166,23 @@ export function textoCuantitativo(r: ResultadoCuantitativo): string {
     L.push(`\nAlertas amarillas (${r.alertas.total_amarillas}):`);
     for (const al of r.alertas.amarillas) L.push(`- 🟡 ${al}`);
   }
-  if (!r.alertas.rojas.length && !r.alertas.amarillas.length) L.push(`\nSin alertas de riesgo detectadas.`);
+  if (!r.alertas.rojas.length && !r.alertas.amarillas.length)
+    L.push(`\nSin alertas de riesgo detectadas.`);
   L.push(`\nPrecio actual: ${toUSD(r.precio_actual)} · Cap. de mercado: ${toUSD(r.market_cap)}`);
   return L.join("\n");
 }
 
 export function textoCualitativo(r: ResultadoCualitativo): string {
-  const nom = { modelo_negocio: "Modelo de negocio", management: "Management", ventaja_competitiva: "Ventaja competitiva", gobierno_corporativo: "Gobierno corporativo", porter: "Porter (5 fuerzas)" } as Record<string, string>;
-  const L: string[] = [`Score cualitativo de ${r.empresa} (${r.ticker}) — sector: ${r.sector || "s/d"} / ${r.industry || "s/d"}:`];
+  const nom = {
+    modelo_negocio: "Modelo de negocio",
+    management: "Management",
+    ventaja_competitiva: "Ventaja competitiva",
+    gobierno_corporativo: "Gobierno corporativo",
+    porter: "Porter (5 fuerzas)",
+  } as Record<string, string>;
+  const L: string[] = [
+    `Score cualitativo de ${r.empresa} (${r.ticker}) — sector: ${r.sector || "s/d"} / ${r.industry || "s/d"}:`,
+  ];
   for (const k of Object.keys(r.dimensiones)) {
     const dim = r.dimensiones[k]!;
     L.push(`- ${nom[k] ?? k}: ${dim.score.toFixed(1)}/10 (peso ${(dim.peso * 100).toFixed(0)}%)`);
@@ -1778,43 +2199,70 @@ export function textoCualitativo(r: ResultadoCualitativo): string {
 export function textoWacc(r: ResultadoWacc): string {
   const L: string[] = [];
   L.push(`WACC de ${r.ticker} (CAPM + riesgo país):`);
-  L.push(`- RF UST 10Y: ${r.rf_ust_10y != null ? r.rf_ust_10y.toFixed(2) + "%" : "s/d"} · Beta: ${(r.beta ?? 1).toFixed(2)} vs ${r.benchmark} · Prima mercado: ${r.prima_riesgo_mercado.toFixed(1)}%`);
-  L.push(`- Riesgo país: ${r.riesgo_pais_pct != null ? r.riesgo_pais_pct.toFixed(2) + "%" : "s/d"} · Size premium: ${r.size_premium.toFixed(2)}%`);
-  L.push(`- Ke (CAPM): ${r.ke_capm != null ? r.ke_capm.toFixed(2) + "%" : "s/d"} · Kd: ${r.kd != null ? r.kd.toFixed(2) + "%" : "s/d"} · Impuestos: ${(r.tasa_impositiva * 100).toFixed(0)}%`);
+  L.push(
+    `- RF UST 10Y: ${r.rf_ust_10y != null ? r.rf_ust_10y.toFixed(2) + "%" : "s/d"} · Beta: ${(r.beta ?? 1).toFixed(2)} vs ${r.benchmark} · Prima mercado: ${r.prima_riesgo_mercado.toFixed(1)}%`,
+  );
+  L.push(
+    `- Riesgo país: ${r.riesgo_pais_pct != null ? r.riesgo_pais_pct.toFixed(2) + "%" : "s/d"} · Size premium: ${r.size_premium.toFixed(2)}%`,
+  );
+  L.push(
+    `- Ke (CAPM): ${r.ke_capm != null ? r.ke_capm.toFixed(2) + "%" : "s/d"} · Kd: ${r.kd != null ? r.kd.toFixed(2) + "%" : "s/d"} · Impuestos: ${(r.tasa_impositiva * 100).toFixed(0)}%`,
+  );
   L.push(`- Pesos E/D: ${(r.peso_equity ?? 0).toFixed(2)} / ${(r.peso_deuda ?? 0).toFixed(2)}`);
   L.push(`- WACC USD: ${r.wacc_usd != null ? r.wacc_usd.toFixed(2) + "%" : "s/d"}`);
-  if (r.wacc_nominal_ars != null) L.push(`- Devaluación esperada anual: ${r.devaluacion_esperada_anual?.toFixed(2) ?? "s/d"}% · WACC nominal ARS: ${r.wacc_nominal_ars.toFixed(2)}%`);
+  if (r.wacc_nominal_ars != null)
+    L.push(
+      `- Devaluación esperada anual: ${r.devaluacion_esperada_anual?.toFixed(2) ?? "s/d"}% · WACC nominal ARS: ${r.wacc_nominal_ars.toFixed(2)}%`,
+    );
   return L.join("\n");
 }
 
 export function textoDcf(r: ResultadoDcf): string {
   const L: string[] = [];
-  L.push(`DCF por proyección de márgenes de ${r.ticker} · WACC ${r.wacc_usado.toFixed(2)}% · g corto ${r.g_corto.toFixed(2)}% → g largo ${r.g_largo.toFixed(2)}%`);
+  L.push(
+    `DCF por proyección de márgenes de ${r.ticker} · WACC ${r.wacc_usado.toFixed(2)}% · g corto ${r.g_corto.toFixed(2)}% → g largo ${r.g_largo.toFixed(2)}%`,
+  );
   for (const p of r.proyecciones) {
-    L.push(`- Año ${p.año}: ${toUSD(p.ingresos)} ingresos · ${toUSD(p.fcff)} FCFF (crec. ${p.crecimiento.toFixed(1)}%)`);
+    L.push(
+      `- Año ${p.año}: ${toUSD(p.ingresos)} ingresos · ${toUSD(p.fcff)} FCFF (crec. ${p.crecimiento.toFixed(1)}%)`,
+    );
   }
-  L.push(`- Valor terminal: ${toUSD(r.valor_terminal)} · Enterprise Value: ${toUSD(r.enterprise_value)}`);
+  L.push(
+    `- Valor terminal: ${toUSD(r.valor_terminal)} · Enterprise Value: ${toUSD(r.enterprise_value)}`,
+  );
   L.push(`- Equity Value: ${toUSD(r.equity_value)} (deuda neta ${toUSD(r.deuda_neta)})`);
   L.push(`- Valor intrínseco: ${toUSD(r.valor_intrinseco)} vs precio ${toUSD(r.precio_actual)}`);
-  L.push(`- Margen de seguridad: ${r.margen_seguridad_pct != null ? r.margen_seguridad_pct.toFixed(1) + "%" : "s/d"} -> ${r.decision}`);
+  L.push(
+    `- Margen de seguridad: ${r.margen_seguridad_pct != null ? r.margen_seguridad_pct.toFixed(1) + "%" : "s/d"} -> ${r.decision}`,
+  );
   return L.join("\n");
 }
 
 export function textoMultiples(r: ResultadoMultiples): string {
   const L: string[] = [];
   L.push(`Valuación por múltiplos de ${r.ticker} (${r.sector || "s/d"} / ${r.industry || "s/d"}):`);
-  L.push(`- EV/EBITDA: ${r.ev_ebitda != null ? r.ev_ebitda.toFixed(2) : "s/d"} · P/E: ${r.pe != null ? r.pe.toFixed(2) : "s/d"} · P/BV: ${r.pbv != null ? r.pbv.toFixed(2) : "s/d"} · EV/Revenue: ${r.ev_revenue != null ? r.ev_revenue.toFixed(2) : "s/d"}`);
-  L.push(`- Medianas sectoriales proxy: EV/EBITDA ${r.multiples_sector.ev_ebitda}, P/E ${r.multiples_sector.pe}, P/BV ${r.multiples_sector.pbv}, EV/Rev ${r.multiples_sector.ev_revenue}`);
-  L.push(`- Valor intrínseco por múltiplos: ${toUSD(r.valor_intrinseco_multi)}${r.rango_multi ? ` (rango ${toUSD(r.rango_multi.min)}–${toUSD(r.rango_multi.max)})` : ""}`);
+  L.push(
+    `- EV/EBITDA: ${r.ev_ebitda != null ? r.ev_ebitda.toFixed(2) : "s/d"} · P/E: ${r.pe != null ? r.pe.toFixed(2) : "s/d"} · P/BV: ${r.pbv != null ? r.pbv.toFixed(2) : "s/d"} · EV/Revenue: ${r.ev_revenue != null ? r.ev_revenue.toFixed(2) : "s/d"}`,
+  );
+  L.push(
+    `- Medianas sectoriales proxy: EV/EBITDA ${r.multiples_sector.ev_ebitda}, P/E ${r.multiples_sector.pe}, P/BV ${r.multiples_sector.pbv}, EV/Rev ${r.multiples_sector.ev_revenue}`,
+  );
+  L.push(
+    `- Valor intrínseco por múltiplos: ${toUSD(r.valor_intrinseco_multi)}${r.rango_multi ? ` (rango ${toUSD(r.rango_multi.min)}–${toUSD(r.rango_multi.max)})` : ""}`,
+  );
   return L.join("\n");
 }
 
 export function textoBookValue(r: ResultadoBookValue): string {
   const L: string[] = [];
   L.push(`Valor libro ajustado + APV de ${r.ticker}:`);
-  L.push(`- Valor libro: ${toUSD(r.valor_libro)} · por acción: ${toUSD(r.valor_libro_por_accion)} · P/BV: ${r.ratio_precio_valor_libro != null ? r.ratio_precio_valor_libro.toFixed(2) : "s/d"}`);
+  L.push(
+    `- Valor libro: ${toUSD(r.valor_libro)} · por acción: ${toUSD(r.valor_libro_por_accion)} · P/BV: ${r.ratio_precio_valor_libro != null ? r.ratio_precio_valor_libro.toFixed(2) : "s/d"}`,
+  );
   if (r.senal_subvaluacion) L.push(`- ${r.senal_subvaluacion}`);
-  L.push(`- APV: ${toUSD(r.apv)} = VAN unlevered ${toUSD(r.van_unlevered)} + PV(escudo fiscal) ${toUSD(r.pv_tax_shield)}`);
+  L.push(
+    `- APV: ${toUSD(r.apv)} = VAN unlevered ${toUSD(r.van_unlevered)} + PV(escudo fiscal) ${toUSD(r.pv_tax_shield)}`,
+  );
   L.push(`- Valor intrínseco APV: ${toUSD(r.valor_intrinseco_apv)}`);
   return L.join("\n");
 }
@@ -1822,10 +2270,18 @@ export function textoBookValue(r: ResultadoBookValue): string {
 export function textoTriangulacion(r: ResultadoTriangulacion): string {
   const L: string[] = [];
   L.push(`Triangulación de valoración de ${r.ticker} (perfil: ${r.perfil}):`);
-  L.push(`- DCF: ${toUSD(r.valor_dcf)} · Múltiplos: ${toUSD(r.valor_multi)} · Valor libro: ${toUSD(r.valor_libro)}`);
-  L.push(`- Pesos aplicados: DCF ${(r.pesos.dcf * 100).toFixed(0)}% / Múltiplos ${(r.pesos.multi * 100).toFixed(0)}% / Libro ${(r.pesos.book * 100).toFixed(0)}%`);
-  L.push(`- Valor intrínseco ponderado: ${toUSD(r.valor_intrinseco_ponderado)}${r.rango_final ? ` · Rango ${toUSD(r.rango_final.min)}–${toUSD(r.rango_final.max)}` : ""}`);
-  L.push(`- Margen de seguridad: ${r.margen_seguridad_pct != null ? r.margen_seguridad_pct.toFixed(1) + "%" : "s/d"} -> ${r.decision_final}`);
+  L.push(
+    `- DCF: ${toUSD(r.valor_dcf)} · Múltiplos: ${toUSD(r.valor_multi)} · Valor libro: ${toUSD(r.valor_libro)}`,
+  );
+  L.push(
+    `- Pesos aplicados: DCF ${(r.pesos.dcf * 100).toFixed(0)}% / Múltiplos ${(r.pesos.multi * 100).toFixed(0)}% / Libro ${(r.pesos.book * 100).toFixed(0)}%`,
+  );
+  L.push(
+    `- Valor intrínseco ponderado: ${toUSD(r.valor_intrinseco_ponderado)}${r.rango_final ? ` · Rango ${toUSD(r.rango_final.min)}–${toUSD(r.rango_final.max)}` : ""}`,
+  );
+  L.push(
+    `- Margen de seguridad: ${r.margen_seguridad_pct != null ? r.margen_seguridad_pct.toFixed(1) + "%" : "s/d"} -> ${r.decision_final}`,
+  );
   return L.join("\n");
 }
 
@@ -1833,21 +2289,40 @@ export function textoFicha(r: ResultadoFicha): string {
   const L: string[] = [];
   L.push(`FICHA DE DECISIÓN — ${r.empresa} (${r.ticker}) — ${r.fecha}`);
   L.push(`Precio actual: ${toUSD(r.precio_actual)}`);
-  L.push(`\nCapa 1 · MACRO: régimen ${r.macro.score_macro} · riesgo país ${r.macro.riesgo_pais_bps != null ? r.macro.riesgo_pais_bps.toFixed(0) + "bps" : "s/d"} · tasa libre local ${r.macro.tasa_libre_riesgo_local != null ? r.macro.tasa_libre_riesgo_local.toFixed(2) + "%" : "s/d"}`);
-  L.push(`\nCapa 3 · CUALITATIVO: ${r.cualitativo.score_total.toFixed(2)}/10 (${r.cualitativo.continuar ? "habilitado" : "BLOQUEADO"})`);
+  L.push(
+    `\nCapa 1 · MACRO: régimen ${r.macro.score_macro} · riesgo país ${r.macro.riesgo_pais_bps != null ? r.macro.riesgo_pais_bps.toFixed(0) + "bps" : "s/d"} · tasa libre local ${r.macro.tasa_libre_riesgo_local != null ? r.macro.tasa_libre_riesgo_local.toFixed(2) + "%" : "s/d"}`,
+  );
+  L.push(
+    `\nCapa 3 · CUALITATIVO: ${r.cualitativo.score_total.toFixed(2)}/10 (${r.cualitativo.continuar ? "habilitado" : "BLOQUEADO"})`,
+  );
   for (const k of Object.keys(r.cualitativo.dimensiones)) {
     const dim = r.cualitativo.dimensiones[k]!;
     L.push(`  - ${k.replace(/_/g, " ")}: ${dim.score.toFixed(1)}`);
   }
   L.push(`\nCapa 4 · CUANTITATIVO:`);
-  L.push(`  - ROE ${r.cuantitativo.metricas.M12_roe != null ? (r.cuantitativo.metricas.M12_roe * 100).toFixed(1) + "%" : "s/d"} · margen neto ${r.cuantitativo.metricas.M6_margen_neto != null ? (r.cuantitativo.metricas.M6_margen_neto * 100).toFixed(1) + "%" : "s/d"} · Deuda/EBITDA ${r.cuantitativo.metricas.M14_deuda_ebitda != null ? r.cuantitativo.metricas.M14_deuda_ebitda.toFixed(2) + "x" : "s/d"} · P/E ${r.cuantitativo.metricas.M15_pe != null ? r.cuantitativo.metricas.M15_pe.toFixed(2) : "s/d"}`);
-  if (r.cuantitativo.alertas.rojas.length) L.push(`  - ${r.cuantitativo.alertas.total_rojas} alerta(s) ROJA(s): ${r.cuantitativo.alertas.rojas.join(" · ")}`);
-  L.push(`\nCapa 5 · WACC: ${r.wacc.wacc_usd != null ? r.wacc.wacc_usd.toFixed(2) + "%" : "s/d"} (Ke ${r.wacc.ke != null ? r.wacc.ke.toFixed(2) + "%" : "s/d"} · Kd ${r.wacc.kd != null ? r.wacc.kd.toFixed(2) + "%" : "s/d"} · beta ${r.wacc.beta?.toFixed(2) ?? "s/d"})`);
+  L.push(
+    `  - ROE ${r.cuantitativo.metricas.M12_roe != null ? (r.cuantitativo.metricas.M12_roe * 100).toFixed(1) + "%" : "s/d"} · margen neto ${r.cuantitativo.metricas.M6_margen_neto != null ? (r.cuantitativo.metricas.M6_margen_neto * 100).toFixed(1) + "%" : "s/d"} · Deuda/EBITDA ${r.cuantitativo.metricas.M14_deuda_ebitda != null ? r.cuantitativo.metricas.M14_deuda_ebitda.toFixed(2) + "x" : "s/d"} · P/E ${r.cuantitativo.metricas.M15_pe != null ? r.cuantitativo.metricas.M15_pe.toFixed(2) : "s/d"}`,
+  );
+  if (r.cuantitativo.alertas.rojas.length)
+    L.push(
+      `  - ${r.cuantitativo.alertas.total_rojas} alerta(s) ROJA(s): ${r.cuantitativo.alertas.rojas.join(" · ")}`,
+    );
+  L.push(
+    `\nCapa 5 · WACC: ${r.wacc.wacc_usd != null ? r.wacc.wacc_usd.toFixed(2) + "%" : "s/d"} (Ke ${r.wacc.ke != null ? r.wacc.ke.toFixed(2) + "%" : "s/d"} · Kd ${r.wacc.kd != null ? r.wacc.kd.toFixed(2) + "%" : "s/d"} · beta ${r.wacc.beta?.toFixed(2) ?? "s/d"})`,
+  );
   L.push(`\nCapa 6-9 · VALUACIÓN:`);
-  L.push(`  - DCF: ${toUSD(r.valuacion.vi_dcf)} · Múltiplos: ${toUSD(r.valuacion.vi_multi)} · Libro: ${toUSD(r.valuacion.vi_libro)}`);
-  L.push(`  - Valor central ponderado: ${toUSD(r.valuacion.vi_central)} · perfil ${r.valuacion.perfil}${r.valuacion.rango ? ` · rango ${toUSD(r.valuacion.rango.min)}–${toUSD(r.valuacion.rango.max)}` : ""}`);
-  L.push(`\nPaso 10 · MARGEN DE SEGURIDAD calibrado: MOS ${r.margen_seguridad.mos_aplicado_pct.toFixed(0)}%`);
-  L.push(`  - Precio máximo de entrada: ${toUSD(r.margen_seguridad.precio_max_entrada)} · target: ${toUSD(r.margen_seguridad.precio_target)} · upside: ${r.margen_seguridad.upside_pct != null ? r.margen_seguridad.upside_pct.toFixed(1) + "%" : "s/d"}`);
+  L.push(
+    `  - DCF: ${toUSD(r.valuacion.vi_dcf)} · Múltiplos: ${toUSD(r.valuacion.vi_multi)} · Libro: ${toUSD(r.valuacion.vi_libro)}`,
+  );
+  L.push(
+    `  - Valor central ponderado: ${toUSD(r.valuacion.vi_central)} · perfil ${r.valuacion.perfil}${r.valuacion.rango ? ` · rango ${toUSD(r.valuacion.rango.min)}–${toUSD(r.valuacion.rango.max)}` : ""}`,
+  );
+  L.push(
+    `\nPaso 10 · MARGEN DE SEGURIDAD calibrado: MOS ${r.margen_seguridad.mos_aplicado_pct.toFixed(0)}%`,
+  );
+  L.push(
+    `  - Precio máximo de entrada: ${toUSD(r.margen_seguridad.precio_max_entrada)} · target: ${toUSD(r.margen_seguridad.precio_target)} · upside: ${r.margen_seguridad.upside_pct != null ? r.margen_seguridad.upside_pct.toFixed(1) + "%" : "s/d"}`,
+  );
   L.push(`\nDECISIÓN FINAL: ${r.decision_final}`);
   if (r.bloqueado_por_cualitativo) L.push(`(Bloqueado por score cualitativo insuficiente.)`);
   if (r.notas_consistencia.length) {
@@ -1861,8 +2336,12 @@ export function textoMacro(r: ResultadoMacro): string {
   const L: string[] = [];
   L.push(`Contexto macro (${new Date(r.timestamp).toLocaleString("es-AR")}):`);
   L.push(`- Régimen: ${r.regimen_macro} (score ${r.score_macro})`);
-  L.push(`- Inflación mensual: ${r.inflacion_mensual != null ? r.inflacion_mensual.toFixed(2) + "%" : "s/d"} · Riesgo país: ${r.riesgo_pais != null ? r.riesgo_pais.toFixed(0) + "bps" : "s/d"}`);
-  L.push(`- Tasa pasiva BCRA: ${r.tasa_pasiva != null ? r.tasa_pasiva.toFixed(2) + "%" : "s/d"} · Tasa real Fisher (mensual): ${r.tasa_real_mensual_fisher != null ? r.tasa_real_mensual_fisher.toFixed(2) + "%" : "s/d"}`);
+  L.push(
+    `- Inflación mensual: ${r.inflacion_mensual != null ? r.inflacion_mensual.toFixed(2) + "%" : "s/d"} · Riesgo país: ${r.riesgo_pais != null ? r.riesgo_pais.toFixed(0) + "bps" : "s/d"}`,
+  );
+  L.push(
+    `- Tasa pasiva BCRA: ${r.tasa_pasiva != null ? r.tasa_pasiva.toFixed(2) + "%" : "s/d"} · Tasa real Fisher (mensual): ${r.tasa_real_mensual_fisher != null ? r.tasa_real_mensual_fisher.toFixed(2) + "%" : "s/d"}`,
+  );
   const dol = (label: string, v: { compra: number | null; venta: number | null } | null) =>
     `  - ${label}: ${v?.compra != null ? "$" + v.compra.toFixed(2) : "s/d"} / ${v?.venta != null ? "$" + v.venta.toFixed(2) : "s/d"}`;
   L.push(`Dólares (compra/venta):`);
@@ -1870,8 +2349,11 @@ export function textoMacro(r: ResultadoMacro): string {
   L.push(dol("Blue", r.dolar_blue));
   L.push(dol("MEP", r.dolar_mep));
   L.push(dol("CCL", r.dolar_ccl));
-  L.push(`- Spread soberano implícito: ${r.spread_soberano != null ? r.spread_soberano.toFixed(2) : "s/d"} · Tasa libre local: ${r.tasa_libre_riesgo_local != null ? r.tasa_libre_riesgo_local.toFixed(2) + "%" : "s/d"}`);
-  if (r.senal_regimen.length) L.push(`\nSeñales de régimen:\n${r.senal_regimen.map((s) => `- ${s}`).join("\n")}`);
+  L.push(
+    `- Spread soberano implícito: ${r.spread_soberano != null ? r.spread_soberano.toFixed(2) : "s/d"} · Tasa libre local: ${r.tasa_libre_riesgo_local != null ? r.tasa_libre_riesgo_local.toFixed(2) + "%" : "s/d"}`,
+  );
+  if (r.senal_regimen.length)
+    L.push(`\nSeñales de régimen:\n${r.senal_regimen.map((s) => `- ${s}`).join("\n")}`);
   return L.join("\n");
 }
 
@@ -1884,7 +2366,9 @@ export function textoCiclo(r: ResultadoCiclo): string {
   L.push(`Riesgos: ${r.riesgos.join(" · ")}`);
   L.push(`\nRatios intermarket (200d):`);
   for (const [k, v] of Object.entries(r.ratios)) {
-    L.push(`- ${k}: ratio ${v.ratio ?? "s/d"} · MA200 ${v.ma200 ?? "s/d"} · pendiente ${v.slope ?? "s/d"} — ${v.trend}`);
+    L.push(
+      `- ${k}: ratio ${v.ratio ?? "s/d"} · MA200 ${v.ma200 ?? "s/d"} · pendiente ${v.slope ?? "s/d"} — ${v.trend}`,
+    );
   }
   return L.join("\n");
 }
@@ -1892,7 +2376,9 @@ export function textoCiclo(r: ResultadoCiclo): string {
 export function textoPerformanceSectorial(r: ResultadoPerformanceSectorial): string {
   const L: string[] = [`Performance sectorial EE.UU. (${r.period}):`];
   for (const it of r.items) {
-    L.push(`- ${it.sector} (${it.etf}): ${it.changePercent != null ? (it.changePercent >= 0 ? "+" : "") + it.changePercent.toFixed(2) + "%" : "s/d"} · precio ${toUSD(it.currentPrice)}${it.trendScore === 1 ? " · tendencia +" : it.trendScore === -1 ? " · tendencia -" : ""}`);
+    L.push(
+      `- ${it.sector} (${it.etf}): ${it.changePercent != null ? (it.changePercent >= 0 ? "+" : "") + it.changePercent.toFixed(2) + "%" : "s/d"} · precio ${toUSD(it.currentPrice)}${it.trendScore === 1 ? " · tendencia +" : it.trendScore === -1 ? " · tendencia -" : ""}`,
+    );
   }
   return L.join("\n");
 }
@@ -1901,12 +2387,20 @@ export function textoValuacionSectorial(r: ResultadoValuacionSectorial): string 
   if (r.error) return `SIN RESULTADOS: ${r.error}`;
   const L: string[] = [];
   L.push(`Valuación sectorial — ${r.sector} (${r.etf}):`);
-  L.push(`- P/E promedio: ${r.metricas.avgTrailingPE != null ? r.metricas.avgTrailingPE.toFixed(1) : "s/d"} · P/BV promedio: ${r.metricas.avgPriceToBook != null ? r.metricas.avgPriceToBook.toFixed(1) : "s/d"} · Cap total: ${toUSD(r.metricas.totalMarketCap)}`);
-  L.push(`- WACC promedio estimado: ${r.wacc.averageWacc != null ? (r.wacc.averageWacc * 100).toFixed(1) + "%" : "s/d"} · Spread (ROA-WACC): ${r.wacc.averageSpread != null ? (r.wacc.averageSpread * 100).toFixed(1) + "%" : "s/d"}`);
-  L.push(`- Solvencia promedio: ${r.solvencia.averageSolvency != null ? (r.solvencia.averageSolvency * 100).toFixed(1) + "%" : "s/d"} · saludables: ${r.solvencia.healthyCount}/${r.solvencia.totalTickers}${r.solvencia.fragileSector ? " · SECTOR FRÁGIL (<40%)" : ""}`);
+  L.push(
+    `- P/E promedio: ${r.metricas.avgTrailingPE != null ? r.metricas.avgTrailingPE.toFixed(1) : "s/d"} · P/BV promedio: ${r.metricas.avgPriceToBook != null ? r.metricas.avgPriceToBook.toFixed(1) : "s/d"} · Cap total: ${toUSD(r.metricas.totalMarketCap)}`,
+  );
+  L.push(
+    `- WACC promedio estimado: ${r.wacc.averageWacc != null ? (r.wacc.averageWacc * 100).toFixed(1) + "%" : "s/d"} · Spread (ROA-WACC): ${r.wacc.averageSpread != null ? (r.wacc.averageSpread * 100).toFixed(1) + "%" : "s/d"}`,
+  );
+  L.push(
+    `- Solvencia promedio: ${r.solvencia.averageSolvency != null ? (r.solvencia.averageSolvency * 100).toFixed(1) + "%" : "s/d"} · saludables: ${r.solvencia.healthyCount}/${r.solvencia.totalTickers}${r.solvencia.fragileSector ? " · SECTOR FRÁGIL (<40%)" : ""}`,
+  );
   L.push(`\nTickers:`);
   for (const t of r.tickers) {
-    L.push(`- ${t.ticker}: P/E ${t.trailingPE != null ? t.trailingPE.toFixed(1) : "s/d"} (pct ${t.pePercentile ?? "s/d"}) · P/BV ${t.priceToBook != null ? t.priceToBook.toFixed(1) : "s/d"} (pct ${t.pbPercentile ?? "s/d"}) · solvencia ${t.solvency != null ? (t.solvency * 100).toFixed(0) + "%" : "s/d"} · WACC ${t.wacc != null ? (t.wacc * 100).toFixed(1) + "%" : "s/d"}`);
+    L.push(
+      `- ${t.ticker}: P/E ${t.trailingPE != null ? t.trailingPE.toFixed(1) : "s/d"} (pct ${t.pePercentile ?? "s/d"}) · P/BV ${t.priceToBook != null ? t.priceToBook.toFixed(1) : "s/d"} (pct ${t.pbPercentile ?? "s/d"}) · solvencia ${t.solvency != null ? (t.solvency * 100).toFixed(0) + "%" : "s/d"} · WACC ${t.wacc != null ? (t.wacc * 100).toFixed(1) + "%" : "s/d"}`,
+    );
   }
   return L.join("\n");
 }
