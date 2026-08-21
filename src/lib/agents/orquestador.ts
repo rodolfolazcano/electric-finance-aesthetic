@@ -63,6 +63,7 @@ import {
 import type { ConfiguracionOrquestacion } from "@/lib/model-orchestration";
 import { MODELO_POR_DEFECTO } from "@/lib/model-registry";
 import { construirPromptSkills } from "@/lib/skills";
+import { iolSesionActiva } from "@/lib/iol.server";
 import type { FuenteMercado } from "@/lib/mercado.server";
 
 export type Msg = { role: "user" | "assistant"; content: string };
@@ -172,6 +173,36 @@ function esPreguntaCuantitativa(pregunta: string): boolean {
     /factores\s+maestros|qu[eé]\s+factores|a\s+qu[eé]\s+se\s+correlaciona|estilo\s+de\s+/.test(p) ||
     /rebalanceo|ponderaci[oó]n\s+de\s+activos/.test(p)
   );
+}
+
+/**
+ * Detecta credenciales de IOL escritas en el mensaje del usuario, en los
+ * formatos más comunes:
+ *  - "inicia sesión en iol usuario@gmail.com mipassword"
+ *  - "usuario: X password: Y" / "mi usuario es X y mi contraseña Y"
+ * Devuelve null si no hay credenciales reconocibles.
+ */
+export function detectarCredencialesIOL(
+  pregunta: string,
+): { usuario: string; password: string } | null {
+  const p = (pregunta ?? "").trim();
+  if (!p || p.length > 600) return null;
+  // Formato etiquetado.
+  const u = p.match(/(?:usuario|user|email|mail)\s*[:=]\s*([^\s,;]+)/i);
+  const c = p.match(/(?:password|contrase[ñn]a|clave|pass)\s*[:=]\s*([^\s,;]+)/i);
+  if (u?.[1] && c?.[1]) return { usuario: u[1], password: c[1] };
+  // Formato libre: mención de IOL/login seguida de un email y un token.
+  if (/iol|invertir\s*online|inici[ae][a-z]*\s+sesi[óo]n|loguea|login/i.test(p)) {
+    const email = p.match(/([\w.+-]+@[\w-]+\.[\w.-]+)/);
+    if (email?.[1]) {
+      const resto = p.slice((email.index ?? 0) + email[0].length).trim();
+      const pass = resto.split(/[\s,;]+/)[0];
+      if (pass && pass.length >= 4 && !/^(y|and|para|password|contrase[ñn]a)$/i.test(pass)) {
+        return { usuario: email[1], password: pass };
+      }
+    }
+  }
+  return null;
 }
 
 /** Preguntas de VERIFICACIÓN de entidades/brokers en el registro de la CNV. */
@@ -381,7 +412,9 @@ export async function ejecutarTool(
   sessionId = "anon",
 ): Promise<{ texto: string; fuentes: FuenteMercado[]; ok: boolean; eventos?: EventoChat[] }> {
   const { query, periodo, simbolo } = extraerDatosTool(argsRaw);
-  console.log(`[TOOL] ${name} ${argsRaw.slice(0, 220)}`); // TEMP PASO4
+  // Nunca volcar credenciales de IOL al log del servidor.
+  const argsParaLog = name === "iol_login" ? "<credenciales ocultas>" : argsRaw.slice(0, 220);
+  console.log(`[TOOL] ${name} ${argsParaLog}`); // TEMP PASO4
   switch (name) {
     case "consultar_mercado":
       return { ...(await ejecutarMercado(query)), ok: true };
@@ -1176,6 +1209,89 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
       });
       enviar({ t: "status", v: "searching" });
     }
+  }
+
+  // ---- Red de seguridad 6: credenciales de IOL en el mensaje → login forzado ----
+  // Si el usuario escribió usuario+contraseña de IOL (en cualquier formato razonable),
+  // el login se EJECUTA acá, sin depender de que el modelo decida invocar la herramienta.
+  const credencialesIOL = detectarCredencialesIOL(pregunta);
+  let loginIolForzadoOk = false;
+  if (credencialesIOL && !iolSesionActiva(sessionId)) {
+    const callId = `iol_login_forzado_${Date.now()}`;
+    const argsLogin = JSON.stringify({
+      usuario: credencialesIOL.usuario,
+      password: credencialesIOL.password,
+    });
+    messages.push({
+      role: "assistant",
+      content: "",
+      tool_calls: [{ id: callId, function: { name: "iol_login", arguments: argsLogin } }],
+    });
+    enviar({ t: "status", v: "iol", q: "inicio de sesión IOL" });
+    console.log("[TOOL] iol_login (red-seguridad) <credenciales ocultas>");
+    const loginRes = await ejecutarIolLogin(argsLogin, sessionId);
+    loginIolForzadoOk = loginRes.ok;
+    if (loginRes.fuentes.length) enviar({ t: "sources", v: loginRes.fuentes });
+    messages.push({
+      role: "tool",
+      tool_call_id: callId,
+      name: "iol_login",
+      content: loginRes.ok
+        ? `${loginRes.texto}\n\n${
+            /(portafolio|cartera|posiciones|tenencia|saldo|estado de cuenta|operaciones|mis accion|mis bono|mis cedear)/i.test(
+              pregunta,
+            )
+              ? "El usuario pidió ver sus datos: invocá AHORA iol_cuenta con la acción que corresponda (portafolio y/o estadocuenta) y presentá los resultados en una tabla."
+              : "Informale al usuario que la sesión quedó activa y ofrecé qué puede consultar (portafolio, estado de cuenta, operaciones)."
+          }`
+        : `El inicio de sesión en IOL FALLÓ: ${loginRes.texto} Informalo con honestidad y no inventes datos de la cuenta.`,
+    });
+    enviar({ t: "status", v: "searching" });
+  }
+
+  // ---- Red de seguridad 7: sesión IOL activa + pide su portafolio/cuenta → datos forzados ----
+  if (
+    !credencialesIOL &&
+    iolSesionActiva(sessionId) &&
+    /(portafolio|cartera|posiciones|tenencia|saldo|estado de cuenta|estadocuenta|mis operaciones)/i.test(
+      pregunta,
+    ) &&
+    !fuentes.some((f) => f.dominio?.includes("invertironline")) &&
+    !notasTexto.includes("Portafolio IOL") &&
+    !notasTexto.includes("Estado de cuenta IOL")
+  ) {
+    const callId = `iol_cuenta_forzado_${Date.now()}`;
+    const accion = /saldo|estado de cuenta|estadocuenta/i.test(pregunta)
+      ? "estadocuenta"
+      : "portafolio";
+    messages.push({
+      role: "assistant",
+      content: "",
+      tool_calls: [
+        {
+          id: callId,
+          function: {
+            name: "iol_cuenta",
+            arguments: JSON.stringify({ accion, pais: "argentina" }),
+          },
+        },
+      ],
+    });
+    enviar({ t: "status", v: "iol", q: accion });
+    const cuentaRes = await ejecutarIolCuenta(
+      JSON.stringify({ accion, pais: "argentina" }),
+      sessionId,
+    );
+    if (cuentaRes.fuentes.length) enviar({ t: "sources", v: cuentaRes.fuentes });
+    messages.push({
+      role: "tool",
+      tool_call_id: callId,
+      name: "iol_cuenta",
+      content: cuentaRes.ok
+        ? `Datos reales de la cuenta IOL del usuario:\n\n${cuentaRes.texto}`
+        : `No se pudo obtener ${accion} de IOL: ${cuentaRes.texto}`,
+    });
+    enviar({ t: "status", v: "searching" });
   }
 
   // El enfoque del coordinador llega al redactor como guía.
