@@ -882,6 +882,180 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  // -------------------------------------------------------------------------
+  // Herramientas migradas del tab /herramientas (clarity-dashboard).
+  // -------------------------------------------------------------------------
+  {
+    type: "function",
+    function: {
+      name: "optimizar_cartera_avanzada",
+      description:
+        "Optimiza una cartera con 5 estrategias cuantitativas sobre series reales de Yahoo Finance (2 años por defecto): Máx. Sharpe, Mín. Varianza, Equi-weight, Riesgo inverso y Markowitz. Devuelve retorno anual, volatilidad, Sharpe, VaR95, skewness, kurtosis, test de normalidad Jarque-Bera y pesos por activo de cada estrategia. Usar cuando el usuario pida optimizar una cartera, comparar estrategias de asignación o 'cómo repartir' un monto entre varios tickers.",
+      parameters: {
+        type: "object",
+        properties: {
+          tickers: {
+            type: "array",
+            items: { type: "string" },
+            description: "Entre 2 y 20 tickers (ej. ['SPY','QQQ','AAPL','GGAL.BA']).",
+          },
+          years: { type: "number", description: "Años de historia a usar (0.5 a 10, default 2)." },
+          benchmarks: {
+            type: "array",
+            items: { type: "string" },
+            description: "Benchmarks para el CAPM de la cartera (default ['SPY']).",
+          },
+          notional: {
+            type: "number",
+            description: "Monto nocional de referencia en USD (default 15000).",
+          },
+        },
+        required: ["tickers"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "backtest_optimizacion",
+      description:
+        "Backtest walk-forward de la optimización de cartera: entrena con datos previos a una fecha de corte y evalúa fuera de muestra. Devuelve pesos entrenados vs resultado forward (retorno, volatilidad, Sharpe). Usar cuando el usuario pregunte si la estrategia 'hubiera funcionado', pida validar la optimización o backtesting.",
+      parameters: {
+        type: "object",
+        properties: {
+          tickers: {
+            type: "array",
+            items: { type: "string" },
+            description: "Entre 2 y 20 tickers.",
+          },
+          cutoffDate: {
+            type: "string",
+            description: "Fecha de corte YYYY-MM-DD (entrena antes, evalúa después).",
+          },
+          years: { type: "number", description: "Años de historia de entrenamiento (default 2)." },
+        },
+        required: ["tickers", "cutoffDate"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "distribucion_riesgo",
+      description:
+        "Análisis de riesgo por distribución de retornos con datos reales: media y volatilidad anualizadas, Sharpe, VaR 95%, skewness, kurtosis, test Jarque-Bera de normalidad, pérdida/ganancia máxima y histograma. Acepta intervalos intradía (1m a 1mo) y períodos (1d a max). Usar cuando el usuario pida riesgo, volatilidad, VaR o 'qué tan riesgoso es' un activo o varios.",
+      parameters: {
+        type: "object",
+        properties: {
+          tickers: {
+            type: "array",
+            items: { type: "string" },
+            description: "Entre 1 y 20 tickers.",
+          },
+          intervalo: {
+            type: "string",
+            description: "Intervalo: 1m|5m|15m|30m|1h|1d|1wk|1mo (default 1d).",
+          },
+          periodo: {
+            type: "string",
+            description: "Período: 1d|5d|1mo|3mo|6mo|1y|2y|5y|10y|max (default 2y).",
+          },
+        },
+        required: ["tickers"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "capm_auto",
+      description:
+        "Regresión CAPM con auto-detección del mejor benchmark (mayor R² entre índices, sectores, países y factores) más beta p-variance y exponente de Hurst (metodología Labadie §3.2). Devuelve beta, alpha anualizado, R², correlación, p-valor y errores estándar por ticker. Usar cuando el usuario pida beta/alpha sin especificar benchmark, o análisis CAPM riguroso.",
+      parameters: {
+        type: "object",
+        properties: {
+          tickers: {
+            type: "array",
+            items: { type: "string" },
+            description: "Entre 1 y 20 tickers.",
+          },
+          benchmarks: {
+            type: "array",
+            items: { type: "string" },
+            description: "Benchmarks explícitos (opcional si autoDetect=true).",
+          },
+          autoDetect: {
+            type: "boolean",
+            description: "Auto-detectar mejor benchmark por R² (default true).",
+          },
+        },
+        required: ["tickers"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "analisis_industria",
+      description:
+        "Análisis sectorial/industrial completo: fundamentales (P/E, PEG, ROE, márgenes, FCF yield, upside de analistas), score fundamental por ticker, matriz de benchmarks por industria y comparación contra ETF sectorial. Usar cuando el usuario pida analizar un sector o industria, comparar empresas de un rubro o pedir 'los mejores valores de X industria'.",
+      parameters: {
+        type: "object",
+        properties: {
+          sector: {
+            type: "string",
+            description: "Sector GICS en inglés (ej. 'Technology', 'Healthcare').",
+          },
+          industry: {
+            type: "string",
+            description: "Industria en inglés (ej. 'Software - Infrastructure').",
+          },
+          tickers: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: { ticker: { type: "string" }, nombre: { type: "string" } },
+              required: ["ticker"],
+            },
+            description: "Tickers de la industria a incluir (1 a 50).",
+          },
+        },
+        required: ["sector", "industry", "tickers"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "ranking_valuacion_sectores",
+      description:
+        "Ranking de valuación relativa de los sectores EE.UU.: P/E forward y trailing promedio, PEG, percentil histórico mediano de P/E, cantidad de tickers válidos y market cap total por sector. No requiere parámetros. Usar cuando el usuario pregunte qué sectores están baratos/caros o pida una vista comparativa de valuación sectorial.",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "oportunidades_diarias",
+      description:
+        "Screeners del día de Yahoo Finance: mayores alzas, mayores bajas, más operadas, más cortocircuitadas y infravaloradas de gran capitalización, con precio, variación %, volumen y market cap. No requiere parámetros. Usar cuando el usuario pregunte por oportunidades del día, qué está subiendo/bajando o movimientos inusuales de mercado.",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "matriz_benchmarks",
+      description:
+        "Matriz de correlaciones semanales entre ETFs sectoriales y benchmarks (SPDRs, SPY, QQQ, etc.) con los pares más diversificadores y más redundantes, y mejor benchmark por R² para cada activo. No requiere parámetros. Usar cuando el usuario pregunte por correlaciones entre sectores, diversificación o qué ETF se mueve junto a cuál.",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
 ];
 
 export type EstadoHerramienta =
@@ -947,6 +1121,19 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
       return "grafico";
     case "generar_informe":
       return "informe";
+    case "optimizar_cartera_avanzada":
+    case "backtest_optimizacion":
+      return "portafolio";
+    case "distribucion_riesgo":
+      return "riesgo";
+    case "capm_auto":
+    case "matriz_benchmarks":
+      return "capm";
+    case "analisis_industria":
+    case "ranking_valuacion_sectores":
+      return "portafolio";
+    case "oportunidades_diarias":
+      return "mercado";
     default:
       return "searching";
   }

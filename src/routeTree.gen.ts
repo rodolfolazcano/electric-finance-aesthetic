@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AsesorRouteImport } from './routes/asesor'
+import { Route as HerramientasRouteImport } from './routes/herramientas'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as ApiSugerenciasRouteImport } from './routes/api/sugerencias'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const AsesorRoute = AsesorRouteImport.update({
   id: '/asesor',
   path: '/asesor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HerramientasRoute = HerramientasRouteImport.update({
+  id: '/herramientas',
+  path: '/herramientas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -44,6 +50,7 @@ const ApiSugerenciasRoute = ApiSugerenciasRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/asesor': typeof AsesorRoute
+  '/herramientas': typeof HerramientasRoute
   '/api/chat': typeof ApiChatRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/asesor': typeof AsesorRoute
+  '/herramientas': typeof HerramientasRoute
   '/api/chat': typeof ApiChatRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
@@ -59,19 +67,33 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/asesor': typeof AsesorRoute
+  '/herramientas': typeof HerramientasRoute
   '/api/chat': typeof ApiChatRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/asesor' | '/api/chat' | '/api/search' | '/api/sugerencias'
+  fullPaths:
+    | '/'
+    | '/asesor'
+    | '/herramientas'
+    | '/api/chat'
+    | '/api/search'
+    | '/api/sugerencias'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/asesor' | '/api/chat' | '/api/search' | '/api/sugerencias'
+  to:
+    | '/'
+    | '/asesor'
+    | '/herramientas'
+    | '/api/chat'
+    | '/api/search'
+    | '/api/sugerencias'
   id:
     | '__root__'
     | '/'
     | '/asesor'
+    | '/herramientas'
     | '/api/chat'
     | '/api/search'
     | '/api/sugerencias'
@@ -80,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AsesorRoute: typeof AsesorRoute
+  HerramientasRoute: typeof HerramientasRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiSearchRoute: typeof ApiSearchRoute
   ApiSugerenciasRoute: typeof ApiSugerenciasRoute
@@ -99,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/asesor'
       fullPath: '/asesor'
       preLoaderRoute: typeof AsesorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/herramientas': {
+      id: '/herramientas'
+      path: '/herramientas'
+      fullPath: '/herramientas'
+      preLoaderRoute: typeof HerramientasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -128,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AsesorRoute: AsesorRoute,
+  HerramientasRoute: HerramientasRoute,
   ApiChatRoute: ApiChatRoute,
   ApiSearchRoute: ApiSearchRoute,
   ApiSugerenciasRoute: ApiSugerenciasRoute,

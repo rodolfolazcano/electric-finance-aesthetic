@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   ShieldCheck,
@@ -12,6 +12,10 @@ import {
   Linkedin,
   ArrowRight,
   TrendingUp,
+  Gauge,
+  Activity,
+  LineChart,
+  KeyRound,
 } from "lucide-react";
 import bgImage from "@/assets/bg-skyline.jpg";
 import balanzLogo from "@/assets/balanz.png";
@@ -44,6 +48,10 @@ function contenidoTest(): string {
   return `Sección Perfil: "Conozca su perfil de inversor". Test del Inversor: 8 preguntas, 2 minutos, sin datos personales. Resultado orientativo (Conservador, Moderado o Agresivo) que orienta qué productos suelen adaptarse mejor a cada perfil de riesgo; la definición final la toma el cliente junto a su asesor.`;
 }
 
+function contenidoHerramientas(): string {
+  return `Sección Herramientas: "Probá el panel de análisis financiero". Dashboard interactivo con datos en vivo de Yahoo Finance, IOL, BCRA, ArgentinaDatos y CriptoYa. Cuatro módulos: Contexto (macro argentino, intermercado y ciclo económico), Análisis (semáforo técnico + fundamental por activo), Cuantitativo (optimizador de carteras con 5 estrategias, riesgo por distribución de retornos, CAPM con auto-benchmark) y Sectores (performance, matriz de correlaciones, valuación relativa y oportunidades del día). Para analizar el portafolio propio, el visitante inicia sesión con su usuario y contraseña de InvertirOnline (IOL) desde el botón IOL del panel; las credenciales se procesan en el servidor y no se guardan en el sitio. Acceso libre desde el botón "Abrir Herramientas".`;
+}
+
 function contenidoInstrumentos(
   lista: Instrumento[],
   perfil: PerfilResultante | null,
@@ -67,9 +75,7 @@ function contenidoBrokers(): string {
 }
 
 function contenidoPreguntas(): string {
-  return `Sección de preguntas frecuentes:\n${FAQ.map((f) => `P: ${f.q}\nR: ${f.a}`).join(
-    "\n\n",
-  )}`;
+  return `Sección de preguntas frecuentes:\n${FAQ.map((f) => `P: ${f.q}\nR: ${f.a}`).join("\n\n")}`;
 }
 
 function contenidoAlianzas(): string {
@@ -84,6 +90,8 @@ const FALLBACK_SECCION = {
     "¿Cómo funciona el asesoramiento de Cintia Boos, Agente Productora CNV, y cómo se empieza?",
   "test-inversor":
     "¿Cómo puedo conocer mi perfil de inversor y qué productos suelen adaptarse mejor a cada perfil de riesgo?",
+  herramientas:
+    "¿Qué herramientas de análisis financiero puedo probar y cómo conecto mi cuenta de IOL para analizar mi portafolio?",
   instrumentos:
     "¿Qué instrumentos se pueden operar en el mercado de capitales argentino y cómo elegirlos según perfil y horizonte?",
   brokers:
@@ -129,6 +137,7 @@ export const Route = createFileRoute("/")({
 const NAV = [
   { id: "inicio", label: "Inicio" },
   { id: "test-inversor", label: "Perfil" },
+  { id: "herramientas", label: "Herramientas" },
   { id: "instrumentos", label: "Instrumentos" },
   { id: "brokers", label: "Brokers" },
   { id: "preguntas", label: "Preguntas" },
@@ -537,58 +546,57 @@ function Index() {
           contenido={contenidoInicio()}
           fallbackPregunta={FALLBACK_SECCION.inicio}
         >
-        <section id="inicio" className="relative flex min-h-[88svh] items-center overflow-hidden">
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(56rem 34rem at 82% 8%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 62%), radial-gradient(46rem 30rem at -5% 92%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%), linear-gradient(180deg, rgba(6,9,18,0.72) 0%, rgba(6,9,18,0.45) 45%, rgba(6,9,18,0.62) 100%)",
-            }}
-          />
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(52rem 30rem at 78% 30%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 65%)",
-            }}
-          />
+          <section id="inicio" className="relative flex min-h-[88svh] items-center overflow-hidden">
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(56rem 34rem at 82% 8%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 62%), radial-gradient(46rem 30rem at -5% 92%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%), linear-gradient(180deg, rgba(6,9,18,0.72) 0%, rgba(6,9,18,0.45) 45%, rgba(6,9,18,0.62) 100%)",
+              }}
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(52rem 30rem at 78% 30%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 65%)",
+              }}
+            />
 
-          <div className={`${CONTAINER} relative pt-28 pb-16`}>
-            <p className="flex items-center gap-2 eyebrow">
-              <ShieldCheck className="h-4 w-4" />
-              Agente Productora CNV · Mat. N° 2192
-            </p>
+            <div className={`${CONTAINER} relative pt-28 pb-16`}>
+              <p className="flex items-center gap-2 eyebrow">
+                <ShieldCheck className="h-4 w-4" />
+                Agente Productora CNV · Mat. N° 2192
+              </p>
 
-            <h1 className="mt-6 font-display">
-              <span className="block text-[clamp(3rem,8vw,5.5rem)] font-semibold leading-[1.02] tracking-tight chrome-text">
-                Su capital, con estrategia
-              </span>
-              <span className="mt-3 block text-[clamp(1.35rem,3.2vw,2.2rem)] font-medium leading-tight tracking-tight text-primary">
-                Cintia Boos · Asesoramiento patrimonial con criterio
-              </span>
-            </h1>
+              <h1 className="mt-6 font-display">
+                <span className="block text-[clamp(3rem,8vw,5.5rem)] font-semibold leading-[1.02] tracking-tight chrome-text">
+                  Su capital, con estrategia
+                </span>
+                <span className="mt-3 block text-[clamp(1.35rem,3.2vw,2.2rem)] font-medium leading-tight tracking-tight text-primary">
+                  Cintia Boos · Asesoramiento patrimonial con criterio
+                </span>
+              </h1>
 
-            <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-muted-foreground lg:text-[19px]">
-              Invertir no es adivinar el próximo movimiento del mercado: es tener un plan que
-              resista los que no se pueden anticipar. Diseñamos ese plan a su medida, en su cuenta
-              comitente y con brokers regulados por la CNV. Sin costo directo para usted.
-            </p>
+              <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-muted-foreground lg:text-[19px]">
+                Invertir no es adivinar el próximo movimiento del mercado: es tener un plan que
+                resista los que no se pueden anticipar. Diseñamos ese plan a su medida, en su cuenta
+                comitente y con brokers regulados por la CNV. Sin costo directo para usted.
+              </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              <WhatsAppLink className="btn-primary inline-flex items-center gap-2.5 rounded-full px-7 py-3.5 text-[14px] font-semibold">
-                Quiero mi diagnóstico gratuito
-                <ArrowRight className="h-4 w-4" />
-              </WhatsAppLink>
-              <span className="text-[12px] uppercase tracking-[0.14em] text-muted-foreground">
-                Respuesta el mismo día · Sin compromiso
-              </span>
+              <div className="mt-10 flex flex-wrap items-center gap-4">
+                <WhatsAppLink className="btn-primary inline-flex items-center gap-2.5 rounded-full px-7 py-3.5 text-[14px] font-semibold">
+                  Quiero mi diagnóstico gratuito
+                  <ArrowRight className="h-4 w-4" />
+                </WhatsAppLink>
+                <span className="text-[12px] uppercase tracking-[0.14em] text-muted-foreground">
+                  Respuesta el mismo día · Sin compromiso
+                </span>
+              </div>
+              <div aria-hidden className="electric-line mt-14 max-w-2xl" />
             </div>
-            <div aria-hidden className="electric-line mt-14 max-w-2xl" />
-          </div>
-
-        </section>
+          </section>
         </SugerenciasSeccion>
 
         {/* ============ BARRA DE CREDIBILIDAD ============ */}
@@ -650,6 +658,98 @@ function Index() {
           </section>
         </SugerenciasSeccion>
 
+        {/* ============ HERRAMIENTAS DE ANÁLISIS ============ */}
+        <SugerenciasSeccion
+          id="herramientas"
+          label="Herramientas"
+          contenido={contenidoHerramientas()}
+          fallbackPregunta={FALLBACK_SECCION.herramientas}
+        >
+          <section id="herramientas" className={SECTION}>
+            <div className={CONTAINER}>
+              <SectionHeading
+                label="Herramientas"
+                title="Probá el panel de análisis financiero"
+                lead={
+                  <>
+                    Un dashboard interactivo con datos en vivo de Yahoo Finance, IOL, BCRA,
+                    ArgentinaDatos y CriptoYa: contexto macro, semáforo técnico y fundamental,
+                    optimizador de carteras, riesgo, CAPM y análisis sectorial. Y si opera con
+                    InvertirOnline, puede iniciar sesión con su usuario y contraseña para analizar{" "}
+                    <em>su</em> portafolio real.
+                  </>
+                }
+              />
+
+              <div className="mx-auto mt-10 grid max-w-4xl gap-4 sm:grid-cols-2">
+                {[
+                  {
+                    icon: Gauge,
+                    titulo: "Contexto",
+                    texto:
+                      "Macro argentino en vivo: dólares, riesgo país, inflación, reservas, intermercado y etapa del ciclo económico.",
+                  },
+                  {
+                    icon: Activity,
+                    titulo: "Análisis",
+                    texto:
+                      "Semáforo técnico + fundamental por activo: RSI, MACD, medias, soportes y resistencias, con gráfico interactivo.",
+                  },
+                  {
+                    icon: LineChart,
+                    titulo: "Cuantitativo",
+                    texto:
+                      "Optimizador de carteras (5 estrategias), riesgo por distribución de retornos y CAPM con auto-benchmark.",
+                  },
+                  {
+                    icon: Layers,
+                    titulo: "Sectores",
+                    texto:
+                      "Performance sectorial, matriz de correlaciones entre ETFs, valuación relativa y oportunidades del día.",
+                  },
+                ].map((m) => (
+                  <div
+                    key={m.titulo}
+                    className="rounded-2xl border border-border/70 bg-secondary/20 p-5 transition-colors hover:border-primary/40"
+                  >
+                    <p className="flex items-center gap-2 font-display text-[15px] font-semibold text-foreground">
+                      <m.icon className="h-4 w-4 flex-none text-primary" />
+                      {m.titulo}
+                    </p>
+                    <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
+                      {m.texto}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mx-auto mt-8 flex max-w-4xl flex-col items-center justify-between gap-4 rounded-2xl border border-primary/30 bg-primary/[0.07] px-6 py-5 text-center sm:flex-row sm:text-left">
+                <p className="flex items-center gap-2 text-[13px] leading-snug text-foreground/90">
+                  <KeyRound className="h-4 w-4 flex-none text-gold" />
+                  <span>
+                    ¿Quiere ver análisis sobre <strong className="text-primary">su</strong> cartera?
+                    Dentro del panel, inicie sesión con su usuario y contraseña de{" "}
+                    <strong>IOL</strong> (el botón «IOL» arriba a la derecha). Las credenciales se
+                    procesan en el servidor al momento y no se guardan en el sitio.
+                  </span>
+                </p>
+                <Link
+                  to="/herramientas"
+                  search={{ tab: "contexto" }}
+                  className="flex-none rounded-full bg-primary px-5 py-2.5 text-[12.5px] font-semibold text-primary-foreground shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:bg-primary/90"
+                >
+                  Abrir Herramientas
+                </Link>
+              </div>
+
+              <p className="mx-auto mt-4 max-w-4xl text-center text-[11px] leading-snug text-muted-foreground">
+                Herramientas informativas con datos de terceros. No constituyen recomendación de
+                inversión.
+              </p>
+            </div>
+          </section>
+        </SugerenciasSeccion>
+
         {/* ============ INSTRUMENTOS ============ */}
         <SugerenciasSeccion
           id="instrumentos"
@@ -657,132 +757,129 @@ function Index() {
           contenido={contenidoInstrumentos(instrumentosMostrados, perfilInv, verTodos)}
           fallbackPregunta={FALLBACK_SECCION.instrumentos}
         >
-        <section
-          id="instrumentos"
-          className={SECTION}
-        >
-          <div className={CONTAINER}>
-            <SectionHeading
-              label="Instrumentos"
-              title="El mercado completo, filtrado para usted"
-              lead={
-                <>
-                  Todas las operaciones se efectúan en su cuenta{" "}
-                  <TooltipTerm
-                    term="comitente"
-                    tip="Cuenta a nombre del cliente en el bróker, donde permanecen depositados sus fondos y títulos."
-                  />
-                  , en un{" "}
-                  <TooltipTerm
-                    term="ALyC"
-                    tip="Agente de Liquidación y Compensación: el bróker registrado en la CNV que ejecuta y liquida las operaciones."
-                  />{" "}
-                  registrado en la CNV. Su dinero permanece siempre a su nombre.
-                </>
-              }
-            />
+          <section id="instrumentos" className={SECTION}>
+            <div className={CONTAINER}>
+              <SectionHeading
+                label="Instrumentos"
+                title="El mercado completo, filtrado para usted"
+                lead={
+                  <>
+                    Todas las operaciones se efectúan en su cuenta{" "}
+                    <TooltipTerm
+                      term="comitente"
+                      tip="Cuenta a nombre del cliente en el bróker, donde permanecen depositados sus fondos y títulos."
+                    />
+                    , en un{" "}
+                    <TooltipTerm
+                      term="ALyC"
+                      tip="Agente de Liquidación y Compensación: el bróker registrado en la CNV que ejecuta y liquida las operaciones."
+                    />{" "}
+                    registrado en la CNV. Su dinero permanece siempre a su nombre.
+                  </>
+                }
+              />
 
-            {perfilInv && !verTodos && (
-              <div className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/[0.07] px-5 py-4 text-center sm:flex-row sm:text-left">
-                <p className="flex items-center gap-2 text-[13.5px] leading-snug text-foreground/90">
-                  <TrendingUp className="h-4 w-4 flex-none text-primary" />
-                  <span>
-                    Mostrando los instrumentos que suelen adecuarse a su perfil{" "}
-                    <strong className="text-primary">{perfilInv.nombre}</strong>.
-                  </span>
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setVerTodos(true)}
-                  className="flex-none rounded-full border border-primary/40 bg-primary/10 px-3.5 py-1.5 text-[11.5px] font-semibold text-primary transition-colors hover:border-primary hover:bg-primary/15"
-                >
-                  Ver el catálogo completo
-                </button>
-              </div>
-            )}
-            {perfilInv && verTodos && (
-              <div className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-between gap-3 rounded-2xl border border-border/70 bg-secondary/20 px-5 py-4 text-center sm:flex-row sm:text-left">
-                <p className="flex items-center gap-2 text-[13.5px] leading-snug text-muted-foreground">
-                  <ShieldCheck className="h-4 w-4 flex-none text-primary" />
-                  <span>
-                    Catálogo completo.{" "}
-                    <button
-                      type="button"
-                      onClick={() => setVerTodos(false)}
-                      className="font-semibold text-primary underline underline-offset-2 hover:text-primary/80"
-                    >
-                      Volver a {perfilInv.nombre}
-                    </button>
-                  </span>
-                </p>
-              </div>
-            )}
-            {!perfilInv && (
-              <p className="mx-auto mt-6 max-w-xl text-center text-[12.5px] leading-relaxed text-muted-foreground">
-                Complete el{" "}
-                <a
-                  href="#test-inversor"
-                  className="font-semibold text-primary underline underline-offset-2 hover:text-primary/80"
-                >
-                  Test del Inversor
-                </a>{" "}
-                y el catálogo se ajustará automáticamente a su perfil.
-              </p>
-            )}
-
-            <div className="mt-10 grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-              {instrumentosMostrados.map(
-                ({ nombre, que, moneda, perfil, verificar, porque, paraQuien }) => {
-                  const Icon = ICONOS_INSTRUMENTO[nombre];
-                  const withTip = nombre === "CEDEARs";
-                  const label = (
-                    <span className="block text-[15px] font-semibold leading-snug text-foreground">
-                      {withTip ? (
-                        <TooltipTerm
-                          term={nombre}
-                          tip="Certificado que representa acciones de empresas extranjeras y se opera en pesos en la Bolsa local."
-                        />
-                      ) : (
-                        nombre
-                      )}
+              {perfilInv && !verTodos && (
+                <div className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/[0.07] px-5 py-4 text-center sm:flex-row sm:text-left">
+                  <p className="flex items-center gap-2 text-[13.5px] leading-snug text-foreground/90">
+                    <TrendingUp className="h-4 w-4 flex-none text-primary" />
+                    <span>
+                      Mostrando los instrumentos que suelen adecuarse a su perfil{" "}
+                      <strong className="text-primary">{perfilInv.nombre}</strong>.
                     </span>
-                  );
-                  return (
-                    <div
-                      key={nombre}
-                      className="surface-card group flex items-start gap-4 rounded-xl px-5 py-5 text-left transition-colors hover:border-primary/60 hover:bg-primary/[0.06]"
-                    >
-                      <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-gradient-to-br from-white/12 to-white/[0.02] text-gold ring-1 ring-white/15 transition-colors group-hover:text-primary group-hover:ring-primary/40">
-                        <Icon className="h-5 w-5" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="flex flex-wrap items-center justify-between gap-2">
-                          {label}
-                          <RiskChip
-                            perfil={perfil}
-                            {...(verificar === true ? { verificar: true } : {})}
-                          />
-                        </span>
-                        <span className="mt-1 block text-[13px] leading-snug text-muted-foreground">
-                          {que}
-                        </span>
-                        <span className="mt-1 block text-[11px] uppercase tracking-[0.06em] text-muted-foreground/80">
-                          {moneda}
-                        </span>
-                        <span className="mt-1.5 block text-[12.5px] leading-snug text-foreground/90">
-                          {porque}
-                        </span>
-                        <span className="mt-1.5 block border-l-2 border-gold/40 pl-2 text-[11.5px] leading-snug text-gold/90">
-                          {paraQuien}
-                        </span>
-                      </span>
-                    </div>
-                  );
-                },
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setVerTodos(true)}
+                    className="flex-none rounded-full border border-primary/40 bg-primary/10 px-3.5 py-1.5 text-[11.5px] font-semibold text-primary transition-colors hover:border-primary hover:bg-primary/15"
+                  >
+                    Ver el catálogo completo
+                  </button>
+                </div>
               )}
+              {perfilInv && verTodos && (
+                <div className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-between gap-3 rounded-2xl border border-border/70 bg-secondary/20 px-5 py-4 text-center sm:flex-row sm:text-left">
+                  <p className="flex items-center gap-2 text-[13.5px] leading-snug text-muted-foreground">
+                    <ShieldCheck className="h-4 w-4 flex-none text-primary" />
+                    <span>
+                      Catálogo completo.{" "}
+                      <button
+                        type="button"
+                        onClick={() => setVerTodos(false)}
+                        className="font-semibold text-primary underline underline-offset-2 hover:text-primary/80"
+                      >
+                        Volver a {perfilInv.nombre}
+                      </button>
+                    </span>
+                  </p>
+                </div>
+              )}
+              {!perfilInv && (
+                <p className="mx-auto mt-6 max-w-xl text-center text-[12.5px] leading-relaxed text-muted-foreground">
+                  Complete el{" "}
+                  <a
+                    href="#test-inversor"
+                    className="font-semibold text-primary underline underline-offset-2 hover:text-primary/80"
+                  >
+                    Test del Inversor
+                  </a>{" "}
+                  y el catálogo se ajustará automáticamente a su perfil.
+                </p>
+              )}
+
+              <div className="mt-10 grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+                {instrumentosMostrados.map(
+                  ({ nombre, que, moneda, perfil, verificar, porque, paraQuien }) => {
+                    const Icon = ICONOS_INSTRUMENTO[nombre];
+                    const withTip = nombre === "CEDEARs";
+                    const label = (
+                      <span className="block text-[15px] font-semibold leading-snug text-foreground">
+                        {withTip ? (
+                          <TooltipTerm
+                            term={nombre}
+                            tip="Certificado que representa acciones de empresas extranjeras y se opera en pesos en la Bolsa local."
+                          />
+                        ) : (
+                          nombre
+                        )}
+                      </span>
+                    );
+                    return (
+                      <div
+                        key={nombre}
+                        className="surface-card group flex items-start gap-4 rounded-xl px-5 py-5 text-left transition-colors hover:border-primary/60 hover:bg-primary/[0.06]"
+                      >
+                        <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-gradient-to-br from-white/12 to-white/[0.02] text-gold ring-1 ring-white/15 transition-colors group-hover:text-primary group-hover:ring-primary/40">
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="flex flex-wrap items-center justify-between gap-2">
+                            {label}
+                            <RiskChip
+                              perfil={perfil}
+                              {...(verificar === true ? { verificar: true } : {})}
+                            />
+                          </span>
+                          <span className="mt-1 block text-[13px] leading-snug text-muted-foreground">
+                            {que}
+                          </span>
+                          <span className="mt-1 block text-[11px] uppercase tracking-[0.06em] text-muted-foreground/80">
+                            {moneda}
+                          </span>
+                          <span className="mt-1.5 block text-[12.5px] leading-snug text-foreground/90">
+                            {porque}
+                          </span>
+                          <span className="mt-1.5 block border-l-2 border-gold/40 pl-2 text-[11.5px] leading-snug text-gold/90">
+                            {paraQuien}
+                          </span>
+                        </span>
+                      </div>
+                    );
+                  },
+                )}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
         </SugerenciasSeccion>
 
         {/* ============ BROKERS ============ */}
@@ -792,55 +889,52 @@ function Index() {
           contenido={contenidoBrokers()}
           fallbackPregunta={FALLBACK_SECCION.brokers}
         >
-        <section
-          id="brokers"
-          className={SECTION}
-        >
-          <div className={CONTAINER}>
-            <SectionHeading
-              label="Brokers"
-              title="Operamos donde su dinero está protegido"
-              lead="Balanz, Inviu e IOL: tres ALyC registrados en la CNV. Usted elige con quién operar y su cuenta comitente queda siempre a su nombre. Nosotros aportamos la estrategia; la custodia es del bróker regulado."
-            />
+          <section id="brokers" className={SECTION}>
+            <div className={CONTAINER}>
+              <SectionHeading
+                label="Brokers"
+                title="Operamos donde su dinero está protegido"
+                lead="Balanz, Inviu e IOL: tres ALyC registrados en la CNV. Usted elige con quién operar y su cuenta comitente queda siempre a su nombre. Nosotros aportamos la estrategia; la custodia es del bróker regulado."
+              />
 
-            <div className="mt-10">
-              <div className="surface-card overflow-hidden rounded-[2rem]">
-                <div className="grid grid-cols-1 gap-3 p-3 sm:grid-cols-3 sm:gap-0 sm:p-5">
-                  {BROKERS.map((b, i) => (
-                    <a
-                      key={b.name}
-                      href={b.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`group flex flex-col items-center rounded-2xl px-6 py-8 transition-colors hover:bg-primary/[0.06] ${
-                        i > 0 ? "sm:border-l sm:border-border/60" : ""
-                      }`}
-                    >
-                      <span className="flex h-28 w-full items-center justify-center px-6 lg:h-32">
-                        <img
-                          src={b.logo}
-                          alt={`Logo ${b.name}`}
-                          loading="lazy"
-                          width={260}
-                          height={96}
-                          className="max-h-full w-full object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.35)] transition-transform duration-300 group-hover:scale-105"
-                        />
-                      </span>
-                      <span className="mt-5 text-[16px] font-semibold">{b.name}</span>
-                      <span className="mt-1 text-[12px] leading-snug text-muted-foreground tabular-nums">
-                        {b.mat}
-                      </span>
-                      <span className="mt-3 inline-flex items-center gap-1.5 text-[12px] font-semibold text-primary">
-                        Sitio oficial
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </span>
-                    </a>
-                  ))}
+              <div className="mt-10">
+                <div className="surface-card overflow-hidden rounded-[2rem]">
+                  <div className="grid grid-cols-1 gap-3 p-3 sm:grid-cols-3 sm:gap-0 sm:p-5">
+                    {BROKERS.map((b, i) => (
+                      <a
+                        key={b.name}
+                        href={b.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`group flex flex-col items-center rounded-2xl px-6 py-8 transition-colors hover:bg-primary/[0.06] ${
+                          i > 0 ? "sm:border-l sm:border-border/60" : ""
+                        }`}
+                      >
+                        <span className="flex h-28 w-full items-center justify-center px-6 lg:h-32">
+                          <img
+                            src={b.logo}
+                            alt={`Logo ${b.name}`}
+                            loading="lazy"
+                            width={260}
+                            height={96}
+                            className="max-h-full w-full object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.35)] transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </span>
+                        <span className="mt-5 text-[16px] font-semibold">{b.name}</span>
+                        <span className="mt-1 text-[12px] leading-snug text-muted-foreground tabular-nums">
+                          {b.mat}
+                        </span>
+                        <span className="mt-3 inline-flex items-center gap-1.5 text-[12px] font-semibold text-primary">
+                          Sitio oficial
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </span>
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
         </SugerenciasSeccion>
 
         {/* ============ PREGUNTAS ============ */}
@@ -850,40 +944,40 @@ function Index() {
           contenido={contenidoPreguntas()}
           fallbackPregunta={FALLBACK_SECCION.preguntas}
         >
-        <section id="preguntas" className={SECTION}>
-          <div className={CONTAINER}>
-            <SectionHeading
-              label="Preguntas"
-              title="Lo que todo nuevo inversor pregunta"
-              lead="Sin letra chica: las dudas más frecuentes, respondidas antes de que dé el primer paso."
-            />
+          <section id="preguntas" className={SECTION}>
+            <div className={CONTAINER}>
+              <SectionHeading
+                label="Preguntas"
+                title="Lo que todo nuevo inversor pregunta"
+                lead="Sin letra chica: las dudas más frecuentes, respondidas antes de que dé el primer paso."
+              />
 
-            <div className="mx-auto mt-10 max-w-3xl">
-              {FAQ.map((f) => (
-                <details key={f.q} className="group border-b border-border/70 py-4">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 marker:hidden">
-                    <span className="text-[17px] font-semibold leading-snug lg:text-[19px]">
-                      {f.q}
-                    </span>
-                    <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-gold/40 text-gold transition-transform duration-300 group-open:rotate-45">
-                      <Plus className="h-4 w-4" />
-                    </span>
-                  </summary>
-                  <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground lg:text-[16px]">
-                    {f.a}
-                  </p>
-                </details>
-              ))}
-            </div>
+              <div className="mx-auto mt-10 max-w-3xl">
+                {FAQ.map((f) => (
+                  <details key={f.q} className="group border-b border-border/70 py-4">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 marker:hidden">
+                      <span className="text-[17px] font-semibold leading-snug lg:text-[19px]">
+                        {f.q}
+                      </span>
+                      <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-gold/40 text-gold transition-transform duration-300 group-open:rotate-45">
+                        <Plus className="h-4 w-4" />
+                      </span>
+                    </summary>
+                    <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground lg:text-[16px]">
+                      {f.a}
+                    </p>
+                  </details>
+                ))}
+              </div>
 
-            <div className="mt-10 text-center">
-              <WhatsAppLink className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold text-primary-foreground">
-                ¿Quedó una duda? Escríbame por WhatsApp
-                <ArrowRight className="h-4 w-4" />
-              </WhatsAppLink>
+              <div className="mt-10 text-center">
+                <WhatsAppLink className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold text-primary-foreground">
+                  ¿Quedó una duda? Escríbame por WhatsApp
+                  <ArrowRight className="h-4 w-4" />
+                </WhatsAppLink>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
         </SugerenciasSeccion>
 
         {/* ============ ALIANZAS ============ */}
@@ -893,110 +987,110 @@ function Index() {
           contenido={contenidoAlianzas()}
           fallbackPregunta={FALLBACK_SECCION.alianzas}
         >
-        <section id="alianzas" className={SECTION}>
-          <div className={CONTAINER}>
-            <SectionHeading
-              label="Alianzas"
-              title="Profesionales de confianza"
-              lead="Cuando el caso lo requiere, lo conectamos con especialistas independientes de confianza. Servicios ajenos a la actividad regulada por la CNV."
-            />
+          <section id="alianzas" className={SECTION}>
+            <div className={CONTAINER}>
+              <SectionHeading
+                label="Alianzas"
+                title="Profesionales de confianza"
+                lead="Cuando el caso lo requiere, lo conectamos con especialistas independientes de confianza. Servicios ajenos a la actividad regulada por la CNV."
+              />
 
-            <div className="mx-auto mt-10 max-w-3xl">
-              <div className="surface-card overflow-hidden rounded-2xl px-6">
-                <details className="group border-b border-border/70">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 marker:hidden">
-                    <span className="flex items-center gap-3">
-                      <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-primary/15 text-primary">
-                        <Layers className="h-5 w-5" />
-                      </span>
-                      <span className="flex flex-col items-start gap-0.5">
-                        <span className="font-display text-[15px] font-semibold">
-                          Franco Lamas · Desarrollo de software
+              <div className="mx-auto mt-10 max-w-3xl">
+                <div className="surface-card overflow-hidden rounded-2xl px-6">
+                  <details className="group border-b border-border/70">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 marker:hidden">
+                      <span className="flex items-center gap-3">
+                        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-primary/15 text-primary">
+                          <Layers className="h-5 w-5" />
                         </span>
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
-                          Presencia digital
+                        <span className="flex flex-col items-start gap-0.5">
+                          <span className="font-display text-[15px] font-semibold">
+                            Franco Lamas · Desarrollo de software
+                          </span>
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+                            Presencia digital
+                          </span>
                         </span>
                       </span>
-                    </span>
-                    <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-gold/40 text-gold transition-transform duration-300 group-open:rotate-45">
-                      <Plus className="h-4 w-4" />
-                    </span>
-                  </summary>
-                  <div className="pb-6">
-                    <div className="rounded-xl border border-border/70 px-5 py-4">
-                      <p className="text-[14.5px] leading-relaxed text-muted-foreground">
-                        Landing pages, sitios completos y apps a medida, con hosting incluido los
-                        primeros meses.
-                      </p>
-                      <ul className="mt-3 space-y-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
-                        <li>— Landing page: una página, responsive, con SEO</li>
-                        <li>
-                          — Sitio completo: multi-página, panel de administración e integraciones
-                        </li>
-                        <li>— Apps a medida: desarrollo, DevOps y mantenimiento (SRE)</li>
-                        <li>— Hosting incluido los primeros meses, con costo mensual luego</li>
-                      </ul>
-                      <p className="mt-4 text-[12px] italic text-muted-foreground">
-                        Franco Lamas · Developer · DevOps · SRE
-                      </p>
+                      <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-gold/40 text-gold transition-transform duration-300 group-open:rotate-45">
+                        <Plus className="h-4 w-4" />
+                      </span>
+                    </summary>
+                    <div className="pb-6">
+                      <div className="rounded-xl border border-border/70 px-5 py-4">
+                        <p className="text-[14.5px] leading-relaxed text-muted-foreground">
+                          Landing pages, sitios completos y apps a medida, con hosting incluido los
+                          primeros meses.
+                        </p>
+                        <ul className="mt-3 space-y-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
+                          <li>— Landing page: una página, responsive, con SEO</li>
+                          <li>
+                            — Sitio completo: multi-página, panel de administración e integraciones
+                          </li>
+                          <li>— Apps a medida: desarrollo, DevOps y mantenimiento (SRE)</li>
+                          <li>— Hosting incluido los primeros meses, con costo mensual luego</li>
+                        </ul>
+                        <p className="mt-4 text-[12px] italic text-muted-foreground">
+                          Franco Lamas · Developer · DevOps · SRE
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </details>
+                  </details>
 
-                <details className="group">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 marker:hidden">
-                    <span className="flex items-center gap-3">
-                      <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-gold/15 text-gold">
-                        <Scale className="h-5 w-5" />
-                      </span>
-                      <span className="flex flex-col items-start gap-0.5">
-                        <span className="font-display text-[15px] font-semibold">
-                          Estudio Jurídico Dr. Pupi Cervio
+                  <details className="group">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 marker:hidden">
+                      <span className="flex items-center gap-3">
+                        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-gold/15 text-gold">
+                          <Scale className="h-5 w-5" />
                         </span>
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
-                          Recupero de criptoestafas
+                        <span className="flex flex-col items-start gap-0.5">
+                          <span className="font-display text-[15px] font-semibold">
+                            Estudio Jurídico Dr. Pupi Cervio
+                          </span>
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
+                            Recupero de criptoestafas
+                          </span>
                         </span>
                       </span>
-                    </span>
-                    <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-gold/40 text-gold transition-transform duration-300 group-open:rotate-45">
-                      <Plus className="h-4 w-4" />
-                    </span>
-                  </summary>
-                  <div className="pb-6">
-                    <div className="rounded-xl border border-border/70 px-5 py-4">
-                      <p className="text-[14.5px] leading-relaxed text-muted-foreground">
-                        Si te estafaron con criptoactivos, te conecto con representación penal
-                        especializada.
-                      </p>
-                      <ul className="mt-3 space-y-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
-                        <li>— Representación penal del caso (abogado penalista)</li>
-                        <li>— Rastreo forense de fondos y billeteras</li>
-                        <li>— Presentación de la denuncia y seguimiento judicial</li>
-                      </ul>
-                      <p className="mt-4 text-[12px] italic text-muted-foreground">
-                        Dr. Santiago Luis Pupi · Abogado penalista
-                      </p>
-                      <a
-                        href="https://www.pupicervio.com/"
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-gold underline underline-offset-4 hover:text-primary"
-                      >
-                        Sitio oficial: pupicervio.com
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
+                      <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-gold/40 text-gold transition-transform duration-300 group-open:rotate-45">
+                        <Plus className="h-4 w-4" />
+                      </span>
+                    </summary>
+                    <div className="pb-6">
+                      <div className="rounded-xl border border-border/70 px-5 py-4">
+                        <p className="text-[14.5px] leading-relaxed text-muted-foreground">
+                          Si te estafaron con criptoactivos, te conecto con representación penal
+                          especializada.
+                        </p>
+                        <ul className="mt-3 space-y-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
+                          <li>— Representación penal del caso (abogado penalista)</li>
+                          <li>— Rastreo forense de fondos y billeteras</li>
+                          <li>— Presentación de la denuncia y seguimiento judicial</li>
+                        </ul>
+                        <p className="mt-4 text-[12px] italic text-muted-foreground">
+                          Dr. Santiago Luis Pupi · Abogado penalista
+                        </p>
+                        <a
+                          href="https://www.pupicervio.com/"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-gold underline underline-offset-4 hover:text-primary"
+                        >
+                          Sitio oficial: pupicervio.com
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      </div>
                     </div>
-                  </div>
-                </details>
+                  </details>
+                </div>
+
+                <p className="mt-4 text-center text-[12px] leading-relaxed text-muted-foreground">
+                  Estos profesionales son terceros independientes. Su actividad es ajena a la de
+                  Cintia Boos, regulada por la CNV.
+                </p>
               </div>
-
-              <p className="mt-4 text-center text-[12px] leading-relaxed text-muted-foreground">
-                Estos profesionales son terceros independientes. Su actividad es ajena a la de
-                Cintia Boos, regulada por la CNV.
-              </p>
             </div>
-          </div>
-        </section>
+          </section>
         </SugerenciasSeccion>
 
         {/* ============ CTA FINAL ============ */}
@@ -1015,7 +1109,8 @@ function Index() {
               Empiece hoy con un diagnóstico claro
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-[17px] leading-relaxed text-muted-foreground lg:text-[18px]">
-              Analizamos su situación, su horizonte y su tolerancia al riesgo, y le mostramos un camino concreto. Sin costo, sin compromiso y con reglas claras desde el minuto uno.
+              Analizamos su situación, su horizonte y su tolerancia al riesgo, y le mostramos un
+              camino concreto. Sin costo, sin compromiso y con reglas claras desde el minuto uno.
             </p>
             <WhatsAppLink className="mt-9 inline-flex items-center gap-2.5 rounded-full bg-primary px-8 py-4 text-[15px] font-semibold text-primary-foreground shadow-[0_12px_40px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:bg-primary/90">
               Reservar mi diagnóstico por WhatsApp

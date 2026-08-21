@@ -2260,3 +2260,409 @@ export async function ejecutarGenerarInforme(argsRaw: string): Promise<Resultado
     eventos: [{ t: "informe", v: { titulo, contenidoMarkdown: documento } }],
   };
 }
+
+// ---------------------------------------------------------------------------
+// Herramientas migradas del tab /herramientas (clarity-dashboard).
+// Invocan las server functions del subárbol src/lib/herramientas en contexto
+// de servidor (ejecución local, sin HTTP).
+// ---------------------------------------------------------------------------
+
+import { optimizeAllPortfolios } from "@/lib/herramientas/finance.functions";
+import { backtestOptimization } from "@/lib/herramientas/finance.functions";
+import { getRiesgoAnalysis, type DistribStats } from "@/lib/herramientas/riesgo.functions";
+import { getCAPMAnalysis } from "@/lib/herramientas/capm.functions";
+import { getSectorAnalysis } from "@/lib/herramientas/sector-analysis.functions";
+import { getSectorValuationRanking } from "@/lib/herramientas/sector-valuation-ranking.functions";
+import { getMarketScreeners } from "@/lib/herramientas/daily-opportunities.functions";
+import { getBenchmarksMatrix } from "@/lib/herramientas/sectores/benchmarks-matrix.functions";
+
+type ResTool = { texto: string; fuentes: FuenteMercado[]; ok: boolean };
+
+function pctS(v: number | null | undefined, dec = 1): string {
+  if (v == null || !isFinite(v)) return "s/d";
+  return `${v >= 0 ? "+" : ""}${(v * 100).toFixed(dec)}%`;
+}
+function n2(v: number | null | undefined, dec = 2): string {
+  if (v == null || !isFinite(v)) return "s/d";
+  return v.toFixed(dec);
+}
+
+type ArgsLibres = {
+  tickers?: unknown;
+  notional?: unknown;
+  benchmarks?: unknown;
+  years?: unknown;
+  cutoffDate?: unknown;
+  intervalo?: unknown;
+  periodo?: unknown;
+  autoDetect?: unknown;
+  sector?: unknown;
+  industry?: unknown;
+};
+
+function parseArgsObj(argsRaw: string): ArgsLibres {
+  try {
+    return JSON.parse(argsRaw) as ArgsLibres;
+  } catch {
+    return {};
+  }
+}
+
+function tickersDe(args: ArgsLibres): string[] {
+  const raw = args.tickers;
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((t) => String(t).trim().toUpperCase())
+    .filter(Boolean)
+    .slice(0, 20);
+}
+
+export async function ejecutarOptimizacionAvanzada(argsRaw: string): Promise<ResTool> {
+  const args = parseArgsObj(argsRaw);
+  const tickers = tickersDe(args);
+  if (tickers.length < 2) {
+    return {
+      texto:
+        "SIN RESULTADOS: se necesitan al menos 2 tickers. Reinvocá con tickers=['SPY','QQQ',...].",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    const r = (await optimizeAllPortfolios({
+      data: {
+        tickers,
+        notional: typeof args.notional === "number" ? args.notional : 15000,
+        numSimulations: 2000,
+        benchmarks: Array.isArray(args.benchmarks) ? args.benchmarks.map(String) : ["SPY"],
+        autoDetectBenchmarks: false,
+        years: typeof args.years === "number" ? args.years : 2,
+      },
+    })) as unknown as Record<string, unknown>;
+    const L: string[] = [
+      `Optimización de cartera (${tickers.join(", ")}) — ${args.years ?? 2} años, series diarias Yahoo:`,
+    ];
+    for (const key of ["maxSharpe", "minVariance", "equalWeight", "inverseVol", "markowitz"]) {
+      const e = r[key] as {
+        retornoAnual?: number;
+        volatilidadAnual?: number;
+        sharpe?: number;
+        var95?: number;
+        pesos?: Record<string, number>;
+      } | null;
+      if (!e) continue;
+      const pesos = Object.entries(e.pesos ?? {})
+        .filter(([, w]) => Number(w) > 0.005)
+        .map(([t, w]) => `${t} ${(Number(w) * 100).toFixed(1)}%`)
+        .join(", ");
+      L.push(
+        `- ${key}: retorno ${pctS(e.retornoAnual)} · vol ${pctS(e.volatilidadAnual)} · Sharpe ${n2(e.sharpe)} · VaR95 ${pctS(e.var95)} · pesos: ${pesos || "—"}`,
+      );
+    }
+    L.push(
+      "Interpretación: Sharpe = retorno por unidad de riesgo; VaR95 = pérdida diaria típica del peor 5%.",
+    );
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: no se pudo optimizar la cartera (${e instanceof Error ? e.message : "error"}). Verificá que los tickers tengan historia suficiente en Yahoo.`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+export async function ejecutarBacktestOptimizacion(argsRaw: string): Promise<ResTool> {
+  const args = parseArgsObj(argsRaw);
+  const tickers = tickersDe(args);
+  const cutoff = String(args.cutoffDate ?? "").trim();
+  if (tickers.length < 2 || !/^\d{4}-\d{2}-\d{2}$/.test(cutoff)) {
+    return {
+      texto:
+        "SIN RESULTADOS: se necesitan tickers (>=2) y cutoffDate YYYY-MM-DD. Reinvocá con ambos parámetros.",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    const r = (await backtestOptimization({
+      data: {
+        tickers,
+        cutoffDate: cutoff,
+        years: typeof args.years === "number" ? args.years : 2,
+        numSimulations: 2000,
+      },
+    })) as unknown as Record<string, unknown>;
+    const L = [`Backtest walk-forward (corte ${cutoff}, entrenamiento ${args.years ?? 2} años):`];
+    for (const [k, v] of Object.entries(r)) {
+      if (v && typeof v === "object" && "sharpe" in (v as object)) {
+        const o = v as { retornoAnual?: number; volatilidadAnual?: number; sharpe?: number };
+        L.push(
+          `- ${k}: retorno ${pctS(o.retornoAnual)} · vol ${pctS(o.volatilidadAnual)} · Sharpe ${n2(o.sharpe)}`,
+        );
+      }
+    }
+    L.push(
+      "El backtest entrena los pesos con datos previos al corte y los evalúa con datos posteriores (fuera de muestra).",
+    );
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: backtest falló (${e instanceof Error ? e.message : "error"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+export async function ejecutarDistribucionRiesgo(argsRaw: string): Promise<ResTool> {
+  const args = parseArgsObj(argsRaw);
+  const tickers = tickersDe(args);
+  if (!tickers.length) {
+    return { texto: "SIN RESULTADOS: indicá al menos un ticker.", fuentes: [], ok: false };
+  }
+  try {
+    const rs = (await getRiesgoAnalysis({
+      data: {
+        tickers,
+        interval: typeof args.intervalo === "string" ? args.intervalo : "1d",
+        period: typeof args.periodo === "string" ? args.periodo : "2y",
+      },
+    })) as unknown as DistribStats[];
+    const lista = Array.isArray(rs) ? rs : [];
+    if (!lista.length) {
+      return {
+        texto: "SIN RESULTADOS: sin datos suficientes para esos tickers/períodos.",
+        fuentes: [],
+        ok: false,
+      };
+    }
+    const L = ["Distribución de retornos (datos reales Yahoo):"];
+    for (const r of lista) {
+      L.push(
+        `- ${r.ticker}: media anual ${pctS(r.meanAnnual as number)} · vol anual ${pctS(r.volatilityAnnual as number)} · Sharpe ${n2(r.sharpeRatio as number)} · VaR95 ${pctS(r.var95 as number)} · skew ${n2(r.skewness as number)} · kurtosis ${n2(r.kurtosis as number)} · Jarque-Bera p=${n2(r.pValue as number, 4)} (${r.isNormal ? "normal" : "colas pesadas"}) · máx pérdida ${pctS(r.maxLoss as number)} · máx ganancia ${pctS(r.maxGain as number)}`,
+      );
+    }
+    L.push(
+      "Si Jarque-Bera rechaza normalidad (p<0.05), el VaR gaussiano subestima el riesgo de cola.",
+    );
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: análisis de riesgo falló (${e instanceof Error ? e.message : "error"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+export async function ejecutarCapmAuto(argsRaw: string): Promise<ResTool> {
+  const args = parseArgsObj(argsRaw);
+  const tickers = tickersDe(args);
+  if (!tickers.length) {
+    return { texto: "SIN RESULTADOS: indicá al menos un ticker.", fuentes: [], ok: false };
+  }
+  const autoDetect = args.autoDetect !== false;
+  try {
+    const rs = (await getCAPMAnalysis({
+      data: {
+        tickers,
+        benchmarks: Array.isArray(args.benchmarks) ? args.benchmarks.map(String) : [],
+        multilinear: false,
+        autoDetect,
+        source: "yahoo",
+      },
+    })) as unknown as Array<{
+      ticker: string;
+      beta?: number;
+      annualizedAlpha?: number;
+      rSquared?: number;
+      correlation?: number;
+      pValue?: number;
+      benchmarkLabel?: string;
+      hurstExponent?: number;
+      betaP?: number;
+    }>;
+    const L = ["CAPM con auto-detección de benchmark (mayor R²):"];
+    for (const r of rs) {
+      L.push(
+        `- ${r.ticker}: beta ${n2(r.beta)} vs ${r.benchmarkLabel ?? "—"} · alpha anual ${pctS(r.annualizedAlpha)} · R² ${n2(r.rSquared, 3)} · correlación ${n2(r.correlation, 3)} · p-valor ${n2(r.pValue, 4)}${r.hurstExponent != null ? ` · Hurst ${n2(r.hurstExponent, 3)}` : ""}${r.betaP != null ? ` · beta p-variance ${n2(r.betaP)}` : ""}`,
+      );
+    }
+    L.push(
+      "Alpha positivo y significativo (p<0.05) sugiere rendimiento anormal histórico; Hurst>0.5 sugiere persistencia de tendencia.",
+    );
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: CAPM falló (${e instanceof Error ? e.message : "error"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+export async function ejecutarAnalisisIndustria(argsRaw: string): Promise<ResTool> {
+  const args = parseArgsObj(argsRaw);
+  const sector = String(args.sector ?? "").trim();
+  const industry = String(args.industry ?? "").trim();
+  const rawTickers = Array.isArray(args.tickers) ? args.tickers : [];
+  const tickers = rawTickers
+    .map((t) => {
+      if (typeof t === "string") return { ticker: t.trim().toUpperCase(), nombre: t.trim() };
+      const o = t as { ticker?: unknown; nombre?: unknown };
+      return {
+        ticker: String(o.ticker ?? "")
+          .trim()
+          .toUpperCase(),
+        nombre: String(o.nombre ?? o.ticker ?? "").trim(),
+      };
+    })
+    .filter((t) => t.ticker)
+    .slice(0, 50);
+  if (!sector || !industry || !tickers.length) {
+    return {
+      texto:
+        "SIN RESULTADOS: se requieren sector, industry y tickers (lista de {ticker, nombre}). Ejemplo: sector='Technology', industry='Software - Infrastructure', tickers=[{ticker:'MSFT', nombre:'Microsoft'}].",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    const r = (await getSectorAnalysis({
+      data: { sector, industry, tickers, mode: "completo" },
+    })) as {
+      avgPE?: number | null;
+      avgForwardPE?: number | null;
+      avgScore?: number | null;
+      tickers?: Array<{
+        ticker: string;
+        price?: number | null;
+        trailingPE?: number | null;
+        forwardPE?: number | null;
+        pegRatio?: number | null;
+        returnOnEquity?: number | null;
+        profitMargin?: number | null;
+        fcfYield?: number | null;
+        fundScore?: number | null;
+      }>;
+    };
+    const L = [`Análisis de ${sector} · ${industry} (${tickers.length} tickers):`];
+    L.push(
+      `Promedios: P/E ${n2(r.avgPE, 1)} · P/E fwd ${n2(r.avgForwardPE, 1)} · score fundamental ${n2(r.avgScore, 1)}`,
+    );
+    for (const t of (r.tickers ?? []).slice(0, 25)) {
+      L.push(
+        `- ${t.ticker}: precio ${n2(t.price)} · P/E ${n2(t.trailingPE, 1)} · P/E fwd ${n2(t.forwardPE, 1)} · PEG ${n2(t.pegRatio)} · ROE ${pctS(t.returnOnEquity)} · margen ${pctS(t.profitMargin)} · FCF yield ${pctS(t.fcfYield)} · score ${n2(t.fundScore, 1)}`,
+      );
+    }
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: análisis sectorial falló (${e instanceof Error ? e.message : "error"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+export async function ejecutarRankingValuacion(): Promise<ResTool> {
+  try {
+    const r = (await getSectorValuationRanking()) as {
+      rows?: Array<{
+        sector: string;
+        avgForwardPE?: number | null;
+        avgTrailingPE?: number | null;
+        avgPEG?: number | null;
+        medianPEPercentile?: number | null;
+        tickerCount?: number;
+      }>;
+    };
+    const rows = [...(r.rows ?? [])].sort(
+      (a, b) => (a.avgForwardPE ?? 999) - (b.avgForwardPE ?? 999),
+    );
+    if (!rows.length) {
+      return {
+        texto: "SIN RESULTADOS: ranking no disponible en este momento.",
+        fuentes: [],
+        ok: false,
+      };
+    }
+    const L = ["Ranking de valuación sectorial (menor P/E forward = más barato):"];
+    for (const s of rows) {
+      L.push(
+        `- ${s.sector}: P/E fwd ${n2(s.avgForwardPE, 1)} · P/E trailing ${n2(s.avgTrailingPE, 1)} · PEG ${n2(s.avgPEG)} · pctil P/E mediano ${n2(s.medianPEPercentile, 0)} · ${s.tickerCount ?? 0} tickers`,
+      );
+    }
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: ranking falló (${e instanceof Error ? e.message : "error"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+export async function ejecutarOportunidadesDiarias(): Promise<ResTool> {
+  try {
+    const r = (await getMarketScreeners()) as {
+      day_gainers?: Array<{ symbol: string; price?: number | null; percentChange?: number | null }>;
+      day_losers?: Array<{ symbol: string; price?: number | null; percentChange?: number | null }>;
+      most_actives?: Array<{
+        symbol: string;
+        price?: number | null;
+        percentChange?: number | null;
+      }>;
+      undervalued?: Array<{ symbol: string; price?: number | null; percentChange?: number | null }>;
+    };
+    const fmtLista = (
+      items: Array<{ symbol: string; price?: number | null; percentChange?: number | null }>,
+    ) =>
+      items
+        .slice(0, 8)
+        .map(
+          (i) =>
+            `${i.symbol} ${i.price != null ? `$${i.price.toFixed(2)}` : ""} (${pctS(i.percentChange)})`,
+        )
+        .join(", ") || "—";
+    const L = [
+      "Screeners del día (Yahoo Finance):",
+      `- Mayores alzas: ${fmtLista(r.day_gainers ?? [])}`,
+      `- Mayores bajas: ${fmtLista(r.day_losers ?? [])}`,
+      `- Más operadas: ${fmtLista(r.most_actives ?? [])}`,
+      `- Infravaloradas large-cap: ${fmtLista(r.undervalued ?? [])}`,
+    ];
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: screeners no disponibles (${e instanceof Error ? e.message : "error"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+export async function ejecutarMatrizBenchmarks(): Promise<ResTool> {
+  try {
+    const r = (await getBenchmarksMatrix()) as {
+      mejoresParaDiversificar?: Array<{ etfA: string; etfB: string; correlation: number }>;
+      masRedundantes?: Array<{ etfA: string; etfB: string; correlation: number }>;
+    };
+    const L = ["Matriz de correlaciones entre benchmarks/ETFs sectoriales:"];
+    for (const p of r.mejoresParaDiversificar ?? []) {
+      L.push(`- Mayor diversificación: ${p.etfA} vs ${p.etfB} → corr ${n2(p.correlation)}`);
+    }
+    for (const p of r.masRedundantes ?? []) {
+      L.push(`- Más redundantes: ${p.etfA} vs ${p.etfB} → corr ${n2(p.correlation)}`);
+    }
+    L.push("Correlaciones bajas entre activos mejoran la diversificación de una cartera.");
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: matriz no disponible (${e instanceof Error ? e.message : "error"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}

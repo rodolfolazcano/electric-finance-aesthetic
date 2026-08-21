@@ -113,6 +113,16 @@ async function cargarIndice(baseUrl?: string): Promise<{
     /* sin índice */
   }
 
+  // 2) fallback local: índice generado por scripts/build-kb-index.mjs (public/kb/)
+  if (!json || !json.chunks?.length) {
+    try {
+      const url = baseUrl ? new URL("/kb/academic-index.json", baseUrl).toString() : "/kb/academic-index.json";
+      const res = await fetch(url);
+      if (res.ok) json = (await res.json()) as IndiceAcademico;
+    } catch {
+      /* sin índice local */
+    }
+  }
 
   if (!json || !json.chunks?.length) return null;
   const dims = json.dims || 2048;

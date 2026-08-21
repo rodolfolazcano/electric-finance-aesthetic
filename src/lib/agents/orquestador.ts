@@ -42,6 +42,14 @@ import {
   ejecutarCicloEconomico,
   ejecutarPerformanceSectorial,
   ejecutarValuacionSectorial,
+  ejecutarOptimizacionAvanzada,
+  ejecutarBacktestOptimizacion,
+  ejecutarDistribucionRiesgo,
+  ejecutarCapmAuto,
+  ejecutarAnalisisIndustria,
+  ejecutarRankingValuacion,
+  ejecutarOportunidadesDiarias,
+  ejecutarMatrizBenchmarks,
   ejecutarIolLogin,
   ejecutarIolCuenta,
   ejecutarIolMercado,
@@ -457,6 +465,38 @@ export async function ejecutarTool(
     }
     case "valuacion_sectorial": {
       const res = await ejecutarValuacionSectorial(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "optimizar_cartera_avanzada": {
+      const res = await ejecutarOptimizacionAvanzada(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "backtest_optimizacion": {
+      const res = await ejecutarBacktestOptimizacion(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "distribucion_riesgo": {
+      const res = await ejecutarDistribucionRiesgo(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "capm_auto": {
+      const res = await ejecutarCapmAuto(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "analisis_industria": {
+      const res = await ejecutarAnalisisIndustria(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "ranking_valuacion_sectores": {
+      const res = await ejecutarRankingValuacion();
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "oportunidades_diarias": {
+      const res = await ejecutarOportunidadesDiarias();
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "matriz_benchmarks": {
+      const res = await ejecutarMatrizBenchmarks();
       return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
     }
     case "iol_login":
