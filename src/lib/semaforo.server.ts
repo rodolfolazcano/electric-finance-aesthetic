@@ -73,8 +73,7 @@ function extraerMetricas(
   const roe = numero(fd?.returnOnEquity);
   const deudaEquity = numero(fd?.debtToEquity);
   const target = numero(fd?.targetMeanPrice);
-  const upside =
-    target != null && precio != null && precio > 0 ? (target - precio) / precio : null;
+  const upside = target != null && precio != null && precio > 0 ? (target - precio) / precio : null;
   return { pe, revenueGrowth, profitMargin, roe, upside, deudaEquity };
 }
 
@@ -225,13 +224,17 @@ export async function analizarSemaforo(consulta: string): Promise<SemaforoResult
       (c): c is number => typeof c === "number" && isFinite(c) && c > 0,
     );
     const precio =
-      numero(res?.meta?.regularMarketPrice) ?? (closes.length ? (closes[closes.length - 1] ?? null) : null);
+      numero(res?.meta?.regularMarketPrice) ??
+      (closes.length ? (closes[closes.length - 1] ?? null) : null);
     const fechaUltimo = res?.meta?.regularMarketTime
       ? new Date(res?.meta?.regularMarketTime * 1000)
       : new Date();
     out.fechaDatos = FORMATO_FECHA.format(fechaUltimo);
     out.nombre =
-      res?.meta?.longName ?? res?.meta?.shortName ?? qsResp?.json?.quoteSummary?.result?.[0]?.price?.longName ?? null;
+      res?.meta?.longName ??
+      res?.meta?.shortName ??
+      qsResp?.json?.quoteSummary?.result?.[0]?.price?.longName ??
+      null;
     out.moneda =
       res?.meta?.currency ?? qsResp?.json?.quoteSummary?.result?.[0]?.price?.currency ?? null;
     out.precio = precio;
@@ -313,17 +316,37 @@ export async function analizarSemaforo(consulta: string): Promise<SemaforoResult
       { nombre: "Soporte/Resistencia", score: sr.score, peso: 0.2, detalle: sr.detalle },
       { nombre: "Anomalía de precio", score: anomalia.score, peso: 0.1, detalle: anomalia.detalle },
     ];
-    for (const key of ["pe", "revenueGrowth", "profitMargin", "roe", "upside", "deudaEquity"] as const) {
+    for (const key of [
+      "pe",
+      "revenueGrowth",
+      "profitMargin",
+      "roe",
+      "upside",
+      "deudaEquity",
+    ] as const) {
       if (metricas[key] == null) continue;
       const v = metricas[key];
       let nombre: string = key;
       let texto = "";
-      if (key === "pe") { nombre = "P/E"; texto = `P/E ${fmtNum(v, 1)}`; }
-      else if (key === "revenueGrowth") { nombre = "Crecimiento ingresos"; texto = `${((v ?? 0) * 100).toFixed(1)}%`; }
-      else if (key === "profitMargin") { nombre = "Margen"; texto = `${((v ?? 0) * 100).toFixed(1)}%`; }
-      else if (key === "roe") { nombre = "ROE"; texto = `${((v ?? 0) * 100).toFixed(1)}%`; }
-      else if (key === "upside") { nombre = "Upside vs consenso"; texto = `${((v ?? 0) * 100).toFixed(1)}%`; }
-      else { nombre = "Deuda/Patrimonio"; texto = fmtNum(v, 2); }
+      if (key === "pe") {
+        nombre = "P/E";
+        texto = `P/E ${fmtNum(v, 1)}`;
+      } else if (key === "revenueGrowth") {
+        nombre = "Crecimiento ingresos";
+        texto = `${((v ?? 0) * 100).toFixed(1)}%`;
+      } else if (key === "profitMargin") {
+        nombre = "Margen";
+        texto = `${((v ?? 0) * 100).toFixed(1)}%`;
+      } else if (key === "roe") {
+        nombre = "ROE";
+        texto = `${((v ?? 0) * 100).toFixed(1)}%`;
+      } else if (key === "upside") {
+        nombre = "Upside vs consenso";
+        texto = `${((v ?? 0) * 100).toFixed(1)}%`;
+      } else {
+        nombre = "Deuda/Patrimonio";
+        texto = fmtNum(v, 2);
+      }
       signals.push({ nombre, score: scoreMetricaFundamental(key, v), peso: null, detalle: texto });
     }
 
@@ -382,30 +405,46 @@ export function textoSemaforo(r: SemaforoResult): string {
   L.push(`Precio actual: ${fmtNum(r.precio, 4)} · Datos al: ${r.fechaDatos}`);
   L.push("");
   L.push("ANÁLISIS TÉCNICO");
-  L.push(`- RSI14: ${fmtNum(r.history.rsi, 1)} · MACD: ${fmtNum(r.history.macd, 3)} (hist. ${fmtNum(r.history.histMacd, 3)})${r.history.senal != null ? ` · señal MACD ${fmtNum(r.history.senal, 3)}` : ""}`);
-  L.push(`- SMA20: ${fmtNum(r.history.sma20)} | SMA50: ${fmtNum(r.history.sma50)} | SMA200: ${fmtNum(r.history.sma200)}`);
+  L.push(
+    `- RSI14: ${fmtNum(r.history.rsi, 1)} · MACD: ${fmtNum(r.history.macd, 3)} (hist. ${fmtNum(r.history.histMacd, 3)})${r.history.senal != null ? ` · señal MACD ${fmtNum(r.history.senal, 3)}` : ""}`,
+  );
+  L.push(
+    `- SMA20: ${fmtNum(r.history.sma20)} | SMA50: ${fmtNum(r.history.sma50)} | SMA200: ${fmtNum(r.history.sma200)}`,
+  );
   L.push(`- Máx 52s: ${fmtNum(r.history.high52)} | Mín 52s: ${fmtNum(r.history.low52)}`);
   L.push(`- ${t.detalle.replace(/\n/g, "\n  ")}`);
-  L.push(`- Soportes: ${r.soportes.length ? r.soportes.map((s) => fmtNum(s)).join(" / ") : "s/d"} | Resistencias: ${r.resistencias.length ? r.resistencias.map((s) => fmtNum(s)).join(" / ") : "s/d"}`);
-  L.push(`- Score técnico: ${t.score == null ? "s/d" : fmtNum(t.score, 2)} (sobre 2) · señal ${textoSeñalSig(t.score)}`);
+  L.push(
+    `- Soportes: ${r.soportes.length ? r.soportes.map((s) => fmtNum(s)).join(" / ") : "s/d"} | Resistencias: ${r.resistencias.length ? r.resistencias.map((s) => fmtNum(s)).join(" / ") : "s/d"}`,
+  );
+  L.push(
+    `- Score técnico: ${t.score == null ? "s/d" : fmtNum(t.score, 2)} (sobre 2) · señal ${textoSeñalSig(t.score)}`,
+  );
   L.push("");
   L.push("ANÁLISIS FUNDAMENTAL");
   if (f.score == null) {
     L.push(`- ${f.detalle}`);
   } else {
     L.push(`- ${f.detalle}`);
-    L.push(`- Score fundamental: ${f.score == null ? "s/d" : fmtNum(f.score, 2)} (sobre 2) · señal ${textoSeñalSig(f.score)}`);
+    L.push(
+      `- Score fundamental: ${f.score == null ? "s/d" : fmtNum(f.score, 2)} (sobre 2) · señal ${textoSeñalSig(f.score)}`,
+    );
   }
   L.push("");
   L.push("SEMÁFORO UNIFICADO (técnico + fundamental)");
-  L.push(`- Técnico: ${r.techScore == null ? "s/d" : fmtNum(r.techScore, 2)} | Fundamental: ${r.fundScore == null ? "s/d" : fmtNum(r.fundScore, 2)} | Unificado: ${r.scoreUnificado == null ? "s/d" : fmtNum(r.scoreUnificado, 2)}`);
+  L.push(
+    `- Técnico: ${r.techScore == null ? "s/d" : fmtNum(r.techScore, 2)} | Fundamental: ${r.fundScore == null ? "s/d" : fmtNum(r.fundScore, 2)} | Unificado: ${r.scoreUnificado == null ? "s/d" : fmtNum(r.scoreUnificado, 2)}`,
+  );
   L.push(`- Clasificación: ${r.clasificacionJerarquica}`);
-  L.push(`- Luz: ${textoLuz(r.light)} (umbrales: >1.5 COMPRA · >0.3 COMPRA CON CAUTELA · >-0.3 MANTENER · >-1.5 REDUCIR · VENTA)`);
+  L.push(
+    `- Luz: ${textoLuz(r.light)} (umbrales: >1.5 COMPRA · >0.3 COMPRA CON CAUTELA · >-0.3 MANTENER · >-1.5 REDUCIR · VENTA)`,
+  );
   if (r.signals.length) {
     L.push("");
     L.push("SEÑALES DETALLADAS");
     for (const s of r.signals) {
-      L.push(`- ${s.nombre}${s.peso != null ? ` (peso ${Math.round(s.peso * 100)}%)` : ""}: score ${s.score == null ? "s/d" : fmtNum(s.score, 2)} — ${s.detalle}`);
+      L.push(
+        `- ${s.nombre}${s.peso != null ? ` (peso ${Math.round(s.peso * 100)}%)` : ""}: score ${s.score == null ? "s/d" : fmtNum(s.score, 2)} — ${s.detalle}`,
+      );
     }
   }
   if (r.noticias && !/no se pudieron obtener noticias/i.test(r.noticias)) {
@@ -414,6 +453,8 @@ export function textoSemaforo(r: SemaforoResult): string {
     L.push(r.noticias);
   }
   L.push("");
-  L.push("Este análisis es educativo y NO constituye recomendación de inversión. Los datos provienen de fuentes públicas externas y pueden contener errores o demoras.");
+  L.push(
+    "Este análisis es educativo y NO constituye recomendación de inversión. Los datos provienen de fuentes públicas externas y pueden contener errores o demoras.",
+  );
   return L.join("\n");
 }

@@ -1,0 +1,3534 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-07-25",
+  "metadata": {
+    "descripcion": "Unificación de Renta Fija + Variable mapeada a perfiles de inversor IOL",
+    "totalCategorias": 26,
+    "totalPaneles": 58,
+    "totalPerfiles": 7,
+    "totalTickersReferenciados": 980,
+    "fuentes": [
+      "RENTA_FIJA_COMPLETA.json",
+      "unificado_completo.json",
+      "unificado factores mas lista.txt",
+      "api iol.txt",
+      "metodo af yfinance.txt"
+    ]
+  },
+  "categorias_activo": [
+    {
+      "id": "efectivo_cauciones_fci",
+      "nombre": "Efectivo, FCI Money Market y Cauciones",
+      "tipo": "Renta Fija Corto Plazo",
+      "descripcion": "Instrumentos de máxima liquidez y mínimo riesgo, principalmente cauciones, FCI T+0 y saldos disponibles",
+      "subcategorias": [
+        {
+          "id": "cauciones_bcba",
+          "nombre": "Cauciones BCBA",
+          "descripcion": "Préstamos de dinero garantizados con títulos valores en BYMA. Plazo 1 día renovable automáticamente",
+          "tickers": [],
+          "tickers_count": 0,
+          "paneles": [
+            "panel_cauciones_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/cauciones/argentina/Todos"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "fci_money_market",
+          "nombre": "FCI Money Market",
+          "descripcion": "Fondos comunes de inversión de corto plazo (T+0/T+1). Rendimiento diario, liquidez inmediata",
+          "tickers": [],
+          "tickers_count": 0,
+          "paneles": [
+            "panel_fci_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/estadocuenta (disponible inmediato)",
+            "GET /api/v2/Cotizaciones/fondosComunesInversion/argentina/Todos"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "saldos_disponibles",
+          "nombre": "Saldos y Disponible",
+          "descripcion": "Dinero disponible en cuenta corriente, saldos en pesos y dólares",
+          "tickers": [],
+          "tickers_count": 0,
+          "paneles": [],
+          "endpoints_iol": [
+            "GET /api/v2/estadocuenta (cuentas[].disponible)",
+            "GET /api/v2/portafolio/argentina"
+          ],
+          "endpoints_yahoo": []
+        }
+      ],
+      "perfiles_recomendados": [
+        "corto_plazo_conservador",
+        "conservador",
+        "moderadamente_conservador",
+        "moderado",
+        "moderadamente_agresivo",
+        "agresivo"
+      ]
+    },
+    {
+      "id": "bonos_corto_plazo",
+      "nombre": "Bonos Corto Plazo (LECAP, LECER, Letras)",
+      "tipo": "Renta Fija Corto Plazo",
+      "descripcion": "Letras del Tesoro en pesos (LECAP), ajustables por CER (LECER), dólar-linked y TAMAR. Plazo remanente <18 meses",
+      "subcategorias": [
+        {
+          "id": "lecap",
+          "nombre": "LECAP (Letras Capitalizables)",
+          "descripcion": "Letras del Tesoro Nacional en pesos a descuento, capitalizables a tasa fija",
+          "tickers": [
+            "S30N6",
+            "S14G6",
+            "S15S6",
+            "S17L6",
+            "S18E7",
+            "S20E7",
+            "S31M7",
+            "S30J7",
+            "S15A7",
+            "S14F7",
+            "S30A7",
+            "S17J7",
+            "S14J7",
+            "S14S7",
+            "S15S7",
+            "S17N7",
+            "S16D7"
+          ],
+          "tickers_count": 17,
+          "paneles": [
+            "panel_titulos_publicos_iol",
+            "panel_lecap"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "lecer",
+          "nombre": "LECER (Letras CER)",
+          "descripcion": "Letras ajustables por CER (inflación), corto plazo en pesos",
+          "tickers": [
+            "X30N6",
+            "X30S6",
+            "X31L6",
+            "X30J7",
+            "X30A7",
+            "X31M7",
+            "X30D7"
+          ],
+          "tickers_count": 7,
+          "paneles": [
+            "panel_titulos_publicos_iol",
+            "panel_lecap"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "dollar_linked_corto",
+          "nombre": "Dólar-Linked Corto Plazo",
+          "descripcion": "Letras ajustables por tipo de cambio oficial, cobertura cambiaria de corto plazo",
+          "tickers": [
+            "D31L6",
+            "D31G6",
+            "D30S6",
+            "D31M7",
+            "D30J7",
+            "D31A7"
+          ],
+          "tickers_count": 6,
+          "paneles": [
+            "panel_titulos_publicos_iol",
+            "panel_dollar_linked"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "letras_tamar_corto",
+          "nombre": "Letras TAMAR Corto Plazo",
+          "descripcion": "Letras ajustables por tasa TAMAR (tasa de política monetaria)",
+          "tickers": [
+            "M31G6",
+            "M31M7",
+            "M30J7"
+          ],
+          "tickers_count": 3,
+          "paneles": [
+            "panel_titulos_publicos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        }
+      ],
+      "perfiles_recomendados": [
+        "corto_plazo_conservador",
+        "conservador",
+        "moderadamente_conservador",
+        "moderado"
+      ]
+    },
+    {
+      "id": "bonos_soberanos_hard_dollar",
+      "nombre": "Bonos Soberanos Hard Dollar (Bonares y Globales)",
+      "tipo": "Renta Fija Mediano-Largo Plazo",
+      "descripcion": "Bonares (ley argentina) y Globales (ley Nueva York) denominados en USD. Alta liquidez, usados para MEP, CCL y cobertura cambiaria. Step-up y tasa fija",
+      "subcategorias": [
+        {
+          "id": "bonares_ley_argentina",
+          "nombre": "Bonares (Ley Argentina)",
+          "descripcion": "Bonos soberanos bajo ley argentina. Especies: Pesos, Dólar MEP (D), Cable (C)",
+          "tickers": [
+            "AL30",
+            "AL30D",
+            "AL30C",
+            "AL35",
+            "AL35D",
+            "AL41",
+            "AL29",
+            "AL29D",
+            "AL29C"
+          ],
+          "tickers_count": 9,
+          "paneles": [
+            "panel_bonos_iol",
+            "panel_titulos_publicos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/bonos/argentina/Todos",
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle",
+            "GET /api/v2/{mercado}/Titulos/{ticker}/Cotizacion/seriehistorica/{desde}/{hasta}/{ajuste}"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker + '.BA' })",
+            "chart/{symbol}"
+          ]
+        },
+        {
+          "id": "globales_ley_ny",
+          "nombre": "Globales (Ley Nueva York)",
+          "descripcion": "Bonos soberanos bajo ley extranjera. Referencia para CCL y arbitraje internacional",
+          "tickers": [
+            "GD30",
+            "GD30D",
+            "GD30C",
+            "GD35",
+            "GD38",
+            "GD41",
+            "GD29",
+            "GD29D",
+            "AE38"
+          ],
+          "tickers_count": 9,
+          "paneles": [
+            "panel_bonos_iol",
+            "panel_titulos_publicos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/bonos/argentina/Todos",
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker + '.BA' })"
+          ]
+        },
+        {
+          "id": "bontes_usd_dollar_linked",
+          "nombre": "Bontes USD / Dólar Linked",
+          "descripcion": "Bonos del Tesoro en USD y dólar linked. Alta demanda institucional como cobertura cambiaria",
+          "tickers": [
+            "AO27",
+            "AO28",
+            "AN29",
+            "TZV27",
+            "TZV28"
+          ],
+          "tickers_count": 5,
+          "paneles": [
+            "panel_bonos_iol",
+            "panel_titulos_publicos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        }
+      ],
+      "perfiles_recomendados": [
+        "conservador",
+        "moderadamente_conservador",
+        "moderado",
+        "moderadamente_agresivo"
+      ]
+    },
+    {
+      "id": "ajustables_cer",
+      "nombre": "Ajustables por CER (Boncer, Bontes y Canje)",
+      "tipo": "Renta Fija Mediano Plazo",
+      "descripcion": "Bonos ajustables por inflación (CER). Cero cupón, Boncer cortos/medios y bonos tradicionales de canje. Núcleo de la operatoria en pesos ajustada por inflación",
+      "subcategorias": [
+        {
+          "id": "boncer_cero_cupon",
+          "nombre": "Cero Cupón / Boncer Cortos y Medios",
+          "descripcion": "Bonos cero cupón y Boncer de corto y mediano plazo, ajustados por CER. Mueven miles de millones diarios en BYMA",
+          "tickers": [
+            "TZXM8",
+            "TZXS7",
+            "TZXD6",
+            "TZXM7",
+            "TX26",
+            "TZXD7",
+            "TZXO6",
+            "TZXD8",
+            "TZX28",
+            "TZXS8",
+            "TZXO7",
+            "TZX27",
+            "TZXM9",
+            "TZXA7",
+            "TZXY7"
+          ],
+          "tickers_count": 15,
+          "paneles": [
+            "panel_cer_iol",
+            "panel_bonos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/bonos/argentina/Todos",
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle",
+            "GET /api/v2/{mercado}/Titulos/{ticker}/Cotizacion/seriehistorica/{desde}/{hasta}/{ajuste}"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "bonos_tradicionales_canje",
+          "nombre": "Bonos Tradicionales / Canje",
+          "descripcion": "Bonos de canje reestructuración 2005/2010: Discount, Par, Cuasi Par, PR17 y PAP0. Volumen constante, carteras medianas o minoristas",
+          "tickers": [
+            "TX28",
+            "TX31",
+            "DICP",
+            "PARP",
+            "PR17",
+            "PAP0"
+          ],
+          "tickers_count": 6,
+          "paneles": [
+            "panel_cer_iol",
+            "panel_bonos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        }
+      ],
+      "perfiles_recomendados": [
+        "conservador",
+        "moderadamente_conservador",
+        "moderado"
+      ]
+    },
+    {
+      "id": "tasa_dual_tamar",
+      "nombre": "Tasa Dual y TAMAR",
+      "tipo": "Renta Fija Mediano Plazo",
+      "descripcion": "Bonos duales (ajustables por inflación con piso de tasa fija) y ajustables por tasa TAMAR. Alta participación institucional",
+      "subcategorias": [
+        {
+          "id": "bonos_duales",
+          "nombre": "Bonos Duales",
+          "descripcion": "Máximo entre CER + margen y Tasa Fija garantizada. Instrumentos de Media Duración en CER",
+          "tickers": [
+            "TXMJ9",
+            "TTS26",
+            "TTD26",
+            "TXMD8",
+            "TXMJ8"
+          ],
+          "tickers_count": 5,
+          "paneles": [
+            "panel_bonos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "bonos_tamar",
+          "nombre": "Bonos TAMAR",
+          "descripcion": "Bonos ajustables por tasa TAMAR (Tasa de Ajuste Marginal Anualizada de Referencia), cupón trimestral",
+          "tickers": [
+            "TMG28",
+            "TMF27",
+            "TMF28",
+            "TML27",
+            "TMG27"
+          ],
+          "tickers_count": 5,
+          "paneles": [
+            "panel_bonos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        }
+      ],
+      "perfiles_recomendados": [
+        "conservador",
+        "moderadamente_conservador",
+        "moderado"
+      ]
+    },
+    {
+      "id": "tasa_fija_capitalizables",
+      "nombre": "Tasa Fija y Capitalizables (Bontes Cap)",
+      "tipo": "Renta Fija Corto-Mediano Plazo",
+      "descripcion": "Bonos del Tesoro a tasa fija en pesos y bonos capitalizables. Instrumentos fluidos para hacer tasa en pesos a corto/mediano plazo",
+      "subcategorias": [
+        {
+          "id": "bontes_tasa_fija",
+          "nombre": "Bontes Tasa Fija",
+          "descripcion": "Bonos del Tesoro con cupón fijo en pesos, tasas entre 15% y 35% anual",
+          "tickers": [
+            "T30A7",
+            "T30J7",
+            "T31Y7",
+            "T15E7",
+            "TO26",
+            "TY30P"
+          ],
+          "tickers_count": 6,
+          "paneles": [
+            "panel_bonos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        }
+      ],
+      "perfiles_recomendados": [
+        "conservador",
+        "moderadamente_conservador",
+        "moderado"
+      ]
+    },
+    {
+      "id": "bopreal",
+      "nombre": "BOPREAL (Bonos para la Reconstrucción de una Argentina Libre)",
+      "tipo": "Renta Fija Mediano Plazo",
+      "descripcion": "Bonos emitidos para cancelar deudas con importadores y proveedores del exterior. Mercado secundario robusto y alto volumen. Pagan cupón en USD al TC oficial",
+      "subcategorias": [
+        {
+          "id": "bopreal_series",
+          "nombre": "BOPREAL Series Principales",
+          "descripcion": "Series 1 a 6 negociadas en pesos con ajuste USD al tipo de cambio oficial",
+          "tickers": [
+            "BPOC7",
+            "BPOD7",
+            "BPOB8",
+            "BPOA8",
+            "BPOB7",
+            "BPOA7"
+          ],
+          "tickers_count": 6,
+          "paneles": [
+            "panel_bonos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        }
+      ],
+      "perfiles_recomendados": [
+        "moderadamente_conservador",
+        "moderado"
+      ]
+    },
+    {
+      "id": "corporativos_ons",
+      "nombre": "Obligaciones Negociables Corporativas (ONs)",
+      "tipo": "Renta Fija Privada",
+      "descripcion": "Obligaciones Negociables de empresas argentinas en USD, CER y tasa fija. Calificaciones crediticias variadas. Emisores de energía,oil & gas, infraestructura y agroindustria",
+      "subcategorias": [
+        {
+          "id": "ons_energia_oil_gas",
+          "nombre": "ONs Energía, Oil & Gas",
+          "descripcion": "ONs de empresas del sector energético argentino: Pampa, YPF, Vista, Pluspetrol, PAE, TGS, Capex, Genneia, YPF Energía Eléctrica",
+          "tickers": [
+            "YPFON",
+            "PAMPON",
+            "VISTON",
+            "PLUSON",
+            "PAEON",
+            "TGSON",
+            "CAPXON",
+            "GENNON",
+            "YPFDON"
+          ],
+          "tickers_count": 9,
+          "paneles": [
+            "panel_ons_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/obligacionesNegociables/argentina/Todos"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "ons_infraestructura_telecom",
+          "nombre": "ONs Infraestructura, Telecom y Servicios",
+          "descripcion": "ONs de empresas de telecomunicaciones, concesionarias y utilities: Telecom, Edenor, AA2000, Camuzzi, Edesa, Edemsa, Luz de Tres Picos",
+          "tickers": [
+            "TECOON",
+            "EDENON",
+            "AA20ON",
+            "CAMZON",
+            "EDESON",
+            "EDEMON",
+            "LT3PON"
+          ],
+          "tickers_count": 7,
+          "paneles": [
+            "panel_ons_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/obligacionesNegociables/argentina/Todos"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "ons_agro_industria",
+          "nombre": "ONs Agroindustria y Manufactura",
+          "descripcion": "ONs de empresas agroindustriales, manufactureras y de maquinaria: CLISA, John Deere, Scania, PCR, MSU Green, CGC, PECOM, MSU Energy",
+          "tickers": [
+            "CLISAON",
+            "JDHON",
+            "SCANON",
+            "PCON",
+            "MSUGON",
+            "CGCOON",
+            "PECON",
+            "MSUEON"
+          ],
+          "tickers_count": 8,
+          "paneles": [
+            "panel_ons_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/obligacionesNegociables/argentina/Todos"
+          ],
+          "endpoints_yahoo": []
+        }
+      ],
+      "perfiles_recomendados": [
+        "moderadamente_conservador",
+        "moderado",
+        "moderadamente_agresivo"
+      ]
+    },
+    {
+      "id": "provinciales_subsoberanos",
+      "nombre": "Bonos Provinciales y Subsoberanos",
+      "tipo": "Renta Fija Pública Provincial",
+      "descripcion": "Bonos emitidos por provincias argentinas y la Ciudad de Buenos Aires. Rendimientos superiores a soberanos, con riesgo crediticio provincial",
+      "subcategorias": [
+        {
+          "id": "provinciales_liquidos",
+          "nombre": "Provinciales Líquidos",
+          "descripcion": "Provincias con buen historial de pago y volumen de negociación significativo",
+          "tickers": [
+            "CABA",
+            "PBA",
+            "CORD",
+            "SF",
+            "NEUQ",
+            "CHUB",
+            "JUJU",
+            "CHAC",
+            "ERIO",
+            "TDF",
+            "MEND"
+          ],
+          "tickers_count": 11,
+          "paneles": [
+            "panel_bonos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "letras_provinciales",
+          "nombre": "Letras Provinciales",
+          "descripcion": "Letras de corto plazo emitidas por provincias. Plazo < 12 meses, alta tasa",
+          "tickers": [
+            "LCHAC",
+            "LCHUB",
+            "LPBA",
+            "LRCN",
+            "LRN"
+          ],
+          "tickers_count": 5,
+          "paneles": [
+            "panel_bonos_iol"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        },
+        {
+          "id": "subsoberanos_iliquidos",
+          "nombre": "Subsoberanos Ilíquidos y Especies D/C Muertas",
+          "descripcion": "Bonos provinciales defolteados, en euros, residuales sin liquidez y especies C/D sin mercado real",
+          "tickers": [
+            "CHAQ",
+            "BC37E",
+            "BA37E",
+            "BB37E",
+            "GE29",
+            "GE38",
+            "GE41",
+            "PAY0",
+            "PAE0",
+            "DIP0",
+            "CEDI",
+            "TX26D",
+            "TX28D",
+            "TZV7D",
+            "TY7D",
+            "TZX7D",
+            "TXS8D",
+            "TJ7D",
+            "TA7D",
+            "TXO6D",
+            "TZX8D",
+            "GE41D",
+            "TX31D",
+            "TXS7D",
+            "TTD6D",
+            "PR17D",
+            "DICPC",
+            "TA7C",
+            "TTD6C",
+            "TXD6D",
+            "TO26D",
+            "TVPAD",
+            "TXM7D",
+            "CUAPD",
+            "TTS6C",
+            "PARPC",
+            "PARPD",
+            "TX26C",
+            "TY30C",
+            "CUAPC",
+            "DIP0C",
+            "DIP0D",
+            "GE29D",
+            "GE38C",
+            "PAE0",
+            "TMG7D",
+            "TMG8D",
+            "TO26C",
+            "TTS6D",
+            "TVPEC",
+            "TVPPD",
+            "TVY0C",
+            "TX31C",
+            "TXA7D",
+            "TXD7D",
+            "TXD8D",
+            "TXJ8D",
+            "TXJ9D",
+            "TXM8D",
+            "TY30D"
+          ],
+          "tickers_count": 60,
+          "paneles": [],
+          "endpoints_iol": [],
+          "endpoints_yahoo": []
+        }
+      ],
+      "perfiles_recomendados": [
+        "moderado",
+        "moderadamente_agresivo",
+        "agresivo"
+      ]
+    },
+    {
+      "id": "cupones_pbi",
+      "nombre": "Cupones PBI",
+      "tipo": "Renta Fija Residual",
+      "descripcion": "Cupones atados al crecimiento del PBI argentino. Negociación marginal, alta volatilidad, sin volumen coherente. Instrumento de nicho",
+      "subcategorias": [
+        {
+          "id": "cupones_pbi_series",
+          "nombre": "Series de Cupones PBI",
+          "descripcion": "TVP series A, Y, E, P, Y0. Pagan si el PBI real supera 3% anual",
+          "tickers": [
+            "TVPA",
+            "TVPY",
+            "TVPE",
+            "TVPP",
+            "TVY0"
+          ],
+          "tickers_count": 5,
+          "paneles": [],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": []
+        }
+      ],
+      "perfiles_recomendados": [
+        "moderadamente_agresivo",
+        "agresivo"
+      ]
+    },
+    {
+      "id": "large_cap_us",
+      "nombre": "Large Cap US (Acciones y ETFs de Gran Capitalización)",
+      "tipo": "Renta Variable - Large Cap",
+      "descripcion": "Acciones de gran capitalización de EE.UU. (S&P 500, Nasdaq-100, Dow Jones) y ADRs internacionales listados en BCBA. ETFs sectoriales y de mercado amplio",
+      "subcategorias": [
+        {
+          "id": "acciones_sp500_industriales",
+          "nombre": "S&P 500 - Industriales",
+          "descripcion": "Acciones industriales del S&P 500: Caterpillar, Deere, Honeywell, 3M, Boeing, GE, Lockheed Martin, RTX, Union Pacific, United Rentals",
+          "tickers": [
+            "CAT",
+            "CAT.BA",
+            "CATD",
+            "DE",
+            "DE.BA",
+            "DED",
+            "HON",
+            "HON.BA",
+            "HOND",
+            "MMM",
+            "MMM.BA",
+            "MMMD",
+            "BA",
+            "BA.BA",
+            "GE",
+            "GE.BA",
+            "GED",
+            "LMT",
+            "LMT.BA",
+            "LMTD",
+            "RTX",
+            "RTX.BA",
+            "RTXD",
+            "UNP",
+            "UNP.BA",
+            "UNPD",
+            "FDX",
+            "FDXD",
+            "URI"
+          ],
+          "tickers_count": 29,
+          "paneles": [
+            "panel_sp500",
+            "panel_djia",
+            "panel_nasdaq100"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/acciones/argentina/Todos",
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle",
+            "GET /api/v2/{mercado}/Titulos/{ticker}/Cotizacion/seriehistorica/{desde}/{hasta}/{ajuste}"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })",
+            "fetchYahooSummary({ symbol: ticker + '.BA' })",
+            "yahooFundamentalsBatch({ symbols: [ticker] })",
+            "chart/{symbol}"
+          ]
+        },
+        {
+          "id": "acciones_sp500_consumo_ciclico",
+          "nombre": "S&P 500 - Consumo Cíclico",
+          "descripcion": "Amazon, Tesla, McDonald's, Starbucks, Booking, Home Depot, Nike, Ford, GM, Carnival, Las Vegas Sands, NIO",
+          "tickers": [
+            "AMZN",
+            "AMZN.BA",
+            "AMZND",
+            "TSLA",
+            "MCD",
+            "MCD.BA",
+            "MCDD",
+            "SBUX",
+            "SBUX.BA",
+            "SBUXD",
+            "BKNG",
+            "HD",
+            "HD.BA",
+            "NKE",
+            "NKE.BA",
+            "NKED",
+            "F",
+            "F.BA",
+            "FD",
+            "GM",
+            "GM.BA",
+            "GMD",
+            "CCL",
+            "CCL.BA",
+            "CCLD",
+            "LVS",
+            "LVS.BA",
+            "NIO",
+            "NIO.BA",
+            "NIOD",
+            "ANF",
+            "ROST",
+            "TJX",
+            "BKNGD",
+            "AMZN"
+          ],
+          "tickers_count": 34,
+          "paneles": [
+            "panel_sp500",
+            "panel_nasdaq100"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })",
+            "chart/{symbol}"
+          ]
+        },
+        {
+          "id": "acciones_sp500_salud",
+          "nombre": "S&P 500 - Cuidado de la Salud",
+          "descripcion": "Farmacéuticas: JNJ, PFE, ABBV, MRK, LLY, AMGN, GILD, BMY, NVS, AZN, GSK, BIIB. Dispositivos: ABT, MDT, BSX, ISRG, SYK. Planes: UNH, CI, ELV",
+          "tickers": [
+            "JNJ",
+            "JNJ.BA",
+            "JNJD",
+            "PFE",
+            "PFE.BA",
+            "PFED",
+            "ABBV",
+            "ABBV.BA",
+            "ABBVD",
+            "MRK",
+            "MRK.BA",
+            "MRKD",
+            "LLY",
+            "AMGN",
+            "AMGN.BA",
+            "AMGND",
+            "GILD",
+            "GILD.BA",
+            "GILDD",
+            "BMY",
+            "BMY.BA",
+            "NVS",
+            "NVS.BA",
+            "AZN",
+            "AZN.BA",
+            "AZND",
+            "GSK",
+            "GSK.BA",
+            "ABT",
+            "ABT.BA",
+            "MDT",
+            "MDT.BA",
+            "UNH",
+            "UNH.BA",
+            "ISRG",
+            "ISRG.BA",
+            "ISRGD",
+            "CI",
+            "ELV"
+          ],
+          "tickers_count": 39,
+          "paneles": [
+            "panel_sp500",
+            "panel_nasdaq100"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })",
+            "yahooFundamentalsBatch({ symbols: [ticker] })"
+          ]
+        },
+        {
+          "id": "acciones_sp500_defensivo",
+          "nombre": "S&P 500 - Defensivo del Consumidor",
+          "descripcion": "Walmart, Costco, Procter & Gamble, Coca-Cola, PepsiCo, Colgate, Kimberly-Clark, Hershey, Mondelez, Altria, Philip Morris, Diageo, KO, PEP, PG",
+          "tickers": [
+            "WMT",
+            "WMT.BA",
+            "WMTD",
+            "COST",
+            "COST.BA",
+            "COSTD",
+            "PG",
+            "KO",
+            "KO.BA",
+            "KOD",
+            "PEP",
+            "PEP.BA",
+            "PEPD",
+            "CL",
+            "CL.BA",
+            "CLD",
+            "KMB",
+            "KMB.BA",
+            "KMBD",
+            "HSY",
+            "HSY.BA",
+            "HSYD",
+            "MDLZ",
+            "MDLZ.BA",
+            "MDLZD",
+            "MO",
+            "MO.BA",
+            "MOD",
+            "PM",
+            "PM.BA",
+            "PMD",
+            "DEO",
+            "DEO.BA",
+            "DEOD"
+          ],
+          "tickers_count": 34,
+          "paneles": [
+            "panel_sp500"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "acciones_sp500_energia",
+          "nombre": "S&P 500 - Energía",
+          "descripcion": "Exxon, Chevron, Shell, BP, TotalEnergies, Equinor, Petrobras, Schlumberger, Baker Hughes, Halliburton, ConocoPhillips, EOG, Diamondback",
+          "tickers": [
+            "XOM",
+            "XOM.BA",
+            "XOMD",
+            "CVX",
+            "CVX.BA",
+            "CVXD",
+            "SHEL",
+            "SHEL.BA",
+            "SHELD",
+            "BP",
+            "BP.BA",
+            "TTE",
+            "TTE.BA",
+            "TTED",
+            "EQNR",
+            "EQNR.BA",
+            "EQNRD",
+            "PBR",
+            "PBR.BA",
+            "PBRD",
+            "SLB",
+            "SLB.BA",
+            "SLBD",
+            "BKR",
+            "BKR.BA",
+            "BKRD",
+            "HAL",
+            "HAL.BA",
+            "HALD",
+            "EOG",
+            "FANG"
+          ],
+          "tickers_count": 31,
+          "paneles": [
+            "panel_sp500"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "acciones_sp500_tecnologia",
+          "nombre": "S&P 500 / Nasdaq-100 - Tecnología",
+          "descripcion": "Apple, Microsoft, NVIDIA, Alphabet, Meta, Tesla, Broadcom, Oracle, Adobe, Salesforce, Cisco, AMD, Intel, IBM, Qualcomm, MU, Intuit, PayPal, Block",
+          "tickers": [
+            "AAPL",
+            "AAPL.BA",
+            "AAPLD",
+            "MSFT",
+            "MSFT.BA",
+            "MSFTD",
+            "NVDA",
+            "NVDA.BA",
+            "NVDAD",
+            "GOOGL",
+            "GOOGL.BA",
+            "GOOGD",
+            "META",
+            "META.BA",
+            "METAD",
+            "AVGO",
+            "ORCL",
+            "ADBE",
+            "CRM",
+            "CSCO",
+            "AMD",
+            "INTC",
+            "IBM",
+            "QCOM",
+            "MU",
+            "INTU",
+            "PYPL",
+            "SQ"
+          ],
+          "tickers_count": 28,
+          "paneles": [
+            "panel_nasdaq100",
+            "panel_sp500"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })",
+            "yahooFundamentalsBatch({ symbols: [ticker] })"
+          ]
+        },
+        {
+          "id": "acciones_sp500_financieras",
+          "nombre": "S&P 500 - Servicios Financieros",
+          "descripcion": "JPMorgan, Goldman Sachs, Bank of America, Morgan Stanley, Wells Fargo, Citi, Berkshire Hathaway, Visa, Mastercard, BlackRock, S&P Global",
+          "tickers": [
+            "JPM",
+            "JPM.BA",
+            "GS",
+            "GS.BA",
+            "BAC",
+            "BAC.BA",
+            "MS",
+            "MS.BA",
+            "WFC",
+            "C",
+            "BRK.B",
+            "BRK.BA",
+            "V",
+            "V.BA",
+            "MA",
+            "MA.BA",
+            "BLK",
+            "SPGI"
+          ],
+          "tickers_count": 18,
+          "paneles": [
+            "panel_sp500"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "acciones_sp500_comunicaciones",
+          "nombre": "S&P 500 - Servicios de Comunicación",
+          "descripcion": "Netflix, Disney, Comcast, Verizon, AT&T, T-Mobile, Warner Bros, Electronic Arts, Activision, Take-Two, Spotify, Roku, Twitter (X)",
+          "tickers": [
+            "NFLX",
+            "NFLX.BA",
+            "NFLXD",
+            "DIS",
+            "DIS.BA",
+            "DISD",
+            "CMCSA",
+            "VZ",
+            "T",
+            "TMUS",
+            "EA",
+            "SPOT",
+            "ROKU"
+          ],
+          "tickers_count": 13,
+          "paneles": [
+            "panel_nasdaq100",
+            "panel_sp500"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "etfs_mercado_amplio",
+          "nombre": "ETFs de Mercado Amplio",
+          "descripcion": "ETFs que replican índices de gran capitalización: S&P 500 (SPY, IVV, VOO), Nasdaq-100 (QQQ), Dow Jones (DIA), Total Market (VTI, IWV), Global (VT, ACWI), Desarrollados (EFA), Emergentes (EEM, VWO)",
+          "tickers": [
+            "SPY",
+            "IVV",
+            "QQQ",
+            "DIA",
+            "VTI",
+            "IWV",
+            "VT",
+            "ACWI",
+            "ACWID",
+            "EFA",
+            "EEM",
+            "VWO",
+            "IWB",
+            "IWM",
+            "SCHD"
+          ],
+          "tickers_count": 15,
+          "paneles": [
+            "panel_etf_us",
+            "panel_nasdaq100"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })",
+            "chart/{symbol}"
+          ]
+        },
+        {
+          "id": "etfs_sectoriales",
+          "nombre": "ETFs Sectoriales EE.UU.",
+          "descripcion": "Select Sector SPDRs: Tecnología (XLK), Financieras (XLF), Salud (XLV), Energía (XLE), Comunicaciones (XLC), Consumo Cíclico (XLY), Defensivo (XLP), Industriales (XLI), Materiales (XLB), Inmobiliario (XLRE), Utilities (XLU)",
+          "tickers": [
+            "XLK",
+            "XLF",
+            "XLV",
+            "XLE",
+            "XLC",
+            "XLY",
+            "XLP",
+            "XLI",
+            "XLB",
+            "XLRE",
+            "XLU"
+          ],
+          "tickers_count": 11,
+          "paneles": [
+            "panel_etf_sectores_us",
+            "panel_factores_sectores"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "etfs_tematicos",
+          "nombre": "ETFs Temáticos",
+          "descripcion": "ARKK (Innovación), ICLN (Energía Limpia), SMH (Semiconductores), IBB (Biotecnología), SOXX (Semiconductores), BOTZ (Robótica), HACK (Ciberseguridad), XBI (Biotecnología), ARKQ (Autonomía), IHI (Dispositivos Médicos), ITA (Aeroespacial), MOO (Agro), NLR (Uranio)",
+          "tickers": [
+            "ARKK",
+            "ARKKD",
+            "ICLN",
+            "SMH",
+            "IBB",
+            "SOXX",
+            "BOTZ",
+            "HACK",
+            "XBI",
+            "ARKQ",
+            "IHI",
+            "ITA",
+            "PPA",
+            "MOO",
+            "NLR"
+          ],
+          "tickers_count": 15,
+          "paneles": [
+            "panel_etf_tematicos",
+            "panel_etf_us"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "etfs_emergentes",
+          "nombre": "ETFs Países Emergentes",
+          "descripcion": "EEM, VWO, EWZ (Brasil), FXI (China), ARGT (Argentina), ILF (Latam), ECH (Chile), EWS (Singapur), EWT (Taiwán), EWW (México), EZA (Sudáfrica)",
+          "tickers": [
+            "EEM",
+            "VWO",
+            "EWZ",
+            "FXI",
+            "ARGT",
+            "ILF",
+            "ECH",
+            "EWS",
+            "EWT",
+            "EWW",
+            "EZA"
+          ],
+          "tickers_count": 11,
+          "paneles": [
+            "panel_etf_emergentes",
+            "panel_paises"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "etfs_desarrollados",
+          "nombre": "ETFs Países Desarrollados",
+          "descripcion": "EFA (EAFE), VGK (Europa), FEZ (Eurozona), EWJ (Japón), EWY (Corea), EWG (Alemania), EWC (Canadá), IWM (Small Cap), SPY, VTI, IWB, IWV",
+          "tickers": [
+            "EFA",
+            "VGK",
+            "FEZ",
+            "EWJ",
+            "EWY",
+            "EWG",
+            "EWC",
+            "IWM",
+            "SPY",
+            "VTI",
+            "IWB",
+            "IWV",
+            "SCHD"
+          ],
+          "tickers_count": 13,
+          "paneles": [
+            "panel_etf_desarrollados",
+            "panel_paises"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "adrs_internacionales",
+          "nombre": "ADRs Internacionales",
+          "descripcion": "215 ADRs de 30+ países listados en NYSE/NASDAQ: Brasil (Petrobras, Vale, Ambev, Itau), México (AMX, Televisa, Femsa), China (Alibaba, JD, Bidu, NIO), Canadá, Chile, Europa, Asia Pacífico",
+          "tickers": [
+            "PBR",
+            "VALE",
+            "ABEV",
+            "ITUB",
+            "AMX",
+            "TV",
+            "FMX",
+            "BABA",
+            "JD",
+            "BIDU",
+            "NIO",
+            "XPEV",
+            "LI",
+            "TCOM",
+            "BZ",
+            "YMM",
+            "BEKE",
+            "GDS",
+            "ATHM",
+            "TME",
+            "YY",
+            "IQ",
+            "DAC",
+            "GSL",
+            "SBSW",
+            "GGAL",
+            "SUPV",
+            "BMA",
+            "EDN",
+            "IRS",
+            "LOMA",
+            "CEPU",
+            "TEO",
+            "CRESY",
+            "YPF",
+            "PAM",
+            "BBVA",
+            "SAN",
+            "TEF",
+            "STLA",
+            "BCS",
+            "LYG",
+            "NGG",
+            "DEO",
+            "UL",
+            "AZN",
+            "GSK",
+            "TD",
+            "RY",
+            "BNS",
+            "BMO",
+            "CNQ",
+            "SU",
+            "ENB",
+            "TRP",
+            "SHOP",
+            "LUN",
+            "SBSW",
+            "BSBR",
+            "BRFS",
+            "CSAN",
+            "BHC",
+            "MUFG",
+            "SMFG",
+            "HMC",
+            "TM",
+            "SONY"
+          ],
+          "tickers_count": 68,
+          "paneles": [
+            "panel_adr_argentina",
+            "panel_adr_brasil",
+            "panel_adr_canada",
+            "panel_adr_chile",
+            "panel_adr_mexico",
+            "panel_adr_reino_unido"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/acciones/argentina/Todos (para Cedears)"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })",
+            "yahooFundamentalsBatch({ symbols: [ticker] })"
+          ]
+        }
+      ],
+      "perfiles_recomendados": [
+        "moderado",
+        "moderadamente_agresivo",
+        "agresivo"
+      ]
+    },
+    {
+      "id": "small_cap_us",
+      "nombre": "Small & Mid Cap US (Acciones y ETFs de Pequeña y Mediana Capitalización)",
+      "tipo": "Renta Variable - Small/Mid Cap",
+      "descripcion": "Acciones de pequeña y mediana capitalización de EE.UU. (Russell 2000, S&P MidCap 400) y ETFs asociados. Mayor volatilidad y potencial de crecimiento",
+      "subcategorias": [
+        {
+          "id": "small_cap_sectoriales",
+          "nombre": "Small Caps Industriales y Materiales",
+          "descripcion": "Pequeñas y medianas empresas industriales: construcción, manufactura, ingeniería y materiales",
+          "tickers": [
+            "AAON",
+            "APOG",
+            "ARLO",
+            "ASPN",
+            "AWI",
+            "ACA",
+            "ACM",
+            "AGX",
+            "AMRC",
+            "APG",
+            "ABM",
+            "ALGT",
+            "ALK",
+            "ALLE",
+            "ARCB",
+            "ASC",
+            "ASLE",
+            "ATI",
+            "ATS",
+            "AZZ",
+            "BAH",
+            "BBSI",
+            "BLBD",
+            "BKSY"
+          ],
+          "tickers_count": 24,
+          "paneles": [
+            "panel_small_cap_us"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/acciones/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })",
+            "yahooFundamentalsBatch({ symbols: [ticker] })"
+          ]
+        },
+        {
+          "id": "small_cap_tecnologia_salud",
+          "nombre": "Small Caps Tecnología, Salud y Biotech",
+          "descripcion": "Empresas biotecnológicas, farmacéuticas especializadas y tecnología emergente listadas en Nasdaq y NYSE",
+          "tickers": [
+            "ACAD",
+            "ADMA",
+            "ALKS",
+            "ALNY",
+            "AMPH",
+            "ANAB",
+            "ARDX",
+            "ARQT",
+            "ARVN",
+            "ARWR",
+            "ASND",
+            "AURA",
+            "AUTL",
+            "AVXL",
+            "AXSM",
+            "BBIO",
+            "BCAB",
+            "BCRX",
+            "BEAM",
+            "BHC",
+            "BHVN",
+            "CRWD",
+            "DASH",
+            "DDOG",
+            "DKNG",
+            "DOCU",
+            "DXCM",
+            "ETSY",
+            "EXPE",
+            "FSLY",
+            "GDRX",
+            "GOSS",
+            "HCP",
+            "HOOD",
+            "HUT",
+            "INO",
+            "IREN",
+            "JMIA",
+            "MRNA",
+            "MSTR",
+            "NET",
+            "NIO",
+            "OKLO",
+            "ONDS",
+            "PATH",
+            "PINS",
+            "PLTR",
+            "RGTI",
+            "RIOT",
+            "RKLB",
+            "ROKU",
+            "RXRX",
+            "SNAP",
+            "SPCE",
+            "SQ",
+            "TEAM",
+            "TEM",
+            "TWLO",
+            "UPST",
+            "U",
+            "WKHS",
+            "XPEV",
+            "ZM",
+            "ZS"
+          ],
+          "tickers_count": 64,
+          "paneles": [
+            "panel_nasdaq100",
+            "panel_small_cap_us"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })",
+            "yahooFundamentalsBatch({ symbols: [ticker] })"
+          ]
+        },
+        {
+          "id": "etfs_small_mid_cap",
+          "nombre": "ETFs Small/Mid Cap",
+          "descripcion": "IWM (Russell 2000), IJH (S&P MidCap 400), IJR (S&P SmallCap 600), VB (Vanguard Small Cap), AVUV, SPSM, VTWO",
+          "tickers": [
+            "IWM",
+            "IJH",
+            "IJR",
+            "VB",
+            "AVUV",
+            "SPSM",
+            "VTWO"
+          ],
+          "tickers_count": 7,
+          "paneles": [
+            "panel_etf_small_cap",
+            "panel_etf_us"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        }
+      ],
+      "perfiles_recomendados": [
+        "moderadamente_agresivo",
+        "agresivo"
+      ]
+    },
+    {
+      "id": "argentina_emergentes",
+      "nombre": "Argentina y Mercados Emergentes",
+      "tipo": "Renta Variable - Argentina/Emergentes",
+      "descripcion": "Acciones argentinas (BCBA), Cedears representativos de ADRs argentinos, y ETFs de mercados emergentes con foco en Latinoamérica",
+      "subcategorias": [
+        {
+          "id": "acciones_argentinas_bcba",
+          "nombre": "Acciones Argentinas BCBA - Energía",
+          "descripcion": "YPF, Pampa Energía, Vista Energy, Transportadora de Gas del Sur, Transportadora de Gas del Norte, Capex, YPF",
+          "tickers": [
+            "YPFD",
+            "YPFD.BA",
+            "PAMP",
+            "PAMP.BA",
+            "VIST",
+            "VIST.BA",
+            "VISTD",
+            "TGSU2",
+            "TGSU2.BA",
+            "TGNO4",
+            "TGNO4.BA",
+            "CAPX",
+            "CAPX.BA",
+            "GPRK",
+            "GPRK.BA"
+          ],
+          "tickers_count": 14,
+          "paneles": [
+            "panel_acciones_argentinas",
+            "panel_adr_argentina"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/acciones/argentina/Todos",
+            "GET /api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle",
+            "GET /api/v2/{mercado}/Titulos/{ticker}/Cotizacion/seriehistorica/{desde}/{hasta}/{ajuste}"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker + '.BA' })"
+          ]
+        },
+        {
+          "id": "acciones_argentinas_financieras",
+          "nombre": "Acciones Argentinas BCBA - Financieras",
+          "descripcion": "Grupo Galicia, Banco Macro, Banco Supervielle, BBVA Argentina, Grupo Financiero Valores",
+          "tickers": [
+            "GGAL",
+            "GGAL.BA",
+            "BMA",
+            "BMA.BA",
+            "SUPV",
+            "SUPV.BA",
+            "BBAR",
+            "BBAR.BA",
+            "VALO",
+            "VALO.BA"
+          ],
+          "tickers_count": 10,
+          "paneles": [
+            "panel_acciones_argentinas",
+            "panel_adr_argentina"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/acciones/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker + '.BA' })"
+          ]
+        },
+        {
+          "id": "acciones_argentinas_industriales",
+          "nombre": "Acciones Argentinas BCBA - Industriales, Agro y Consumo",
+          "descripcion": "Aluar, Arcor, Ledesma, Cresud, Molinos Río de la Plata, Molinos Agro, San Miguel, Mirgor, Sociedad Comercial del Plata, Ferrum, Longvie, Havanna, Consultatio, IRSA, Autopistas del Sol, Grupo Concesionario del Oeste",
+          "tickers": [
+            "ALUA",
+            "ALUA.BA",
+            "ARCOR",
+            "ARCOR.BA",
+            "LEDE",
+            "LEDE.BA",
+            "CRES",
+            "CRES.BA",
+            "MOLI",
+            "MOLI.BA",
+            "MOLA",
+            "MOLA.BA",
+            "SAMI",
+            "SAMI.BA",
+            "MIRG",
+            "MIRG.BA",
+            "COME",
+            "COME.BA",
+            "FERR",
+            "FERR.BA",
+            "LONG",
+            "LONG.BA",
+            "HAVA",
+            "HAVA.BA",
+            "CTIO",
+            "CTIO.BA",
+            "IRSA",
+            "IRSA.BA",
+            "AUSO",
+            "AUSO.BA",
+            "OEST",
+            "OEST.BA",
+            "GCDI",
+            "GCDI.BA",
+            "MORI",
+            "MORI.BA",
+            "INVJ",
+            "INVJ.BA",
+            "SEMI",
+            "SEMI.BA",
+            "GRIM",
+            "GRIM.BA",
+            "PATA",
+            "PATA.BA",
+            "RIGO",
+            "RIGO.BA",
+            "RICH",
+            "RICH.BA",
+            "ROSE",
+            "ROSE.BA",
+            "RAGH",
+            "AGRO",
+            "AGRO.BA",
+            "CADO",
+            "CADO.BA",
+            "GARO",
+            "GARO.BA",
+            "POLL",
+            "POLL.BA",
+            "INTR",
+            "INTR.BA",
+            "DOME",
+            "DOME.BA"
+          ],
+          "tickers_count": 50,
+          "paneles": [
+            "panel_acciones_argentinas"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/acciones/argentina/Todos",
+            "GET /api/v2/portafolio/argentina"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker + '.BA' })"
+          ]
+        },
+        {
+          "id": "cedears_argentinos",
+          "nombre": "Cedears Argentinos (ADR Representativos)",
+          "descripcion": "Cedears de empresas argentinas que cotizan en BCBA representando ADRs de NYSE/NASDAQ. Incluye YPF, GGAL, PAM, EDN, TEO, IRS, CRESY, SUPV, BMA, CEPU, LOMA",
+          "tickers": [
+            "YPFD",
+            "GGAL",
+            "PAM",
+            "EDN",
+            "TEO",
+            "IRS",
+            "CRESY",
+            "SUPV",
+            "BMA",
+            "CEPU",
+            "LOMA"
+          ],
+          "tickers_count": 11,
+          "paneles": [
+            "panel_adr_argentina"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/acciones/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "etf_argentina_latam",
+          "nombre": "ETFs Argentina y Latinoamérica",
+          "descripcion": "ARGT (Global X Argentina ETF), ILF (iShares Latin America 40), EWZ (iShares Brazil), EWW (iShares Mexico), ECH (iShares Chile)",
+          "tickers": [
+            "ARGT",
+            "ILF",
+            "EWZ",
+            "EWW",
+            "ECH"
+          ],
+          "tickers_count": 5,
+          "paneles": [
+            "panel_etf_emergentes",
+            "panel_paises"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "etf_emergentes_general",
+          "nombre": "ETFs Mercados Emergentes Globales",
+          "descripcion": "EEM (iShares MSCI Emerging Markets), VWO (Vanguard FTSE Emerging Markets), FXI (China), INDA (India), EWY (Corea), EWT (Taiwán), EWS (Singapur), EZA (Sudáfrica), TUR (Turquía), EPI (India)",
+          "tickers": [
+            "EEM",
+            "VWO",
+            "FXI",
+            "INDA",
+            "EWY",
+            "EWT",
+            "EWS",
+            "EZA",
+            "TUR",
+            "EPI"
+          ],
+          "tickers_count": 10,
+          "paneles": [
+            "panel_etf_emergentes",
+            "panel_paises"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "adr_argentina",
+          "nombre": "ADR Argentina (NYSE/NASDAQ)",
+          "descripcion": "ADRs de empresas argentinas cotizando en NYSE/NASDAQ: YPF, GGAL, BMA, SUPV, EDN, TEO, IRS, LOMA, CEPU, PAM, CRESY, BIOF",
+          "tickers": [
+            "YPF",
+            "GGAL",
+            "BMA",
+            "SUPV",
+            "EDN",
+            "TEO",
+            "IRS",
+            "LOMA",
+            "CEPU",
+            "PAM",
+            "CRESY",
+            "BIOF"
+          ],
+          "tickers_count": 12,
+          "paneles": [
+            "panel_adr_argentina"
+          ],
+          "endpoints_iol": [],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })",
+            "yahooFundamentalsBatch({ symbols: [ticker] })"
+          ]
+        },
+        {
+          "id": "adr_brasil",
+          "nombre": "ADR Brasil (NYSE/NASDAQ)",
+          "descripcion": "ADRs de Brasil: Vale, Petrobras, Ambev, Itaú, Banco Bradesco, Gerdau, Suzano, Cosan, Embraer, PagSeguro, StoneCo, XP Inc, Nu Holdings",
+          "tickers": [
+            "VALE",
+            "PBR",
+            "ABEV",
+            "ITUB",
+            "BBD",
+            "GGB",
+            "SUZ",
+            "CSAN",
+            "ERJ",
+            "PAGS",
+            "STNE",
+            "XP",
+            "NU"
+          ],
+          "tickers_count": 13,
+          "paneles": [
+            "panel_adr_brasil"
+          ],
+          "endpoints_iol": [],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "adr_mexico_canada",
+          "nombre": "ADR México, Canadá, Chile, Reino Unido",
+          "descripcion": "ADRs regionales: México (AMX, FMX, TV), Canadá (SHOP, TD, CNQ, SU, BNS), Chile (BSAC, SQM), Reino Unido (UL, DEO, NGG, AZN, GSK, RYCEY, BP, SHEL)",
+          "tickers": [
+            "AMX",
+            "FMX",
+            "TV",
+            "SHOP",
+            "TD",
+            "CNQ",
+            "SU",
+            "BNS",
+            "BSAC",
+            "SQM",
+            "UL",
+            "DEO",
+            "NGG",
+            "AZN",
+            "GSK",
+            "BP",
+            "SHEL",
+            "MUFG",
+            "SMFG",
+            "HMC",
+            "TM",
+            "SONY"
+          ],
+          "tickers_count": 22,
+          "paneles": [
+            "panel_adr_canada",
+            "panel_adr_mexico",
+            "panel_adr_chile",
+            "panel_adr_reino_unido"
+          ],
+          "endpoints_iol": [],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "bienes_raices_argentina",
+          "nombre": "Bienes Raíces Argentina y REITs",
+          "descripcion": "Desarrolladores inmobiliarios argentinos (Consultatio, IRSA, GCDI, RAGHSA) y REITs de EE.UU. (VNQ, IYR, XLRE). Cartera de real estate diversificada geográficamente",
+          "tickers": [
+            "CTIO",
+            "CTIO.BA",
+            "IRSA",
+            "IRSA.BA",
+            "GCDI",
+            "GCDI.BA",
+            "RAGH",
+            "VNQ",
+            "IYR",
+            "XLRE",
+            "ICF",
+            "REET",
+            "RWR",
+            "XHB",
+            "ITB",
+            "AMT",
+            "PLD",
+            "EQIX",
+            "WELL",
+            "SPG",
+            "O",
+            "DLR",
+            "PSA",
+            "AVB",
+            "EQR",
+            "WY",
+            "CCI",
+            "SBAC",
+            "EXR",
+            "VICI",
+            "ARE",
+            "BXP"
+          ],
+          "tickers_count": 32,
+          "paneles": [
+            "panel_inmuebles",
+            "panel_sp500"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/acciones/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        }
+      ],
+      "perfiles_recomendados": [
+        "moderadamente_agresivo",
+        "agresivo"
+      ]
+    },
+    {
+      "id": "smart_beta_factores",
+      "nombre": "Smart Beta y Factores Estilo",
+      "tipo": "Renta Variable - Factor",
+      "descripcion": "ETFs de factores estilo: Momentum (MTUM), Calidad (QUAL), Valor (VLUE), Tamaño (SIZE), Baja Volatilidad (USMV). ETFs Value (IVE, IWD), Growth (IVW, IWF). Rebalanceo sistemático por reglas cuantitativas",
+      "subcategorias": [
+        {
+          "id": "etfs_smart_beta",
+          "nombre": "ETFs Smart Beta",
+          "descripcion": "Factor ETFs: Momentum, Calidad, Valor, Tamaño, Baja Volatilidad, Dividendos",
+          "tickers": [
+            "MTUM",
+            "QUAL",
+            "VLUE",
+            "SIZE",
+            "USMV",
+            "IVE",
+            "IVW",
+            "IWF",
+            "IWD",
+            "IJR",
+            "SPY",
+            "QQQ",
+            "DIA",
+            "SCHD",
+            "VIG",
+            "SPHQ",
+            "ESGU"
+          ],
+          "tickers_count": 17,
+          "paneles": [
+            "panel_smart_beta",
+            "panel_etf_us"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })",
+            "yahooFundamentalsBatch({ symbols: [ticker] })"
+          ]
+        },
+        {
+          "id": "estrategias_avanzadas",
+          "nombre": "Estrategias Avanzadas y Multiactivo",
+          "descripcion": "AOA, AOK, AOM (iShares Core Allocation), EDV (Vanguard Extended Duration), SHY (Short Treasury), MAGS (MAGA), EPI (India)",
+          "tickers": [
+            "AOA",
+            "AOK",
+            "AOM",
+            "EDV",
+            "SHY",
+            "MAGS",
+            "EPI"
+          ],
+          "tickers_count": 7,
+          "paneles": [
+            "panel_estrategias_avanzadas"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        }
+      ],
+      "perfiles_recomendados": [
+        "moderado",
+        "moderadamente_agresivo",
+        "agresivo"
+      ]
+    },
+    {
+      "id": "apalancados_inversos",
+      "nombre": "ETFs Apalancados e Inversos",
+      "tipo": "Renta Variable - Especulativo",
+      "descripcion": "ETFs con apalancamiento 2x/3x y ETFs inversos para cobertura y estrategias tácticas. Alto riesgo, adecuado solo para perfiles especulativos",
+      "subcategorias": [
+        {
+          "id": "apalancados_alcistas",
+          "nombre": "Apalancados Alcistas (Bull)",
+          "descripcion": "SSO (S&P 500 2x), QLD (Nasdaq 2x), UCO (Oil 2x), AGQ (Silver 2x), UGL (Gold 2x), USD (USD Index 2x), TQQQ (Nasdaq 3x), SPXL (S&P 500 3x)",
+          "tickers": [
+            "SSO",
+            "QLD",
+            "UCO",
+            "AGQ",
+            "UGL",
+            "USD",
+            "TQQQ",
+            "SPXL"
+          ],
+          "tickers_count": 8,
+          "paneles": [
+            "panel_apalancados_alcistas"
+          ],
+          "endpoints_iol": [],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "apalancados_bajistas",
+          "nombre": "Apalancados Bajistas (Bear)",
+          "descripcion": "SDS (S&P 500 -2x), SH (S&P 500 -1x), PSQ (Nasdaq -1x), TBT (Treasury -2x), SCO (Oil -2x), VXX (VIX), DXY (Dólar Index)",
+          "tickers": [
+            "SDS",
+            "SH",
+            "PSQ",
+            "TBT",
+            "SCO",
+            "VXX",
+            "DXY"
+          ],
+          "tickers_count": 7,
+          "paneles": [
+            "panel_apalancados_bajistas"
+          ],
+          "endpoints_iol": [],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        }
+      ],
+      "perfiles_recomendados": [
+        "corto_plazo_especulativo",
+        "agresivo"
+      ]
+    },
+    {
+      "id": "commodities_materias_primas",
+      "nombre": "Commodities y Materias Primas",
+      "tipo": "Activo Real",
+      "descripcion": "ETFs de commodities: petróleo (USO), gas natural (UNG), oro (GLD), plata (SLV), cobre (COPX), agricultura (DBA, SOYB, CORN, WEAT), litio (LIT), uranio (URA, NLR), metales preciosos (PALL)",
+      "subcategorias": [
+        {
+          "id": "etfs_commodities",
+          "nombre": "ETFs Commodities",
+          "descripcion": "Cobertura inflacionaria y diversificación con activos reales",
+          "tickers": [
+            "USO",
+            "UNG",
+            "GLD",
+            "SLV",
+            "COPX",
+            "DBA",
+            "SOYB",
+            "CORN",
+            "WEAT",
+            "LIT",
+            "URA",
+            "PALL",
+            "DBC",
+            "GSG",
+            "NLR"
+          ],
+          "tickers_count": 15,
+          "paneles": [
+            "panel_commodities",
+            "panel_etf_us"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        }
+      ],
+      "perfiles_recomendados": [
+        "moderado",
+        "moderadamente_agresivo",
+        "agresivo"
+      ]
+    },
+    {
+      "id": "factores_macro_renta_fija",
+      "nombre": "Factores Macro y Renta Fija Global",
+      "tipo": "Factores de Riesgo",
+      "descripcion": "Indicadores macroeconómicos (DXY, VIX, TNX, MERVAL), ETFs de renta fija global por duration (SHY, IEF, TLT, HYG, LQD, BNDX, AGG, EMB, BND) y bonos del tesoro EE.UU.",
+      "subcategorias": [
+        {
+          "id": "factores_macro",
+          "nombre": "Factores Macroeconómicos",
+          "descripcion": "Índices de referencia macro: DXY (Dólar Index), VIX (Volatilidad), TNX (T-Note 10y), MERVAL (Argentina)",
+          "tickers": [
+            "DXY",
+            "VIX",
+            "TNX",
+            "MERVAL",
+            "SPX",
+            "IXIC",
+            "N225",
+            "GDAXI",
+            "STOXX",
+            "MXX"
+          ],
+          "tickers_count": 10,
+          "paneles": [
+            "panel_factores_macro",
+            "panel_indices_globales"
+          ],
+          "endpoints_iol": [],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: '^' + ticker })",
+            "chart/^VIX",
+            "chart/^TNX",
+            "chart/^MERV"
+          ]
+        },
+        {
+          "id": "bonos_tesoro_etf",
+          "nombre": "ETFs Bonos del Tesoro EE.UU.",
+          "descripcion": "Exposición a treasuries americanos por duración: Corto (SHY), Medio (IEF), Largo (TLT), Total Bond (AGG, BND)",
+          "tickers": [
+            "SHY",
+            "IEF",
+            "TLT",
+            "AGG",
+            "BND",
+            "BNDX"
+          ],
+          "tickers_count": 6,
+          "paneles": [
+            "panel_factores_renta_fija"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        },
+        {
+          "id": "credit_spread_etf",
+          "nombre": "ETFs Crédito Corporativo y Emergente",
+          "descripcion": "High Yield (HYG), Investment Grade (LQD), Emerging Markets (EMB), Global Bond ex-US (BNDX)",
+          "tickers": [
+            "HYG",
+            "LQD",
+            "EMB",
+            "BNDX"
+          ],
+          "tickers_count": 4,
+          "paneles": [
+            "panel_factores_renta_fija"
+          ],
+          "endpoints_iol": [
+            "GET /api/v2/Cotizaciones/etf/argentina/Todos"
+          ],
+          "endpoints_yahoo": [
+            "fetchYahooSummary({ symbol: ticker })"
+          ]
+        }
+      ],
+      "perfiles_recomendados": [
+        "corto_plazo_conservador",
+        "conservador",
+        "moderado"
+      ]
+    }
+  ],
+  "paneles_mercado": [
+    {
+      "id": "panel_cauciones_iol",
+      "nombre": "Panel Cauciones IOL (BCBA)",
+      "descripcion": "Cauciones bursátiles en BYMA",
+      "tipo_instrumento": "cauciones",
+      "api_endpoint": "GET /api/v2/Cotizaciones/cauciones/argentina/Todos",
+      "api_function": "iolPanelFn({ instrumento: 'cauciones', pais: 'argentina' })",
+      "origen": "IOL API",
+      "api_referencia": "api iol.txt"
+    },
+    {
+      "id": "panel_fci_iol",
+      "nombre": "Panel FCI IOL (Fondos Comunes de Inversión)",
+      "descripcion": "Fondos comunes de inversión argentinos por categoría: money market, renta fija, renta mixta, renta variable, plazos fijos",
+      "tipo_instrumento": "fci",
+      "api_endpoint": "GET /api/v2/Cotizaciones/fondosComunesInversion/argentina/Todos",
+      "api_function": "iolPanelFn({ instrumento: 'fondosComunesInversion', pais: 'argentina' })",
+      "origen": "IOL API",
+      "api_referencia": "api iol.txt"
+    },
+    {
+      "id": "panel_bonos_iol",
+      "nombre": "Panel Bonos IOL (BCBA/MAE)",
+      "descripcion": "Bonos soberanos, provinciales, CER, duales, TAMAR, BOPREAL y ONs",
+      "tipo_instrumento": "bonos",
+      "api_endpoint": "GET /api/v2/Cotizaciones/bonos/argentina/Todos",
+      "api_function": "iolPanelFn({ instrumento: 'bonos', pais: 'argentina' })",
+      "origen": "IOL API",
+      "api_referencia": "api iol.txt"
+    },
+    {
+      "id": "panel_titulos_publicos_iol",
+      "nombre": "Panel Títulos Públicos IOL",
+      "descripcion": "Títulos públicos argentinos: bonos soberanos, letras (LECAP, LECER, DLK, TAMAR) y bontes",
+      "tipo_instrumento": "titulosPublicos",
+      "api_endpoint": "GET /api/v2/Cotizaciones/titulosPublicos/argentina/Todos",
+      "api_function": "iolPanelFn({ instrumento: 'titulosPublicos', pais: 'argentina' })",
+      "origen": "IOL API",
+      "api_referencia": "api iol.txt"
+    },
+    {
+      "id": "panel_lecap",
+      "nombre": "Panel LECAP / Letras Capitalizables",
+      "descripcion": "Letras del Tesoro capitalizables en pesos a distintos plazos",
+      "tipo_instrumento": "lecap",
+      "api_endpoint": "GET /api/v2/{mercado}/Titulos/S30N6/CotizacionDetalle y equivalentes",
+      "api_function": "cotizacionDetalleFn({ mercado: 'bCBA', ticker })",
+      "origen": "ArgentinaDatos",
+      "api_referencia": "RENTA_FIJA_COMPLETA.json -> categorias[].subcategorias[].bonos[].ticker"
+    },
+    {
+      "id": "panel_cer_iol",
+      "nombre": "Panel Bonos CER IOL",
+      "descripcion": "Bonos ajustables por CER: Boncer, Bontes CER y títulos de canje",
+      "tipo_instrumento": "bonos",
+      "api_endpoint": "GET /api/v2/Cotizaciones/bonos/argentina/Todos",
+      "api_function": "iolPanelFn({ instrumento: 'bonos', pais: 'argentina' }) + filter CER",
+      "origen": "IOL API",
+      "api_referencia": "api iol.txt"
+    },
+    {
+      "id": "panel_dollar_linked",
+      "nombre": "Panel Dólar Linked",
+      "descripcion": "Bonos y letras ajustables por tipo de cambio oficial",
+      "tipo_instrumento": "bonos",
+      "api_endpoint": "GET /api/v2/Cotizaciones/bonos/argentina/Todos + filter DLK",
+      "api_function": "iolPanelFn() + filter",
+      "origen": "IOL API",
+      "api_referencia": "api iol.txt"
+    },
+    {
+      "id": "panel_ons_iol",
+      "nombre": "Panel Obligaciones Negociables IOL",
+      "descripcion": "Obligaciones Negociables corporativas argentinas",
+      "tipo_instrumento": "obligacionesNegociables",
+      "api_endpoint": "GET /api/v2/Cotizaciones/obligacionesNegociables/argentina/Todos",
+      "api_function": "iolPanelFn({ instrumento: 'obligacionesNegociables', pais: 'argentina' })",
+      "origen": "IOL API",
+      "api_referencia": "api iol.txt"
+    },
+    {
+      "id": "panel_acciones_argentinas",
+      "nombre": "Panel Acciones Argentinas BCBA",
+      "descripcion": "Acciones líderes y general listadas en BYMA/BCBA",
+      "tipo_instrumento": "acciones",
+      "api_endpoint": "GET /api/v2/Cotizaciones/acciones/argentina/Todos",
+      "api_function": "iolPanelFn({ instrumento: 'acciones', pais: 'argentina' })",
+      "origen": "IOL API",
+      "api_referencia": "api iol.txt"
+    },
+    {
+      "id": "panel_adr_argentina",
+      "nombre": "Panel ADR Argentina",
+      "descripcion": "ADRs de empresas argentinas en NYSE/NASDAQ: YPF, GGAL, BMA, SUPV, EDN, TEO, IRS, LOMA, CEPU, PAM, CRESY",
+      "tipo_instrumento": "adr",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_adr_brasil",
+      "nombre": "Panel ADR Brasil",
+      "descripcion": "ADRs de empresas brasileñas: Vale, Petrobras, Ambev, Itaú, Bradesco",
+      "tipo_instrumento": "adr",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_adr_canada",
+      "nombre": "Panel ADR Canadá",
+      "descripcion": "ADRs canadienses: Shopify, TD Bank, Suncor, CNQ, Barrick Gold, BNS",
+      "tipo_instrumento": "adr",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_adr_chile",
+      "nombre": "Panel ADR Chile",
+      "descripcion": "ADRs chilenos: Banco Santander Chile, SQM",
+      "tipo_instrumento": "adr",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_adr_mexico",
+      "nombre": "Panel ADR México",
+      "descripcion": "ADRs mexicanos: América Móvil, FEMSA, Televisa, Grupo México",
+      "tipo_instrumento": "adr",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_adr_reino_unido",
+      "nombre": "Panel ADR Reino Unido",
+      "descripcion": "ADRs británicos: Unilever, Diageo, National Grid, AstraZeneca, GSK, BP, Shell",
+      "tipo_instrumento": "adr",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_nasdaq100",
+      "nombre": "Panel Nasdaq-100",
+      "descripcion": "100 empresas del índice Nasdaq-100 (NDX). Tecnología, consumo, salud, biotecnología",
+      "tipo_instrumento": "acciones_us",
+      "api_endpoint": "Yahoo Finance quoteSummary + IOL Cedears",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance + IOL API",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_sp500",
+      "nombre": "Panel S&P 500",
+      "descripcion": "500 empresas del S&P 500. Cobertura amplia del mercado accionario estadounidense",
+      "tipo_instrumento": "acciones_us",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker }) + yahooFundamentalsBatch",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_djia",
+      "nombre": "Panel Dow Jones Industrial Average (DJIA)",
+      "descripcion": "30 empresas industriales líderes del Dow Jones",
+      "tipo_instrumento": "acciones_us",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_etf_us",
+      "nombre": "Panel ETFs EE.UU.",
+      "descripcion": "ETFs de mercado amplio, sectoriales, temáticos, factores, commodities y renta fija cotizados en NYSE/NASDAQ y disponibles como Cedears en BCBA",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary + IOL",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance + IOL API",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_etf_sectores_us",
+      "nombre": "Panel ETFs Sectoriales EE.UU.",
+      "descripcion": "Select Sector SPDRs: XLK, XLF, XLV, XLE, XLC, XLY, XLP, XLI, XLB, XLRE, XLU",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_etf_tematicos",
+      "nombre": "Panel ETFs Temáticos",
+      "descripcion": "ETFs temáticos: ARKK, ICLN, SMH, IBB, BOTZ, HACK, SOXX, XBI, ARKQ, IHI, ITA, PPA, MOO, NLR",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_etf_emergentes",
+      "nombre": "Panel ETFs Mercados Emergentes",
+      "descripcion": "ETFs de países emergentes: EEM, VWO, EWZ, FXI, ARGT, ILF, ECH, EWS, EWT, EWW, EZA, INDA",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_etf_desarrollados",
+      "nombre": "Panel ETFs Mercados Desarrollados",
+      "descripcion": "ETFs de países desarrollados: EFA, VGK, FEZ, EWJ, EWY, EWG, EWC",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_etf_small_cap",
+      "nombre": "Panel ETFs Small/Mid Cap",
+      "descripcion": "ETFs de pequeña y mediana capitalización: IWM, IJH, IJR, VB, AVUV, SPSM, VTWO",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_small_cap_us",
+      "nombre": "Panel Small/Mid Cap US (Directo NYSE/NASDAQ)",
+      "descripcion": "Acciones de pequeña y mediana capitalización estadounidenses con cobertura de analistas y datos en tiempo real vía Yahoo Finance",
+      "tipo_instrumento": "acciones_us",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker }) + yahooFundamentalsBatch",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_commodities",
+      "nombre": "Panel Commodities",
+      "descripcion": "ETFs de materias primas: energía, metales, agricultura",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_factores_macro",
+      "nombre": "Panel Factores Macroeconómicos",
+      "descripcion": "Indicadores macro: DXY, VIX, TNX, MERVAL, índices bursátiles globales",
+      "tipo_instrumento": "indices",
+      "api_endpoint": "Yahoo Finance chart/^{symbol}",
+      "api_function": "fetchYahooSummary({ symbol: '^' + ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_factores_renta_fija",
+      "nombre": "Panel Factores Renta Fija Global",
+      "descripcion": "ETFs de renta fija por duration y crédito: SHY, IEF, TLT, HYG, LQD, EMB, AGG, BND, BNDX",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_factores_sectores",
+      "nombre": "Panel Factores Sectores EE.UU.",
+      "descripcion": "ETFs sectoriales SPDR: XLK, XLF, XLV, XLE, XLC, XLY, XLP, XLI, XLB, XLRE, XLU",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_smart_beta",
+      "nombre": "Panel Smart Beta",
+      "descripcion": "ETFs de factores: MTUM, QUAL, VLUE, SIZE, USMV, IVE, IVW, IWF, IWD, IJR, SPY, QQQ, DIA, SCHD, VIG, SPHQ, ESGU",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker }) + yahooFundamentalsBatch",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_estrategias_avanzadas",
+      "nombre": "Panel Estrategias Avanzadas",
+      "descripcion": "ETF multiactivo: AOA, AOK, AOM, EDV, EPI, MAGS, SHY",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_apalancados_alcistas",
+      "nombre": "Panel Apalancados Alcistas (Bull)",
+      "descripcion": "ETFs apalancados 2x/3x: SSO, QLD, UCO, AGQ, UGL, USD, TQQQ, SPXL",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_apalancados_bajistas",
+      "nombre": "Panel Apalancados Bajistas (Bear)",
+      "descripcion": "ETFs inversos y bajistas: SDS, SH, PSQ, TBT, SCO, VXX",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_paises",
+      "nombre": "Panel ETFs por País",
+      "descripcion": "ETFs de países individuales y regionales: ARGT, EWZ, EWW, ECH, EEM, VWO, FXI, INDA, EFA, EWG, EWJ",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_indices_globales",
+      "nombre": "Panel Índices Globales",
+      "descripcion": "Índices de referencia global: SPX, IXIC, N225, GDAXI, STOXX, MXX, MERVAL, FTSE, HSI, VIX, DXY, TNX",
+      "tipo_instrumento": "indices",
+      "api_endpoint": "Yahoo Finance chart/^{symbol}",
+      "api_function": "fetchYahooSummary({ symbol: '^' + ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_inmuebles",
+      "nombre": "Panel Inmuebles y REITs",
+      "descripcion": "ETFs de real estate: VNQ, IYR, XLRE, ICF, REET, RWR, XHB, ITB",
+      "tipo_instrumento": "etf",
+      "api_endpoint": "Yahoo Finance quoteSummary",
+      "api_function": "fetchYahooSummary({ symbol: ticker })",
+      "origen": "Yahoo Finance",
+      "api_referencia": "metodo af yfinance.txt"
+    },
+    {
+      "id": "panel_iol_sectoriales",
+      "nombre": "Panel IOL Sectoriales (Merval)",
+      "descripcion": "Índices sectoriales IOL/Merval: energía, bancos, industriales, consumo, etc.",
+      "tipo_instrumento": "indices",
+      "api_endpoint": "IOL API + Yahoo Finance",
+      "api_function": "iolPanelFn + fetchYahooSummary",
+      "origen": "IOL API",
+      "api_referencia": "api iol.txt + metodo af yfinance.txt"
+    }
+  ],
+  "perfiles_inversor": [
+    {
+      "id": "corto_plazo_conservador",
+      "nombre": "Corto Plazo: Conservador",
+      "puntaje_min_horizonte": null,
+      "puntaje_max_horizonte": null,
+      "puntaje_min_tolerancia": null,
+      "puntaje_max_tolerancia": null,
+      "descripcion": "Inversor con horizonte de muy corto plazo y nula tolerancia al riesgo. Preservación de capital como objetivo único. Busca liquidez inmediata y rendimiento predecible",
+      "rendimiento_promedio": "TNA 30-40% (pesos)",
+      "mejor_escenario": "TNA 45%",
+      "peor_escenario": "TNA 20%",
+      "asignacion": [
+        {
+          "categoria_id": "efectivo_cauciones_fci",
+          "porcentaje": 60
+        },
+        {
+          "categoria_id": "bonos_corto_plazo",
+          "porcentaje": 40
+        },
+        {
+          "categoria_id": "large_cap_us",
+          "porcentaje": 0
+        },
+        {
+          "categoria_id": "small_cap_us",
+          "porcentaje": 0
+        },
+        {
+          "categoria_id": "argentina_emergentes",
+          "porcentaje": 0
+        }
+      ],
+      "paneles_recomendados": [
+        "panel_cauciones_iol",
+        "panel_titulos_publicos_iol",
+        "panel_fci_iol",
+        "panel_lecap",
+        "panel_dollar_linked"
+      ],
+      "tickers_destacados": {
+        "efectivo": [
+          "cauciones BCBA",
+          "FCI T+0 Money Market",
+          "saldos disponibles"
+        ],
+        "bonos": [
+          "SHY",
+          "IEF",
+          "LECAP corto (S30N6, S17L6, S14G6)",
+          "LECER (X30N6)",
+          "Dólar Linked (D31L6, D31G6)",
+          "Boncer corto (TZXD6, TX26)",
+          "AL29",
+          "GD29",
+          "Letras TAMAR (M31G6)"
+        ]
+      },
+      "estrategia": "Preservación de capital con generación de ingresos corrientes. 100% renta fija de corto plazo. Sin exposición a renta variable. Liquidez diaria garantizada. Ideal para fondos de emergencia y metas a <6 meses"
+    },
+    {
+      "id": "corto_plazo_especulativo",
+      "nombre": "Corto Plazo: Especulativo",
+      "puntaje_min_horizonte": null,
+      "puntaje_max_horizonte": null,
+      "puntaje_min_tolerancia": null,
+      "puntaje_max_tolerancia": null,
+      "descripcion": "Inversor con horizonte de corto plazo pero máxima tolerancia al riesgo. Busca oportunidades tácticas y especulativas con instrumentos de alta volatilidad",
+      "rendimiento_promedio": "Variable (alta volatilidad)",
+      "mejor_escenario": "+100% anual",
+      "peor_escenario": "-70% anual",
+      "asignacion": [
+        {
+          "categoria_id": "efectivo_cauciones_fci",
+          "porcentaje": 0
+        },
+        {
+          "categoria_id": "bonos_corto_plazo",
+          "porcentaje": 0
+        },
+        {
+          "categoria_id": "large_cap_us",
+          "porcentaje": 0
+        },
+        {
+          "categoria_id": "small_cap_us",
+          "porcentaje": 0
+        },
+        {
+          "categoria_id": "argentina_emergentes",
+          "porcentaje": 100
+        }
+      ],
+      "paneles_recomendados": [
+        "panel_apalancados_alcistas",
+        "panel_apalancados_bajistas",
+        "panel_small_cap_us",
+        "panel_adr_argentina",
+        "panel_acciones_argentinas",
+        "panel_factores_macro"
+      ],
+      "tickers_destacados": {
+        "apalancados": [
+          "TQQQ",
+          "SPXL",
+          "SSO",
+          "QLD",
+          "UCO",
+          "AGQ"
+        ],
+        "inversos": [
+          "SDS",
+          "SH",
+          "PSQ",
+          "SCO",
+          "VXX"
+        ],
+        "volatilidad": [
+          "VIX",
+          "VXX",
+          "DXY"
+        ],
+        "argentina_especulativo": [
+          "YPFD",
+          "GGAL",
+          "CEPU",
+          "PAMP",
+          "VIST",
+          "BBAR"
+        ]
+      },
+      "estrategia": "Estrategias tácticas de corto plazo con apalancamiento. Trading de volatilidad, ETFs inversos y posiciones direccionales agresivas. Gestión activa del riesgo con stops dinámicos. No apto para inversores sin experiencia"
+    },
+    {
+      "id": "conservador",
+      "nombre": "Conservador",
+      "puntaje_min_horizonte": 1,
+      "puntaje_max_horizonte": 3,
+      "puntaje_min_tolerancia": 1,
+      "puntaje_max_tolerancia": 3,
+      "descripcion": "Inversor con baja tolerancia al riesgo y horizonte de 1-3 años. Prioriza la preservación de capital con algo de crecimiento moderado",
+      "rendimiento_promedio": "TNA 25-35% (pesos) / 3-6% (USD)",
+      "mejor_escenario": "+15% anual en USD",
+      "peor_escenario": "-5% anual en USD",
+      "asignacion": [
+        {
+          "categoria_id": "efectivo_cauciones_fci",
+          "porcentaje": 25
+        },
+        {
+          "categoria_id": "bonos_corto_plazo",
+          "porcentaje": 55
+        },
+        {
+          "categoria_id": "large_cap_us",
+          "porcentaje": 15
+        },
+        {
+          "categoria_id": "small_cap_us",
+          "porcentaje": 0
+        },
+        {
+          "categoria_id": "argentina_emergentes",
+          "porcentaje": 5
+        }
+      ],
+      "paneles_recomendados": [
+        "panel_cauciones_iol",
+        "panel_bonos_iol",
+        "panel_titulos_publicos_iol",
+        "panel_cer_iol",
+        "panel_lecap",
+        "panel_fci_iol",
+        "panel_sp500",
+        "panel_factores_renta_fija"
+      ],
+      "tickers_destacados": {
+        "efectivo": [
+          "cauciones BCBA",
+          "FCI T+0"
+        ],
+        "bonos_argentinos": [
+          "LECAP (S30N6, S14G6)",
+          "LECER (X30N6, X30S6)",
+          "Boncer (TZXD6, TX26, TZX27)",
+          "Dual (TTS26, TTD26)",
+          "TAMAR (TMG28)",
+          "AL29",
+          "GD29",
+          "BOPREAL (BPOC7)",
+          "Bonte TF (T30A7, TO26)"
+        ],
+        "renta_variable": [
+          "SPY",
+          "IVV",
+          "QQQ",
+          "DIA",
+          "XLK",
+          "XLF",
+          "XLV",
+          "XLP",
+          "SCHD",
+          "JNJ",
+          "PG",
+          "KO",
+          "PEP",
+          "WMT",
+          "MCD"
+        ]
+      },
+      "estrategia": "Cartera defensiva con predominio de renta fija (80%). Bonos soberanos cortos y letras. Exposición moderada a large caps vía ETFs diversificados. Mínima exposición a emergentes. Rebalanceo trimestral con revisión semestral de duration"
+    },
+    {
+      "id": "moderadamente_conservador",
+      "nombre": "Moderadamente Conservador",
+      "puntaje_min_horizonte": 2,
+      "puntaje_max_horizonte": 4,
+      "puntaje_min_tolerancia": 3,
+      "puntaje_max_tolerancia": 5,
+      "descripcion": "Inversor con tolerancia al riesgo baja-media y horizonte de 2-4 años. Busca equilibrio entre seguridad y crecimiento moderado",
+      "rendimiento_promedio": "TNA 30-40% (pesos) / 4-8% (USD)",
+      "mejor_escenario": "+20% anual en USD",
+      "peor_escenario": "-10% anual en USD",
+      "asignacion": [
+        {
+          "categoria_id": "efectivo_cauciones_fci",
+          "porcentaje": 15
+        },
+        {
+          "categoria_id": "bonos_corto_plazo",
+          "porcentaje": 45
+        },
+        {
+          "categoria_id": "large_cap_us",
+          "porcentaje": 20
+        },
+        {
+          "categoria_id": "small_cap_us",
+          "porcentaje": 10
+        },
+        {
+          "categoria_id": "argentina_emergentes",
+          "porcentaje": 10
+        }
+      ],
+      "paneles_recomendados": [
+        "panel_bonos_iol",
+        "panel_titulos_publicos_iol",
+        "panel_cer_iol",
+        "panel_sp500",
+        "panel_nasdaq100",
+        "panel_etf_us",
+        "panel_small_cap_us",
+        "panel_adr_argentina",
+        "panel_factores_renta_fija"
+      ],
+      "tickers_destacados": {
+        "efectivo": [
+          "cauciones BCBA",
+          "FCI T+1"
+        ],
+        "bonos": [
+          "AL30",
+          "GD30",
+          "AL29",
+          "GD29",
+          "AL35",
+          "GD35",
+          "Boncer (TZX28, TX28, TZXM8)",
+          "Dual (TXMJ9, TXMD8)",
+          "TAMAR (TMF27, TMG27)",
+          "BOPREAL (BPOD7, BPOB8)",
+          "Bontes TF (T30J7, T31Y7)",
+          "AO27",
+          "AO28",
+          "ONs grado inversión"
+        ],
+        "large_cap": [
+          "SPY",
+          "QQQ",
+          "XLK",
+          "XLF",
+          "XLV",
+          "XLI",
+          "AAPL",
+          "MSFT",
+          "NVDA",
+          "GOOGL",
+          "AMZN",
+          "META",
+          "JPM",
+          "V",
+          "UNH"
+        ],
+        "small_cap": [
+          "IWM",
+          "IJH",
+          "AAON",
+          "ALNY",
+          "AXSM",
+          "ALKS"
+        ],
+        "argentina_emergentes": [
+          "EEM",
+          "EWZ",
+          "ARGT",
+          "YPFD",
+          "GGAL",
+          "PAMP",
+          "IRSA",
+          "GGAL"
+        ]
+      },
+      "estrategia": "Cartera balanceada con sesgo defensivo. Núcleo de renta fija argentina (60%) complementado con renta variable internacional (30%) y argentina (10%). Diversificación sectorial vía ETFs. Duration media de 2-4 años en bonos"
+    },
+    {
+      "id": "moderado",
+      "nombre": "Moderado",
+      "puntaje_min_horizonte": 3,
+      "puntaje_max_horizonte": 5,
+      "puntaje_min_tolerancia": 5,
+      "puntaje_max_tolerancia": 7,
+      "descripcion": "Inversor con tolerancia al riesgo media y horizonte de 3-5 años. Busca crecimiento con gestión activa del riesgo",
+      "rendimiento_promedio": "TNA 35-50% (pesos) / 6-12% (USD)",
+      "mejor_escenario": "+30% anual en USD",
+      "peor_escenario": "-20% anual en USD",
+      "asignacion": [
+        {
+          "categoria_id": "efectivo_cauciones_fci",
+          "porcentaje": 10
+        },
+        {
+          "categoria_id": "bonos_corto_plazo",
+          "porcentaje": 30
+        },
+        {
+          "categoria_id": "large_cap_us",
+          "porcentaje": 30
+        },
+        {
+          "categoria_id": "small_cap_us",
+          "porcentaje": 15
+        },
+        {
+          "categoria_id": "argentina_emergentes",
+          "porcentaje": 15
+        }
+      ],
+      "paneles_recomendados": [
+        "panel_bonos_iol",
+        "panel_sp500",
+        "panel_nasdaq100",
+        "panel_etf_us",
+        "panel_etf_sectores_us",
+        "panel_etf_tematicos",
+        "panel_small_cap_us",
+        "panel_smart_beta",
+        "panel_commodities",
+        "panel_adr_argentina",
+        "panel_acciones_argentinas",
+        "panel_paises",
+        "panel_inmuebles"
+      ],
+      "tickers_destacados": {
+        "efectivo": [
+          "cauciones BCBA",
+          "FCI T+1"
+        ],
+        "bonos": [
+          "AL30",
+          "GD30",
+          "AL35",
+          "GD35",
+          "AL41",
+          "GD38",
+          "GD41",
+          "Boncer (TZX28, TX28, TZXM9)",
+          "Dual (TXMJ9)",
+          "BOPREAL (BPOD7)",
+          "ONs corporativas seleccionadas",
+          "Bonte TF (TY30P)"
+        ],
+        "large_cap": [
+          "SPY",
+          "QQQ",
+          "XLK",
+          "XLF",
+          "XLV",
+          "XLE",
+          "XLC",
+          "XLY",
+          "AAPL",
+          "MSFT",
+          "NVDA",
+          "GOOGL",
+          "AMZN",
+          "META",
+          "AVGO",
+          "TSLA",
+          "LLY",
+          "JPM",
+          "V",
+          "MA",
+          "BRK.B",
+          "COST",
+          "WMT"
+        ],
+        "small_cap": [
+          "IWM",
+          "IJH",
+          "CRWD",
+          "DDOG",
+          "MRNA",
+          "PLTR",
+          "SQ",
+          "ZS",
+          "DASH",
+          "DXCM",
+          "ALNY",
+          "BEAM",
+          "BBIO"
+        ],
+        "argentina_emergentes": [
+          "EEM",
+          "VWO",
+          "EWZ",
+          "FXI",
+          "ARGT",
+          "ILF",
+          "YPFD",
+          "GGAL",
+          "PAMP",
+          "VIST",
+          "TGSU2",
+          "BMA",
+          "IRSA",
+          "CRES",
+          "PAM",
+          "CEPU",
+          "LOMA"
+        ],
+        "commodities": [
+          "GLD",
+          "SLV",
+          "USO",
+          "COPX",
+          "LIT",
+          "URA"
+        ],
+        "smart_beta": [
+          "MTUM",
+          "QUAL",
+          "VLUE",
+          "USMV",
+          "SCHD",
+          "VIG"
+        ]
+      },
+      "estrategia": "Cartera balanceada con sesgo de crecimiento. 40% renta fija (bonos argentinos soberanos y corporativos), 45% renta variable internacional (con sesgo tecnológico y calidad), 15% Argentina + emergentes. Exposición a smart beta, factores y commodities como diversificadores. Rebalanceo mensual con seguimiento continuo"
+    },
+    {
+      "id": "moderadamente_agresivo",
+      "nombre": "Moderadamente Agresivo",
+      "puntaje_min_horizonte": 4,
+      "puntaje_max_horizonte": 7,
+      "puntaje_min_tolerancia": 7,
+      "puntaje_max_tolerancia": 9,
+      "descripcion": "Inversor con tolerancia al riesgo media-alta y horizonte de 4-7 años. Busca crecimiento agresivo con exposición significativa a renta variable",
+      "rendimiento_promedio": "TNA 40-60% (pesos) / 8-15% (USD)",
+      "mejor_escenario": "+40% anual en USD",
+      "peor_escenario": "-30% anual en USD",
+      "asignacion": [
+        {
+          "categoria_id": "efectivo_cauciones_fci",
+          "porcentaje": 5
+        },
+        {
+          "categoria_id": "bonos_corto_plazo",
+          "porcentaje": 15
+        },
+        {
+          "categoria_id": "large_cap_us",
+          "porcentaje": 35
+        },
+        {
+          "categoria_id": "small_cap_us",
+          "porcentaje": 20
+        },
+        {
+          "categoria_id": "argentina_emergentes",
+          "porcentaje": 25
+        }
+      ],
+      "paneles_recomendados": [
+        "panel_sp500",
+        "panel_nasdaq100",
+        "panel_etf_tematicos",
+        "panel_etf_sectores_us",
+        "panel_small_cap_us",
+        "panel_smart_beta",
+        "panel_commodities",
+        "panel_adr_argentina",
+        "panel_acciones_argentinas",
+        "panel_apalancados_alcistas",
+        "panel_paises",
+        "panel_inmuebles",
+        "panel_bonos_iol"
+      ],
+      "tickers_destacados": {
+        "efectivo": [
+          "cauciones BCBA"
+        ],
+        "bonos": [
+          "AL30",
+          "GD30",
+          "AL35",
+          "GD35",
+          "ONs selectas (YPF, Pampa, Vista)",
+          "BOPREAL"
+        ],
+        "large_cap": [
+          "QQQ",
+          "SPY",
+          "XLK",
+          "XLC",
+          "XLY",
+          "AAPL",
+          "MSFT",
+          "NVDA",
+          "GOOGL",
+          "AMZN",
+          "META",
+          "AVGO",
+          "TSLA",
+          "LLY",
+          "NFLX",
+          "ADBE",
+          "CRM",
+          "AMD",
+          "MRVL",
+          "MU"
+        ],
+        "small_cap": [
+          "IWM",
+          "CRWD",
+          "DDOG",
+          "MRNA",
+          "PLTR",
+          "SNAP",
+          "SQ",
+          "DKNG",
+          "DASH",
+          "DOCU",
+          "HOOD",
+          "RKLB",
+          "SOFI",
+          "UPST",
+          "ALNY",
+          "AXSM",
+          "BBIO",
+          "BEAM"
+        ],
+        "argentina_emergentes": [
+          "YPFD",
+          "GGAL",
+          "PAMP",
+          "VIST",
+          "TGSU2",
+          "BMA",
+          "SUPV",
+          "EDN",
+          "CEPU",
+          "PAM",
+          "CRES",
+          "IRSA",
+          "LOMA",
+          "BBAR",
+          "EEM",
+          "EWZ",
+          "ARGT",
+          "FXI"
+        ],
+        "commodities_tematicos": [
+          "GLD",
+          "SLV",
+          "COPX",
+          "URA",
+          "LIT",
+          "ARKK",
+          "ICLN",
+          "SMH",
+          "IBB"
+        ]
+      },
+      "estrategia": "Cartera agresiva con 80% en renta variable. Fuerte sesgo a tecnología US (Nasdaq-100), small caps innovadoras y Argentina. Renta fija reducida para diversificación táctica. Exposición a temáticos (IA, biotech, semiconductores, energía limpia). Rebalanceo quincenal con stops dinámicos"
+    },
+    {
+      "id": "agresivo",
+      "nombre": "Agresivo",
+      "puntaje_min_horizonte": 5,
+      "puntaje_max_horizonte": 10,
+      "puntaje_min_tolerancia": 9,
+      "puntaje_max_tolerancia": 10,
+      "descripcion": "Inversor con máxima tolerancia al riesgo y horizonte de 5+ años. Busca maximizar retorno de largo plazo aceptando alta volatilidad y pérdidas temporales significativas",
+      "rendimiento_promedio": "TNA 50-80% (pesos) / 10-20% (USD)",
+      "mejor_escenario": "+60% anual en USD",
+      "peor_escenario": "-50% anual en USD",
+      "asignacion": [
+        {
+          "categoria_id": "efectivo_cauciones_fci",
+          "porcentaje": 5
+        },
+        {
+          "categoria_id": "bonos_corto_plazo",
+          "porcentaje": 0
+        },
+        {
+          "categoria_id": "large_cap_us",
+          "porcentaje": 40
+        },
+        {
+          "categoria_id": "small_cap_us",
+          "porcentaje": 25
+        },
+        {
+          "categoria_id": "argentina_emergentes",
+          "porcentaje": 30
+        }
+      ],
+      "paneles_recomendados": [
+        "panel_nasdaq100",
+        "panel_sp500",
+        "panel_small_cap_us",
+        "panel_etf_tematicos",
+        "panel_adr_argentina",
+        "panel_acciones_argentinas",
+        "panel_apalancados_alcistas",
+        "panel_commodities",
+        "panel_paises",
+        "panel_inmuebles",
+        "panel_smart_beta"
+      ],
+      "tickers_destacados": {
+        "efectivo": [
+          "cauciones BCBA (mínimo)"
+        ],
+        "large_cap": [
+          "QQQ",
+          "SPY",
+          "XLK",
+          "XLC",
+          "XLY",
+          "AAPL",
+          "MSFT",
+          "NVDA",
+          "GOOGL",
+          "AMZN",
+          "META",
+          "AVGO",
+          "TSLA",
+          "LLY",
+          "NFLX",
+          "AMD",
+          "CRM",
+          "ADBE",
+          "NOW",
+          "ISRG",
+          "UBER",
+          "COST"
+        ],
+        "small_cap": [
+          "IWM",
+          "CRWD",
+          "PLTR",
+          "DDOG",
+          "MRNA",
+          "SNAP",
+          "SQ",
+          "DKNG",
+          "DASH",
+          "HOOD",
+          "RKLB",
+          "SOFI",
+          "UPST",
+          "MSTR",
+          "ALNY",
+          "BBIO",
+          "BEAM",
+          "AXSM",
+          "ARWR",
+          "BHVN"
+        ],
+        "argentina_emergentes": [
+          "YPFD",
+          "GGAL",
+          "PAMP",
+          "VIST",
+          "TGSU2",
+          "BMA",
+          "SUPV",
+          "EDN",
+          "CEPU",
+          "PAM",
+          "CRES",
+          "IRSA",
+          "LOMA",
+          "BBAR",
+          "CAPX",
+          "GPRK",
+          "EEM",
+          "EWZ",
+          "FXI",
+          "ARGT",
+          "ILF",
+          "VWO",
+          "INDA",
+          "EWY"
+        ],
+        "tematicos_commodities": [
+          "ARKK",
+          "ICLN",
+          "SMH",
+          "IBB",
+          "SOXX",
+          "BOTZ",
+          "HACK",
+          "GLD",
+          "SLV",
+          "COPX",
+          "URA",
+          "LIT",
+          "USO"
+        ],
+        "apalancados_selectos": [
+          "TQQQ",
+          "SPXL",
+          "QLD",
+          "SSO"
+        ]
+      },
+      "estrategia": "Cartera de máxima convicción: 95% renta variable con alta concentración en tecnología US, small caps innovadoras, Argentina value y emergentes selectos. Sin renta fija. Exposición a temáticos disruptivos (IA, biotecnología, semiconductores, vehículos autónomos). Incluye ETFs apalancados selectivamente. Rebalanceo semanal con monitoreo diario. Acepta pérdidas temporales de hasta 50%"
+    }
+  ],
+  "api_endpoints_referencia": {
+    "iol": {
+      "base_url": "https://api.invertironline.com",
+      "version": "api/v2",
+      "endpoints": {
+        "estado_cuenta": {
+          "method": "GET",
+          "path": "/api/v2/estadocuenta",
+          "descripcion": "Saldo disponible, tenencias, carteras consolidadas"
+        },
+        "portafolio": {
+          "method": "GET",
+          "path": "/api/v2/portafolio/{pais}",
+          "descripcion": "Detalle de tenencias por país (argentina/eeuu)"
+        },
+        "cotizaciones": {
+          "method": "GET",
+          "path": "/api/v2/Cotizaciones/{instrumento}/{pais}/Todos",
+          "descripcion": "Panel completo de cotizaciones por instrumento"
+        },
+        "cotizacion_detalle": {
+          "method": "GET",
+          "path": "/api/v2/{mercado}/Titulos/{ticker}/CotizacionDetalle",
+          "descripcion": "Cotización detallada de un título específico"
+        },
+        "serie_historica": {
+          "method": "GET",
+          "path": "/api/v2/{mercado}/Titulos/{ticker}/Cotizacion/seriehistorica/{desde}/{hasta}/{ajuste}",
+          "descripcion": "Serie histórica con ajuste (ninguno/ajustado)"
+        },
+        "operaciones": {
+          "method": "GET",
+          "path": "/api/v2/operaciones",
+          "descripcion": "Historial de operaciones del usuario"
+        },
+        "venta_mep_simple": {
+          "method": "GET",
+          "path": "/api/v2/OperatoriaSimplificada/VentaMepSimple/MontosEstimados/{monto}",
+          "descripcion": "Montos estimados para venta MEP simple"
+        },
+        "portafolio_asesor": {
+          "method": "GET",
+          "path": "/api/v2/Asesores/Portafolio/{clienteId}/{pais}",
+          "descripcion": "Portafolio de cliente asesorado"
+        },
+        "estado_cuenta_asesor": {
+          "method": "GET",
+          "path": "/api/v2/Asesores/EstadoDeCuenta/{clienteId}",
+          "descripcion": "Estado de cuenta de cliente asesorado"
+        }
+      }
+    },
+    "yahoo_finance": {
+      "base_url": "Yahoo Finance API v1/v11",
+      "modulos": [
+        "assetProfile",
+        "incomeStatementHistory",
+        "balanceSheetHistory",
+        "cashflowStatementHistory",
+        "defaultKeyStatistics",
+        "financialData",
+        "calendarEvents",
+        "secFilings",
+        "recommendationTrend",
+        "upgradeDowngradeHistory",
+        "institutionOwnership",
+        "fundOwnership",
+        "insiderTransactions",
+        "insiderHolders",
+        "netSharePurchaseActivity",
+        "earnings",
+        "earningsHistory",
+        "earningsTrend",
+        "industryTrend",
+        "indexTrend",
+        "sectorTrend",
+        "majorDirectHolders",
+        "majorHoldersBreakdown",
+        "price",
+        "quoteType",
+        "summaryDetail",
+        "symbol",
+        "esgScores",
+        "fundProfile",
+        "topHoldings"
+      ],
+      "function_summary": "fetchYahooSummary({ symbol: string }) -> quoteSummary",
+      "function_batch": "yahooFundamentalsBatch({ symbols: string[] }) -> fundamentals + beta + R²",
+      "function_chart": "chart/{symbol}?range={range}&interval={interval}",
+      "function_news": "fetchNoticiasTicker(ticker) via Flask localhost:5000/api/news?ticker={symbol}"
+    },
+    "bcra": {
+      "base_url": "https://api.bcra.gob.ar",
+      "endpoints": {
+        "cotizaciones_cambiarias": "GET /estadisticascambiarias/v1.0/Cotizaciones",
+        "monetarias": "GET /estadisticas/v4.0/Monetarias/{IdVariable}"
+      }
+    },
+    "argentina_datos": {
+      "base_url": "https://api.argentinadatos.com",
+      "endpoints": {
+        "dolares": "GET /v1/cotizaciones/dolares",
+        "inflacion": "GET /v1/finanzas/indices/inflacion"
+      }
+    },
+    "criptoya": {
+      "base_url": "https://criptoya.com",
+      "endpoint": "GET /api/dolar"
+    },
+    "flask_news": {
+      "base_url": "http://localhost:5000",
+      "endpoint": "GET /api/news?ticker={symbol}&count={n}",
+      "descripcion": "Servicio Flask local que obtiene noticias vía yfinance.get_news()",
+      "technology": "Python Flask → yfinance"
+    }
+  },
+  "referencia_categorias_origen": {
+    "RENTA_FIJA_COMPLETA.json": {
+      "categorias_mapeadas": [
+        {
+          "categoria_origen": "bonos_soberanos_hard_dollar",
+          "categoria_destino": [
+            "bonos_soberanos_hard_dollar"
+          ]
+        },
+        {
+          "categoria_origen": "ajustables_cer",
+          "categoria_destino": [
+            "ajustables_cer"
+          ]
+        },
+        {
+          "categoria_origen": "tasa_dual_tamar",
+          "categoria_destino": [
+            "tasa_dual_tamar"
+          ]
+        },
+        {
+          "categoria_origen": "tasa_fija_capitalizables",
+          "categoria_destino": [
+            "tasa_fija_capitalizables"
+          ]
+        },
+        {
+          "categoria_origen": "bopreal",
+          "categoria_destino": [
+            "bopreal"
+          ]
+        },
+        {
+          "categoria_origen": "bonos_iliquidos_residuales",
+          "categoria_destino": [
+            "provinciales_subsoberanos",
+            "cupones_pbi"
+          ]
+        }
+      ],
+      "subcategorias_lecap": "LECAP, LECER, Dólar-Linked y Letras TAMAR de RENTA_FIJA_COMPLETA.json consolidadas en bonos_corto_plazo"
+    },
+    "unificado_completo.json": {
+      "sectores_mapeados": [
+        {
+          "sector_origen": "Acciones Industriales",
+          "categoria_destino": "large_cap_us / small_cap_us"
+        },
+        {
+          "sector_origen": "Bienes Raíces",
+          "categoria_destino": "argentina_emergentes:bienes_raices_argentina"
+        },
+        {
+          "sector_origen": "Consumo Cíclico",
+          "categoria_destino": "large_cap_us"
+        },
+        {
+          "sector_origen": "Cuidado de la Salud",
+          "categoria_destino": "large_cap_us / small_cap_us"
+        },
+        {
+          "sector_origen": "Defensiva del Consumidor",
+          "categoria_destino": "large_cap_us"
+        },
+        {
+          "sector_origen": "Energía",
+          "categoria_destino": "large_cap_us / argentina_emergentes"
+        },
+        {
+          "sector_origen": "Fondos y ETFs",
+          "categoria_destino": "large_cap_us:etfs / smart_beta_factores / apalancados_inversos / commodities_materias_primas / factores_macro_renta_fija"
+        },
+        {
+          "sector_origen": "Materiales Básicos",
+          "categoria_destino": "large_cap_us"
+        },
+        {
+          "sector_origen": "Servicios Financieros",
+          "categoria_destino": "large_cap_us / argentina_emergentes"
+        },
+        {
+          "sector_origen": "Servicios de Comunicación",
+          "categoria_destino": "large_cap_us"
+        },
+        {
+          "sector_origen": "Tecnología",
+          "categoria_destino": "large_cap_us / small_cap_us"
+        },
+        {
+          "sector_origen": "Utilidades",
+          "categoria_destino": "large_cap_us / argentina_emergentes"
+        }
+      ]
+    }
+  },
+  "distribucion_por_mercado": {
+    "BCBA (BYMA)": {
+      "descripcion": "Bolsa y Mercados Argentinos — acciones, bonos, cauciones, ONs, Cedears, ETFs, FCI",
+      "categorias": [
+        "efectivo_cauciones_fci",
+        "bonos_corto_plazo",
+        "bonos_soberanos_hard_dollar",
+        "ajustables_cer",
+        "tasa_dual_tamar",
+        "tasa_fija_capitalizables",
+        "bopreal",
+        "corporativos_ons",
+        "provinciales_subsoberanos",
+        "cupones_pbi",
+        "argentina_emergentes"
+      ],
+      "api_iol": true
+    },
+    "NYSE": {
+      "descripcion": "New York Stock Exchange — ADRs argentinos, internacionales, ETFs US",
+      "categorias": [
+        "large_cap_us",
+        "small_cap_us",
+        "argentina_emergentes:adr_argentina"
+      ],
+      "api_yahoo": true
+    },
+    "NASDAQ": {
+      "descripcion": "NASDAQ Stock Exchange — Tecnología, biotech, ETFs, ADRs",
+      "categorias": [
+        "large_cap_us:tecnologia",
+        "small_cap_us:tecnologia_salud",
+        "argentina_emergentes:adrs_internacionales"
+      ],
+      "api_yahoo": true
+    },
+    "MAE": {
+      "descripcion": "Mercado Abierto Electrónico — bonos soberanos, provinciales, ONs",
+      "categorias": [
+        "bonos_soberanos_hard_dollar",
+        "provinciales_subsoberanos",
+        "corporativos_ons"
+      ],
+      "api_iol": true
+    },
+    "OTC": {
+      "descripcion": "Over The Counter — bonos ilíquidos, especies muertas, cupones PBI",
+      "categorias": [
+        "cupones_pbi",
+        "provinciales_subsoberanos:subsoberanos_iliquidos"
+      ],
+      "api_iol": false
+    }
+  }
+}

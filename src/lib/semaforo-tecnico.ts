@@ -101,8 +101,7 @@ export function macd(closes: number[], fast = 12, slow = 26, senalPeriod = 9): R
     const s = eSlow[i];
     if (f != null && s != null) linea.push(f - s);
   }
-  if (linea.length < senalPeriod + 1)
-    return { macd: null, senal: null, hist: null };
+  if (linea.length < senalPeriod + 1) return { macd: null, senal: null, hist: null };
   const eSenal = ema(linea, senalPeriod);
   const macdVal = linea[linea.length - 1] ?? null;
   const senalVal = eSenal[eSenal.length - 1] ?? null;
@@ -116,24 +115,44 @@ export function macd(closes: number[], fast = 12, slow = 26, senalPeriod = 9): R
 /** Tendencia: precio vs SMA20/SMA50/SMA200 y cruce de medias. Puntaje en [-2, 2]. */
 export function analizarTendencia(closes: number[]): { score: number; detalle: string } {
   const n = closes.length;
-  if (n < 20)
-    return { score: 0, detalle: "sin datos suficientes para calcular la tendencia" };
+  if (n < 20) return { score: 0, detalle: "sin datos suficientes para calcular la tendencia" };
   const precio = closes[n - 1] ?? 0;
   const s20 = sma(closes, 20);
   const s50 = n >= 50 ? sma(closes, 50) : null;
   const s200 = n >= 200 ? sma(closes, 200) : null;
 
   const partes: { ok: boolean; peso: number; texto: string }[] = [];
-  if (s20 != null) partes.push({ ok: precio > s20, peso: 0.25, texto: `precio ${precio > s20 ? ">" : "<"} SMA20 (${fmtNum(s20)})` });
-  if (s50 != null) partes.push({ ok: precio > s50, peso: 0.25, texto: `precio ${precio > s50 ? ">" : "<"} SMA50 (${fmtNum(s50)})` });
-  if (s200 != null) partes.push({ ok: precio > s200, peso: 0.25, texto: `precio ${precio > s200 ? ">" : "<"} SMA200 (${fmtNum(s200)})` });
-  if (s50 != null && s200 != null) partes.push({ ok: s50 > s200, peso: 0.25, texto: `SMA50 ${s50 > s200 ? ">" : "<"} SMA200 (${s50 > s200 ? "cruza alcista" : "cruza bajista"})` });
+  if (s20 != null)
+    partes.push({
+      ok: precio > s20,
+      peso: 0.25,
+      texto: `precio ${precio > s20 ? ">" : "<"} SMA20 (${fmtNum(s20)})`,
+    });
+  if (s50 != null)
+    partes.push({
+      ok: precio > s50,
+      peso: 0.25,
+      texto: `precio ${precio > s50 ? ">" : "<"} SMA50 (${fmtNum(s50)})`,
+    });
+  if (s200 != null)
+    partes.push({
+      ok: precio > s200,
+      peso: 0.25,
+      texto: `precio ${precio > s200 ? ">" : "<"} SMA200 (${fmtNum(s200)})`,
+    });
+  if (s50 != null && s200 != null)
+    partes.push({
+      ok: s50 > s200,
+      peso: 0.25,
+      texto: `SMA50 ${s50 > s200 ? ">" : "<"} SMA200 (${s50 > s200 ? "cruza alcista" : "cruza bajista"})`,
+    });
   if (!partes.length) return { score: 0, detalle: "sin suficientes medias móviles" };
 
   const sumaPesos = partes.reduce((s, p) => s + p.peso, 0);
   const bruto = partes.reduce((s, p) => s + (p.ok ? 1 : -1) * p.peso, 0) / sumaPesos;
   const direccion = bruto >= 0 ? "alcista" : "bajista";
-  const fuerza = Math.abs(bruto) >= 0.5 ? " fuerte" : Math.abs(bruto) >= 0.25 ? " moderada" : " leve";
+  const fuerza =
+    Math.abs(bruto) >= 0.5 ? " fuerte" : Math.abs(bruto) >= 0.25 ? " moderada" : " leve";
   return {
     score: clamp(bruto * 2, -2, 2),
     detalle: `tendencia ${direccion}${fuerza}: ${partes.map((p) => p.texto).join(" · ")}`,
@@ -206,7 +225,9 @@ export function analizarSoporteResistencia(
     // Espacio hacia la resistencia menos el colchón hacia el soporte.
     const espacio = distRes - distSop;
     puntos += clamp(espacio / 0.1, -1, 1);
-    texto.push(`soporte a ${(distSop * 100).toFixed(1)}% / resistencia a ${(distRes * 100).toFixed(1)}%`);
+    texto.push(
+      `soporte a ${(distSop * 100).toFixed(1)}% / resistencia a ${(distRes * 100).toFixed(1)}%`,
+    );
   }
   if (low52 != null && high52 != null && high52 > low52 && precio > 0) {
     const pos = clamp((precio - low52) / (high52 - low52), 0, 1);
@@ -362,8 +383,7 @@ export function calcularScoreFundamental(m: MetricasFundamentales): {
     });
   }
 
-  if (!tramos.length)
-    return { score: null, detalle: "sin métricas fundamentales disponibles" };
+  if (!tramos.length) return { score: null, detalle: "sin métricas fundamentales disponibles" };
   const score = clamp(tramos.reduce((s, t) => s + t.v, 0) / tramos.length, -2, 2);
   return { score, detalle: tramos.map((t) => t.texto).join(" · ") };
 }

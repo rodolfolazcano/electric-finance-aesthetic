@@ -10,6 +10,8 @@ import {
   cicloEconomicoFn,
   performanceSectorialFn,
 } from "@/lib/herramientas/clara.functions";
+import { TendenciasMacroPanel } from "@/components/herramientas/TendenciasMacroPanel";
+import { MarketNewsPanel } from "@/components/herramientas/MarketNewsPanel";
 import { cn } from "@/lib/utils";
 
 function fmtPct(v: number | null | undefined, dec = 1): string {
@@ -267,6 +269,8 @@ export function ContextoTab() {
       <MacroCard />
       <CicloBanner />
       <PerformanceSectorial />
+      <TendenciasMacroPanel />
+      <MarketNewsPanel />
     </div>
   );
 }

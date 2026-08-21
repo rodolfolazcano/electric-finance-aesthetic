@@ -2,7 +2,11 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { analisisValorIntrinseco, textoAnalisis, type AnalisisCompleto } from "./valuation-pipeline";
+import {
+  analisisValorIntrinseco,
+  textoAnalisis,
+  type AnalisisCompleto,
+} from "./valuation-pipeline";
 
 export interface RespuestaValor {
   analisis: AnalisisCompleto;

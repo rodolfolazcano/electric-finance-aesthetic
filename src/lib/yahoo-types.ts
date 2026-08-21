@@ -159,3 +159,31 @@ export interface QuoteSummaryResult {
   earnings?: Record<string, any>;
   secFilings?: { filings?: Array<Record<string, any>> };
 }
+
+/** Perfil de empresa (m�dulo assetProfile de quoteSummary) � usado por fundamental-af. */
+export interface CompanyOfficer {
+  name?: string;
+  title?: Record<string, unknown> | string;
+  age?: number;
+  yearBorn?: number;
+  fiscalYear?: number;
+  totalPay?: number;
+  exercisedValue?: number;
+  unexercisedValue?: number;
+}
+
+export interface AssetProfile {
+  longName?: string;
+  shortName?: string;
+  sector?: string;
+  industry?: string;
+  country?: string;
+  longBusinessSummary?: string;
+  companyOfficers?: CompanyOfficer[];
+  auditRisk?: number;
+  boardRisk?: number;
+  compensationRisk?: number;
+  shareHolderRightsRisk?: number;
+  overallRisk?: number;
+  [key: string]: unknown;
+}

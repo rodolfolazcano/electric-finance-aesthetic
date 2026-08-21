@@ -572,6 +572,56 @@ export async function ejecutarTool(
         };
       }
     }
+    case "score_sectorial": {
+      const mod = await import("@/lib/herramientas/score-sectorial.functions");
+      try {
+        const args = argsRaw.trim() ? (JSON.parse(argsRaw) as Record<string, unknown>) : {};
+        const data = await mod.scoreSectorialFn({
+          data: {
+            ticker: String(args["simbolo"] ?? simbolo ?? query ?? "").trim(),
+            ...(typeof args["peersMax"] === "number" ? { peersMax: args["peersMax"] } : {}),
+          },
+        });
+        const S = data.score;
+        const L = [
+          `Score sectorial de ${data.ticker}${data.nombre ? ` (${data.nombre})` : ""}:`,
+          `- Sector universo: ${data.sectorUniverso ?? "N/D"} · Industria: ${data.industriaUniverso ?? "N/D"} | Yahoo: ${data.sectorYahoo ?? "N/D"} / ${data.industriaYahoo ?? "N/D"}`,
+          `- Perfil sectorial (${data.perfil.sector}${data.perfil.esDefault ? ", DEFAULT" : ""}): sensibilidad tasas ${data.perfil.sensibilidadTasas}, commodities ${data.perfil.sensibilidadCommodity}. ${data.perfil.justificacion}`,
+          `- SCORE SECTORIAL: ${S.disponible ? `${S.valor}/100 (base ${S.raw ?? "N/D"})` : `no disponible (valor neutro ${S.valor})`}`,
+        ];
+        if (S.disponible && S.detalle && Object.keys(S.detalle).length) {
+          const d = Object.entries(S.detalle)
+            .map(([k, v]) => `${k}=${v}`)
+            .join(" · ");
+          L.push(`- Detalle: ${d}`);
+        }
+        L.push(`- Resumen ejecutivo: ${data.interpretacion.resumenEjecutivo}`);
+        for (const f of data.interpretacion.fortalezas) L.push(`- Fortaleza: ${f}`);
+        for (const dd of data.interpretacion.debilidades) L.push(`- Debilidad: ${dd}`);
+        if (data.interpretacion.mejorAlternativaSector)
+          L.push(`- Mejor alternativa del sector: ${data.interpretacion.mejorAlternativaSector}`);
+        for (const a of data.interpretacion.advertencias) L.push(`- Advertencia: ${a}`);
+        for (const a of data.advertenciasDatos) L.push(`- Nota de datos: ${a}`);
+        if (data.pares.length) {
+          L.push(
+            `- Pares comparados: ${data.pares
+              .slice(0, 10)
+              .map(
+                (p) =>
+                  `${p.ticker} (fs ${p.fundScore ?? "N/D"}, P/E ${p.trailingPE != null ? p.trailingPE.toFixed(1) : "N/D"})`,
+              )
+              .join("; ")}`,
+          );
+        }
+        return { texto: L.join("\n"), fuentes: [], ok: true };
+      } catch (e) {
+        return {
+          texto: `SIN RESULTADOS: score_sectorial falló (${e instanceof Error ? e.message : "error"}).`,
+          fuentes: [],
+          ok: false,
+        };
+      }
+    }
     case "datos_financieros":
       return await ejecutarDatosFinancieros(argsRaw);
     case "grafico_chat":

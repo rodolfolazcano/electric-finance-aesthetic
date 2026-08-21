@@ -112,7 +112,13 @@ const MAPEO_METODOLOGIA: Array<{ claves: string[]; id: string }> = [
     id: "MATF_Lopez_Dumrauf_Unidad_3",
   },
   {
-    claves: ["emergente", "mercados emergentes", "empresa emergente", "riesgo pais", "pais emergente"],
+    claves: [
+      "emergente",
+      "mercados emergentes",
+      "empresa emergente",
+      "riesgo pais",
+      "pais emergente",
+    ],
     id: "DFIN_Pascale_3_Unidad_3",
   },
   {
@@ -127,9 +133,18 @@ const MAPEO_METODOLOGIA: Array<{ claves: string[]; id: string }> = [
     claves: ["gordon", "valor terminal", "perpetuidad", "crecimiento terminal"],
     id: "MATF_Lopez_Dumrauf_Unidad_3",
   },
-  { claves: ["valoracion de empresas", "valuacion de empresas", "valor de la empresa"], id: "DFIN_Pascale_3_Unidad_3" },
-  { claves: ["administracion de carteras", "asset allocation", "asignacion de activos"], id: "IFACI_Elbaum_Unidad_3" },
-  { claves: ["wacc", "costo medio ponderado", "estructura de capital"], id: "DFIN_Alonso_Unidad_3" },
+  {
+    claves: ["valoracion de empresas", "valuacion de empresas", "valor de la empresa"],
+    id: "DFIN_Pascale_3_Unidad_3",
+  },
+  {
+    claves: ["administracion de carteras", "asset allocation", "asignacion de activos"],
+    id: "IFACI_Elbaum_Unidad_3",
+  },
+  {
+    claves: ["wacc", "costo medio ponderado", "estructura de capital"],
+    id: "DFIN_Alonso_Unidad_3",
+  },
 ];
 
 function elegirDescriptor(tema: string, papers: DescriptorPaper[]): DescriptorPaper | null {
@@ -173,7 +188,10 @@ async function buscarArchivo(carpetaPt: string, id: string): Promise<string | nu
       if (e.isDirectory()) {
         pila.push(ruta);
       } else if (/\.pdf$/i.test(e.name)) {
-        const base = path.basename(e.name).replace(/\.pdf$/i, "").toLowerCase();
+        const base = path
+          .basename(e.name)
+          .replace(/\.pdf$/i, "")
+          .toLowerCase();
         const limpia = base.replace(/[^a-z0-9_]/g, "");
         if (limpia === idL || base.startsWith(idL) || idL.startsWith(limpia)) return ruta;
       }
@@ -186,12 +204,18 @@ async function buscarArchivo(carpetaPt: string, id: string): Promise<string | nu
 function desescapePdf(s: string): string {
   return s.replace(/\\([nrtbf()\\])/g, (_m, c: string) => {
     switch (c) {
-      case "n": return "\n";
-      case "r": return "\r";
-      case "t": return "\t";
-      case "b": return "\b";
-      case "f": return "\f";
-      default: return c;
+      case "n":
+        return "\n";
+      case "r":
+        return "\r";
+      case "t":
+        return "\t";
+      case "b":
+        return "\b";
+      case "f":
+        return "\f";
+      default:
+        return c;
     }
   });
 }
@@ -262,18 +286,46 @@ async function extraerTextoPdf(ruta: string): Promise<string> {
 
 /** ---- Extracción de fórmulas por patrones ---- */
 const PATRONES_FORMULA: Array<{ nombre: string; re: RegExp }> = [
-  { nombre: "Valor actual / valor presente", re: /(?:valor actual|valor presente|\bVA\b|\bVP\b)[\s:=]*([^\n.;]{2,90})/i },
-  { nombre: "Flujo de caja descontado (DCF)", re: /(?:flujo de caja descontado|flujo de fondos descontado|dcf|valor de la empresa)[\s:=]*([^\n.;]{2,90})/i },
-  { nombre: "Valor terminal (Gordon / perpetuidad)", re: /(?:valor terminal|gordon|perpetuidad|crecimiento terminal)[\s:=]*([^\n.;]{2,90})/i },
-  { nombre: "WACC", re: /(?:\bWACC\b|costo medio ponderado|costo de capital medio)[\s:=]*([^\n.;]{2,90})/i },
+  {
+    nombre: "Valor actual / valor presente",
+    re: /(?:valor actual|valor presente|\bVA\b|\bVP\b)[\s:=]*([^\n.;]{2,90})/i,
+  },
+  {
+    nombre: "Flujo de caja descontado (DCF)",
+    re: /(?:flujo de caja descontado|flujo de fondos descontado|dcf|valor de la empresa)[\s:=]*([^\n.;]{2,90})/i,
+  },
+  {
+    nombre: "Valor terminal (Gordon / perpetuidad)",
+    re: /(?:valor terminal|gordon|perpetuidad|crecimiento terminal)[\s:=]*([^\n.;]{2,90})/i,
+  },
+  {
+    nombre: "WACC",
+    re: /(?:\bWACC\b|costo medio ponderado|costo de capital medio)[\s:=]*([^\n.;]{2,90})/i,
+  },
   { nombre: "CAPM", re: /(?:\bCAPM\b|costo de capital propio)[\s:=]*([^\n.;]{2,90})/i },
   { nombre: "VAN / VPN", re: /(?:\bVAN\b|\bVPN\b|valor actual neto)[\s:=]*([^\n.;]{2,90})/i },
   { nombre: "TIR", re: /(?:\bTIR\b|\bIRR\b|tasa interna de retorno)[\s:=]*([^\n.;]{2,90})/i },
-  { nombre: "Interés compuesto", re: /(?:interes compuesto|monto final|capitalizacion)[\s:=]*([^\n.;]{2,90})/i },
+  {
+    nombre: "Interés compuesto",
+    re: /(?:interes compuesto|monto final|capitalizacion)[\s:=]*([^\n.;]{2,90})/i,
+  },
 ];
 
 const TOKENS_VARIABLES = new Set([
-  "FCF", "VA", "VF", "VAN", "VPN", "TIR", "WACC", "CAPM", "E", "D", "K", "B", "TV", "FC",
+  "FCF",
+  "VA",
+  "VF",
+  "VAN",
+  "VPN",
+  "TIR",
+  "WACC",
+  "CAPM",
+  "E",
+  "D",
+  "K",
+  "B",
+  "TV",
+  "FC",
 ]);
 
 function extraerVariablesDeExpresion(expresion: string): string[] {
@@ -293,7 +345,10 @@ export function extraerFormulas(texto: string): Formula[] {
   for (const p of PATRONES_FORMULA) {
     const matches = [...texto.matchAll(p.re)];
     for (const m of matches.slice(0, 2)) {
-      const contexto = texto.slice(Math.max(0, (m.index ?? 0) - 60), (m.index ?? 0) + 100).replace(/\s+/g, " ").trim();
+      const contexto = texto
+        .slice(Math.max(0, (m.index ?? 0) - 60), (m.index ?? 0) + 100)
+        .replace(/\s+/g, " ")
+        .trim();
       const expresion = (m[1] ?? "").trim();
       if (!expresion) continue;
       formulas.push({
@@ -318,24 +373,94 @@ export function extraerFormulas(texto: string): Formula[] {
 /** ---- Supuestos por defecto según metodología ---- */
 const SUPUESTOS_DEFECTO: Record<string, Supuesto[]> = {
   DCF: [
-    { variable: "Horizonte de proyección", valor: "5 años", fuente: "Práctica estándar del paper", descripcion: "Años de proyección explícita de flujos de caja." },
-    { variable: "Crecimiento terminal", valor: "2.5% (US) / 3.5% (emergentes)", fuente: "PIB nominal esperado", descripcion: "Tasa de crecimiento perpetuo del valor terminal (Gordon)." },
-    { variable: "Tasa libre de riesgo", valor: "10Y Treasury (US) / Bonar 2030 (AR)", fuente: "Mercado (Yahoo Finance ^TNX)", descripcion: "Rendimiento del bono soberano de referencia." },
-    { variable: "Premio de riesgo de mercado", valor: "5.5%", fuente: "Damodaran / paper", descripcion: "Equity risk premium de referencia para CAPM." },
-    { variable: "Beta", valor: "3 años daily vs SPY / MERVAL", fuente: "Yahoo Finance chart (R² mayor)", descripcion: "Beta contra el benchmark con mejor ajuste." },
+    {
+      variable: "Horizonte de proyección",
+      valor: "5 años",
+      fuente: "Práctica estándar del paper",
+      descripcion: "Años de proyección explícita de flujos de caja.",
+    },
+    {
+      variable: "Crecimiento terminal",
+      valor: "2.5% (US) / 3.5% (emergentes)",
+      fuente: "PIB nominal esperado",
+      descripcion: "Tasa de crecimiento perpetuo del valor terminal (Gordon).",
+    },
+    {
+      variable: "Tasa libre de riesgo",
+      valor: "10Y Treasury (US) / Bonar 2030 (AR)",
+      fuente: "Mercado (Yahoo Finance ^TNX)",
+      descripcion: "Rendimiento del bono soberano de referencia.",
+    },
+    {
+      variable: "Premio de riesgo de mercado",
+      valor: "5.5%",
+      fuente: "Damodaran / paper",
+      descripcion: "Equity risk premium de referencia para CAPM.",
+    },
+    {
+      variable: "Beta",
+      valor: "3 años daily vs SPY / MERVAL",
+      fuente: "Yahoo Finance chart (R² mayor)",
+      descripcion: "Beta contra el benchmark con mejor ajuste.",
+    },
   ],
   EMERGENTES: [
-    { variable: "Horizonte de proyección", valor: "5 años", fuente: "Práctica del paper", descripcion: "Años de proyección explícita de flujos." },
-    { variable: "Crecimiento terminal", valor: "3.5%", fuente: "PIB nominal esperado de mercados emergentes", descripcion: "Crecimiento perpetuo con prima por país." },
-    { variable: "Tasa libre de riesgo", valor: "Bonar 2030 / tesoro de referencia", fuente: "Mercado", descripcion: "Riesgo soberano del país emergente." },
-    { variable: "Premio de riesgo de mercado", valor: "6.0% - 7.0%", fuente: "Damodaran ajustado por riesgo país", descripcion: "MRP mayor que en mercados desarrollados." },
-    { variable: "Beta", valor: "3 años daily vs MERVAL / SPY", fuente: "Yahoo Finance chart (R² mayor)", descripcion: "Se elige el benchmark local cuando ajusta mejor (R²)." },
+    {
+      variable: "Horizonte de proyección",
+      valor: "5 años",
+      fuente: "Práctica del paper",
+      descripcion: "Años de proyección explícita de flujos.",
+    },
+    {
+      variable: "Crecimiento terminal",
+      valor: "3.5%",
+      fuente: "PIB nominal esperado de mercados emergentes",
+      descripcion: "Crecimiento perpetuo con prima por país.",
+    },
+    {
+      variable: "Tasa libre de riesgo",
+      valor: "Bonar 2030 / tesoro de referencia",
+      fuente: "Mercado",
+      descripcion: "Riesgo soberano del país emergente.",
+    },
+    {
+      variable: "Premio de riesgo de mercado",
+      valor: "6.0% - 7.0%",
+      fuente: "Damodaran ajustado por riesgo país",
+      descripcion: "MRP mayor que en mercados desarrollados.",
+    },
+    {
+      variable: "Beta",
+      valor: "3 años daily vs MERVAL / SPY",
+      fuente: "Yahoo Finance chart (R² mayor)",
+      descripcion: "Se elige el benchmark local cuando ajusta mejor (R²).",
+    },
   ],
   CAPM: [
-    { variable: "Tasa libre de riesgo", valor: "10Y Treasury (US)", fuente: "Mercado (^TNX)", descripcion: "Rendimiento del bono a 10 años." },
-    { variable: "Premio de riesgo de mercado", valor: "5.5%", fuente: "Damodaran / paper", descripcion: "Equity risk premium de referencia." },
-    { variable: "Beta", valor: "3 años daily vs SPY / MERVAL", fuente: "Yahoo Finance chart", descripcion: "Beta con el benchmark de mejor R²." },
-    { variable: "Prima de tamaño / país", valor: "0% - 2%", fuente: "Ajuste discrecional del analista", descripcion: "Solo si el paper lo pide." },
+    {
+      variable: "Tasa libre de riesgo",
+      valor: "10Y Treasury (US)",
+      fuente: "Mercado (^TNX)",
+      descripcion: "Rendimiento del bono a 10 años.",
+    },
+    {
+      variable: "Premio de riesgo de mercado",
+      valor: "5.5%",
+      fuente: "Damodaran / paper",
+      descripcion: "Equity risk premium de referencia.",
+    },
+    {
+      variable: "Beta",
+      valor: "3 años daily vs SPY / MERVAL",
+      fuente: "Yahoo Finance chart",
+      descripcion: "Beta con el benchmark de mejor R².",
+    },
+    {
+      variable: "Prima de tamaño / país",
+      valor: "0% - 2%",
+      fuente: "Ajuste discrecional del analista",
+      descripcion: "Solo si el paper lo pide.",
+    },
   ],
 };
 
@@ -349,7 +474,8 @@ function supuestosPorTema(tema: string): Supuesto[] {
 /** Extrae supuestos mencionados explícitamente en el texto del paper. */
 export function extraerSupuestos(texto: string, tema: string): Supuesto[] {
   const encontrados: Supuesto[] = [];
-  const patrones = /([^\n.;]*(?:supuest|asum|premisa|hip[oó]tesis|se asume|considera)[^\n.;]*[.;])/gi;
+  const patrones =
+    /([^\n.;]*(?:supuest|asum|premisa|hip[oó]tesis|se asume|considera)[^\n.;]*[.;])/gi;
   for (const m of texto.matchAll(patrones)) {
     const frase = (m[1] ?? "").replace(/\s+/g, " ").trim();
     if (!frase || frase.length > 220) continue;
@@ -409,10 +535,10 @@ export async function leerPaper(tema: string): Promise<PaperMetodologia> {
   const categoria = descriptor?.categoria ?? "Knowledge base";
   const resumen = extraidoCompleto
     ? texto.slice(0, 600).replace(/\s+/g, " ").trim()
-    : (descriptor
-        ? `Paper del índice académico: ${descriptor.id} — ${nombre} (${categoria}). ` +
-          "El PDF no permitió extraer texto de forma confiable; se usan los supuestos estándar de la metodología y los datos de mercado."
-        : `No se encontró un paper específico para "${temaLimpio}" en la carpeta pt/. Se aplica la metodología DCF estándar con supuestos documentados.`);
+    : descriptor
+      ? `Paper del índice académico: ${descriptor.id} — ${nombre} (${categoria}). ` +
+        "El PDF no permitió extraer texto de forma confiable; se usan los supuestos estándar de la metodología y los datos de mercado."
+      : `No se encontró un paper específico para "${temaLimpio}" en la carpeta pt/. Se aplica la metodología DCF estándar con supuestos documentados.`;
 
   const formulas = extraidoCompleto ? extraerFormulas(texto) : [];
   if (!formulas.length && /dcf|flujo de caja|descontad/i.test(temaLimpio)) {

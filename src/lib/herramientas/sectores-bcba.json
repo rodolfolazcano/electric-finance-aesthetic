@@ -1,0 +1,392 @@
+{
+  "Servicios financieros": {
+    "Datos financieros y bolsas de valores": [
+      {
+        "ticker": "A3.BA",
+        "nombre": "A3 Mercados S.A."
+      }
+    ],
+    "Bancos - Regionales": [
+      {
+        "ticker": "BBAR.BA",
+        "nombre": "Banco BBVA Argentina S.A."
+      },
+      {
+        "ticker": "BHIP.BA",
+        "nombre": "Banco Hipotecario S.A."
+      },
+      {
+        "ticker": "BMA.BA",
+        "nombre": "Banco Macro S.A."
+      },
+      {
+        "ticker": "BPAT.BA",
+        "nombre": "Banco Patagonia S.A."
+      },
+      {
+        "ticker": "GGAL.BA",
+        "nombre": "Grupo Financiero Galicia S.A."
+      },
+      {
+        "ticker": "SUPV.BA",
+        "nombre": "Grupo Supervielle S.A."
+      }
+    ],
+    "Mercados de capitales": [
+      {
+        "ticker": "BYMA.BA",
+        "nombre": "Bolsas y Mercados Argentinos S.A."
+      }
+    ],
+    "Bancos - Diversificados": [
+      {
+        "ticker": "VALO.BA",
+        "nombre": "Banco de Valores S.A."
+      }
+    ]
+  },
+  "Acciones industriales": {
+    "Maquinaria agrícola y de construcción pesada": [
+      {
+        "ticker": "AGRO.BA",
+        "nombre": "Agrometal S.A.I."
+      }
+    ],
+    "Operaciones de infraestructura": [
+      {
+        "ticker": "AUSO.BA",
+        "nombre": "Autopistas Del Sol SA"
+      },
+      {
+        "ticker": "OEST.BA",
+        "nombre": "Grupo Concesionario del Oeste S.A."
+      }
+    ],
+    "Conglomerados": [
+      {
+        "ticker": "CADO.BA",
+        "nombre": "Carlos Casado S.A."
+      },
+      {
+        "ticker": "COME.BA",
+        "nombre": "Sociedad Comercial del Plata S.A."
+      },
+      {
+        "ticker": "CRES.BA",
+        "nombre": "Cresud Sociedad Anónima, Comercial, Inmobiliaria, Financiera y Agropecuaria"
+      },
+      {
+        "ticker": "GARO.BA",
+        "nombre": "Garovaglio y Zorraquín S.A."
+      },
+      {
+        "ticker": "LEDE.BA",
+        "nombre": "Ledesma Sociedad Anónima Agrícola Industrial"
+      },
+      {
+        "ticker": "PAMP.BA",
+        "nombre": "Pampa Energía S.A."
+      }
+    ],
+    "Productos y equipos de construcción": [
+      {
+        "ticker": "FERR.BA",
+        "nombre": "Ferrum S.A. de Cerámica y Metalurgia"
+      }
+    ],
+    "Ingeniería y Construcción": [
+      {
+        "ticker": "POLL.BA",
+        "nombre": "Polledo Sociedad Anonima, Industrial, Constructora y Financiera"
+      }
+    ]
+  },
+  "Materiales Básicos": {
+    "Aluminio": [
+      {
+        "ticker": "ALUA.BA",
+        "nombre": "Aluar Aluminio Argentino S.A.I.C."
+      }
+    ],
+    "quimicos": [
+      {
+        "ticker": "CARC.BA",
+        "nombre": "Carboclor S.A."
+      }
+    ],
+    "Papel y productos de papel": [
+      {
+        "ticker": "CELU.BA",
+        "nombre": "Celulosa Argentina S.A."
+      }
+    ],
+    "Materiales de construcción": [
+      {
+        "ticker": "HARG.BA",
+        "nombre": "Holcim (Argentina) S.A."
+      },
+      {
+        "ticker": "LOMA.BA",
+        "nombre": "Loma Negra Compañía Industrial Argentina Sociedad Anónima"
+      }
+    ],
+    "Insumos agrícolas": [
+      {
+        "ticker": "INAG.BA",
+        "nombre": "Insumos Agroquímicos S.A."
+      }
+    ],
+    "Acero": [
+      {
+        "ticker": "TXAR.BA",
+        "nombre": "Ternium Argentina S.A."
+      }
+    ]
+  },
+  "Tecnología": {
+    "Servicios de tecnología de la información": [
+      {
+        "ticker": "BOLT.BA",
+        "nombre": "Boldt S.A."
+      },
+      {
+        "ticker": "GAMI.BA",
+        "nombre": "B-Gaming S.A."
+      }
+    ],
+    "Electrónica de Consumo": [
+      {
+        "ticker": "MIRG.BA",
+        "nombre": "Mirgor Sociedad Anónima, Comercial, Industrial, Financiera, Inmobiliaria y Agropecuaria"
+      }
+    ]
+  },
+  "Fondos y ETFs": {
+    "ETF generales": [
+      {
+        "ticker": "BRIO.BA",
+        "nombre": "Banco Santander Argentina S.A."
+      },
+      {
+        "ticker": "BROU.BA",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "CONC.BA",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "DOMA.BA",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "GCM.BA",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "IEB.BA",
+        "nombre": "IEB Construcciones S.A."
+      },
+      {
+        "ticker": "IRCP.BA",
+        "nombre": "IRSA Propiedades Comerciales S.A."
+      },
+      {
+        "ticker": "MERA.BA",
+        "nombre": "MERA.BA,0P0001B660,0"
+      },
+      {
+        "ticker": "MTR.BA",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "TOMB.BA",
+        "nombre": "Nombre no encontrado"
+      }
+    ]
+  },
+  "Energía": {
+    "Exploración y producción de petróleo y gas": [
+      {
+        "ticker": "CAPX.BA",
+        "nombre": "Capex S.A."
+      }
+    ],
+    "Midstream de petróleo y gas": [
+      {
+        "ticker": "TGNO4.BA",
+        "nombre": "Transportadora de Gas del Norte S.A."
+      }
+    ],
+    "Petróleo y Gas Integrados": [
+      {
+        "ticker": "TGSU2.BA",
+        "nombre": "Transportadora de Gas del Sur S.A."
+      },
+      {
+        "ticker": "YPFD.BA",
+        "nombre": "YPF Sociedad Anónima"
+      }
+    ]
+  },
+  "Utilidades": {
+    "Servicios públicos: electricidad regulada": [
+      {
+        "ticker": "CECO2.BA",
+        "nombre": "Central Costanera S.A."
+      },
+      {
+        "ticker": "CEPU.BA",
+        "nombre": "Central Puerto S.A."
+      },
+      {
+        "ticker": "EDN.BA",
+        "nombre": "Empresa Distribuidora y Comercializadora Norte Sociedad Anónima"
+      },
+      {
+        "ticker": "TRAN.BA",
+        "nombre": "Compañía de Transporte de Energía Eléctrica en Alta Tensión Transener S.A."
+      }
+    ],
+    "Servicios Públicos - Gas Regulado": [
+      {
+        "ticker": "CGPA2.BA",
+        "nombre": "Camuzzi Gas Pampeana S.A."
+      },
+      {
+        "ticker": "DGCU2.BA",
+        "nombre": "Distribuidora de Gas Cuyana S.A."
+      },
+      {
+        "ticker": "GBAN.BA",
+        "nombre": "Naturgy BAN, S.A."
+      },
+      {
+        "ticker": "METR.BA",
+        "nombre": "MetroGAS S.A."
+      }
+    ]
+  },
+  "Bienes raíces": {
+    "Bienes Raíces - Desarrollo": [
+      {
+        "ticker": "CTIO.BA",
+        "nombre": "Consultatio S.A."
+      }
+    ],
+    "Servicios inmobiliarios": [
+      {
+        "ticker": "GCDI.BA",
+        "nombre": "GCDI S.A."
+      },
+      {
+        "ticker": "IRSA.BA",
+        "nombre": "IRSA Inversiones y Representaciones Sociedad Anónima"
+      }
+    ]
+  },
+  "Servicios de comunicación": {
+    "Servicios de telecomunicaciones": [
+      {
+        "ticker": "CVH.BA",
+        "nombre": "Cablevisión Holding S.A."
+      },
+      {
+        "ticker": "TECO2.BA",
+        "nombre": "Telecom Argentina S.A."
+      }
+    ],
+    "Entretenimiento": [
+      {
+        "ticker": "GCLA.BA",
+        "nombre": "Grupo Clarín S.A."
+      }
+    ]
+  },
+  "Consumo cíclico": {
+    "Mobiliario, accesorios y electrodomésticos": [
+      {
+        "ticker": "DOME.BA",
+        "nombre": "DOMEC Compañía de Artefactos Domésticos S.A.I.C.y F."
+      },
+      {
+        "ticker": "FIPL.BA",
+        "nombre": "Fiplasto S.A."
+      },
+      {
+        "ticker": "LONG.BA",
+        "nombre": "Longvie S.A."
+      }
+    ],
+    "Calzado y accesorios": [
+      {
+        "ticker": "GRIM.BA",
+        "nombre": "Grimoldi S.A."
+      }
+    ],
+    "Restaurantes": [
+      {
+        "ticker": "HAVA.BA",
+        "nombre": "Havanna Holding S.A."
+      }
+    ],
+    "Grandes almacenes": [
+      {
+        "ticker": "PATA.BA",
+        "nombre": "Sociedad Anónima Importadora y Exportadora de la Patagonia"
+      }
+    ]
+  },
+  "Defensiva del Consumidor": {
+    "Alimentos envasados": [
+      {
+        "ticker": "INTR.BA",
+        "nombre": "Compañía Introductora de Buenos Aires S.A."
+      },
+      {
+        "ticker": "MOLI.BA",
+        "nombre": "Molinos Rio de la Plata S.A."
+      }
+    ],
+    "Productos agrícolas": [
+      {
+        "ticker": "INVJ.BA",
+        "nombre": "Inversora Juramento S.A."
+      },
+      {
+        "ticker": "MOLA.BA",
+        "nombre": "Molinos Agro S.A."
+      },
+      {
+        "ticker": "MORI.BA",
+        "nombre": "Morixe Hermanos S.A.C.I."
+      },
+      {
+        "ticker": "SAMI.BA",
+        "nombre": "S.A. San Miguel A.G.I.C.I. y F."
+      },
+      {
+        "ticker": "SEMI.BA",
+        "nombre": "Molinos Juan Semino S.A."
+      }
+    ],
+    "Productos personales y para el hogar": [
+      {
+        "ticker": "RIGO.BA",
+        "nombre": "Rigolleau S.A."
+      }
+    ]
+  },
+  "Cuidado de la salud": {
+    "Fabricantes de medicamentos: especializados y genéricos": [
+      {
+        "ticker": "RICH.BA",
+        "nombre": "Laboratorios Richmond S.A.C.I.F."
+      },
+      {
+        "ticker": "ROSE.BA",
+        "nombre": "Instituto Rosenbusch S.A."
+      }
+    ]
+  }
+}

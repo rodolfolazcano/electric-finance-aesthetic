@@ -129,9 +129,7 @@ export function analizarSoportesResistencias(
     high52,
     low52,
     cantidadPivotes: altos.length + bajos.length,
-    metodo: `pivotes (ventana ${window}) agrupados con tolerancia ${Math.round(
-      tolerancia * 100,
-    )}%`,
+    metodo: `pivotes (ventana ${window}) agrupados con tolerancia ${Math.round(tolerancia * 100)}%`,
   };
 }
 

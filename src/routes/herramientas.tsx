@@ -13,6 +13,8 @@ import {
   Menu,
   X,
   Phone,
+  Sigma,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { IOLLoginButton } from "@/components/shared/IOLLoginButton";
@@ -21,7 +23,11 @@ import { ContextoTab } from "@/components/herramientas/ContextoTab";
 import { AnalisisTab } from "@/components/herramientas/AnalisisTab";
 import { CuantitativoTab } from "@/components/herramientas/CuantitativoTab";
 import { SectoresTab } from "@/components/herramientas/SectoresTab";
+import { RazonesFinancierasTab } from "@/components/herramientas/RazonesFinancierasTab";
+import { EstimacionesTab } from "@/components/herramientas/EstimacionesTab";
+import { PlanificacionFinancieraTab } from "@/components/herramientas/PlanificacionFinancieraTab";
 import { PlaceholderTab } from "@/components/herramientas/PlaceholderTab";
+import { ArbitrajeP2PPanel } from "@/components/herramientas/ArbitrajeP2PPanel";
 import bgImage from "@/assets/bg-skyline.jpg";
 import retratoCintia from "@/assets/cintia-boos.png";
 
@@ -53,13 +59,15 @@ export const Route = createFileRoute("/herramientas")({
 const TABS = [
   { id: "contexto", label: "Contexto", icon: Gauge, tipo: "core" },
   { id: "analisis", label: "Análisis", icon: Activity, tipo: "core" },
+  { id: "razones", label: "Razones + DuPont", icon: Sigma, tipo: "core" },
   { id: "cuantitativo", label: "Cuantitativo", icon: LineChart, tipo: "core" },
+  { id: "estimaciones", label: "Estimaciones", icon: Target, tipo: "core" },
   { id: "sectores", label: "Sectores", icon: Layers, tipo: "core" },
+  { id: "planificacion", label: "Planificación", icon: Calculator, tipo: "core" },
   { id: "opciones", label: "Opciones", icon: PieChart, tipo: "proximamente" },
   { id: "renta-fija", label: "Renta Fija", icon: Landmark, tipo: "proximamente" },
   { id: "cripto", label: "Cripto", icon: Bitcoin, tipo: "proximamente" },
   { id: "arbitrador", label: "Arbitrador", icon: ArrowLeftRight, tipo: "proximamente" },
-  { id: "planificacion", label: "Planificación", icon: Calculator, tipo: "proximamente" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -244,8 +252,11 @@ function HerramientasContenido() {
         <main className="min-w-0 flex-1">
           {activo === "contexto" && <ContextoTab />}
           {activo === "analisis" && <AnalisisTab />}
+          {activo === "razones" && <RazonesFinancierasTab />}
           {activo === "cuantitativo" && <CuantitativoTab />}
+          {activo === "estimaciones" && <EstimacionesTab />}
           {activo === "sectores" && <SectoresTab />}
+          {activo === "planificacion" && <PlanificacionFinancieraTab />}
           {activo === "opciones" && (
             <PlaceholderTab
               titulo="Opciones"
@@ -264,18 +275,7 @@ function HerramientasContenido() {
               descripcion="Panel cripto con precios multi-exchange y métricas de mercado."
             />
           )}
-          {activo === "arbitrador" && (
-            <PlaceholderTab
-              titulo="Arbitrador ADR / CEDEAR"
-              descripcion="Brecha entre NYSE y BCBA actualizada cada 30 segundos."
-            />
-          )}
-          {activo === "planificacion" && (
-            <PlaceholderTab
-              titulo="Planificación Financiera"
-              descripcion="Calculadoras de jubilación, hipoteca, inversiones, objetivos, presupuesto, pasivos y patrimonio neto."
-            />
-          )}
+          {activo === "arbitrador" && <ArbitrajeP2PPanel />}
 
           <p className="mt-8 text-[11px] leading-snug text-muted-foreground">
             Herramientas informativas con datos de terceros. No constituyen recomendación de

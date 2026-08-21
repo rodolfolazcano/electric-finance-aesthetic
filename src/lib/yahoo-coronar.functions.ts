@@ -96,7 +96,13 @@ async function yahooQuoteSummary(symbol: string): Promise<YahooFundamentals> {
     upsideAnalistasPct: null,
     error: null,
   };
-  const modules = ["assetProfile", "summaryDetail", "financialData", "defaultKeyStatistics", "price"];
+  const modules = [
+    "assetProfile",
+    "summaryDetail",
+    "financialData",
+    "defaultKeyStatistics",
+    "price",
+  ];
   try {
     const response = await fetchYahooQuoteSummaryJson<YQuoteSummary>(symbol, modules);
     if (!response.json) {
@@ -147,9 +153,7 @@ async function yahooChartCloses(symbol: string, range = "1y"): Promise<number[]>
 async function yahooResolve(query: string): Promise<string | null> {
   const res = await fetchYahooSearch(query);
   const quotes = res?.quotes ?? [];
-  const eq = quotes.find(
-    (q) => q.quoteType === "EQUITY" && q.symbol && !q.symbol?.includes("."),
-  );
+  const eq = quotes.find((q) => q.quoteType === "EQUITY" && q.symbol && !q.symbol?.includes("."));
   return eq?.symbol ?? quotes[0]?.symbol ?? null;
 }
 

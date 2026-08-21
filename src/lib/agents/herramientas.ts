@@ -883,6 +883,30 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "score_sectorial",
+      description:
+        "Score sectorial de un ticker con la metodología clarity: clasifica el activo en su sector/industria (universo EE.UU. + BCBA), aplica el perfil sectorial (pesos fundamentales/técnicos, sensibilidad a tasas y commodities), calcula el score fundamental 0-100 con bandas por sector y bonuses Graham (margen de seguridad) y Amat (solvencia PN/Activo), y genera una interpretación relativa contra pares del mismo sector: resumen ejecutivo, fortalezas, debilidades, mejor alternativa del sector y advertencias (cuellos de botella estructurales, riesgo geopolítico, muestra insuficiente). Lenguaje descriptivo conforme CNV. Usar cuando el usuario pida 'score sectorial', 'análisis sectorial de X', 'cómo está X vs su sector', 'posición relativa de X' o 'mejores acciones de su sector'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description:
+              "Ticker del activo (ej. AAPL, MSFT, GGAL.BA). Para CEDEARs el score queda no disponible: analizar el subyacente en USD.",
+          },
+          peersMax: {
+            type: "number",
+            description: "Cantidad máxima de pares del sector a comparar (default 10).",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
   // -------------------------------------------------------------------------
   // Fuentes públicas genéricas
   // -------------------------------------------------------------------------
@@ -1235,6 +1259,8 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
     case "analisis_tecnico":
       return "semaforo";
     case "analizar_portafolio_clarity":
+      return "portafolio";
+    case "score_sectorial":
       return "portafolio";
     case "datos_financieros":
       return "mercado";

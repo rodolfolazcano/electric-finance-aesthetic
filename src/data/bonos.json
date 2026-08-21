@@ -1,0 +1,3443 @@
+{
+    "AL29D": {
+        "ticker_api": "AL29D",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "descripcion": "BONOS DE LA REPÃšBLICA ARGENTINA EN DÃ“LARES ESTADOUNIDENSES AL 1% 2029",
+        "vencimiento": "2029-07-09",
+        "fechaEmision": "2021-07-09",
+        "isin": "ARARGE3209Y4",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 2193821728,
+        "cuponAnual": 1,
+        "valorPar": 100,
+        "valorResidualActual": 70,
+        "yieldConvention": "STREET",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-07-09",
+                "monto": 10.35,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2027-01-09",
+                "monto": 10.3,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 10.25,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 10.2,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 10.15,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 10.1,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 10.05,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
+        ],
+        "historico": []
+    },
+    "TZV26": {
+        "ticker_api": "TZV26",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Dollar-Linked",
+        "descripcion": "BONO DEL TESORO NACIONAL VINCULADO AL DÃ“LAR CERO CUPÃ“N 2026",
+        "vencimiento": "2026-06-30",
+        "fechaEmision": "2021-06-30",
+        "isin": "AR0788694542",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Annual",
+        "convencionDias": "REAL/365",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 1,
+        "cuponAnual": 0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "zero-coupon",
+        "ajuste": "DolarOficial",
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-06-30",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": []
+    },
+    "AL30": {
+        "ticker_api": "AL30",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS DE LA REPUBLICA ARGENTINA EN DOLARES ESTADOUNIDENSES STEP UP 2030",
+        "vencimiento": "2030-07-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Step-up",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 0,
+        "cuponAnual": 0.125,
+        "valorPar": 100,
+        "valorResidualActual": 0,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 8.38,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 8.16,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 7.51,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 6.91,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 6.36,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 5.85,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 5.38,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 4.95,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
+        ],
+        "historico": []
+    },
+    "AL30D": {
+        "ticker_api": "AL30D",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "descripcion": "BONOS REPÃšBLICA ARGENTINA USD STEP UP 2030 (DÃ“LAR CABLE)",
+        "vencimiento": "2030-07-09",
+        "fechaEmision": "2021-07-09",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 13501133049,
+        "cuponAnual": 0.75,
+        "valorPar": 100,
+        "valorResidualActual": 72,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-07-09",
+                "monto": 8.27,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2027-01-09",
+                "monto": 8.24,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 8.21,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 8.42,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 8.35,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 8.28,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 8.21,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 8.14,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 8.07,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
+        ],
+        "historico": []
+    },
+    "GD30D": {
+        "ticker_api": "GD30D",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "descripcion": "BONOS GLOBALES ARGENTINA USD AL 0.125% 2030 (DÃ“LAR CABLE)",
+        "vencimiento": "2030-07-09",
+        "fechaEmision": "2022-01-09",
+        "isin": "US040114HS26",
+        "jurisdiccion": "NY",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 16090612053,
+        "cuponAnual": 0.125,
+        "valorPar": 100,
+        "valorResidualActual": 72,
+        "yieldConvention": "STREET",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 3.5,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 3.5,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 3.5,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 3.5,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 3.5,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 3.5,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 3.5,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 103.5,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": []
+    },
+    "GD30": {
+        "ticker_api": "GD30",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS GLOBALES DE LA REPUBLICA ARGENTINA AMORTIZABLES EN DOLARES ESTADOUNIDENSES STEP UP 2030",
+        "vencimiento": "2030-07-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Step-up",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.125,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 0.38,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 0.88,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 0.88,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 0.88,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 0.88,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 0.88,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 0.88,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 0.88,
+                "tipoFlujo": "Cupon"
+            }
+        ],
+        "historico": []
+    },
+    "GD35D": {
+        "ticker_api": "GD35D",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "descripcion": "BONOS GLOBALES ARGENTINA USD AL 4.125% 2035 (DÃ“LAR CABLE)",
+        "vencimiento": "2035-07-09",
+        "fechaEmision": "2022-01-09",
+        "isin": "US040114HT09",
+        "jurisdiccion": "NY",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 20501717797,
+        "cuponAnual": 4.125,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 2.0625,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 102.0625,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
+        ],
+        "historico": []
+    },
+    "GD35": {
+        "ticker_api": "GD35",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS GLOBALES DE LA REPUBLICA ARGENTINA AMORTIZABLES EN DOLARES ESTADOUNIDENSES STEP UP 2035",
+        "vencimiento": "2035-07-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Step-up",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.125,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            }
+        ],
+        "historico": []
+    },
+    "GD41D": {
+        "ticker_api": "GD41D",
+        "mercado": "Mercado Abierto",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "descripcion": "BONOS GLOBALES DE LA REPUBLICA ARGENTINA AMORTIZABLES EN DOLARES ESTADOUNIDENSES STEP UP 2041",
+        "vencimiento": "2041-07-09",
+        "fechaEmision": "2022-01-09",
+        "isin": "US040114HV54",
+        "jurisdiccion": "NY",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 10482111279,
+        "cuponAnual": 3.5,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2038-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2038-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2039-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2039-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2040-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2040-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2041-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2041-07-09",
+                "monto": 101.75,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
+        ],
+        "historico": []
+    },
+    "GD41": {
+        "ticker_api": "GD41",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS GLOBALES DE LA REPUBLICA ARGENTINA AMORTIZABLES EN DOLARES ESTADOUNIDENSES STEP UP 2041",
+        "vencimiento": "2041-07-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Step-up",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.125,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2038-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2038-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2039-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2039-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2040-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2040-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2041-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2041-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            }
+        ],
+        "historico": []
+    },
+    "AA37D": {
+        "ticker_api": "AA37D",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "descripcion": "BONOS GLOBALES ARGENTINA USD AL 5% 2037 (DÃ“LAR CABLE)",
+        "vencimiento": "2037-07-09",
+        "fechaEmision": "2022-01-09",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 0,
+        "cuponAnual": 5,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-07-09",
+                "monto": 102.5,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
+        ],
+        "historico": []
+    },
+    "AA37": {
+        "ticker_api": "AA37",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "descripcion": "BONOS GLOBALES ARGENTINA USD AL 5% 2037",
+        "vencimiento": "2037-07-09",
+        "fechaEmision": "2022-01-09",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 0,
+        "cuponAnual": 5,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-07-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-01-09",
+                "monto": 2.5,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-07-09",
+                "monto": 102.5,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
+        ],
+        "historico": []
+    },
+    "CUJ26": {
+        "ticker_api": "CUJ26",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "CER",
+        "descripcion": "BONOS DEL TESORO NACIONAL AJUSTABLE POR CER 0.4% 2026",
+        "vencimiento": "2026-04-30",
+        "fechaEmision": "2021-04-30",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "REAL/365",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.4,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": "CER",
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-04-30",
+                "monto": 100.4,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": []
+    },
+    "DIP26": {
+        "ticker_api": "DIP26",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "CER",
+        "descripcion": "BONOS DEL TESORO NACIONAL AJUSTABLE POR CER 2.5% 2026",
+        "vencimiento": "2026-04-30",
+        "fechaEmision": "2021-04-30",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "REAL/365",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 2.5,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": "CER",
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-04-30",
+                "monto": 102.5,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": []
+    },
+    "T2X4": {
+        "ticker_api": "T2X4",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "CER",
+        "descripcion": "BONOS DEL TESORO NACIONAL AJUSTABLE POR CER 4% 2024",
+        "vencimiento": "2028-02-18",
+        "fechaEmision": "2022-02-18",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Annual",
+        "convencionDias": "REAL/365",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 4,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": "CER",
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-02-18",
+                "monto": 4,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-02-18",
+                "monto": 104,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": []
+    },
+    "S17L6": {
+        "ticker_api": "S17L6",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Letra del Tesoro Nacional Capitalizable en Pesos - 2.16% TNM - Pesos - Vto 17/07/2026",
+        "vencimiento": "2026-07-17",
+        "fechaEmision": "2021-07-17",
+        "isin": "AR0184448337",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 2751779000000,
+        "cuponAnual": 25.92,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-07-17",
+                "monto": 107.59,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "T30J6": {
+        "ticker_api": "T30J6",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Bonos del Tesoro Nacional Capitalizable 2.15% TNM - Pesos - Vto 30/06/2026",
+        "vencimiento": "2026-06-30",
+        "fechaEmision": "2021-06-30",
+        "isin": "AR0071678673",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 1509151000,
+        "cuponAnual": 25.8,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-06-30",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "S31L6": {
+        "ticker_api": "S31L6",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Letras del Tesoro Nacional Capitalizable 2.75% TNM - Pesos - Vto 31/07/2026",
+        "vencimiento": "2026-07-31",
+        "fechaEmision": "2021-07-31",
+        "isin": "AR0377625857",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 1844892000000,
+        "cuponAnual": 33,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-07-31",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "S14G6": {
+        "ticker_api": "S14G6",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Letra del Tesoro Nacional Capitalizable en ARS - 2.00% TNM - Pesos - Vto 14/08/2026",
+        "vencimiento": "2026-08-14",
+        "fechaEmision": "2021-08-14",
+        "isin": "AR0077601562",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 4447234000000,
+        "cuponAnual": 24,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-08-14",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "S31G6": {
+        "ticker_api": "S31G6",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Letras del Tesoro Nacional Capitalizable 2.5% TNM - Pesos - Vto 31/08/2026",
+        "vencimiento": "2026-08-31",
+        "fechaEmision": "2021-08-31",
+        "isin": "AR0960697990",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 1916494000000,
+        "cuponAnual": 30,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-08-31",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "S15S6": {
+        "ticker_api": "S15S6",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Letras del Tesoro Nacional Capitalizable 1.99% TNM - Pesos - Vto 15/09/2026",
+        "vencimiento": "2026-09-15",
+        "fechaEmision": "2021-09-15",
+        "isin": "AR0614758420",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 5156402000000,
+        "cuponAnual": 23.88,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-09-15",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "S30S6": {
+        "ticker_api": "S30S6",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Letras del Tesoro Nacional Capitalizable 2.53% TNM - Pesos - Vto 30/09/2026",
+        "vencimiento": "2026-09-30",
+        "fechaEmision": "2021-09-30",
+        "isin": "AR0379015875",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 4591857000000,
+        "cuponAnual": 30.36,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-09-30",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "S30O6": {
+        "ticker_api": "S30O6",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Letra del Tesoro Nacional Capitalizable 2.55% TNM - Pesos - Vto 30/10/2026",
+        "vencimiento": "2026-10-30",
+        "fechaEmision": "2021-10-30",
+        "isin": "AR0475783251",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 670319000000,
+        "cuponAnual": 30.6,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-10-30",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "S30N6": {
+        "ticker_api": "S30N6",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Letras del Tesoro Nacional Capitalizable 2.30% TNM - Pesos - Vto 30/11/2026",
+        "vencimiento": "2026-11-30",
+        "fechaEmision": "2021-11-30",
+        "isin": "AR0451031345",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 1402884000000,
+        "cuponAnual": 27.6,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-11-30",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "T15E7": {
+        "ticker_api": "T15E7",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Bonos del Tesoro Nacional Capitalizable 2.05% TNM - Pesos - Vto 15/01/2027",
+        "vencimiento": "2027-01-15",
+        "fechaEmision": "2022-01-15",
+        "isin": "AR0350916307",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 4362026000000,
+        "cuponAnual": 24.6,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-15",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "T30A7": {
+        "ticker_api": "T30A7",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Bonos del Tesoro Nacional Capitalizable 2.55% TNM - Pesos - Vto 30/04/2027",
+        "vencimiento": "2027-04-30",
+        "fechaEmision": "2022-04-30",
+        "isin": "AR0224546884",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 346145000000,
+        "cuponAnual": 30.6,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-04-30",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "T31Y7": {
+        "ticker_api": "T31Y7",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Bono del Tesoro Nacional Capitalizable 2.40% TNM - Pesos - Vto 31/05/2027",
+        "vencimiento": "2027-05-31",
+        "fechaEmision": "2022-05-31",
+        "isin": "AR0571277315",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 1352881000000,
+        "cuponAnual": 28.8,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-05-31",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "T30J7": {
+        "ticker_api": "T30J7",
+        "mercado": "Mercado Abierto",
+        "instrumento": "LETRA",
+        "tipo": "LECAP",
+        "descripcion": "Bono del Tesoro Nacional Capitalizable 2.58% TNM - Pesos - Vto 30/06/2027",
+        "vencimiento": "2027-06-30",
+        "fechaEmision": "2022-06-30",
+        "isin": "AR0987861058",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Monthly",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 384242000000,
+        "cuponAnual": 30.96,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-06-30",
+                "monto": 100,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": [],
+        "tipoBono": "LECAP_CAPITALIZABLE"
+    },
+    "BF40O": {
+        "ticker_api": "BF40O",
+        "mercado": "bCBA",
+        "instrumento": "ON",
+        "tipo": "ON Hard Dollar",
+        "descripcion": "Banco BBVA Argentina S.A. - Clase 40 - Dolares",
+        "vencimiento": "2027-08-27",
+        "fechaEmision": null,
+        "isin": "AR0078136758",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "REAL/365",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 36503161,
+        "cuponAnual": 7.15,
+        "origenCupon": "calibrado_inverso",
+        "escalaPrecioIOL": 10,
+        "fixtureValidacion": {
+            "fechaSnapshot": "2026-06-27",
+            "precioIOLSnapshot": 1433.9,
+            "metricasPublicadas": {
+                "tir": 0.0486,
+                "tna": 0.0481,
+                "paridad": 1.002413,
+                "duration": 1.245834,
+                "macaulayDuration": 1.306429,
+                "convexity": 2.766292,
+                "currentYield": 0.0499
+            }
+        },
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-02-27",
+                "monto": 3.575,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-08-27",
+                "monto": 103.575,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": []
+    },
+    "AE38": {
+        "ticker_api": "AE38",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS DE LA REPUBLICA ARGENTINA EN DOLARES ESTADOUNIDENSES STEP UP 2038",
+        "vencimiento": "2038-01-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Step-up",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 0,
+        "cuponAnual": 0.125,
+        "valorPar": 100,
+        "valorResidualActual": 0,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 6.67,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 6.37,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 6.08,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 5.8,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 5.54,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 5.29,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 5.05,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 4.82,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 4.6,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 4.39,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 4.19,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 4.0,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 3.82,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 3.64,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 3.48,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 3.32,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 3.17,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2036-01-09",
+                "monto": 3.02,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2036-07-09",
+                "monto": 2.89,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2037-01-09",
+                "monto": 2.76,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2037-07-09",
+                "monto": 2.63,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2038-01-09",
+                "monto": 2.51,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
+        ],
+        "historico": []
+    },
+    "TO26": {
+        "ticker_api": "TO26",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "BONOS DEL TESORO NACIONAL EN PESOS A TASA FIJA VENCIMIENTO 17 DE OCTUBRE DE 2026",
+        "vencimiento": "2026-10-17",
+        "fechaEmision": "2016-10-17",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 15.5,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2026-10-17",
+                "monto": 107.75,
+                "tipoFlujo": "PagoUnico"
+            }
+        ],
+        "historico": []
+    },
+    "AL29": {
+        "ticker_api": "AL29",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS DE LA REPUBLICA ARGENTINA EN DOLARES ESTADOUNIDENSES AL 1% 2029",
+        "vencimiento": "2029-07-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 0,
+        "yieldConvention": "STREET",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "AL35": {
+        "ticker_api": "AL35",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS DE LA REPUBLICA ARGENTINA EN DOLARES ESTADOUNIDENSES STEP UP 2035",
+        "vencimiento": "2035-07-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Step-up",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.125,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            }
+        ],
+        "historico": []
+    },
+    "AL41": {
+        "ticker_api": "AL41",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS DE LA REPUBLICA ARGENTINA EN DOLARES ESTADOUNIDENSES STEP UP 2041",
+        "vencimiento": "2041-07-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Step-up",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.125,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 1.75,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2038-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2038-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2039-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2039-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2040-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2040-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2041-01-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2041-07-09",
+                "monto": 2.44,
+                "tipoFlujo": "Cupon"
+            }
+        ],
+        "historico": []
+    },
+    "AN29": {
+        "ticker_api": "AN29",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "AO27": {
+        "ticker_api": "AO27",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "AO28": {
+        "ticker_api": "AO28",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "GD29": {
+        "ticker_api": "GD29",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS GLOBALES DE LA REPUBLICA ARGENTINA AMORTIZABLES EN DOLARES ESTADOUNIDENSES 1% 2029",
+        "vencimiento": "2029-07-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "US040114HX11",
+        "jurisdiccion": "NY",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 2635028710,
+        "cuponAnual": 1.0,
+        "valorPar": 100,
+        "valorResidualActual": 60,
+        "yieldConvention": "STREET",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2025-01-09",
+                "monto": 10.50,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2025-07-09",
+                "monto": 10.45,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2026-01-09",
+                "monto": 10.40,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2026-07-09",
+                "monto": 10.35,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2027-01-09",
+                "monto": 10.30,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 10.25,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 10.20,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 10.15,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 10.10,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 10.05,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
+        ],
+        "historico": []
+    },
+    "GD38": {
+        "ticker_api": "GD38",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS GLOBALES DE LA REPUBLICA ARGENTINA AMORTIZABLES EN DOLARES ESTADOUNIDENSES STEP UP 2038",
+        "vencimiento": "2038-01-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Step-up",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.125,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-07-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2038-01-09",
+                "monto": 2.12,
+                "tipoFlujo": "Cupon"
+            }
+        ],
+        "historico": []
+    },
+    "GD46": {
+        "ticker_api": "GD46",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Hard Dollar",
+        "tipoBono": "SOBERANO_HD",
+        "descripcion": "BONOS GLOBALES DE LA REPUBLICA ARGENTINA AMORTIZABLES EN DOLARES ESTADOUNIDENSES STEP UP 2046",
+        "vencimiento": "2046-07-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Step-up",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.125,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "step-up",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2035-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2036-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2037-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2038-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2038-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2039-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2039-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2040-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2040-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2041-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2041-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2042-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2042-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2043-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2043-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2044-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2044-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2045-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2045-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2046-01-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2046-07-09",
+                "monto": 1.81,
+                "tipoFlujo": "Cupon"
+            }
+        ],
+        "historico": []
+    },
+    "GE29": {
+        "ticker_api": "GE29",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "GE38": {
+        "ticker_api": "GE38",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "GE41": {
+        "ticker_api": "GE41",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "PR17": {
+        "ticker_api": "PR17",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TX26": {
+        "ticker_api": "TX26",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "BONOS DEL TESORO NACIONAL EN PESOS CON AJUSTE POR CER 2% VTO. 2026",
+        "vencimiento": "2026-11-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 0,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TX28": {
+        "ticker_api": "TX28",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "BONOS DEL TESORO NACIONAL EN PESOS CON AJUSTE POR CER 2,25% VTO 2028",
+        "vencimiento": "2028-11-09",
+        "fechaEmision": "2020-09-04",
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 0,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TX31": {
+        "ticker_api": "TX31",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TTD26": {
+        "ticker_api": "TTD26",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TTS26": {
+        "ticker_api": "TTS26",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TMF27": {
+        "ticker_api": "TMF27",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TMF28": {
+        "ticker_api": "TMF28",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TMG27": {
+        "ticker_api": "TMG27",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TMG28": {
+        "ticker_api": "TMG28",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TML27": {
+        "ticker_api": "TML27",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TY30P": {
+        "ticker_api": "TY30P",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TZV27": {
+        "ticker_api": "TZV27",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TZV28": {
+        "ticker_api": "TZV28",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TZX27": {
+        "ticker_api": "TZX27",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "TZX28": {
+        "ticker_api": "TZX28",
+        "mercado": "bCBA",
+        "instrumento": "BONO",
+        "tipo": "Tasa Fija ARS",
+        "tipoBono": "SOBERANO_TASA_FIJA_ARS",
+        "descripcion": "",
+        "vencimiento": null,
+        "fechaEmision": null,
+        "isin": "",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "ARS",
+        "monedaPago": "ARS",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 0,
+        "cuponAnual": 0.0,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [],
+        "historico": []
+    },
+    "YM34O": {
+        "ticker_api": "YM34O",
+        "mercado": "bCBA",
+        "instrumento": "ON",
+        "tipo": "ON Hard Dollar",
+        "descripcion": "YPF SOCIEDAD ANON REGS 8.25% V 17/01/34",
+        "vencimiento": "2034-01-17",
+        "fechaEmision": null,
+        "isin": "USP989MJBY67",
+        "jurisdiccion": "NY",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
+        "montoEmision": 500000000,
+        "cuponAnual": 8.25,
+        "origenCupon": "prospecto_cnv",
+        "escalaPrecioIOL": 10,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            { "fecha": "2026-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2027-01-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2027-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2028-01-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2028-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2029-01-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2029-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2030-01-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2030-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2031-01-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2031-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
+            { "fecha": "2032-01-17", "monto": 34.125, "tipoFlujo": "Cupon+Amortizacion" },
+            { "fecha": "2032-07-17", "monto": 2.8875, "tipoFlujo": "Cupon" },
+            { "fecha": "2033-01-17", "monto": 32.8875, "tipoFlujo": "Cupon+Amortizacion" },
+            { "fecha": "2033-07-17", "monto": 1.65, "tipoFlujo": "Cupon" },
+            { "fecha": "2034-01-17", "monto": 41.65, "tipoFlujo": "Cupon+Amortizacion" }
+        ],
+        "historico": []
+    },
+    "PQCSO": {
+        "ticker_api": "PQCSO",
+        "mercado": "bCBA",
+        "instrumento": "ON",
+        "tipo": "ON Hard Dollar",
+        "descripcion": "Petroquimica Comodoro Rivadavia S.A. - Clase S - Dolares",
+        "vencimiento": "2031-02-17",
+        "fechaEmision": null,
+        "isin": "AR0309447628",
+        "jurisdiccion": "ARG",
+        "tipoCupon": "Fixed rate",
+        "moneda": "USD",
+        "monedaPago": "USD",
+        "frecuenciaPago": "Semiannual",
+        "convencionDias": "REAL/365",
+        "tipoAmortizacion": "Bullet",
+        "montoEmision": 65000000,
+        "cuponAnual": 8.0,
+        "origenCupon": "prospecto_cnv",
+        "escalaPrecioIOL": 10,
+        "valorPar": 100,
+        "valorResidualActual": 100,
+        "yieldConvention": "STREET",
+        "tipoTasa": "fixed",
+        "ajuste": null,
+        "flujos_futuros_cada_100_vn": [
+            { "fecha": "2026-08-17", "monto": 4.0, "tipoFlujo": "Cupon" },
+            { "fecha": "2027-02-17", "monto": 4.0, "tipoFlujo": "Cupon" },
+            { "fecha": "2027-08-17", "monto": 4.0, "tipoFlujo": "Cupon" },
+            { "fecha": "2028-02-17", "monto": 4.0, "tipoFlujo": "Cupon" },
+            { "fecha": "2028-08-17", "monto": 4.0, "tipoFlujo": "Cupon" },
+            { "fecha": "2029-02-17", "monto": 4.0, "tipoFlujo": "Cupon" },
+            { "fecha": "2029-08-17", "monto": 4.0, "tipoFlujo": "Cupon" },
+            { "fecha": "2030-02-17", "monto": 4.0, "tipoFlujo": "Cupon" },
+            { "fecha": "2030-08-17", "monto": 4.0, "tipoFlujo": "Cupon" },
+            { "fecha": "2031-02-17", "monto": 104.0, "tipoFlujo": "PagoUnico" }
+        ],
+        "historico": []
+    }
+}
