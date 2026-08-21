@@ -242,13 +242,13 @@ export function FundamentalMetricsDataframe({
   return (
     <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground">
           Métricas Fundamentales
         </p>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setMostrarHistorico(!mostrarHistorico)}
-            className={`text-[9px] px-2 py-1 rounded border transition-colors ${
+            className={`text-[13px] px-2 py-1 rounded border transition-colors ${
               mostrarHistorico
                 ? "border-primary/60 bg-primary/10 text-primary"
                 : "border-border/30 text-muted-foreground hover:text-foreground"
@@ -260,7 +260,7 @@ export function FundamentalMetricsDataframe({
             <div className="flex items-center gap-1">
               <button
                 onClick={() => onGranularidadChange("anual")}
-                className={`text-[9px] px-2 py-1 rounded border transition-colors ${
+                className={`text-[13px] px-2 py-1 rounded border transition-colors ${
                   historicoGranularidad === "anual"
                     ? "border-primary/60 bg-primary/10 text-primary"
                     : "border-border/30 text-muted-foreground hover:text-foreground"
@@ -270,7 +270,7 @@ export function FundamentalMetricsDataframe({
               </button>
               <button
                 onClick={() => onGranularidadChange("trimestral")}
-                className={`text-[9px] px-2 py-1 rounded border transition-colors ${
+                className={`text-[13px] px-2 py-1 rounded border transition-colors ${
                   historicoGranularidad === "trimestral"
                     ? "border-primary/60 bg-primary/10 text-primary"
                     : "border-border/30 text-muted-foreground hover:text-foreground"
@@ -289,16 +289,16 @@ export function FundamentalMetricsDataframe({
             key={categoria.nombre}
             className="border-b border-border/20 pb-4 last:border-0 last:pb-0"
           >
-            <p className="text-[10px] font-semibold text-foreground mb-2 flex items-center gap-2">
+            <p className="text-[13px] font-semibold text-foreground mb-2 flex items-center gap-2">
               {categoria.nombre}
-              <span className="text-[8px] text-muted-foreground/60">
+              <span className="text-[12px] text-muted-foreground/60">
                 Prioridad {categoria.prioridad}
               </span>
             </p>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left font-mono text-[11px]">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left font-mono text-[14px]">
                 <thead>
-                  <tr className="text-[9px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                  <tr className="text-[13px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
                     <th className="px-2 py-1">Métrica</th>
                     <th className="px-2 py-1 text-right">Actual</th>
                     {mostrarHistorico && historico.length > 0 && (
@@ -320,7 +320,7 @@ export function FundamentalMetricsDataframe({
                       key={metrica.key}
                       className="border-b border-border/10 last:border-0 hover:bg-muted/5"
                     >
-                      <td className="px-2 py-1 text-[10px] text-muted-foreground">
+                      <td className="px-2 py-1 text-[13px] text-muted-foreground">
                         {metrica.label}
                       </td>
                       <td
@@ -350,7 +350,7 @@ export function FundamentalMetricsDataframe({
       </div>
 
       {result.esETF && (
-        <p className="mt-2 text-[9px] text-muted-foreground italic">
+        <p className="mt-2 text-[13px] text-muted-foreground italic">
           Algunas métricas (P/E, ROE, márgenes) no aplican para ETFs
         </p>
       )}

@@ -37,7 +37,7 @@ export interface GeneratedContent {
 }
 
 function getEmojiFlag(): string {
-  const flags = ["📈", "📊", "🎯", "💰", "🚀", "💎", "🔥", "⚡", "📉", "🛡️"];
+  const flags = ["[COR]", "[LAB]"];
   return flags[Math.floor(Math.random() * flags.length)];
 }
 
@@ -102,7 +102,7 @@ export function generateSocialContent(input: InvestorContentInput): GeneratedCon
     .slice(0, 3)
     .map((a) => `${a.ticker} ${(a.weight * 100).toFixed(0)}%`)
     .join(" • ");
-  const anomalyFlag = input.anomalyDetected ? "⚠️" : "✅";
+  const anomalyFlag = input.anomalyDetected ? "[ALERTA]" : "[OK]";
   const pLabel = input.impliedP ? `p=${input.impliedP.toFixed(2)}` : `p=${input.pValue}`;
 
   // --- Twitter (280 chars, agresivo, directo) ---
@@ -112,57 +112,57 @@ export function generateSocialContent(input: InvestorContentInput): GeneratedCon
       `Sharpe ${sharpeStr} | ${pLabel}\n` +
       `Top: ${topStr}\n` +
       (input.impliedPRegression ? `p_reg=${input.impliedPRegression.toFixed(2)}\n` : "") +
-      `👇 Dale?`,
+      `Dale?`,
     "balanceado",
   );
 
   // --- LinkedIn (profesional, detallado) ---
   const linkedinBody = applyTone(
-    `📊 **${input.strategyName} — Resumen de Inversión**\n\n` +
-      `🔹 Retorno Anual: ${returnPct}%\n` +
-      `🔹 Volatilidad: ${volPct}%\n` +
-      `🔹 Sharpe: ${sharpeStr}\n` +
-      `🔹 Medida de Riesgo: ${pLabel}\n` +
-      (input.impliedPRegression ? `🔹 p Regresión: ${input.impliedPRegression.toFixed(2)}\n` : "") +
-      `🔹 Top Holdings: ${topStr}\n\n` +
-      `🧠 **Análisis Labadie**: La p-variación mide el riesgo real del portafolio. ` +
+    `**${input.strategyName} — Resumen de Inversion**\n\n` +
+      `Retorno Anual: ${returnPct}%\n` +
+      `Volatilidad: ${volPct}%\n` +
+      `Sharpe: ${sharpeStr}\n` +
+      `Medida de Riesgo: ${pLabel}\n` +
+      (input.impliedPRegression ? `p Regresion: ${input.impliedPRegression.toFixed(2)}\n` : "") +
+      `Top Holdings: ${topStr}\n\n` +
+      `Analisis Labadie: La p-variacion mide el riesgo real del portafolio. ` +
       `Con p=${input.pValue}, asumimos que los retornos ${input.pValue > 2 ? "son mean-reverting" : input.pValue < 2 ? "tienen tendencia" : "siguen un random walk"}.\n\n` +
       (input.anomalyDetected
-        ? `⚠️ Se detectaron anomalías en los datos — se recomienda revisar el motor de cálculo.\n\n`
-        : `✅ Datos validados por el motor de detección de anomalías.\n\n`) +
-      `💡 ¿Querés optimizar tu portafolio con esta estrategia? Contactanos.`,
+        ? `Se detectaron anomalias en los datos — se recomienda revisar el motor de calculo.\n\n`
+        : `Datos validados por el motor de deteccion de anomalias.\n\n`) +
+      `Queres optimizar tu portafolio con esta estrategia? Contactanos.`,
     "conservador",
   );
 
   // --- Instagram (visual, bullet points, hashtags) ---
   const instagramBody = applyTone(
     `${getEmojiFlag()} **${input.strategyName}**\n\n` +
-      `📈 Retorno: ${returnPct}%\n` +
-      `📉 Riesgo: ${volPct}%\n` +
-      `⭐ Sharpe: ${sharpeStr}\n` +
-      `🎯 p-variación: ${pLabel}\n\n` +
+      `Retorno: ${returnPct}%\n` +
+      `Riesgo: ${volPct}%\n` +
+      `Sharpe: ${sharpeStr}\n` +
+      `p-variacion: ${pLabel}\n\n` +
       `Portafolio:\n${input.topAllocations
         .slice(0, 4)
-        .map((a) => `▫️ ${a.ticker} ${(a.weight * 100).toFixed(0)}%`)
+        .map((a) => `- ${a.ticker} ${(a.weight * 100).toFixed(0)}%`)
         .join("\n")}\n\n` +
-      `${input.anomalyDetected ? "⚠️ Datos con anomalías detectadas" : "✅ Datos validados"}\n\n` +
+      `${input.anomalyDetected ? "Datos con anomalias detectadas" : "Datos validados"}\n\n` +
       `#Inversiones #Finanzas #Portafolio #${input.strategyName.replace(/\s/g, "")} ` +
-      `#Análisis #CoronarInversiones #Labadie #pVariation`,
+      `#Analisis #CoronarInversiones #Labadie #pVariation`,
     "balanceado",
   );
 
   // --- WhatsApp (directo, personal, conversacional) ---
   const whatsappBody = applyTone(
-    `📊 *${input.strategyName}*\n\n` +
+    `*${input.strategyName}*\n\n` +
       `${getEmojiFlag()} *Rendimiento:* ${returnPct}% anual\n` +
       `${getEmojiFlag()} *Riesgo:* ${volPct}%\n` +
-      `⭐ *Sharpe:* ${sharpeStr}\n` +
-      `🎯 *p:* ${input.pValue}\n\n` +
+      `*Sharpe:* ${sharpeStr}\n` +
+      `*p:* ${input.pValue}\n\n` +
       `*Cartera:* ${topStr}\n\n` +
       (input.anomalyDetected
-        ? `⚠️ Revisá los datos, hay anomalías detectadas.\n`
-        : `✅ Todo ok con los datos.\n`) +
-      `🗓️ Generado por Coronar Inversiones + Labadie Analytics`,
+        ? `Revisa los datos, hay anomalias detectadas.\n`
+        : `Todo ok con los datos.\n`) +
+      `Generado por Coronar Inversiones + Labadie Analytics`,
     "balanceado",
   );
 

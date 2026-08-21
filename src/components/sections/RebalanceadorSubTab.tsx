@@ -94,7 +94,7 @@ const SECTOR_COLORS = [
 export function RebalanceadorSubTab() {
   const fnAnalyze = useServerFn(rebalanceAnalyze);
 
-  // ── Multi-portfolio state ──────────────────────────────────────────
+  //  Multi-portfolio state 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -283,7 +283,7 @@ export function RebalanceadorSubTab() {
 
   return (
     <div className="space-y-4">
-      <div className="mono text-[11px] uppercase tracking-[0.22em] text-primary/80">
+      <div className="mono text-[14px] uppercase tracking-[0.22em] text-primary/80">
         Rebalanceador de Portafolio
       </div>
       <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">
@@ -315,7 +315,7 @@ export function RebalanceadorSubTab() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") renamePortafolio(pf.id, nameDraft);
                 }}
-                className="w-20 bg-background border border-border/40 rounded px-1 text-[11px] outline-none"
+                className="w-20 bg-background border border-border/40 rounded px-1 text-[14px] outline-none"
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
@@ -334,9 +334,9 @@ export function RebalanceadorSubTab() {
                   e.stopPropagation();
                   eliminarPortafolio(pf.id);
                 }}
-                className="ml-1.5 text-red-400/50 hover:text-red-400 text-[9px]"
+                className="ml-1.5 text-red-400/50 hover:text-red-400 text-[13px]"
               >
-                ✕
+                
               </button>
             )}
           </button>
@@ -351,7 +351,7 @@ export function RebalanceadorSubTab() {
 
       <div className="rounded-lg border border-border/40 p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+          <span className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground">
             Cartera actual
           </span>
           <div className="flex items-center gap-2">
@@ -366,15 +366,15 @@ export function RebalanceadorSubTab() {
             </select>
             <button
               onClick={addRow}
-              className="mono text-[10px] uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded-md hover:bg-emerald-500/20"
+              className="mono text-[13px] uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded-md hover:bg-emerald-500/20"
             >
               + Agregar
             </button>
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-mono text-[11px]">
-            <thead className="text-[9px] uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <table className="w-full text-left font-mono text-[14px]">
+            <thead className="text-[13px] uppercase tracking-wider text-muted-foreground bg-muted/10">
               <tr>
                 <th className="px-2 py-1.5">Ticker</th>
                 <th className="px-2 py-1.5 text-right">Cantidad</th>
@@ -390,7 +390,7 @@ export function RebalanceadorSubTab() {
                       value={row.ticker}
                       onChange={(e) => updateRow(row.id, "ticker", e.target.value.toUpperCase())}
                       placeholder="AAPL.BA"
-                      className="w-28 bg-background/40 border border-border/40 rounded px-1.5 py-1 text-[11px] outline-none focus:border-primary/60"
+                      className="w-28 bg-background/40 border border-border/40 rounded px-1.5 py-1 text-[14px] outline-none focus:border-primary/60"
                     />
                   </td>
                   <td className="px-2 py-1">
@@ -399,7 +399,7 @@ export function RebalanceadorSubTab() {
                       min={0}
                       value={row.cantidad || ""}
                       onChange={(e) => updateRow(row.id, "cantidad", +e.target.value || 0)}
-                      className="w-24 text-right bg-background/40 border border-border/40 rounded px-1.5 py-1 text-[11px] outline-none focus:border-primary/60"
+                      className="w-24 text-right bg-background/40 border border-border/40 rounded px-1.5 py-1 text-[14px] outline-none focus:border-primary/60"
                     />
                   </td>
                   <td className="px-2 py-1">
@@ -410,7 +410,7 @@ export function RebalanceadorSubTab() {
                       value={row.precioPromedio || ""}
                       onChange={(e) => updateRow(row.id, "precioPromedio", +e.target.value || 0)}
                       placeholder="opcional"
-                      className="w-28 text-right bg-background/40 border border-border/40 rounded px-1.5 py-1 text-[11px] outline-none focus:border-primary/60"
+                      className="w-28 text-right bg-background/40 border border-border/40 rounded px-1.5 py-1 text-[14px] outline-none focus:border-primary/60"
                     />
                   </td>
                   <td className="px-2 py-1 text-center">
@@ -419,7 +419,7 @@ export function RebalanceadorSubTab() {
                         onClick={() => removeRow(row.id)}
                         className="text-red-400/60 hover:text-red-400 text-xs"
                       >
-                        ✕
+                        
                       </button>
                     )}
                   </td>
@@ -430,7 +430,7 @@ export function RebalanceadorSubTab() {
         </div>
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-muted-foreground">Capital adicional:</span>
+            <span className="text-[13px] text-muted-foreground">Capital adicional:</span>
             <input
               type="number"
               min={0}
@@ -440,7 +440,7 @@ export function RebalanceadorSubTab() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-muted-foreground">Benchmark(s) CAPM:</span>
+            <span className="text-[13px] text-muted-foreground">Benchmark(s) CAPM:</span>
             <input
               value={benchmarks}
               onChange={(e) => setBenchmarksVal(e.target.value)}
@@ -464,26 +464,26 @@ export function RebalanceadorSubTab() {
           {/* Stats cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-1 rounded-lg border border-border/40 overflow-hidden bg-border/40">
             <div className="bg-background/40 p-4">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                 Valor cartera
               </div>
               <div className="text-xl font-bold font-mono">${fmt(totalInvertido, 0)}</div>
-              <div className="text-[10px] text-muted-foreground">
+              <div className="text-[13px] text-muted-foreground">
                 {result.positions.length} activos ·{" "}
                 {result.positions.filter((p) => p.plPct < 0).length} en pérdida
               </div>
             </div>
             <div className="bg-background/40 p-4">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                 Total + capital
               </div>
               <div className="text-xl font-bold font-mono">${fmt(totalConCapital, 0)}</div>
-              <div className="text-[10px] text-muted-foreground">
+              <div className="text-[13px] text-muted-foreground">
                 Capital disp: ${fmt(capital, 0)}
               </div>
             </div>
             <div className="bg-background/40 p-4">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                 Retorno real anual
               </div>
               <div
@@ -501,12 +501,12 @@ export function RebalanceadorSubTab() {
                     "%"
                   : "—"}
               </div>
-              <div className="text-[10px] text-muted-foreground">
+              <div className="text-[13px] text-muted-foreground">
                 Sharpe: {result.portfolioMetrics ? result.portfolioMetrics.sharpe.toFixed(2) : "—"}
               </div>
             </div>
             <div className="bg-background/40 p-4">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                 Riesgo (Vol anual)
               </div>
               <div className="text-xl font-bold font-mono text-amber-400">
@@ -514,7 +514,7 @@ export function RebalanceadorSubTab() {
                   ? result.portfolioMetrics.volatilidadAnual.toFixed(1) + "%"
                   : "—"}
               </div>
-              <div className="text-[10px] text-muted-foreground">
+              <div className="text-[13px] text-muted-foreground">
                 VaR 95%:{" "}
                 {result.portfolioMetrics ? result.portfolioMetrics.var95.toFixed(1) + "%" : "—"} ·
                 DD:{" "}
@@ -528,7 +528,7 @@ export function RebalanceadorSubTab() {
           {/* Efficient Frontier */}
           {result.efficientFrontier && result.efficientFrontier.length > 0 && (
             <div className="rounded-lg border border-border/40 p-4">
-              <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+              <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
                 Frontera eficiente · 2000 simulaciones Monte Carlo
               </div>
               <ResponsiveContainer width="100%" height={280}>
@@ -598,7 +598,7 @@ export function RebalanceadorSubTab() {
                   )}
                 </ScatterChart>
               </ResponsiveContainer>
-              <div className="flex items-center gap-4 mt-2 text-[9px] text-muted-foreground flex-wrap">
+              <div className="flex items-center gap-4 mt-2 text-[13px] text-muted-foreground flex-wrap">
                 <span className="flex items-center gap-1">
                   <span className="inline-block w-2 h-2 rounded-full bg-white/20" /> 2000
                   simulaciones
@@ -614,7 +614,7 @@ export function RebalanceadorSubTab() {
                 ))}
                 {result.currentPortfolio && (
                   <span className="flex items-center gap-1">
-                    <span className="text-red-400 text-[10px]">✦</span> Portafolio actual
+                    <span className="text-red-400 text-[13px]"></span> Portafolio actual
                   </span>
                 )}
               </div>
@@ -625,7 +625,7 @@ export function RebalanceadorSubTab() {
           {result.currentPortfolio && (
             <div className="grid grid-cols-3 gap-1 rounded-lg border border-border/40 overflow-hidden bg-border/40">
               <div className="bg-background/40 p-3">
-                <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                   Retorno esperado actual
                 </div>
                 <div
@@ -639,7 +639,7 @@ export function RebalanceadorSubTab() {
                 </div>
               </div>
               <div className="bg-background/40 p-3">
-                <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                   Riesgo actual
                 </div>
                 <div className="text-lg font-bold font-mono text-amber-400">
@@ -647,7 +647,7 @@ export function RebalanceadorSubTab() {
                 </div>
               </div>
               <div className="bg-background/40 p-3">
-                <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                   Sharpe actual
                 </div>
                 <div
@@ -663,12 +663,12 @@ export function RebalanceadorSubTab() {
           {/* CAPM analysis */}
           {result.capmAnalysis && result.capmAnalysis.length > 0 && (
             <div className="rounded-lg border border-border/40 overflow-hidden">
-              <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground px-4 py-3 bg-muted/10 border-b border-border/40">
+              <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground px-4 py-3 bg-muted/10 border-b border-border/40">
                 CAPM vs benchmark
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-left font-mono text-[10px]">
-                  <thead className="text-[8px] uppercase tracking-wider text-muted-foreground bg-muted/10">
+                <table className="w-full text-left font-mono text-[13px]">
+                  <thead className="text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/10">
                     <tr>
                       <th className="px-3 py-2">Benchmark</th>
                       <th className="px-3 py-2 text-right">Beta</th>
@@ -707,7 +707,7 @@ export function RebalanceadorSubTab() {
           {/* Strategy comparison */}
           {result.strategies.length > 0 && (
             <div className="rounded-lg border border-border/40 p-4 space-y-3">
-              <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground">
                 Comparación de estrategias
               </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
@@ -721,7 +721,7 @@ export function RebalanceadorSubTab() {
                         : "border-border/40 bg-background/40 hover:bg-muted/10"
                     }`}
                   >
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                    <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                       {STRATEGY_LABELS[s.name]}
                     </div>
                     <div
@@ -731,7 +731,7 @@ export function RebalanceadorSubTab() {
                       {s.sharpe > 0 ? "+" : ""}
                       {s.sharpe.toFixed(2)}
                     </div>
-                    <div className="text-[9px] text-muted-foreground">
+                    <div className="text-[13px] text-muted-foreground">
                       Ret: {pct(s.expectedReturn * 252 * 100)} · Vol:{" "}
                       {pct(s.volatility * Math.sqrt(252) * 100)}
                     </div>
@@ -745,7 +745,7 @@ export function RebalanceadorSubTab() {
           {result.enrichedPositions && result.enrichedPositions.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="rounded-lg border border-border/40 p-4">
-                <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+                <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
                   Por categoría
                 </div>
                 <div className="flex items-center justify-center" style={{ height: 160 }}>
@@ -780,7 +780,7 @@ export function RebalanceadorSubTab() {
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="flex justify-center gap-4 text-[9px] text-muted-foreground flex-wrap">
+                <div className="flex justify-center gap-4 text-[13px] text-muted-foreground flex-wrap">
                   {(() => {
                     const map = new Map<string, number>();
                     for (const e of result.enrichedPositions!)
@@ -798,7 +798,7 @@ export function RebalanceadorSubTab() {
                 </div>
               </div>
               <div className="rounded-lg border border-border/40 p-4">
-                <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+                <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
                   Por subtipo
                 </div>
                 <div className="flex items-center justify-center" style={{ height: 160 }}>
@@ -833,7 +833,7 @@ export function RebalanceadorSubTab() {
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="flex justify-center gap-4 text-[9px] text-muted-foreground flex-wrap">
+                <div className="flex justify-center gap-4 text-[13px] text-muted-foreground flex-wrap">
                   {(() => {
                     const map = new Map<string, number>();
                     for (const e of result.enrichedPositions!)
@@ -855,7 +855,7 @@ export function RebalanceadorSubTab() {
             result.enrichedPositions.filter((e) => e.categoriaMacro === "RentaVariable").length >
               0 && (
               <div className="rounded-lg border border-border/40 p-4">
-                <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+                <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
                   Detalle técnico · Renta Variable
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -869,7 +869,7 @@ export function RebalanceadorSubTab() {
                         <div className="flex items-center justify-between">
                           <span className="font-semibold text-sm">{e.ticker}</span>
                           <span
-                            className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
+                            className={`text-[13px] px-2 py-0.5 rounded-full font-mono ${
                               e.score && e.score >= 4
                                 ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
                                 : e.score && e.score >= 1
@@ -884,18 +884,18 @@ export function RebalanceadorSubTab() {
                                 : "VENTA"}
                           </span>
                         </div>
-                        <div className="text-[10px] text-muted-foreground">
+                        <div className="text-[13px] text-muted-foreground">
                           ${fmt(e.precio, 0)} · Peso: {e.pesoPct.toFixed(1)}%
                         </div>
                         {e.plPct !== undefined && e.plPct !== 0 && (
                           <div
-                            className={`text-[10px] ${e.plPct >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                            className={`text-[13px] ${e.plPct >= 0 ? "text-emerald-400" : "text-red-400"}`}
                           >
                             {e.plPct >= 0 ? "+" : ""}
                             {e.plPct.toFixed(2)}%
                           </div>
                         )}
-                        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px]">
+                        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[13px]">
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">RSI</span>
                             <span
@@ -930,9 +930,9 @@ export function RebalanceadorSubTab() {
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
-                          <span className="text-[8px] text-muted-foreground">Score:</span>
+                          <span className="text-[12px] text-muted-foreground">Score:</span>
                           <span
-                            className={`text-[10px] font-mono font-bold ${
+                            className={`text-[13px] font-mono font-bold ${
                               e.score && e.score >= 4
                                 ? "text-emerald-400"
                                 : e.score && e.score >= 1
@@ -954,7 +954,7 @@ export function RebalanceadorSubTab() {
           {/* Distribution pie per strategy */}
           {strategy && strategyWeights.length > 0 && (
             <div className="rounded-lg border border-border/40 p-4">
-              <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+              <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
                 {STRATEGY_LABELS[strategy.name]} — Distribución
               </div>
               <div className="flex items-center justify-center" style={{ height: 200 }}>
@@ -996,12 +996,12 @@ export function RebalanceadorSubTab() {
           {result.enrichedPositions &&
             result.enrichedPositions.filter((e) => e.retornoAnual !== undefined).length > 0 && (
               <div className="rounded-lg border border-border/40 overflow-hidden">
-                <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground px-4 py-3 bg-muted/10 border-b border-border/40">
+                <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground px-4 py-3 bg-muted/10 border-b border-border/40">
                   Activos individuales — {STRATEGY_LABELS[strategy?.name || "max-sharpe"]}
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left font-mono text-[10px]">
-                    <thead className="text-[8px] uppercase tracking-wider text-muted-foreground bg-muted/10">
+                  <table className="w-full text-left font-mono text-[13px]">
+                    <thead className="text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/10">
                       <tr>
                         <th className="px-3 py-2">Ticker</th>
                         <th className="px-3 py-2">Sector</th>
@@ -1034,10 +1034,10 @@ export function RebalanceadorSubTab() {
                               className="border-b border-border/10 hover:bg-muted/10"
                             >
                               <td className="px-3 py-2 font-semibold">{e.ticker}</td>
-                              <td className="px-3 py-2 text-[9px] text-muted-foreground">
+                              <td className="px-3 py-2 text-[13px] text-muted-foreground">
                                 {e.sector || "—"}
                               </td>
-                              <td className="px-3 py-2 text-[9px] text-muted-foreground">
+                              <td className="px-3 py-2 text-[13px] text-muted-foreground">
                                 {e.industria || "—"}
                               </td>
                               <td className="px-3 py-2 text-right font-mono">
@@ -1078,12 +1078,12 @@ export function RebalanceadorSubTab() {
             result.enrichedPositions.filter((e) => e.escenarios).length > 0 &&
             strategy && (
               <div className="rounded-lg border border-border/40 overflow-hidden">
-                <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground px-4 py-3 bg-muted/10 border-b border-border/40">
+                <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground px-4 py-3 bg-muted/10 border-b border-border/40">
                   Escenarios ponderados del portafolio ({STRATEGY_LABELS[strategy.name]})
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left font-mono text-[10px]">
-                    <thead className="text-[8px] uppercase tracking-wider text-muted-foreground bg-muted/10">
+                  <table className="w-full text-left font-mono text-[13px]">
+                    <thead className="text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/10">
                       <tr>
                         <th className="px-3 py-2">Ticker</th>
                         <th className="px-3 py-2 text-right">Pérdida máx.</th>
@@ -1138,18 +1138,18 @@ export function RebalanceadorSubTab() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {result.composicion && (
               <div className="rounded-lg border border-border/40 p-4">
-                <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+                <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
                   Composición actual
                 </div>
                 {result.composicion.sectores.length > 0 && (
                   <div className="mb-3">
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground mb-1.5">
+                    <div className="text-[13px] uppercase tracking-wider text-muted-foreground mb-1.5">
                       Por sector
                     </div>
                     <div className="space-y-1.5">
                       {result.composicion.sectores.slice(0, 6).map((s) => (
                         <div key={s.nombre}>
-                          <div className="flex justify-between text-[10px]">
+                          <div className="flex justify-between text-[13px]">
                             <span className="truncate">{s.nombre}</span>
                             <span className="font-mono font-semibold">
                               {(s.peso * 100).toFixed(1)}%
@@ -1168,22 +1168,22 @@ export function RebalanceadorSubTab() {
                 )}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground mb-1">
+                    <div className="text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
                       Moneda
                     </div>
                     {result.composicion.monedas.map((m) => (
-                      <div key={m.nombre} className="flex justify-between text-[10px] py-0.5">
+                      <div key={m.nombre} className="flex justify-between text-[13px] py-0.5">
                         <span>{m.nombre}</span>
                         <span className="font-mono">{(m.peso * 100).toFixed(1)}%</span>
                       </div>
                     ))}
                   </div>
                   <div>
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground mb-1">
+                    <div className="text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
                       Tipo
                     </div>
                     {result.composicion.tipoActivo.map((t) => (
-                      <div key={t.nombre} className="flex justify-between text-[10px] py-0.5">
+                      <div key={t.nombre} className="flex justify-between text-[13px] py-0.5">
                         <span>{t.nombre}</span>
                         <span className="font-mono">{(t.peso * 100).toFixed(1)}%</span>
                       </div>
@@ -1194,7 +1194,7 @@ export function RebalanceadorSubTab() {
             )}
             {result.portfolioMetrics && (
               <div className="rounded-lg border border-border/40 p-4">
-                <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+                <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
                   Métricas de riesgo/retorno
                 </div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2">
@@ -1234,9 +1234,9 @@ export function RebalanceadorSubTab() {
                       key={label as string}
                       className="flex justify-between items-center border-b border-border/10 py-1"
                     >
-                      <span className="text-[10px] text-muted-foreground">{label as string}</span>
+                      <span className="text-[13px] text-muted-foreground">{label as string}</span>
                       <span
-                        className="font-mono text-[11px] font-semibold"
+                        className="font-mono text-[14px] font-semibold"
                         style={{ color: color as string }}
                       >
                         {value as string}
@@ -1245,7 +1245,7 @@ export function RebalanceadorSubTab() {
                   ))}
                 </div>
                 {result.portfolioMetrics.mejorBenchmark && (
-                  <div className="mt-2 pt-2 border-t border-border/20 text-[9px] text-muted-foreground">
+                  <div className="mt-2 pt-2 border-t border-border/20 text-[13px] text-muted-foreground">
                     Benchmark: {result.portfolioMetrics.mejorBenchmark} · β:{" "}
                     {result.portfolioMetrics.betaCartera.toFixed(2)} · R²:{" "}
                     {(result.portfolioMetrics.r2Cartera * 100).toFixed(0)}%
@@ -1259,7 +1259,7 @@ export function RebalanceadorSubTab() {
           {result.portfolioMetrics?.equityCurve &&
             result.portfolioMetrics.equityCurve.length > 1 && (
               <div className="rounded-lg border border-border/40 p-4">
-                <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+                <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
                   Evolución del portafolio (base 100)
                 </div>
                 <ResponsiveContainer width="100%" height={200}>
@@ -1332,7 +1332,7 @@ export function RebalanceadorSubTab() {
                     />
                   </AreaChart>
                 </ResponsiveContainer>
-                <div className="flex items-center gap-4 mt-2 text-[9px] text-muted-foreground">
+                <div className="flex items-center gap-4 mt-2 text-[13px] text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <span className="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-500" />{" "}
                     Portafolio
@@ -1350,7 +1350,7 @@ export function RebalanceadorSubTab() {
           {/* Histograma de retornos diarios */}
           {result.portfolioMetrics?.equityCurve && strategy && (
             <div className="rounded-lg border border-border/40 p-4">
-              <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+              <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
                 {STRATEGY_LABELS[strategy.name]} — Histograma de retornos diarios
               </div>
               <ResponsiveContainer width="100%" height={200}>
@@ -1410,15 +1410,15 @@ export function RebalanceadorSubTab() {
           {strategy && strategyWeights.length > 0 && result.currentPortfolio && (
             <>
               <div className="rounded-lg border border-border/40 overflow-hidden">
-                <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground px-4 py-3 bg-muted/10 border-b border-border/40 flex items-center justify-between">
+                <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground px-4 py-3 bg-muted/10 border-b border-border/40 flex items-center justify-between">
                   <span>{STRATEGY_LABELS[strategy.name]} — composición actual vs óptima</span>
-                  <span className="text-[9px] text-muted-foreground font-normal">
+                  <span className="text-[13px] text-muted-foreground font-normal">
                     Capital: ${fmt(totalConCapital, 0)} · {strategyWeights.length} activos
                   </span>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left font-mono text-[11px]">
-                    <thead className="text-[9px] uppercase tracking-wider text-muted-foreground bg-muted/10">
+                  <table className="w-full text-left font-mono text-[14px]">
+                    <thead className="text-[13px] uppercase tracking-wider text-muted-foreground bg-muted/10">
                       <tr>
                         <th className="px-3 py-2">Activo</th>
                         <th className="px-3 py-2 text-right">Actual %</th>
@@ -1493,13 +1493,13 @@ export function RebalanceadorSubTab() {
               {/* Summary metrics row */}
               <div className="grid grid-cols-4 gap-1 rounded-lg border border-border/40 overflow-hidden bg-border/40">
                 <div className="bg-background/40 p-3">
-                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                  <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                     Capital total
                   </div>
                   <div className="text-base font-bold font-mono">${fmt(totalConCapital, 0)}</div>
                 </div>
                 <div className="bg-background/40 p-3">
-                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                  <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                     Retorno esperado ({STRATEGY_LABELS[strategy.name]})
                   </div>
                   <div
@@ -1511,7 +1511,7 @@ export function RebalanceadorSubTab() {
                   </div>
                 </div>
                 <div className="bg-background/40 p-3">
-                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                  <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                     Volatilidad
                   </div>
                   <div className="text-base font-bold font-mono text-amber-400">
@@ -1519,7 +1519,7 @@ export function RebalanceadorSubTab() {
                   </div>
                 </div>
                 <div className="bg-background/40 p-3">
-                  <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                  <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                     Sharpe
                   </div>
                   <div
@@ -1535,12 +1535,12 @@ export function RebalanceadorSubTab() {
 
           {/* Positions table */}
           <div className="rounded-lg border border-border/40 overflow-hidden">
-            <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground px-4 py-3 bg-muted/10 border-b border-border/40">
+            <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground px-4 py-3 bg-muted/10 border-b border-border/40">
               Posiciones · {result.positions.filter((p) => p.valorizado > 0).length} activas
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left font-mono text-[11px]">
-                <thead className="text-[9px] uppercase tracking-wider text-muted-foreground bg-muted/10">
+              <table className="w-full text-left font-mono text-[14px]">
+                <thead className="text-[13px] uppercase tracking-wider text-muted-foreground bg-muted/10">
                   <tr>
                     <th className="px-3 py-2">Ticker</th>
                     <th className="px-3 py-2 text-right">Cantidad</th>
@@ -1568,13 +1568,13 @@ export function RebalanceadorSubTab() {
                         >
                           {pos.plPct !== 0 ? pct(pos.plPct) : "—"}
                         </td>
-                        <td className="px-3 py-2 text-right text-[10px]">
+                        <td className="px-3 py-2 text-right text-[13px]">
                           {pos.bestBenchmark || "—"}
                         </td>
-                        <td className="px-3 py-2 text-right text-[10px]">
+                        <td className="px-3 py-2 text-right text-[13px]">
                           {pos.bestBenchmarkR2 ? pos.bestBenchmarkR2.toFixed(3) : "—"}
                         </td>
-                        <td className="px-3 py-2 text-right text-[10px]">
+                        <td className="px-3 py-2 text-right text-[13px]">
                           {pos.bestBeta ? pos.bestBeta.toFixed(2) : "—"}
                         </td>
                       </tr>
@@ -1587,18 +1587,18 @@ export function RebalanceadorSubTab() {
           {/* Correlation matrix */}
           {result.correlationMatrix && (
             <div className="rounded-lg border border-border/40 p-4">
-              <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+              <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
                 Matriz de correlación
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-center font-mono text-[10px]">
+                <table className="w-full text-center font-mono text-[13px]">
                   <thead>
                     <tr>
-                      <th className="px-2 py-1 text-left text-[8px] text-muted-foreground"></th>
+                      <th className="px-2 py-1 text-left text-[12px] text-muted-foreground"></th>
                       {result.correlationMatrix.tickers.map((t) => (
                         <th
                           key={t}
-                          className="px-2 py-1 text-[8px] text-muted-foreground font-normal"
+                          className="px-2 py-1 text-[12px] text-muted-foreground font-normal"
                         >
                           {t.replace(".BA", "")}
                         </th>
@@ -1608,7 +1608,7 @@ export function RebalanceadorSubTab() {
                   <tbody>
                     {result.correlationMatrix.tickers.map((t1, i) => (
                       <tr key={t1} className="border-b border-border/10">
-                        <td className="px-2 py-1 text-left text-[9px] font-semibold">
+                        <td className="px-2 py-1 text-left text-[13px] font-semibold">
                           {t1.replace(".BA", "")}
                         </td>
                         {result.correlationMatrix!.values[i].map((v, j) => {
@@ -1620,7 +1620,7 @@ export function RebalanceadorSubTab() {
                           return (
                             <td
                               key={j}
-                              className="px-2 py-1 text-[9px]"
+                              className="px-2 py-1 text-[13px]"
                               style={{ background: color }}
                             >
                               {v.toFixed(2)}

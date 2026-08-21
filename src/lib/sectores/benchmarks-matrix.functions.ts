@@ -2,7 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { computePearsonCorrelation } from "../intermarket-complete";
 
-// ─── MASTER FACTOR LIST (macro, sectores, smart-beta, países) ────────────────
+//  MASTER FACTOR LIST (macro, sectores, smart-beta, países) 
 
 export const FACTOR_META: Record<string, { name: string; cat: string; sub: string }> = {
   // MACRO & DIVISAS
@@ -77,7 +77,7 @@ ETF_SECTOR_MAP.QQQ = "NASDAQ 100";
 ETF_SECTOR_MAP.DIA = "Dow Jones";
 ETF_SECTOR_MAP.IWM = "Russell 2000";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+//  Types 
 
 export type CRBBondsTrend = "rising" | "falling" | "neutral" | null;
 
@@ -151,7 +151,7 @@ export interface BenchmarksMatrixResult {
   cuellosBotella: CuelloBotellaSector[];
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+//  Helpers 
 
 function computeCRBBondsTrend(closesMap: Map<string, number[]>): MacroFilterResult {
   const dbc = closesMap.get("DBC");
@@ -266,7 +266,7 @@ function perfilLabel(beta: number): string {
   return "Neutral";
 }
 
-// ─── Main function ───────────────────────────────────────────────────────────
+//  Main function 
 
 export const getBenchmarksMatrix = createServerFn({ method: "GET" }).handler(async (): Promise<BenchmarksMatrixResult> => {
   const closesMap = await fetchWeeklyClosesBatch(ALL_TICKERS);
@@ -274,7 +274,7 @@ export const getBenchmarksMatrix = createServerFn({ method: "GET" }).handler(asy
   const returnsMap = new Map<string, number[]>();
   for (const etf of etfs) returnsMap.set(etf, weeklyReturns(closesMap.get(etf)!));
 
-  // ── Matriz de correlación entre todos los pares ──
+  //  Matriz de correlación entre todos los pares 
   const matrix: BenchMatrixRow[] = [];
   for (let i = 0; i < etfs.length; i++) {
     for (let j = i + 1; j < etfs.length; j++) {
@@ -291,7 +291,7 @@ export const getBenchmarksMatrix = createServerFn({ method: "GET" }).handler(asy
   const mejoresParaDiversificar = sorted.slice(0, 3);
   const masRedundantes = sorted.slice(-3).reverse();
 
-  // ── Betas: para CADA activo, encontrar el mejor benchmark (mayor R²) ──
+  //  Betas: para CADA activo, encontrar el mejor benchmark (mayor R²) 
   const spyRet = returnsMap.get("SPY") ?? [];
   const allBenchmarkRetMap = new Map(returnsMap); // all tickers as potential benchmarks
 
@@ -335,7 +335,7 @@ export const getBenchmarksMatrix = createServerFn({ method: "GET" }).handler(asy
       };
     });
 
-  // ── Multi-benchmark (QQQ, DIA, IWM) para compatibilidad descendente ──
+  //  Multi-benchmark (QQQ, DIA, IWM) para compatibilidad descendente 
   const multiBenchmarks = ["QQQ", "DIA", "IWM"];
   const multiBetas: BenchMultiBeta[] = [];
   for (const bm of multiBenchmarks) {

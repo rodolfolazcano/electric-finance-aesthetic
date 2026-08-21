@@ -29,9 +29,9 @@ import type {
 const AD = "https://api.argentinadatos.com";
 const IOL = "https://api.invertironline.com";
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // HELPERS COMPARTIDOS
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 function fetchConCache<T>(url: string, cacheKey: string, ttl = 120_000): Promise<T | null> {
   const cached = getCached<T>(cacheKey, ttl);
@@ -65,9 +65,9 @@ function buildUST10YSyntheticFlows(fechaLiq: Date, yieldPct: number): Array<{ fe
   return flows;
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR A — Hard Dollar vs UST10Y
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 function generarFlujoMensual(
   fechaLiq: Date,
@@ -264,9 +264,9 @@ export const comparadorA = createServerFn({ method: "POST" })
     }
   });
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR B — PF vs LECAP vs Inflación
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // API response formats:
 //   PF: tnaClientes en decimal (0.19 = 19% TNA)
 //   LECAP: tem en % (2.4 = 2.4% TEM)
@@ -349,9 +349,9 @@ export const comparadorB = createServerFn({ method: "POST" })
     }
   });
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR C — Bono CER vs Inflación (retorno real)
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // Busca bonos CER en BONOS_DB + IOL (vía titulos públicos con "CER" en descripción)
 
 export interface CerInstrumento {
@@ -452,9 +452,9 @@ export const comparadorC = createServerFn({ method: "POST" })
     }
   });
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR D — CER vs Tasa Fija (breakeven de inflación)
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 export const comparadorD = createServerFn({ method: "POST" })
   .validator(z.object({ cerTicker: z.string().default("TX26"), tasaFijaTicker: z.string().default("S17L6") }))
@@ -533,9 +533,9 @@ export const comparadorD = createServerFn({ method: "POST" })
     }
   });
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR E — Dollar-Linked vs Hard Dollar vs CER (cobertura cambiaria)
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // CER retorno real basado en inflación interanual histórica real
 
 export const comparadorE = createServerFn({ method: "POST" })
@@ -627,9 +627,9 @@ export const comparadorE = createServerFn({ method: "POST" })
     }
   });
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR F — FCI vs Instrumento Directo
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // FCI API devuelve: { fondo, fecha, vcp, ccp, patrimonio, horizonte }
 // Se matchean por nombre "fondo" entre ultimo y penultimo
 
@@ -701,9 +701,9 @@ export const comparadorF = createServerFn({ method: "POST" }).handler(async (): 
   }
 });
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR G — BADLAR/TAMAR flotante vs Tasa Fija (breakeven de tasa)
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 export const comparadorG = createServerFn({ method: "POST" })
   .validator(z.object({
@@ -789,9 +789,9 @@ export const comparadorG = createServerFn({ method: "POST" })
     }
   });
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // EVOLUCIÓN CAMBIARIA — USD oficial, blue, MEP, CCL + inflación
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 export interface PuntoEvolucion {
   fecha: string;

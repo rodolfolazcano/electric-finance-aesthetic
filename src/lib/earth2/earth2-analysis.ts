@@ -178,16 +178,16 @@ export function generateMarketOutlook(correlations: AssetWeatherCorrelation[]): 
 
   if (positives.length > 0) {
     lines.push(
-      `✅ Sectores beneficiados: ${positives.map((c) => `${c.ticker} (${c.sector})`).join(", ")}`,
+      `[OK] Sectores beneficiados: ${positives.map((c) => `${c.ticker} (${c.sector})`).join(", ")}`,
     );
   }
   if (negatives.length > 0) {
     lines.push(
-      `⚠️ Sectores presionados: ${negatives.map((c) => `${c.ticker} (${c.sector})`).join(", ")}`,
+      `[ADVERTENCIA] Sectores presionados: ${negatives.map((c) => `${c.ticker} (${c.sector})`).join(", ")}`,
     );
   }
   if (lines.length === 0) {
-    lines.push("➡️ Sin impacto climático significativo en el universo de cobertura");
+    lines.push(" Sin impacto climático significativo en el universo de cobertura");
   }
   return lines;
 }

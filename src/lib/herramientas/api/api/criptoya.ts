@@ -77,7 +77,7 @@ function findClosestVenta(arr: ADCotizacion[], targetDate: string): number | nul
 export const fetchDolares = createServerFn({ method: "GET" }).handler(
   async (): Promise<CotizacionDolar[]> => {
     try {
-      // ── 1. Current rates from CriptoYa ──
+      //  1. Current rates from CriptoYa 
       const r = await fetch("https://criptoya.com/api/dolar", { cache: "no-store" });
       if (!r.ok) return [];
       const json: CriptoYaResponse = await r.json();
@@ -92,7 +92,7 @@ export const fetchDolares = createServerFn({ method: "GET" }).handler(
         "ccl",
       ];
 
-      // ── 2. Historical data from ArgentinaDatos (solo casas con endpoint) ──
+      //  2. Historical data from ArgentinaDatos (solo casas con endpoint) 
       const historicos = new Map<string, ADCotizacion[]>();
       const historicosRaw = await Promise.allSettled(casas.map((casa) => fetchADHistorial(casa)));
       casas.forEach((casa, i) => {
@@ -102,7 +102,7 @@ export const fetchDolares = createServerFn({ method: "GET" }).handler(
         }
       });
 
-      // ── 3. Fechas de referencia ──
+      //  3. Fechas de referencia 
       const now = new Date();
       const todayStr = now.toISOString().slice(0, 10); // YYYY-MM-DD
       const ytdStartStr = `${now.getFullYear()}-01-01`; // 1ero enero
@@ -114,7 +114,7 @@ export const fetchDolares = createServerFn({ method: "GET" }).handler(
       const oficialEntry = json["oficial"];
       const oficialVenta = oficialEntry?.venta ?? null;
 
-      // ── 4. Armar resultados ──
+      //  4. Armar resultados 
       return casas.map((casa) => {
         const entry = json[casa];
         const compra = entry?.compra ?? null;

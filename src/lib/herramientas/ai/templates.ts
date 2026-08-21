@@ -61,7 +61,7 @@ const CORNER_RIGHT: LogoSlot = { x: 73, y: 5, w: 22, maxSize: 9, corner: "top-ri
 // ---------------------------------------------------------------------------
 
 export const TEMPLATES: SlideTemplate[] = [
-  // ── Familia A — Mercado diario ──────────────────────────────────────────
+  //  Familia A — Mercado diario 
   {
     id: 1,
     family: "A",
@@ -168,7 +168,7 @@ export const TEMPLATES: SlideTemplate[] = [
     ],
   },
 
-  // ── Familia B — Comparación de instrumentos ─────────────────────────────
+  //  Familia B — Comparación de instrumentos 
   {
     id: 6,
     family: "B",
@@ -270,7 +270,7 @@ export const TEMPLATES: SlideTemplate[] = [
     ],
   },
 
-  // ── Familia C — Oportunidades / producto ────────────────────────────────
+  //  Familia C — Oportunidades / producto 
   {
     id: 11,
     family: "C",
@@ -375,7 +375,7 @@ export const TEMPLATES: SlideTemplate[] = [
     ],
   },
 
-  // ── Familia D — Educativo / conceptual (sin cifras) ─────────────────────
+  //  Familia D — Educativo / conceptual (sin cifras) 
   {
     id: 16,
     family: "D",
@@ -476,7 +476,7 @@ export const TEMPLATES: SlideTemplate[] = [
     ],
   },
 
-  // ── Familia E — Noticias / contexto ─────────────────────────────────────
+  //  Familia E — Noticias / contexto 
   {
     id: 21,
     family: "E",
@@ -575,7 +575,7 @@ export const TEMPLATES: SlideTemplate[] = [
     ],
   },
 
-  // ── Familia F — Identidad / diseño puro (fondo real como mensaje) ────────
+  //  Familia F — Identidad / diseño puro (fondo real como mensaje) 
   {
     id: 26,
     family: "C",

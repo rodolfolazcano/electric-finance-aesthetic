@@ -100,28 +100,28 @@ function BetaBadge({ value }: { value: number | null }) {
 
 function FactorRow({ factor, rank }: { factor: FactorEntry; rank?: number }) {
   return (
-    <div className="flex items-center gap-3 border-b border-border/10 px-2 py-1.5 text-[11px] hover:bg-muted/20 transition-colors">
+    <div className="flex items-center gap-3 border-b border-border/10 px-2 py-1.5 text-[14px] hover:bg-muted/20 transition-colors">
       {rank != null && (
         <span className="w-5 shrink-0 text-right text-muted-foreground/60">{rank}</span>
       )}
       <div className="min-w-[180px]">
         <span className="font-medium text-foreground">{factor.name}</span>
-        <span className="ml-1.5 text-[9px] text-muted-foreground/60">{factor.ticker}</span>
+        <span className="ml-1.5 text-[13px] text-muted-foreground/60">{factor.ticker}</span>
       </div>
-      <span className="text-[9px] text-muted-foreground/50 uppercase min-w-[60px]">
+      <span className="text-[13px] text-muted-foreground/50 uppercase min-w-[60px]">
         {factor.subcategory}
       </span>
       <div className="ml-auto flex items-center gap-3">
         <div className="flex items-center gap-1.5">
-          <span className="text-[9px] text-muted-foreground/50">R</span>
+          <span className="text-[13px] text-muted-foreground/50">R</span>
           <CorrelationBadge value={factor.correlation} />
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[9px] text-muted-foreground/50">\u03B2</span>
+          <span className="text-[13px] text-muted-foreground/50">\u03B2</span>
           <BetaBadge value={factor.beta} />
         </div>
         <div className="flex items-center gap-1.5 w-14">
-          <span className="text-[9px] text-muted-foreground/50">R\u00B2</span>
+          <span className="text-[13px] text-muted-foreground/50">R\u00B2</span>
           <span className="font-mono text-muted-foreground">
             {factor.r_squared != null ? fmtPct(factor.r_squared, 0) : "\u2014"}
           </span>
@@ -147,19 +147,19 @@ function CategorySection({ name, data }: { name: string; data: CategoryData }) {
         <div className="flex items-center gap-2">
           <span
             className={cn(
-              "rounded px-2 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider",
+              "rounded px-2 py-0.5 text-[13px] font-mono font-semibold uppercase tracking-wider",
               colorClass,
             )}
           >
             {name}
           </span>
-          <span className="text-[10px] text-muted-foreground/60 font-mono">
+          <span className="text-[13px] text-muted-foreground/60 font-mono">
             {data.count} factores
           </span>
         </div>
         <div className="flex items-center gap-4">
           {data.avg_correlation != null && (
-            <span className="text-[9px] text-muted-foreground/50 font-mono">
+            <span className="text-[13px] text-muted-foreground/50 font-mono">
               avg R: <CorrelationBadge value={data.avg_correlation} />
             </span>
           )}
@@ -182,28 +182,28 @@ function CategorySection({ name, data }: { name: string; data: CategoryData }) {
 function SummaryCard({ summary }: { summary: Summary }) {
   return (
     <Card className="border-border/40 bg-background/40/40 p-4">
-      <div className="mb-2 text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+      <div className="mb-2 text-[13px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
         Resumen
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-5">
         <div>
-          <div className="text-[9px] text-muted-foreground/60 font-mono">Factores válidos</div>
+          <div className="text-[13px] text-muted-foreground/60 font-mono">Factores válidos</div>
           <div className="text-sm font-mono text-foreground">{summary.total_valid}</div>
         </div>
         <div>
-          <div className="text-[9px] text-muted-foreground/60 font-mono">Corr &gt; 0.5</div>
+          <div className="text-[13px] text-muted-foreground/60 font-mono">Corr &gt; 0.5</div>
           <div className="text-sm font-mono text-green-400">{summary.strong_positive}</div>
         </div>
         <div>
-          <div className="text-[9px] text-muted-foreground/60 font-mono">Corr &lt; -0.5</div>
+          <div className="text-[13px] text-muted-foreground/60 font-mono">Corr &lt; -0.5</div>
           <div className="text-sm font-mono text-red-400">{summary.strong_negative}</div>
         </div>
         <div>
-          <div className="text-[9px] text-muted-foreground/60 font-mono">Corr débil</div>
+          <div className="text-[13px] text-muted-foreground/60 font-mono">Corr débil</div>
           <div className="text-sm font-mono text-yellow-400">{summary.weak_correlation}</div>
         </div>
         <div>
-          <div className="text-[9px] text-muted-foreground/60 font-mono">R promedio</div>
+          <div className="text-[13px] text-muted-foreground/60 font-mono">R promedio</div>
           <div className="text-sm font-mono text-foreground">
             {summary.avg_correlation_all != null
               ? fmtNum(summary.avg_correlation_all, 3)
@@ -228,7 +228,7 @@ function RankingPanel({
     <Card className="border-border/40 bg-background/40/40 p-4">
       <div className="mb-2 flex items-center gap-2">
         <span>{icon}</span>
-        <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+        <span className="text-[13px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
           {title}
         </span>
       </div>
@@ -236,20 +236,20 @@ function RankingPanel({
         {items.map((f, i) => (
           <div
             key={f.ticker}
-            className="flex items-center gap-2 border-b border-border/5 px-1 py-1 text-[11px]"
+            className="flex items-center gap-2 border-b border-border/5 px-1 py-1 text-[14px]"
           >
-            <span className="w-5 shrink-0 text-right text-[9px] text-muted-foreground/50">
+            <span className="w-5 shrink-0 text-right text-[13px] text-muted-foreground/50">
               {i + 1}
             </span>
             <span className="text-foreground font-medium">{f.name}</span>
             <span className="ml-auto flex items-center gap-2">
               <CorrelationBadge value={f.correlation} />
               {f.beta != null && (
-                <span className="text-[9px] text-muted-foreground/50">
+                <span className="text-[13px] text-muted-foreground/50">
                   \u03B2={fmtNum(f.beta, 2)}
                 </span>
               )}
-              <span className="text-[9px] font-mono text-muted-foreground/60 min-w-[3rem] text-right">
+              <span className="text-[13px] font-mono text-muted-foreground/60 min-w-[3rem] text-right">
                 {f.r_squared != null ? `R²=${(f.r_squared * 100).toFixed(0)}%` : ""}
               </span>
             </span>
@@ -260,7 +260,7 @@ function RankingPanel({
   );
 }
 
-// ─── Industrials Highlight — ETFs de Industria destacados ───────────
+//  Industrials Highlight — ETFs de Industria destacados 
 
 const INDUSTRY_ETFS = ["XLI", "CAT", "DE", "GE", "MMM", "BA", "HON", "UNP", "UPS", "FDX"];
 
@@ -281,26 +281,26 @@ function IndustrialsHighlight({ factors, ticker }: { factors: FactorEntry[]; tic
     <Card className="border-blue-500/30 bg-blue-500/5 p-4">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-sm">🏭</span>
-          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-blue-400">
+          <span className="text-sm"></span>
+          <span className="text-[13px] font-mono font-semibold uppercase tracking-wider text-blue-400">
             ETFs Industriales destacados
           </span>
         </div>
-        <span className="text-[8px] text-muted-foreground/50 font-mono">vs {ticker}</span>
+        <span className="text-[12px] text-muted-foreground/50 font-mono">vs {ticker}</span>
       </div>
-      <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid w-full gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
         {industrials.map((f) => (
           <div
             key={f.ticker}
             className="flex items-center justify-between rounded border border-blue-500/15 bg-blue-500/5 px-2.5 py-1.5"
           >
             <div>
-              <span className="text-[10px] font-semibold font-mono text-foreground">
+              <span className="text-[13px] font-semibold font-mono text-foreground">
                 {f.ticker}
               </span>
-              <span className="ml-1 text-[8px] text-muted-foreground/60">{f.name}</span>
+              <span className="ml-1 text-[12px] text-muted-foreground/60">{f.name}</span>
             </div>
-            <div className="flex items-center gap-2 text-[9px] font-mono">
+            <div className="flex items-center gap-2 text-[13px] font-mono">
               <span
                 className={cn(
                   f.correlation != null && f.correlation > 0.5
@@ -354,7 +354,7 @@ export function IntermarketFactorPanel() {
       <Card className="border-border/40 bg-background/40/40 p-4">
         <form onSubmit={handleSearch} className="flex flex-wrap items-end gap-3">
           <div className="flex-1 min-w-[200px]">
-            <label className="mb-1 block text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+            <label className="mb-1 block text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
               Ticker
             </label>
             <Input
@@ -365,7 +365,7 @@ export function IntermarketFactorPanel() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+            <label className="mb-1 block text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
               Período
             </label>
             <div className="flex gap-1">
@@ -375,7 +375,7 @@ export function IntermarketFactorPanel() {
                   type="button"
                   onClick={() => setPeriod(p)}
                   className={cn(
-                    "rounded px-2.5 py-1.5 text-[11px] font-mono transition-colors",
+                    "rounded px-2.5 py-1.5 text-[14px] font-mono transition-colors",
                     period === p
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/50",
@@ -388,7 +388,7 @@ export function IntermarketFactorPanel() {
           </div>
           <button
             type="submit"
-            className="rounded bg-primary px-4 py-1.5 text-[11px] font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="rounded bg-primary px-4 py-1.5 text-[14px] font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Analizar
           </button>
@@ -397,7 +397,7 @@ export function IntermarketFactorPanel() {
 
       {/* Loading */}
       {isLoading && (
-        <div className="grid gap-3">
+        <div className="grid w-full gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-32 w-full rounded-lg" />
           ))}
@@ -418,11 +418,11 @@ export function IntermarketFactorPanel() {
           <div className="flex items-center justify-between">
             <div>
               <span className="font-mono text-sm font-semibold text-foreground">{data.ticker}</span>
-              <span className="ml-2 text-[10px] text-muted-foreground font-mono">
+              <span className="ml-2 text-[13px] text-muted-foreground font-mono">
                 {data.period} &middot; {data.total_factors} factores
               </span>
             </div>
-            <span className="text-[8px] text-muted-foreground/50 font-mono">
+            <span className="text-[12px] text-muted-foreground/50 font-mono">
               {new Date(data.timestamp).toLocaleString("es-AR")}
             </span>
           </div>
@@ -431,7 +431,7 @@ export function IntermarketFactorPanel() {
           <SummaryCard summary={data.summary} />
 
           {/* Rankings */}
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid w-full gap-3 sm:grid-cols-3">
             {data.rankings.top_positive.length > 0 && (
               <RankingPanel
                 title="Correlación Positiva"
@@ -453,10 +453,10 @@ export function IntermarketFactorPanel() {
 
           {/* Categories */}
           <div className="space-y-2">
-            <h3 className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+            <h3 className="text-[13px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
               Factores por Categoría
             </h3>
-            <div className="grid gap-2">
+            <div className="grid w-full gap-2">
               {Object.entries(data.categories).map(([name, catData]) => (
                 <CategorySection key={name} name={name} data={catData} />
               ))}
@@ -472,7 +472,7 @@ export function IntermarketFactorPanel() {
 
       {/* Error from Flask */}
       {data?.error && (
-        <div className="rounded-md border border-warning/40 bg-warning/10 p-4 text-[11px] font-mono text-warning leading-relaxed">
+        <div className="rounded-md border border-warning/40 bg-warning/10 p-4 text-[14px] font-mono text-warning leading-relaxed">
           {data.error}
         </div>
       )}

@@ -367,7 +367,7 @@ export const scoreSectorialFn = createServerFn({ method: "POST" })
       );
     }
 
-    // ─── Fundamentales del ticker ───
+    //  Fundamentales del ticker 
     const currentPrice = num(price?.regularMarketPrice) ?? num(fd?.currentPrice);
     const marketCapRaw = num(price?.marketCap) ?? num(ks?.marketCap);
     const trailingPE = num(sd?.trailingPE) ?? num(ks?.trailingPE);
@@ -451,7 +451,7 @@ export const scoreSectorialFn = createServerFn({ method: "POST" })
 
     const score = calcularSectorial(input);
 
-    // ─── Pares del mismo sector/industria del universo ───
+    //  Pares del mismo sector/industria del universo 
     const peersMax = data.peersMax ?? 10;
     let candidatos: TickerEntry[] = [];
     if (entrada) {
@@ -507,7 +507,7 @@ export const scoreSectorialFn = createServerFn({ method: "POST" })
       });
     }
 
-    // ─── Interpretación sectorial inteligente ───
+    //  Interpretación sectorial inteligente 
     const parTicker = construirParFundamental(ticker, q);
     if (esCedear) {
       parTicker.trailingPE = null;

@@ -71,7 +71,7 @@ export function PairsTradingPanel({
     capitalPerPair: shared.capitalPerPair,
     txCost: shared.txCost,
     inSampleRatio: validateOOS ? 0.7 : undefined,
-    // ─── Labadie ───
+    //  Labadie 
     executionAlgo: shared.executionAlgo,
     pValue: shared.pValue,
     marketImpactGamma: shared.marketImpactGamma,
@@ -108,7 +108,7 @@ export function PairsTradingPanel({
           source,
           token,
           mercado: source === "iol" ? iolMercado : undefined,
-          // ─── Labadie params ───
+          //  Labadie params 
           executionAlgo: shared.executionAlgo,
           pValue: shared.pValue,
           marketImpactGamma: shared.marketImpactGamma,
@@ -132,10 +132,10 @@ export function PairsTradingPanel({
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between px-4 py-2.5 font-mono text-xs text-foreground hover:bg-muted/10 transition-colors">
             <span>¿Cómo interpretar Pairs Trading?</span>
-            <span className="text-muted-foreground">{tutorialOpen ? "▾" : "▸"}</span>
+            <span className="text-muted-foreground">{tutorialOpen ? "" : ""}</span>
           </CollapsibleTrigger>
           <CollapsibleContent className="px-4 pb-3 pt-0">
-            <div className="space-y-2 font-mono text-[10px] leading-relaxed text-muted-foreground">
+            <div className="space-y-2 font-mono text-[13px] leading-relaxed text-muted-foreground">
               <p>
                 <strong>Pairs Trading</strong> es una estrategia de mercado neutral que busca
                 beneficiarse de la convergencia entre dos activos correlacionados. Se basa en la{" "}
@@ -175,29 +175,29 @@ export function PairsTradingPanel({
         </Collapsible>
 
         {/* Config */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Ticker 1
             </label>
             <input
               value={config.asset1}
               onChange={(e) => onUpdateShared("asset1", e.target.value.toUpperCase())}
-              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[11px] outline-none focus:border-primary/60"
+              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[14px] outline-none focus:border-primary/60"
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Ticker 2
             </label>
             <input
               value={config.asset2}
               onChange={(e) => onUpdateShared("asset2", e.target.value.toUpperCase())}
-              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[11px] outline-none focus:border-primary/60"
+              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[14px] outline-none focus:border-primary/60"
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Período
             </label>
             <div className="flex gap-1">
@@ -212,7 +212,7 @@ export function PairsTradingPanel({
                 <button
                   key={p.v}
                   onClick={() => onUpdateShared("period", p.v)}
-                  className={`rounded border px-2 py-1 font-mono text-[11px] transition-colors ${config.period === p.v ? "border-primary/60 bg-primary/10 text-foreground" : "border-border/60 text-muted-foreground hover:text-foreground"}`}
+                  className={`rounded border px-2 py-1 font-mono text-[14px] transition-colors ${config.period === p.v ? "border-primary/60 bg-primary/10 text-foreground" : "border-border/60 text-muted-foreground hover:text-foreground"}`}
                 >
                   {p.l}
                 </button>
@@ -220,7 +220,7 @@ export function PairsTradingPanel({
             </div>
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Ventana rolling
             </label>
             <input
@@ -231,17 +231,17 @@ export function PairsTradingPanel({
               onChange={(e) =>
                 onUpdateShared("window", Math.max(5, parseInt(e.target.value) || 20))
               }
-              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[11px] outline-none focus:border-primary/60"
+              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[14px] outline-none focus:border-primary/60"
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Intervalo
             </label>
             <select
               value={shared.interval}
               onChange={(e) => onUpdateShared("interval", e.target.value as DataInterval)}
-              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[11px] outline-none focus:border-primary/60"
+              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[14px] outline-none focus:border-primary/60"
             >
               <option value="1d">Diario</option>
               <option value="1h">1 hora</option>
@@ -252,9 +252,9 @@ export function PairsTradingPanel({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Umbral entrada (a): {config.entryThresh.toFixed(1)}σ
               <InfoTip>
                 El Z-Score mide cuán lejos está el spread de su media histórica en desviaciones
@@ -273,7 +273,7 @@ export function PairsTradingPanel({
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Stop-loss (b): {config.stopThresh.toFixed(1)}σ
               <InfoTip>
                 Si el Z-Score supera ±bσ se cierra la posición para limitar pérdidas. Debe ser mayor
@@ -297,7 +297,7 @@ export function PairsTradingPanel({
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Capital USD mn
             </label>
             <input
@@ -306,11 +306,11 @@ export function PairsTradingPanel({
               step={0.1}
               value={config.capitalPerPair}
               onChange={(e) => onUpdateShared("capitalPerPair", parseFloat(e.target.value) || 1)}
-              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[11px] outline-none focus:border-primary/60"
+              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[14px] outline-none focus:border-primary/60"
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Costo transacción %
             </label>
             <input
@@ -319,15 +319,15 @@ export function PairsTradingPanel({
               step={0.05}
               value={config.txCost}
               onChange={(e) => onUpdateShared("txCost", parseFloat(e.target.value) || 0)}
-              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[11px] outline-none focus:border-primary/60"
+              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[14px] outline-none focus:border-primary/60"
             />
           </div>
         </div>
 
-        {/* ─── Labadie: Algoritmo de ejecución, p-variance e impacto de mercado ─── */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {/*  Labadie: Algoritmo de ejecución, p-variance e impacto de mercado  */}
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Algoritmo
               <InfoTip>
                 Labadie §2.3-2.4: "pairs" usa Z-score clásico; "tc" = Target Close (forward);
@@ -339,7 +339,7 @@ export function PairsTradingPanel({
               onChange={(e) =>
                 onUpdateShared("executionAlgo", e.target.value as "pairs" | "tc" | "is")
               }
-              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[11px] outline-none focus:border-primary/60"
+              className="w-full rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[14px] outline-none focus:border-primary/60"
             >
               <option value="pairs">Pairs (Z-score)</option>
               <option value="tc">Target Close</option>
@@ -347,7 +347,7 @@ export function PairsTradingPanel({
             </select>
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               p-value (riesgo): {config.pValue?.toFixed(1) ?? "2.0"}
               <InfoTip>
                 Labadie §3.2: p para p-variance. p=2 → varianza clásica; p≠2 → riesgo generalizado.
@@ -365,7 +365,7 @@ export function PairsTradingPanel({
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Impacto γ: {config.marketImpactGamma?.toFixed(2) ?? "0.50"}
               <InfoTip>
                 Labadie §2.1: γ es el exponente de impacto de mercado. Típico 0.3-0.7.
@@ -383,7 +383,7 @@ export function PairsTradingPanel({
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Participación: {((config.participationRate ?? 0.1) * 100).toFixed(0)}%
               <InfoTip>
                 Labadie §2.2 (PVol): % del volumen total que se ejecuta por intervalo.
@@ -407,7 +407,7 @@ export function PairsTradingPanel({
             <div className="flex gap-1 rounded-lg border border-border/40 p-0.5">
               <button
                 onClick={() => onSourceChange("yahoo")}
-                className={`rounded px-2 py-0.5 font-mono text-[10px] transition-colors ${source === "yahoo" ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`rounded px-2 py-0.5 font-mono text-[13px] transition-colors ${source === "yahoo" ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
               >
                 Yahoo Finance
               </button>
@@ -419,7 +419,7 @@ export function PairsTradingPanel({
                     ? undefined
                     : "Inicia sesión en IOL (panel superior) para habilitar esta fuente"
                 }
-                className={`rounded px-2 py-0.5 font-mono text-[10px] transition-colors ${source === "iol" ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground"} ${accessToken ? "" : "opacity-40 cursor-not-allowed"}`}
+                className={`rounded px-2 py-0.5 font-mono text-[13px] transition-colors ${source === "iol" ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground"} ${accessToken ? "" : "opacity-40 cursor-not-allowed"}`}
               >
                 IOL{!accessToken ? " · sin sesión" : ""}
               </button>
@@ -427,7 +427,7 @@ export function PairsTradingPanel({
                 <select
                   value={iolMercado}
                   onChange={(e) => onIolMercadoChange(e.target.value)}
-                  className="ml-1 rounded border border-border/40 bg-background px-1.5 py-0.5 text-[10px] font-mono outline-none"
+                  className="ml-1 rounded border border-border/40 bg-background px-1.5 py-0.5 text-[13px] font-mono outline-none"
                 >
                   <option value="BCBA">BCBA</option>
                   <option value="NYSE">NYSE</option>
@@ -438,9 +438,9 @@ export function PairsTradingPanel({
             </div>
             <button
               onClick={() => setValidateOOS((v) => !v)}
-              className={`rounded border px-2 py-1 font-mono text-[10px] transition-colors ${validateOOS ? "border-accent/60 bg-accent/10 text-foreground" : "border-border/40 text-muted-foreground hover:text-foreground"}`}
+              className={`rounded border px-2 py-1 font-mono text-[13px] transition-colors ${validateOOS ? "border-accent/60 bg-accent/10 text-foreground" : "border-border/40 text-muted-foreground hover:text-foreground"}`}
             >
-              {validateOOS ? "✓ Validar out-of-sample" : "Validar out-of-sample"}
+              {validateOOS ? " Validar out-of-sample" : "Validar out-of-sample"}
             </button>
           </div>
           <button
@@ -453,13 +453,13 @@ export function PairsTradingPanel({
         </div>
 
         {source === "iol" && !accessToken && (
-          <div className="rounded-lg border border-warning/40 bg-warning/10 px-4 py-2 font-mono text-[11px] text-warning">
+          <div className="rounded-lg border border-warning/40 bg-warning/10 px-4 py-2 font-mono text-[14px] text-warning">
              IOL requiere inicio de sesión — iniciá sesión desde el panel superior
           </div>
         )}
 
         {error && (
-          <div className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 font-mono text-[11px] text-danger">
+          <div className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 font-mono text-[14px] text-danger">
             {error}
           </div>
         )}
@@ -467,7 +467,7 @@ export function PairsTradingPanel({
         {result && (
           <div className="space-y-5">
             {/* P&L + Performance at top */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2">
               <PnLChart
                 data={
                   result.trades.length > 0
@@ -481,9 +481,9 @@ export function PairsTradingPanel({
                 <h3 className="font-mono text-xs font-medium text-foreground">
                   Resumen de Performance
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid w-full grid-cols-2 gap-3">
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       Total trades
                     </span>
                     <p className="font-mono text-xs text-foreground">
@@ -491,7 +491,7 @@ export function PairsTradingPanel({
                     </p>
                   </div>
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       Win rate
                       <InfoTip>
                         Porcentaje de trades ganadores. Un win rate &gt; 50% indica más aciertos que
@@ -504,7 +504,7 @@ export function PairsTradingPanel({
                     </p>
                   </div>
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">PNL total</span>
+                    <span className="font-mono text-[13px] text-muted-foreground">PNL total</span>
                     <p
                       className={`font-mono text-xs ${result.performance.totalPnl >= 0 ? "text-success" : "text-danger"}`}
                     >
@@ -513,7 +513,7 @@ export function PairsTradingPanel({
                     </p>
                   </div>
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       Max drawdown
                       <InfoTip>
                         Máxima caída desde un pico hasta un valle. Representa el peor escenario
@@ -525,7 +525,7 @@ export function PairsTradingPanel({
                     </p>
                   </div>
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       Sharpe ratio
                       <InfoTip>
                         Mide el retorno ajustado por riesgo. Un Sharpe &gt; 1 se considera bueno,
@@ -538,7 +538,7 @@ export function PairsTradingPanel({
                     </p>
                   </div>
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       Avg duración
                     </span>
                     <p className="font-mono text-xs text-foreground">
@@ -550,9 +550,9 @@ export function PairsTradingPanel({
             </div>
 
             {/* Cointegration metrics card */}
-            <div className="grid grid-cols-2 gap-3 rounded-lg border border-border/40 bg-muted/5 p-4 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="grid w-full grid-cols-2 gap-3 rounded-lg border border-border/40 bg-muted/5 p-4 sm:grid-cols-3 lg:grid-cols-5">
               <div>
-                <span className="font-mono text-[10px] text-muted-foreground">
+                <span className="font-mono text-[13px] text-muted-foreground">
                   Correlación
                   <InfoTip>
                     Mide la relación lineal entre los dos activos, de -1 a +1. Valores &gt; 0.7
@@ -563,7 +563,7 @@ export function PairsTradingPanel({
                 <p className="font-mono text-xs text-foreground">{result.correlation.toFixed(4)}</p>
               </div>
               <div>
-                <span className="font-mono text-[10px] text-muted-foreground">
+                <span className="font-mono text-[13px] text-muted-foreground">
                   Beta (slope)
                   <InfoTip>
                     Pendiente de la regresión lineal entre activos. Indica cuánto se mueve activo 2
@@ -574,7 +574,7 @@ export function PairsTradingPanel({
                 <p className="font-mono text-xs text-foreground">{result.beta.toFixed(4)}</p>
               </div>
               <div>
-                <span className="font-mono text-[10px] text-muted-foreground">
+                <span className="font-mono text-[13px] text-muted-foreground">
                   R²
                   <InfoTip>
                     Coeficiente de determinación. Indica qué porcentaje de la variación de un activo
@@ -584,11 +584,11 @@ export function PairsTradingPanel({
                 <p className="font-mono text-xs text-foreground">{result.r2.toFixed(4)}</p>
               </div>
               <div>
-                <span className="font-mono text-[10px] text-muted-foreground">ADF p-value</span>
+                <span className="font-mono text-[13px] text-muted-foreground">ADF p-value</span>
                 <p className="font-mono text-xs text-foreground">{result.adfPValue.toFixed(4)}</p>
               </div>
               <div>
-                <span className="font-mono text-[10px] text-muted-foreground">¿Cointegrado?</span>
+                <span className="font-mono text-[13px] text-muted-foreground">¿Cointegrado?</span>
                 <p
                   className={`font-mono text-xs ${result.isCointegrated ? "text-success" : "text-danger"}`}
                 >
@@ -597,12 +597,12 @@ export function PairsTradingPanel({
               </div>
             </div>
 
-            {/* ─── Labadie §3.2: Hurst, impliedP, p-Sharpe ─── */}
+            {/*  Labadie §3.2: Hurst, impliedP, p-Sharpe  */}
             {(result.hurstExponent !== undefined || result.performance.pSharpe !== undefined || result.impliedP !== undefined) && (
-              <div className="grid grid-cols-2 gap-3 rounded-lg border border-border/40 bg-muted/5 p-4 sm:grid-cols-4">
+              <div className="grid w-full grid-cols-2 gap-3 rounded-lg border border-border/40 bg-muted/5 p-4 sm:grid-cols-4">
                 {result.hurstExponent !== undefined && (
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       Hurst (H)
                       <InfoTip>Labadie §3.2: H=0.5 → random walk; H&lt;0.5 → mean-reverting; H&gt;0.5 → trending. Estima memoria del spread.</InfoTip>
                     </span>
@@ -611,7 +611,7 @@ export function PairsTradingPanel({
                 )}
                 {result.impliedP !== undefined && (
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       p = 1/H
                       <InfoTip>Labadie §3.2: Identidad p = 1/H. p=2 → martingala; p≠2 → proceso con memoria.</InfoTip>
                     </span>
@@ -620,7 +620,7 @@ export function PairsTradingPanel({
                 )}
                 {result.impliedPRegression !== undefined && (
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       p (regresión)
                       <InfoTip>Labadie §4 eq.21: p ≈ 2.35 + 0.14×MI − 1.79×σ. Estima p desde volatilidad e impacto de mercado.</InfoTip>
                     </span>
@@ -629,7 +629,7 @@ export function PairsTradingPanel({
                 )}
                 {result.impliedPFromReturns !== undefined && (
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       p (multiescala)
                       <InfoTip>Labadie §4.3: p estimado por regresión log-log de momentos absolutos en múltiples escalas temporales. Más robusto que R/S.</InfoTip>
                     </span>
@@ -638,7 +638,7 @@ export function PairsTradingPanel({
                 )}
                 {result.performance.pSharpe !== undefined && (
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       p-Sharpe
                       <InfoTip>Labadie §3.2: Sharpe usando p-variance como risk measure. Si p≠2 captura memoria del proceso.</InfoTip>
                     </span>
@@ -647,7 +647,7 @@ export function PairsTradingPanel({
                 )}
                 {result.pVarianceUsed !== undefined && (
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       p-Variance (E[|r|^p])
                     </span>
                     <p className="font-mono text-xs text-foreground">{result.pVarianceUsed.toFixed(4)}</p>
@@ -656,10 +656,10 @@ export function PairsTradingPanel({
               </div>
             )}
 
-            {/* ─── Labadie §2.3-2.4: Trading curve (TC/IS) ─── */}
+            {/*  Labadie §2.3-2.4: Trading curve (TC/IS)  */}
             {result.tradingCurve && result.tradingCurve.length > 0 && (
               <div className="rounded-lg border border-border/40 p-4">
-                <h3 className="mb-2 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                <h3 className="mb-2 font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
                   Curva de Ejecución Óptima — {config.executionAlgo === "tc" ? "Target Close" : "Implementation Shortfall"}
                   <InfoTip>
                     Labadie §2.3-2.4: Distribución de volumen óptima por paso temporal.
@@ -685,12 +685,12 @@ export function PairsTradingPanel({
 
             {/* IS/OOS Performance (Backtesting Stage 3) */}
             {result.inSamplePerformance && result.outOfSamplePerformance && (
-              <div className="grid grid-cols-2 gap-3 rounded-lg border border-border/40 bg-muted/5 p-4">
+              <div className="grid w-full grid-cols-2 gap-3 rounded-lg border border-border/40 bg-muted/5 p-4">
                 <div>
-                  <h4 className="mb-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <h4 className="mb-1 font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
                     In-Sample (70%) — Sharpe: {result.inSamplePerformance.sharpe.toFixed(2)}
                   </h4>
-                  <div className="grid grid-cols-3 gap-2 text-[11px]">
+                  <div className="grid w-full grid-cols-3 gap-2 text-[14px]">
                     <div>
                       <span className="text-muted-foreground">Trades</span>
                       <p className="font-mono">{result.inSamplePerformance.totalTrades}</p>
@@ -708,10 +708,10 @@ export function PairsTradingPanel({
                   </div>
                 </div>
                 <div>
-                  <h4 className="mb-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <h4 className="mb-1 font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
                     Out-of-Sample (30%) — Sharpe: {result.outOfSamplePerformance.sharpe.toFixed(2)}
                   </h4>
-                  <div className="grid grid-cols-3 gap-2 text-[11px]">
+                  <div className="grid w-full grid-cols-3 gap-2 text-[14px]">
                     <div>
                       <span className="text-muted-foreground">Trades</span>
                       <p className="font-mono">{result.outOfSamplePerformance.totalTrades}</p>
@@ -755,24 +755,24 @@ export function PairsTradingPanel({
                   <div className={`rounded-lg border p-3 ${signalColor}`}>
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="font-mono text-[10px] uppercase tracking-wider opacity-70">
+                        <span className="font-mono text-[13px] uppercase tracking-wider opacity-70">
                           Señal Actual
                         </span>
                         <p className="font-mono text-sm font-bold mt-0.5">{signalLabel}</p>
                       </div>
                       <div className="text-right">
-                        <span className="font-mono text-[10px] opacity-70">Z-Score</span>
+                        <span className="font-mono text-[13px] opacity-70">Z-Score</span>
                         <p className="font-mono text-sm font-bold">{lastZ.toFixed(2)}σ</p>
                       </div>
                       <div className="text-right">
-                        <span className="font-mono text-[10px] opacity-70">Umbral</span>
+                        <span className="font-mono text-[13px] opacity-70">Umbral</span>
                         <p className="font-mono text-sm">
                           {config.entryThresh.toFixed(1)}σ / {config.stopThresh.toFixed(1)}σ
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="font-mono text-[10px] opacity-60">
+                      <p className="font-mono text-[13px] opacity-60">
                         {isStop
                           ? ` Z-Score en zona de stop-loss. Considerar cerrar posición.`
                           : isSignal
@@ -780,7 +780,7 @@ export function PairsTradingPanel({
                             : `Esperar que Z-Score cruce ±${config.entryThresh}σ para entrar.`}
                       </p>
                       {result.correlationBreakdown?.isBreaking && (
-                        <span className="shrink-0 rounded border border-warning/40 bg-warning/10 px-1.5 py-0.5 text-[9px] text-warning font-mono">
+                        <span className="shrink-0 rounded border border-warning/40 bg-warning/10 px-1.5 py-0.5 text-[13px] text-warning font-mono">
                            Correlación debilitándose ({result.correlationBreakdown.current.toFixed(2)} vs hist. {result.correlationBreakdown.historical.toFixed(2)})
                         </span>
                       )}
@@ -866,7 +866,7 @@ export function PairsTradingPanel({
 
             <TradingViewCompareWidget asset1={result.asset1} asset2={result.asset2} height={520} />
 
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2">
               <SpreadChart
                 data={result.spread}
                 signals={result.signals}
@@ -896,7 +896,7 @@ export function PairsTradingPanel({
               }
             />
 
-            {/* ─── TAO-* + PAIDF-* + Physical-AI-*: Social Content ─── */}
+            {/*  TAO-* + PAIDF-* + Physical-AI-*: Social Content  */}
             {(() => {
               const socialInput: InvestorContentInput = {
                 strategyName: `${result.asset1} / ${result.asset2}`,

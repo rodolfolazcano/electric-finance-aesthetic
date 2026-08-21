@@ -56,7 +56,7 @@ function FichaCard({ ticker }: { ticker: string }) {
 
   if (q.isPending)
     return (
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid w-full gap-4 md:grid-cols-3">
         <Skeleton className="h-48" />
         <Skeleton className="h-48" />
         <Skeleton className="h-48" />
@@ -89,7 +89,7 @@ function FichaCard({ ticker }: { ticker: string }) {
               Upside {fmtPctS(ms.upside_pct)}
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4 text-center">
+          <div className="grid w-full grid-cols-3 gap-4 text-center">
             <Mini label="Score cuali" value={`${d.cualitativo.score_total.toFixed(1)}/10`} />
             <Mini
               label="WACC"
@@ -110,7 +110,7 @@ function FichaCard({ ticker }: { ticker: string }) {
         </Card>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid w-full gap-4 lg:grid-cols-3">
         {/* Valuación */}
         <Card>
           <CardHeader className="pb-2">
@@ -195,7 +195,7 @@ function FichaCard({ ticker }: { ticker: string }) {
             <div className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
               Notas de consistencia
             </div>
-            <ul className="grid gap-1 text-xs text-muted-foreground md:grid-cols-2">
+            <ul className="grid w-full gap-1 text-xs text-muted-foreground md:grid-cols-2">
               {d.notas_consistencia.map((n, i) => (
                 <li key={i}>• {n}</li>
               ))}
@@ -218,7 +218,7 @@ function x(v: number | null | undefined): string {
 function Mini({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-[10px] tracking-wide text-muted-foreground uppercase">{label}</div>
+      <div className="text-[13px] tracking-wide text-muted-foreground uppercase">{label}</div>
       <div className="font-mono text-sm font-semibold">{value}</div>
     </div>
   );
@@ -283,13 +283,13 @@ function SemaforoPanel({ ticker }: { ticker: string }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="grid grid-cols-3 gap-3 text-center">
+        <div className="grid w-full grid-cols-3 gap-3 text-center">
           <Mini label="Técnico" value={d.techScore != null ? d.techScore.toFixed(2) : "s/d"} />
           <Mini label="Fundamental" value={d.fundScore != null ? d.fundScore.toFixed(2) : "s/d"} />
           <Mini label="Total" value={d.totalScore != null ? d.totalScore.toFixed(2) : "s/d"} />
         </div>
         {d.history.rsi != null && (
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs md:grid-cols-4">
+          <div className="grid w-full grid-cols-2 gap-x-6 gap-y-1.5 text-xs md:grid-cols-4">
             <Dato etiqueta="RSI(14)" valor={d.history.rsi?.toFixed(1) ?? "s/d"} />
             <Dato etiqueta="MACD" valor={d.history.macd?.toFixed(3) ?? "s/d"} />
             <Dato etiqueta="SMA50" valor={d.history.sma50?.toFixed(2) ?? "s/d"} />
@@ -368,7 +368,7 @@ function NoticiasPanel({ ticker }: { ticker: string }) {
               >
                 {n.titulo}
               </a>
-              <div className="mt-0.5 font-mono text-[10px] text-muted-foreground">{n.medio}</div>
+              <div className="mt-0.5 font-mono text-[13px] text-muted-foreground">{n.medio}</div>
             </li>
           ))}
         </ul>
@@ -390,14 +390,6 @@ export function AnalisisTab() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-lg font-semibold">Análisis de decisión</h2>
-        <p className="text-sm text-muted-foreground">
-          Pipeline completo estilo Buffett/Graham: macro → cualitativo → cuantitativo → WACC → DCF →
-          múltiplos → triangulación → margen de seguridad. Educativo, no es recomendación de
-          inversión.
-        </p>
-      </div>
 
       <form
         className="flex gap-2"
@@ -442,7 +434,7 @@ export function AnalisisTab() {
       {ticker && (
         <div className="space-y-5">
           <FichaCard ticker={ticker} />
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid w-full gap-4 lg:grid-cols-2">
             <SemaforoPanel ticker={ticker} />
             <NoticiasPanel ticker={ticker} />
           </div>

@@ -5,7 +5,7 @@ import { yahooChartCloses } from "@/lib/yahoo-chart";
 import { yahooQuoteSummary } from "@/lib/yahoo-coronar.functions";
 import { getCached, setCache } from "@/lib/cache";
 
-// ─── Types ─────────────────────────────────────────────────────────
+//  Types 
 
 export interface SerieHistorica {
   /** Fecha ISO (YYYY-MM-DD) */
@@ -43,7 +43,7 @@ export interface HistoricoValuacionResult {
   fetchedAt: string;
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────
+//  Helpers 
 
 function numVal(v: unknown): number | null {
   if (typeof v === "number" && isFinite(v)) return v;
@@ -63,7 +63,7 @@ function percentilActual(serieHistorica: number[], valorActual: number): number 
   return Math.round((menores / validos.length) * 100);
 }
 
-// ─── Server Function ────────────────────────────────────────────────
+//  Server Function 
 
 export const fetchHistoricoValuacion = createServerFn({ method: "GET" })
   .inputValidator(

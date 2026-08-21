@@ -2914,3 +2914,321 @@ export async function ejecutarIolAsesor(
       };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Metodologías cuantitativas de Labadie (stat-arb y ejecución óptima).
+// Reutilizan el motor statarb.math (analyzePair: spread, z-score, ADF,
+// backtest IS/OOS, Hurst, p-varianza y curvas TC/IS de Almgren-Chriss).
+// ---------------------------------------------------------------------------
+
+import { analyzePair } from "@/lib/statarb.math";
+import type { PairConfig } from "@/lib/statarb.types";
+
+type HistPoint = { date: string; close: number };
+
+async function historicoLabadie(simbolo: string, dias: number): Promise<HistPoint[]> {
+  const puntos = await serieDiariaConFechas(simbolo, "2y");
+  const aHist = (ps: { fecha: string; close: number }[]): HistPoint[] =>
+    ps.map((p) => ({ date: p.fecha, close: p.close }));
+  if (puntos.length >= 30) return aHist(puntos.slice(-Math.max(dias + 60, 90)));
+  // Fallback: sufijo .BA para tickers locales sin datos.
+  if (!simbolo.endsWith(".BA")) {
+    const ba = await serieDiariaConFechas(`${simbolo}.BA`, "2y");
+    if (ba.length >= 30) return aHist(ba.slice(-Math.max(dias + 60, 90)));
+  }
+  return aHist(puntos);
+}
+
+function n2L(v: number | null | undefined, dec = 2): string {
+  return typeof v === "number" && isFinite(v) ? v.toFixed(dec) : "s/d";
+}
+
+/** Pairs trading con la metodología Labadie (spread, z-score, señales a·σ/b·σ, backtest). */
+export async function ejecutarPairsTradingLabadie(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  let simboloA = "";
+  let simboloB = "";
+  let ventana = 20;
+  let umbralEntrada = 1.5;
+  let umbralStop = 2.5;
+  let rangoDias = 365;
+  try {
+    const args = JSON.parse(argsRaw) as {
+      simboloA?: string;
+      simboloB?: string;
+      ventana?: number;
+      umbralEntrada?: number;
+      umbralStop?: number;
+      rangoDias?: number;
+    };
+    simboloA = String(args.simboloA ?? "").trim();
+    simboloB = String(args.simboloB ?? "").trim();
+    if (typeof args.ventana === "number" && args.ventana >= 5 && args.ventana <= 120)
+      ventana = Math.round(args.ventana);
+    if (
+      typeof args.umbralEntrada === "number" &&
+      args.umbralEntrada > 0.3 &&
+      args.umbralEntrada < 4
+    )
+      umbralEntrada = args.umbralEntrada;
+    if (
+      typeof args.umbralStop === "number" &&
+      args.umbralStop > umbralEntrada &&
+      args.umbralStop <= 6
+    )
+      umbralStop = args.umbralStop;
+    if (typeof args.rangoDias === "number" && args.rangoDias >= 90 && args.rangoDias <= 730)
+      rangoDias = Math.round(args.rangoDias);
+  } catch {
+    /* sin args */
+  }
+  if (!simboloA || !simboloB) {
+    return {
+      texto:
+        "SIN RESULTADOS: faltan los dos símbolos del par. Reinvocá con simboloA y simboloB (ej. 'GGAL.BA' y 'BMA.BA', o 'AAPL' y 'MSFT').",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    const [h1, h2] = await Promise.all([
+      historicoLabadie(simboloA, rangoDias),
+      historicoLabadie(simboloB, rangoDias),
+    ]);
+    if (h1.length < 30 || h2.length < 30) {
+      return {
+        texto: `SIN RESULTADOS: datos insuficientes (${simboloA}: ${h1.length} obs, ${simboloB}: ${h2.length} obs). Probá otros tickers.`,
+        fuentes: [],
+        ok: false,
+      };
+    }
+    const config: PairConfig = {
+      asset1: simboloA,
+      asset2: simboloB,
+      period: rangoDias,
+      interval: "1d",
+      window: ventana,
+      entryThresh: umbralEntrada,
+      stopThresh: umbralStop,
+      capitalPerPair: 1,
+      txCost: 0.1,
+      executionAlgo: "pairs",
+    };
+    const r = analyzePair(h1, h2, config);
+    const zActual = r.zScore.at(-1)?.value ?? null;
+    const spActual = r.spread.at(-1) ?? null;
+    const L: string[] = [];
+    L.push(
+      `Pairs trading metodología Labadie — ${simboloA} vs ${simboloB} (ventana ${ventana}, entrada ±${umbralEntrada}σ, stop ±${umbralStop}σ, ${rangoDias} días):`,
+    );
+    L.push(
+      `- Correlación: ${n2L(r.correlation, 3)} · Beta de hedge: ${n2L(r.beta, 3)} · R²: ${n2L(r.r2, 3)}`,
+    );
+    L.push(
+      `- Cointegración (ADF): estadístico ${n2L(r.adfStat, 3)}, p-valor ${n2L(r.adfPValue, 4)} → ${
+        r.isCointegrated ? "cointegrados al nivel usual" : "NO se confirma cointegración"
+      }`,
+    );
+    if (spActual)
+      L.push(
+        `- Spread actual: ${n2L(spActual.value, 4)} · media móvil ${n2L(spActual.mean, 4)} · bandas entrada [+${n2L(spActual.upper, 4)}, ${n2L(spActual.lower, 4)}] · stop [+${n2L(spActual.upperSl, 4)}, ${n2L(spActual.lowerSl, 4)}]`,
+      );
+    L.push(`- Z-score actual: ${n2L(zActual, 2)}`);
+    if (zActual != null) {
+      if (zActual > umbralStop)
+        L.push(
+          "  → Lectura: spread EXTREMO sobre la banda de stop-loss; riesgo elevado de ruptura de correlación.",
+        );
+      else if (zActual > umbralEntrada)
+        L.push(
+          "  → Lectura: spread por encima de la banda de entrada (zona de venta del spread según el método).",
+        );
+      else if (zActual < -umbralStop)
+        L.push(
+          "  → Lectura: spread EXTREMO bajo la banda de stop-loss; riesgo elevado de ruptura de correlación.",
+        );
+      else if (zActual < -umbralEntrada)
+        L.push(
+          "  → Lectura: spread por debajo de la banda de entrada (zona de compra del spread según el método).",
+        );
+      else L.push("  → Lectura: spread dentro de la banda neutral; sin señal de entrada.");
+    }
+    if (r.hurstExponent != null)
+      L.push(
+        `- Hurst del spread: ${n2L(r.hurstExponent, 3)} (${
+          r.hurstExponent < 0.45
+            ? "mean-reverting"
+            : r.hurstExponent > 0.55
+              ? "tendencial"
+              : "≈ random walk"
+        }) · p implícita (1/H): ${n2L(r.impliedP, 2)}`,
+      );
+    const perf = r.performance;
+    L.push(
+      `- Backtest histórico: ${perf.totalTrades} trades · win rate ${n2L(perf.winRate * 100, 1)}% · Sharpe ${n2L(perf.sharpe, 2)}${perf.pSharpe != null ? ` · Sharpe p-varianza (p=${n2L(perf.pValueUsed ?? 2, 1)}) ${n2L(perf.pSharpe, 2)}` : ""} · max drawdown ${n2L(perf.maxDrawdown * 100, 1)}% · duración media ${n2L(perf.avgDuration, 1)} días`,
+    );
+    if (r.inSamplePerformance && r.outOfSamplePerformance && r.splitDate) {
+      L.push(
+        `- In-Sample (hasta ${r.splitDate}): ${r.inSamplePerformance.totalTrades} trades, Sharpe ${n2L(r.inSamplePerformance.sharpe, 2)} · Out-of-Sample: ${r.outOfSamplePerformance.totalTrades} trades, Sharpe ${n2L(r.outOfSamplePerformance.sharpe, 2)} → el patrón ${
+          r.outOfSamplePerformance.sharpe > 0
+            ? "SOBREVIVE fuera de muestra"
+            : "NO sobrevive fuera de muestra (etapa 5 del método: descartar y recalibrar)"
+        }`,
+      );
+    }
+    const ultimos = r.trades.slice(-3);
+    for (const t of ultimos) {
+      L.push(
+        `- Último trade (${t.type}): entrada ${t.entryDate} (z ${n2L(t.entryZ, 2)}) → salida ${t.exitDate} (z ${n2L(t.exitZ, 2)}), PNL ${n2L(t.pnl * 100, 2)}%, duración ${t.duration} días`,
+      );
+    }
+    L.push(
+      "\nNota metodológica: aunque el spread sea normal, la distribución del PNL NO lo es (salidas por take-profit/stop-loss dependientes de la trayectoria). Análisis educativo con datos reales de Yahoo Finance; no es recomendación de inversión ni promesa de rentabilidad.",
+    );
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: error al analizar el par (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+/** Curva de ejecución óptima Almgren-Chriss (TC/IS) con PVol, inicio/parada óptimos y p-varianza. */
+export async function ejecutarCurvaEjecucionLabadie(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  let simbolo = "";
+  let benchmark = "pairs";
+  let participacion = 0.1;
+  let pValor = 2;
+  let gammaImpacto = 0.5;
+  let volatilidad: number | undefined;
+  try {
+    const args = JSON.parse(argsRaw) as {
+      simbolo?: string;
+      benchmark?: string;
+      participacionMaxima?: number;
+      pVarianza?: number;
+      gammaImpacto?: number;
+      volatilidadAnual?: number;
+    };
+    simbolo = String(args.simbolo ?? "").trim();
+    const bm = String(args.benchmark ?? "").toLowerCase();
+    if (bm === "tc" || bm === "is") benchmark = bm;
+    if (
+      typeof args.participacionMaxima === "number" &&
+      args.participacionMaxima > 0.01 &&
+      args.participacionMaxima <= 0.5
+    )
+      participacion = args.participacionMaxima;
+    if (typeof args.pVarianza === "number" && args.pVarianza >= 1.1 && args.pVarianza <= 4)
+      pValor = args.pVarianza;
+    if (typeof args.gammaImpacto === "number" && args.gammaImpacto > 0 && args.gammaImpacto < 1)
+      gammaImpacto = args.gammaImpacto;
+    if (
+      typeof args.volatilidadAnual === "number" &&
+      args.volatilidadAnual > 0 &&
+      args.volatilidadAnual < 3
+    )
+      volatilidad = args.volatilidadAnual;
+  } catch {
+    /* sin args */
+  }
+  if (!simbolo) {
+    return {
+      texto:
+        "SIN RESULTADOS: falta el símbolo del activo a ejecutar. Reinvocá con simbolo (ej. 'AAPL', 'GGAL.BA') y opcionalmente benchmark='tc'|'is'.",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    const h1 = await historicoLabadie(simbolo, 365);
+    if (h1.length < 30) {
+      return {
+        texto: `SIN RESULTADOS: datos insuficientes para ${simbolo} (${h1.length} obs).`,
+        fuentes: [],
+        ok: false,
+      };
+    }
+    // El motor TC/IS opera sobre un par: se usa el activo contra sí mismo
+    // desplazado (spread ≈ precio) para heredar las curvas de volumen/vol.
+    const h2 = h1.map((p, i) => ({ date: p.date, close: i === 0 ? p.close : h1[i - 1]!.close }));
+    const config: PairConfig = {
+      asset1: simbolo,
+      asset2: `${simbolo} (lag-1)`,
+      period: 365,
+      interval: "1d",
+      window: 20,
+      entryThresh: 1.5,
+      stopThresh: 2.5,
+      capitalPerPair: 1,
+      txCost: 0.1,
+      executionAlgo: benchmark === "is" ? "is" : "tc",
+      pValue: pValor,
+      marketImpactGamma: gammaImpacto,
+      participationRate: participacion,
+      ...(volatilidad != null ? { volatility: volatilidad } : {}),
+    };
+    const r = analyzePair(h1, h2, config);
+    const L: string[] = [];
+    L.push(
+      `Curva de ejecución óptima (Almgren-Chriss extendido Labadie-Lehalle) — ${simbolo}, benchmark ${
+        benchmark === "is" ? "Implementation Shortfall" : "Target Close"
+      }, PVol máx ${n2L(participacion * 100, 0)}%, γ impacto ${n2L(gammaImpacto, 2)}, p-varianza ${n2L(pValor, 1)}:`,
+    );
+    if (r.tradingCurve?.length) {
+      const curva = r.tradingCurve;
+      const pasos = curva.filter((_, i) => i % Math.max(1, Math.floor(curva.length / 8)) === 0);
+      for (const paso of pasos) {
+        L.push(
+          `  slice ${String(paso.step).padStart(3)}: volumen ${(paso.volume * 100).toFixed(2)}% · acumulado ${(paso.cumulative * 100).toFixed(1)}%`,
+        );
+      }
+      const picos = [...curva].sort((a, b) => b.volume - a.volume).slice(0, 3);
+      L.push(
+        `- Slices más agresivos: ${picos.map((p) => `#${p.step} (${(p.volume * 100).toFixed(2)}%)`).join(", ")}`,
+      );
+    } else {
+      L.push("- La curva detallada no está disponible para estos parámetros.");
+    }
+    if (r.optimalStartPct != null)
+      L.push(
+        `- Tiempo óptimo de INICIO (Target Close): esperar hasta ~${n2L(r.optimalStartPct * 100, 0)}% del horizonte antes del primer slice viable (tamaño mínimo por slice).`,
+      );
+    if (r.optimalStopPct != null)
+      L.push(
+        `- Tiempo óptimo de PARADA (Implementation Shortfall): dejar de ejecutar alrededor de ~${n2L(r.optimalStopPct * 100, 0)}% del horizonte.`,
+      );
+    if (r.hurstExponent != null)
+      L.push(
+        `- Exponente de Hurst estimado: ${n2L(r.hurstExponent, 3)} → p canónica = 1/H = ${n2L(r.impliedP, 2)}. ${
+          r.hurstExponent < 0.45
+            ? "Mean-reversion (p>2): conviene empezar tarde y ejecutar más rápido."
+            : r.hurstExponent > 0.55
+              ? "Tendencia (p<2): conviene empezar antes y ejecutar más despacio."
+              : "≈ Martingala (p=2): perfil neutral de ejecución."
+        }`,
+      );
+    L.push(
+      "- Restricción PVol: cuando la curva óptima pide más que la participación máxima, se satura el límite (min(curva TC, curva PVol)) y se retoma TC después.",
+    );
+    L.push(
+      "\nNota metodológica: cálculo educativo sobre curvas históricas de volumen/volatilidad de Yahoo Finance (J = E(impacto) + λ×riesgo con impacto cóncavo (v/V)^γ). No constituye una orden ni asesoramiento de ejecución.",
+    );
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: error al calcular la curva de ejecución (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}

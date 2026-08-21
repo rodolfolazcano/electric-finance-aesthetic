@@ -59,6 +59,8 @@ import {
   ejecutarDatosFinancieros,
   ejecutarGraficoChat,
   ejecutarGenerarInforme,
+  ejecutarPairsTradingLabadie,
+  ejecutarCurvaEjecucionLabadie,
   type EventoChat,
   type ResultadoConocimiento,
 } from "@/lib/agents/ejecutores";
@@ -296,6 +298,35 @@ function detectarIntencionSkill(pregunta: string): string[] {
   }
   if (/backtest|desempe[ñn]o pasado|se[ñn]ales pasadas|rendimiento hist[oó]rico/.test(p)) {
     skills.push("backtesting-senales");
+  }
+  //  Metodologías cuantitativas de Labadie 
+  if (
+    /pairs?\s*trading|arbitraje\s+estad[íi]stico|spread\s+entre|cointegraci[oó]n|cointegrad|z-?score\s+del\s+spread|par\s+(de\s+)?(acciones|activos)|estatarb|stat\s*arb/.test(
+      p,
+    )
+  ) {
+    skills.push("statarb-labadie");
+  }
+  if (
+    /ejecuci[oó]n\s+[oó]ptima|curva\s+de\s+(trading|ejecuci[oó]n)|algren|almgren|target\s+close|implementation\s+shortfall|impacto\s+de\s+mercado|pvol|participaci[oó]n\s+m[aá]xima|p-?varianza|tiempo\s+[oó]ptimo\s+de\s+(inicio|parada)/.test(
+      p,
+    )
+  ) {
+    skills.push("ejecucion-optima-labadie");
+  }
+  if (
+    /market[-\s]?mak|market\s+maker|creador\s+de\s+mercado|avellaneda|hjb|hamilton[-\s]jacobi|intensidad\s+de\s+ejecuci[oó]n|inventario\s+del?\s*(market|mm)/.test(
+      p,
+    )
+  ) {
+    skills.push("market-making-labadie");
+  }
+  if (
+    /microestructura|libro\s+de\s+[oó]rdenes|\blob\b|order\s+book|glosten|kyle\s+1985|selecci[oó]n\s+adversa.*spread|spoofing|momentum\s+ignition|twap|vwap\b|pov\b|smart\s+order|routing|flash\s+crash|knight\s+capital|makers?\s+y\s+takers?|alta\s+frecuencia|hft/.test(
+      p,
+    )
+  ) {
+    skills.push("microestructura-trading-labadie");
   }
   if (
     /iol|invertir\s*online|mi\s+portafolio|mi\s+cuenta|mis\s+operaciones|estadocuenta|estado\s+de\s+cuenta|comprar\s+\w+\s+en\s+iol|vender\s+\w+\s+en\s+iol/.test(
@@ -628,6 +659,14 @@ export async function ejecutarTool(
       return await ejecutarGraficoChat(argsRaw);
     case "generar_informe":
       return await ejecutarGenerarInforme(argsRaw);
+    case "pairs_trading_labadie": {
+      const res = await ejecutarPairsTradingLabadie(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "curva_ejecucion_labadie": {
+      const res = await ejecutarCurvaEjecucionLabadie(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
     default:
       return { ...(await ejecutarBusqueda(query)), ok: true };
   }

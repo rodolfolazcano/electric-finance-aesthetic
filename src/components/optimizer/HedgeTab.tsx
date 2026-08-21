@@ -369,7 +369,7 @@ export function HedgeTab() {
               setPositions([]);
               setError("");
             }}
-            className={`font-mono text-[11px] px-3 py-1.5 rounded-md border transition-colors ${
+            className={`font-mono text-[14px] px-3 py-1.5 rounded-md border transition-colors ${
               source === s.value
                 ? "border-primary/60 bg-primary/10 text-foreground"
                 : "border-border/60 text-muted-foreground hover:text-foreground"
@@ -387,7 +387,7 @@ export function HedgeTab() {
             <button
               onClick={loadClientes}
               disabled={loading || !accessToken}
-              className="rounded bg-primary/10 px-3 py-1.5 font-mono text-[11px] text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
+              className="rounded bg-primary/10 px-3 py-1.5 font-mono text-[14px] text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
             >
               {loading ? "Verificando tipo de cuenta..." : "Conectar portafolio IOL"}
             </button>
@@ -397,7 +397,7 @@ export function HedgeTab() {
                 <select
                   value={clienteId}
                   onChange={(e) => setClienteId(Number(e.target.value))}
-                  className="rounded border border-border/40 bg-background px-2 py-1 font-mono text-[11px] outline-none"
+                  className="rounded border border-border/40 bg-background px-2 py-1 font-mono text-[14px] outline-none"
                 >
                   <option value={0}>Seleccionar cliente...</option>
                   {clientes.map((c) => (
@@ -408,27 +408,27 @@ export function HedgeTab() {
                 </select>
               )}
               {!esAsesor && (
-                <span className="font-mono text-[11px] text-muted-foreground">
+                <span className="font-mono text-[14px] text-muted-foreground">
                   Cuenta particular — se usará tu portafolio
                 </span>
               )}
               <button
                 onClick={() => loadIOLPortfolio()}
                 disabled={loading || (esAsesor && !clienteId)}
-                className="rounded bg-primary/10 px-3 py-1.5 font-mono text-[11px] text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
+                className="rounded bg-primary/10 px-3 py-1.5 font-mono text-[14px] text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
               >
                 {loading ? "Cargando..." : "Cargar posiciones"}
               </button>
               <button
                 onClick={loadClientes}
-                className="rounded border border-border/40 px-2 py-1 font-mono text-[10px] text-muted-foreground hover:text-foreground"
+                className="rounded border border-border/40 px-2 py-1 font-mono text-[13px] text-muted-foreground hover:text-foreground"
               >
                 Recargar
               </button>
             </>
           )}
           {!accessToken && (
-            <span className="font-mono text-[11px] text-warning">
+            <span className="font-mono text-[14px] text-warning">
               inicie sesión IOL en el header
             </span>
           )}
@@ -438,9 +438,9 @@ export function HedgeTab() {
       {source === "manual" && (
         <div className="space-y-3">
           <div className="overflow-x-auto rounded-lg border border-border/40">
-            <table className="w-full text-left font-mono text-[11px]">
+            <table className="w-full text-left font-mono text-[14px]">
               <thead>
-                <tr className="border-b border-border/40 bg-muted/20 text-[10px] uppercase tracking-wider text-muted-foreground">
+                <tr className="border-b border-border/40 bg-muted/20 text-[13px] uppercase tracking-wider text-muted-foreground">
                   <th className="px-3 py-2">Ticker</th>
                   <th className="px-3 py-2 text-right">Cantidad</th>
                   <th className="px-3 py-2 text-right">Pprome. (USD)</th>
@@ -462,7 +462,7 @@ export function HedgeTab() {
                           setManualRows(next);
                         }}
                         placeholder="GGAL.BA"
-                        className="w-32 rounded border border-border/40 bg-background px-2 py-1 font-mono text-[11px] outline-none focus:border-primary/60"
+                        className="w-32 rounded border border-border/40 bg-background px-2 py-1 font-mono text-[14px] outline-none focus:border-primary/60"
                       />
                     </td>
                     <td className="px-3 py-1.5 text-right">
@@ -480,7 +480,7 @@ export function HedgeTab() {
                           setManualRows(next);
                         }}
                         placeholder="0"
-                        className="w-24 rounded border border-border/40 bg-background px-2 py-1 font-mono text-[11px] text-right outline-none focus:border-primary/60"
+                        className="w-24 rounded border border-border/40 bg-background px-2 py-1 font-mono text-[14px] text-right outline-none focus:border-primary/60"
                       />
                     </td>
                     <td className="px-3 py-1.5 text-right">
@@ -496,16 +496,16 @@ export function HedgeTab() {
                           setManualRows(next);
                         }}
                         placeholder="auto"
-                        className="w-24 rounded border border-border/40 bg-background px-2 py-1 font-mono text-[11px] text-right outline-none focus:border-primary/60"
+                        className="w-24 rounded border border-border/40 bg-background px-2 py-1 font-mono text-[14px] text-right outline-none focus:border-primary/60"
                       />
                     </td>
                     <td className="px-2 py-1.5 text-center">
                       <button
                         onClick={() => setManualRows((prev) => prev.filter((_, j) => j !== i))}
-                        className="font-mono text-[11px] text-muted-foreground hover:text-danger transition-colors"
+                        className="font-mono text-[14px] text-muted-foreground hover:text-danger transition-colors"
                         title="Eliminar fila"
                       >
-                        ✕
+                        
                       </button>
                     </td>
                   </tr>
@@ -522,13 +522,13 @@ export function HedgeTab() {
                   { ticker: "", cantidad: 0, precioPromedio: undefined },
                 ])
               }
-              className="rounded border border-border/40 px-2.5 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+              className="rounded border border-border/40 px-2.5 py-1 font-mono text-[14px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
             >
               + Agregar fila
             </button>
 
             <div className="ml-auto space-y-1">
-              <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
                 Saldo USD
               </label>
               <input
@@ -537,21 +537,21 @@ export function HedgeTab() {
                 step="0.1"
                 value={manualCash}
                 onChange={(e) => setManualCash(Math.max(0, parseFloat(e.target.value) || 0))}
-                className="w-24 rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[11px] outline-none focus:border-primary/60"
+                className="w-24 rounded border border-border/40 bg-background px-2 py-1.5 font-mono text-[14px] outline-none focus:border-primary/60"
               />
             </div>
 
             <button
               onClick={loadManualPositions}
               disabled={resolving}
-              className="rounded bg-primary/10 px-3 py-1.5 font-mono text-[11px] text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
+              className="rounded bg-primary/10 px-3 py-1.5 font-mono text-[14px] text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
             >
               {resolving ? "Resolviendo..." : "Cargar posiciones"}
             </button>
           </div>
 
           {manualErrors.length > 0 && (
-            <div className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 font-mono text-[11px] text-warning">
+            <div className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 font-mono text-[14px] text-warning">
               {manualErrors.map((e) => (
                 <div key={e.ticker}>
                   <strong>{e.ticker}:</strong> {e.motivo}
@@ -584,7 +584,7 @@ export function HedgeTab() {
 
           {/* P&L Filter toggle */}
           <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-background/20 px-3 py-2">
-            <label className="flex items-center gap-2 font-mono text-[11px] cursor-pointer">
+            <label className="flex items-center gap-2 font-mono text-[14px] cursor-pointer">
               <input
                 type="checkbox"
                 checked={plFilterEnabled}
@@ -594,7 +594,7 @@ export function HedgeTab() {
               Solo posiciones en pérdida (plPct &lt; 0%)
             </label>
             {plFilterEnabled && (
-              <span className="font-mono text-[10px] text-muted-foreground">
+              <span className="font-mono text-[13px] text-muted-foreground">
                 {losingPositions.length} de {positions.length} posiciones seleccionables
                 {unclassifiablePositions.length > 0 &&
                   ` (${unclassifiablePositions.length} sin precioPromedio — excluidas)`}
@@ -605,7 +605,7 @@ export function HedgeTab() {
           {/* Modo 2: Hedge mode + gamma */}
           <div className="flex flex-wrap items-center gap-4 rounded-lg border border-border/40 bg-background/20 px-3 py-2">
             <div className="space-y-1">
-              <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
                 Modo de optimización
               </label>
               <div className="flex gap-1.5">
@@ -616,7 +616,7 @@ export function HedgeTab() {
                   <button
                     key={m.value}
                     onClick={() => setHedgeMode(m.value)}
-                    className={`font-mono text-[11px] px-2.5 py-1 rounded border transition-colors ${
+                    className={`font-mono text-[14px] px-2.5 py-1 rounded border transition-colors ${
                       hedgeMode === m.value
                         ? "border-primary/60 bg-primary/10 text-foreground"
                         : "border-border/60 text-muted-foreground hover:text-foreground"
@@ -630,7 +630,7 @@ export function HedgeTab() {
 
             {hedgeMode === "alpha" && (
               <div className="space-y-1">
-                <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
                   γ (gamma): {gamma.toFixed(2)}
                 </label>
                 <input
@@ -667,7 +667,7 @@ export function HedgeTab() {
       )}
 
       {error && (
-        <div className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 font-mono text-[11px] text-danger">
+        <div className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 font-mono text-[14px] text-danger">
           {error}
         </div>
       )}
@@ -676,7 +676,7 @@ export function HedgeTab() {
       {result && (
         <div className="space-y-5">
           {result.coberturaParcial && (
-            <div className="rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 font-mono text-[11px] text-warning">
+            <div className="rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 font-mono text-[14px] text-warning">
               Saldo insuficiente para cobertura total. Se calculó cobertura parcial al{" "}
               {result.coberturaPct}% (${result.totalCosto.toFixed(2)} de $
               {result.totalSaldoDisponible.toFixed(2)} disponibles)
@@ -684,7 +684,7 @@ export function HedgeTab() {
           )}
 
           {result.failedPositions && result.failedPositions.length > 0 && (
-            <div className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 font-mono text-[11px] text-danger">
+            <div className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 font-mono text-[14px] text-danger">
               No se pudo calcular cobertura para:
               {result.failedPositions.map((f) => (
                 <span key={f.ticker} className="ml-1">
@@ -695,13 +695,13 @@ export function HedgeTab() {
           )}
 
           {(result as any).alphaDisclaimer && (
-            <div className="rounded-lg border border-warning/40 bg-warning/5 px-4 py-3 font-mono text-[10px] text-warning">
+            <div className="rounded-lg border border-warning/40 bg-warning/5 px-4 py-3 font-mono text-[13px] text-warning">
               {(result as any).alphaDisclaimer}
             </div>
           )}
 
           {result.excludedTickers && result.excludedTickers.length > 0 && (
-            <div className="rounded-lg border border-border/40 bg-muted/10 px-4 py-2 font-mono text-[10px] text-muted-foreground">
+            <div className="rounded-lg border border-border/40 bg-muted/10 px-4 py-2 font-mono text-[13px] text-muted-foreground">
               Tickers excluidos por datos insuficientes: {result.excludedTickers.join(", ")}
             </div>
           )}
@@ -719,7 +719,7 @@ export function HedgeTab() {
                 <h3 className="mb-2 font-mono text-xs font-medium text-foreground">
                   Desempeño histórico — Cartera de cobertura vs Benchmark
                 </h3>
-                <p className="mb-2 font-mono text-[10px] text-muted-foreground">
+                <p className="mb-2 font-mono text-[13px] text-muted-foreground">
                   Series normalizadas a base 100. Cartera = activos recomendados ponderados por
                   monto.
                 </p>
@@ -801,7 +801,7 @@ export function HedgeTab() {
             <h3 className="font-mono text-xs font-medium text-foreground">
               Resultados por posición cubierta
             </h3>
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid w-full grid-cols-1 gap-3">
               {result.results.map((r) => (
                 <HedgeResultCard key={r.position.ticker} result={r} />
               ))}
@@ -813,13 +813,13 @@ export function HedgeTab() {
               <h3 className="mb-2 font-mono text-xs font-medium text-foreground">
                 Órdenes consolidadas a ejecutar
               </h3>
-              <p className="mb-2 font-mono text-[10px] text-muted-foreground">
+              <p className="mb-2 font-mono text-[13px] text-muted-foreground">
                 Montos totales por instrumento sumando todas las posiciones cubiertas.
               </p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-mono text-[11px]">
+              <div className="overflow-x-auto w-full">
+                <table className="w-full text-left font-mono text-[14px]">
                   <thead>
-                    <tr className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <tr className="text-[13px] uppercase tracking-wider text-muted-foreground">
                       <th className="px-2 py-1">Instrumento</th>
                       <th className="px-2 py-1">Tipo</th>
                       <th className="px-2 py-1 text-right">Monto Total USD</th>
@@ -851,7 +851,7 @@ export function HedgeTab() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2">
             <HedgeScatterChart
               assets={result.universoTabla}
               selectedTickers={selectedUniverseTickers}

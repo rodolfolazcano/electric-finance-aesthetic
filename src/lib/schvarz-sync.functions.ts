@@ -72,7 +72,7 @@ export async function sincronizarUniversoSchvarz(): Promise<SyncSchvarzResult> {
   const semaforoObtenidos: SemaforoResult[] = [];
   const fundamentalObtenidos: FundamentalAFResult[] = [];
 
-  // ── Paso 2: lote en paralelo de semáforos (chunks de 20) ─────────────
+  //  Paso 2: lote en paralelo de semáforos (chunks de 20) 
   if (lectura.semaforoPendientes.length > 0) {
     const chunksSem = chunk(lectura.semaforoPendientes, 20);
     const resSem = await Promise.allSettled(
@@ -86,7 +86,7 @@ export async function sincronizarUniversoSchvarz(): Promise<SyncSchvarzResult> {
     }
   }
 
-  // ── Paso 3: lote en paralelo de fundamentales (chunks de 50) ─────────
+  //  Paso 3: lote en paralelo de fundamentales (chunks de 50) 
   // Concurrencia acotada para no saturar Yahoo: 3 llamadas por turno.
   if (lectura.fundamentalPendientes.length > 0) {
     const chunksFund = chunk(lectura.fundamentalPendientes, 50);
@@ -105,7 +105,7 @@ export async function sincronizarUniversoSchvarz(): Promise<SyncSchvarzResult> {
     }
   }
 
-  // ── Paso 4: guardar de nuevo todo lo obtenido ────────────────────────
+  //  Paso 4: guardar de nuevo todo lo obtenido 
   await Promise.all(
     semaforoObtenidos.map(async (sem) => {
       datos.semaforos.set(sem.ticker.toUpperCase(), sem);

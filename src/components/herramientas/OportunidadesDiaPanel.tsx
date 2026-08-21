@@ -39,7 +39,7 @@ function clasificarMagnitudZ(absZ: number): { label: string; color: string } {
 function magnitudeBadge(absZ: number) {
   const { label, color } = clasificarMagnitudZ(absZ);
   return (
-    <span className={`rounded border px-1.5 py-0.5 text-[10px] font-mono ${color}`}>{label}</span>
+    <span className={`rounded border px-1.5 py-0.5 text-[13px] font-mono ${color}`}>{label}</span>
   );
 }
 
@@ -52,7 +52,7 @@ function SectorBadge({
   favorabilidad: "favorecido" | "desfavorecido" | "neutral" | null;
   regimen: string;
 }) {
-  if (!sector) return <span className="text-[10px] text-muted-foreground">\u2014</span>;
+  if (!sector) return <span className="text-[13px] text-muted-foreground">\u2014</span>;
 
   let color = "border-border/40 bg-muted/20 text-muted-foreground";
   const label = sector;
@@ -67,11 +67,11 @@ function SectorBadge({
     <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className={`rounded border px-1.5 py-0.5 text-[10px] font-mono ${color}`}>
+          <span className={`rounded border px-1.5 py-0.5 text-[13px] font-mono ${color}`}>
             {label}
           </span>
         </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[220px] text-[10px] leading-relaxed">
+        <TooltipContent side="top" className="max-w-[220px] text-[13px] leading-relaxed">
           {favorabilidad === "favorecido"
             ? `Sector favorecido por régimen actual: ${regimen}`
             : favorabilidad === "desfavorecido"
@@ -88,7 +88,7 @@ function NoticiaBadge({
 }: {
   noticias: { scoreNoticias: number; resumenTextual: string } | null;
 }) {
-  if (!noticias) return <span className="text-[10px] text-muted-foreground">\u2014</span>;
+  if (!noticias) return <span className="text-[13px] text-muted-foreground">\u2014</span>;
 
   const icono = noticias.scoreNoticias > 0.2 ? "" : noticias.scoreNoticias < -0.2 ? "" : "";
   const color =
@@ -103,12 +103,12 @@ function NoticiaBadge({
       <Tooltip>
         <TooltipTrigger asChild>
           <span
-            className={`rounded border px-1.5 py-0.5 text-[10px] font-mono cursor-help ${color}`}
+            className={`rounded border px-1.5 py-0.5 text-[13px] font-mono cursor-help ${color}`}
           >
             {icono} {noticias.scoreNoticias.toFixed(1)}
           </span>
         </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[250px] text-[10px] leading-relaxed">
+        <TooltipContent side="top" className="max-w-[250px] text-[13px] leading-relaxed">
           {noticias.resumenTextual}
         </TooltipContent>
       </Tooltip>
@@ -121,11 +121,11 @@ function SpeculativoBadge() {
     <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="rounded border border-orange-800/40 bg-orange-950/40 px-1.5 py-0.5 text-[10px] font-mono text-orange-400">
+          <span className="rounded border border-orange-800/40 bg-orange-950/40 px-1.5 py-0.5 text-[13px] font-mono text-orange-400">
             {""} Especulativo
           </span>
         </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[220px] text-[10px] leading-relaxed">
+        <TooltipContent side="top" className="max-w-[220px] text-[13px] leading-relaxed">
           La señal técnica no tiene respaldo fundamental (ROE negativo, deuda alta o ingresos
           decrecientes). Evaluar con cautela.
         </TooltipContent>
@@ -142,7 +142,7 @@ function ScoreBar({ score, maxScore }: { score: number; maxScore: number }) {
       <div className="h-1 w-12 rounded-full bg-border/30">
         <div className={`h-1 rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
       </div>
-      <span className={`text-[10px] font-mono ${score >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+      <span className={`text-[13px] font-mono ${score >= 0 ? "text-emerald-400" : "text-red-400"}`}>
         {score.toFixed(1)}
       </span>
     </div>
@@ -166,7 +166,7 @@ function ForkRentaFijaBanner({
   return (
     <Card className="border border-warning/40 bg-warning/5">
       <div className="flex items-center justify-between px-4 py-2.5">
-        <div className="flex items-center gap-2 text-[10px] font-mono text-warning">
+        <div className="flex items-center gap-2 text-[13px] font-mono text-warning">
           <span>{""}</span>
           <span>{mensaje}</span>
           <span className="text-muted-foreground">(confianza {confianza}%)</span>
@@ -174,20 +174,20 @@ function ForkRentaFijaBanner({
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => navigate({ to: "/herramientas", search: { tab: "renta-fija" } as any })}
-            className="rounded border border-warning/40 bg-warning/10 px-2 py-1 text-[10px] font-mono text-warning hover:bg-warning/20 transition-colors"
+            className="rounded border border-warning/40 bg-warning/10 px-2 py-1 text-[13px] font-mono text-warning hover:bg-warning/20 transition-colors"
           >
             Ir a Renta Fija
           </button>
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="text-muted-foreground hover:text-foreground text-[10px]"
+            className="text-muted-foreground hover:text-foreground text-[13px]"
           >
             {collapsed ? "\u25BC" : "\u25B2"}
           </button>
         </div>
       </div>
       {!collapsed && (
-        <div className="px-4 pb-3 text-[9px] text-muted-foreground leading-relaxed">
+        <div className="px-4 pb-3 text-[13px] text-muted-foreground leading-relaxed">
           Las oportunidades de equity se muestran igual pero con confianza reducida. Evalúe su
           perfil de riesgo antes de decidir.
         </div>
@@ -254,19 +254,19 @@ export function OportunidadesDiaPanel({ periodo: propPeriodo }: { periodo?: "dia
       {resultados && resultados.items.length > 0 && (
         <>
           <div className="flex items-center justify-between">
-            <div className="text-[10px] text-muted-foreground">
+            <div className="text-[13px] text-muted-foreground">
               {resultados.totalAnalizados ?? 0} activos analizados — mostrando{" "}
               {resultados.items.length} con mejor score compuesto
-              <span className="ml-2 text-[9px] text-muted-foreground/60">
+              <span className="ml-2 text-[13px] text-muted-foreground/60">
                 (régimen: {resultados.regimenActual})
               </span>
             </div>
           </div>
 
           <div className="overflow-x-auto rounded-lg border border-border/40">
-            <Table>
+            <Table className="w-full">
               <TableHeader>
-                <TableRow className="border-border/30 text-[10px] uppercase tracking-wider text-muted-foreground">
+                <TableRow className="border-border/30 text-[13px] uppercase tracking-wider text-muted-foreground">
                   <TableHead className="px-3 py-2">Ticker</TableHead>
                   <TableHead className="px-3 py-2 text-right">Precio</TableHead>
                   <TableHead className="px-3 py-2 text-right">Var.</TableHead>
@@ -293,7 +293,7 @@ export function OportunidadesDiaPanel({ periodo: propPeriodo }: { periodo?: "dia
                       <div className="flex items-center gap-1.5">
                         <span className="font-mono font-medium">{item.ticker}</span>
                         {item.esEspeculativo && <SpeculativoBadge />}
-                        <span className="text-[8px] text-muted-foreground font-mono">
+                        <span className="text-[12px] text-muted-foreground font-mono">
                           {item.tipo}
                         </span>
                       </div>
@@ -346,9 +346,9 @@ export function OportunidadesDiaPanel({ periodo: propPeriodo }: { periodo?: "dia
                           </TooltipTrigger>
                           <TooltipContent
                             side="left"
-                            className="max-w-[220px] text-[10px] font-mono leading-relaxed space-y-1"
+                            className="max-w-[220px] text-[13px] font-mono leading-relaxed space-y-1"
                           >
-                            <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                            <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                               Desglose del score
                             </div>
                             <div className="flex justify-between">
@@ -394,7 +394,7 @@ export function OportunidadesDiaPanel({ periodo: propPeriodo }: { periodo?: "dia
                     <TableCell className="px-3 py-2">
                       <NoticiaBadge noticias={item.noticias} />
                     </TableCell>
-                    <TableCell className="px-3 py-2 max-w-[200px] text-[10px] text-muted-foreground leading-relaxed">
+                    <TableCell className="px-3 py-2 max-w-[200px] text-[13px] text-muted-foreground leading-relaxed">
                       <TooltipProvider delayDuration={300}>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -402,9 +402,9 @@ export function OportunidadesDiaPanel({ periodo: propPeriodo }: { periodo?: "dia
                           </TooltipTrigger>
                           <TooltipContent
                             side="bottom"
-                            className="max-w-[300px] text-[10px] leading-relaxed space-y-1"
+                            className="max-w-[300px] text-[13px] leading-relaxed space-y-1"
                           >
-                            <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                            <div className="text-[13px] uppercase tracking-wider text-muted-foreground">
                               Detalle del score
                             </div>
                             {item.detalleA && (

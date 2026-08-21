@@ -110,7 +110,7 @@ export function PortafolioDashboard() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end gap-2">
         <div className="flex flex-col gap-1">
-          <label className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+          <label className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
             Agregar activo
           </label>
           <div className="flex gap-1">
@@ -122,19 +122,19 @@ export function PortafolioDashboard() {
                 if (e.key === "Enter") onAddTicker(inputSymbol, inputCurrency);
               }}
               placeholder="Ticker (ej: AAPL)"
-              className="w-28 h-8 rounded border border-border/40 bg-background/60 px-2 text-[11px] font-mono text-foreground outline-none focus:border-primary/60 placeholder:text-muted-foreground/40"
+              className="w-28 h-8 rounded border border-border/40 bg-background/60 px-2 text-[14px] font-mono text-foreground outline-none focus:border-primary/60 placeholder:text-muted-foreground/40"
             />
             <select
               value={inputCurrency}
               onChange={(e) => setInputCurrency(e.target.value as "ARS" | "USD")}
-              className="h-8 rounded border border-border/40 bg-background/60 px-1.5 text-[10px] font-mono text-foreground outline-none focus:border-primary/60"
+              className="h-8 rounded border border-border/40 bg-background/60 px-1.5 text-[13px] font-mono text-foreground outline-none focus:border-primary/60"
             >
               <option value="USD">USD</option>
               <option value="ARS">ARS</option>
             </select>
             <button
               onClick={() => onAddTicker(inputSymbol, inputCurrency)}
-              className="h-8 px-3 rounded text-[10px] font-mono font-semibold bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30 transition-colors"
+              className="h-8 px-3 rounded text-[13px] font-mono font-semibold bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30 transition-colors"
             >
               +
             </button>
@@ -146,7 +146,7 @@ export function PortafolioDashboard() {
               setAssets([]);
               localStorage.removeItem(STORAGE_KEY);
             }}
-            className="h-8 px-3 rounded text-[10px] font-mono text-red-400 border border-red-400/40 hover:bg-red-400/10 transition-colors"
+            className="h-8 px-3 rounded text-[13px] font-mono text-red-400 border border-red-400/40 hover:bg-red-400/10 transition-colors"
           >
             Limpiar todo
           </button>
@@ -162,7 +162,7 @@ export function PortafolioDashboard() {
           onAddTicker={onAddTicker}
         />
       ) : (
-        <div className="flex items-center justify-center h-32 rounded border border-dashed border-border/40 text-muted-foreground text-[10px] font-mono">
+        <div className="flex items-center justify-center h-32 rounded border border-dashed border-border/40 text-muted-foreground text-[13px] font-mono">
           Agregá activos usando el campo de arriba para armar un portafolio de prueba
         </div>
       )}

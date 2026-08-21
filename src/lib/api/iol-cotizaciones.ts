@@ -133,7 +133,7 @@ export const iolFuturosOperables = createServerFn({ method: "POST" })
     }
   });
 
-// ─── Metadata de título: GET /api/v2/{mercado}/Titulos/{simbolo} ───────────
+//  Metadata de título: GET /api/v2/{mercado}/Titulos/{simbolo} 
 // Agregado para PortfolioComposition (paso 1, única excepción de "sin fetchers nuevos").
 
 export interface IOLTituloInfo {
@@ -184,7 +184,7 @@ export const iolObtenerTitulo = createServerFn({ method: "POST" })
     }
   });
 
-// ─── Tipos de instrumento por país: GET /api/v2/{pais}/Titulos/Cotizacion/Instrumentos ──
+//  Tipos de instrumento por país: GET /api/v2/{pais}/Titulos/Cotizacion/Instrumentos 
 
 export const iolInstrumentosPorPais = createServerFn({ method: "POST" })
   .validator(z.object({

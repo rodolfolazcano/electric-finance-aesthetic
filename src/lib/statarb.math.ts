@@ -156,7 +156,7 @@ export function simulateTrading(
   stopThresh: number,
   beta: number,
   txCost: number,
-  // ─── Labadie: Market Impact (paper §2.1) ───
+  //  Labadie: Market Impact (paper §2.1) 
   marketImpactGamma?: number,
   participationRate?: number,
   pValue?: number,
@@ -228,7 +228,7 @@ export function simulateTrading(
           position === "long" ? (entryP2 - exitP2) / entryP2 : (exitP2 - entryP2) / entryP2;
         let pnl = (ret1 - beta * ret2) * 100 - 2 * txCost;
 
-        // ─── Labadie: Market Impact cost I(v) = σ × |v/V|^γ × τ^(1/p) (paper §2.1) ───
+        //  Labadie: Market Impact cost I(v) = σ × |v/V|^γ × τ^(1/p) (paper §2.1) 
         if (miGamma > 0 && partRate > 0 && spreadSigma > 0) {
           const impactCost = spreadSigma * Math.pow(partRate, miGamma) * tauFactor;
           pnl -= impactCost * 100;
@@ -309,7 +309,7 @@ export function computePerformance(trades: Trade[], annFactor = 252, pVal?: numb
   const sharpe = stdR > 0 ? ((avgR - rfDiario) / stdR) * Math.sqrt(annFactor) : 0;
   const avgDur = trades.length > 0 ? mean(trades.map((t) => t.duration)) : 0;
 
-  // ─── Labadie §3.2: p-variance Sharpe sobre retornos diarios reales (no PnL de trades) ───
+  //  Labadie §3.2: p-variance Sharpe sobre retornos diarios reales (no PnL de trades) 
   let pSharpe: number | undefined;
   let pVariance: number | undefined;
   const p = pVal ?? 2;
@@ -342,7 +342,7 @@ function runAnalysisOn(
   betaOverride?: number,
   rollMeanOverride?: number[],
   rollStdOverride?: number[],
-  // ─── Labadie §3.2: Hurst real desde los datos para TC/IS (§2.3-2.4) ───
+  //  Labadie §3.2: Hurst real desde los datos para TC/IS (§2.3-2.4) 
   hurstOverride?: number,
 ): {
   performance: PairPerformance;
@@ -390,7 +390,7 @@ function runAnalysisOn(
     }
   }
 
-  // ─── Labadie §2.3–2.4: Target Close (TC) / Implementation Shortfall (IS) ───
+  //  Labadie §2.3–2.4: Target Close (TC) / Implementation Shortfall (IS) 
   let tradingCurve: { step: number; volume: number; cumulative: number }[] | undefined;
   let optimalStartPct: number | undefined;
   let optimalStopPct: number | undefined;
@@ -549,7 +549,7 @@ export function analyzePair(
   const beta = reg.slope;
   const rsq = reg.r2;
 
-  // ─── Labadie §3.2: Exponente de Hurst (self-similar processes) ───
+  //  Labadie §3.2: Exponente de Hurst (self-similar processes) 
   // H ∈ (0,1). H=0.5 → random walk; H<0.5 → mean-reverting; H>0.5 → trending
   // p = 1/H identidad del paper
   const spreadForHurst = c1.map((v, i) => v - beta * (c2[i] ?? 0));
@@ -557,7 +557,7 @@ export function analyzePair(
   const impliedP = hurst > 0 ? Math.min(10, Math.max(1.1, 1 / hurst)) : 2;
   const impliedPFromReturnsVal = r1.length >= 100 ? impliedPFromReturns(r1) : undefined;
 
-  // ─── Labadie §4 (eq. 21): Regresión del implied p ───
+  //  Labadie §4 (eq. 21): Regresión del implied p 
   // implied p ≈ 2.35 + 0.14 × avg_market_impact − 1.79 × volatility
   // Sirve para estimar p automáticamente desde datos de mercado
   const priceVolatility = std(r1) * Math.sqrt(252); // volatilidad anualizada del activo 1
@@ -570,7 +570,7 @@ export function analyzePair(
     2.35 + 0.14 * avgMarketImpact * 100 - 1.79 * priceVolatility
   ));
 
-  // ─── Labadie §3.2: p-variance ───
+  //  Labadie §3.2: p-variance 
   const pUsed = config.pValue ?? 2;
   const pVarianceUsed = computePVariance(r1, pUsed);
 
@@ -680,16 +680,16 @@ export function analyzePair(
     splitDate: config.inSampleRatio ? splitDate : undefined,
     pnlHistogram,
     correlationBreakdown,
-    // ─── Labadie §3.2: Hurst exponent & p-variance ───
+    //  Labadie §3.2: Hurst exponent & p-variance 
     hurstExponent: hurst,
     pVarianceUsed: pVarianceUsed > 0 ? pVarianceUsed : undefined,
-    // ─── Labadie §3.2: implied p = 1/H (identidad del paper) ───
+    //  Labadie §3.2: implied p = 1/H (identidad del paper) 
     impliedP: impliedP !== 2 ? impliedP : undefined,
-    // ─── Labadie §4.3: implied p por regresión multi-escala ───
+    //  Labadie §4.3: implied p por regresión multi-escala 
     impliedPFromReturns: impliedPFromReturnsVal !== undefined && impliedPFromReturnsVal !== 2 ? impliedPFromReturnsVal : undefined,
-    // ─── Labadie §4 (eq. 21): implied p por regresión ───
+    //  Labadie §4 (eq. 21): implied p por regresión 
     impliedPRegression: impliedP_regression !== 2 ? impliedP_regression : undefined,
-    // ─── Labadie §2.5: Optimal starting/stopping times ───
+    //  Labadie §2.5: Optimal starting/stopping times 
     optimalStartPct: full.optimalStartPct,
     optimalStopPct: full.optimalStopPct,
     tradingCurve: full.tradingCurve,
@@ -719,7 +719,7 @@ export function simulateSyntheticSpread(
   volatility: number,
   days: number,
   dt: number = 1 / 252,
-  // ─── Labadie §3.2: Hurst exponent para proceso self-similar ───
+  //  Labadie §3.2: Hurst exponent para proceso self-similar 
   hurst?: number,
 ): { date: string; value: number }[] {
   // Ornstein-Uhlenbeck process: dS = theta*(mu - S)*dt + sigma*dB

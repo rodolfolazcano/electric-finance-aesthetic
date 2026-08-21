@@ -98,7 +98,7 @@ export interface RazonesFinancierasResult {
   error: string | null;
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────
+//  Helpers 
 
 function safeNum(v: number | null | undefined): number | null {
   return v != null && isFinite(v) ? v : null;
@@ -113,7 +113,7 @@ function round2(v: number | null): number | null {
   return v != null ? Math.round(v * 100) / 100 : null;
 }
 
-// ─── Cálculo por periodo ────────────────────────────────────────────────
+//  Cálculo por periodo 
 
 export function calcularRazonesPeriodo(
   p: PeriodoHistoricoRow,
@@ -223,7 +223,7 @@ export function calcularRazonesPeriodo(
   };
 }
 
-// ─── Interpretación cualitativa (Weston & Brigham) ─────────────────────
+//  Interpretación cualitativa (Weston & Brigham) 
 
 function interpretarLiquidez(r: RazonesPeriodo): string[] {
   const out: string[] = [];
@@ -400,7 +400,7 @@ function interpretarDuPont(r: RazonesPeriodo): string[] {
   ];
 }
 
-// ─── Resultado completo ─────────────────────────────────────────────────
+//  Resultado completo 
 
 export function calcularRazonesFinancieras(
   result: FundamentalAFResult,

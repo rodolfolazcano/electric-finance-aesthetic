@@ -58,7 +58,7 @@ export type MultimodalOutput = {
   cascade?: CascadeInterpretation;
 };
 
-// ─── Utilidades ──────────────────────────────────────────────────────────────
+//  Utilidades 
 
 /** Ejecuta la cascada y arma el bloque de instrucciones (con fallback). */
 async function reasonCascade(
@@ -75,7 +75,7 @@ function describeAttachment(attachment?: AttachmentInput | null): string {
   return " (adjunto)";
 }
 
-// ─── Acciones ────────────────────────────────────────────────────────────────
+//  Acciones 
 
 async function textToImage(input: MultimodalInput): Promise<MultimodalOutput> {
   const cascade = await reasonCascade(input.message, input.files ?? []);
@@ -217,7 +217,7 @@ async function videoToText(input: MultimodalInput): Promise<MultimodalOutput> {
   return { text: parts.join("\n\n"), model: "vision-frames" };
 }
 
-// ─── Video → frames (ffmpeg best-effort) ─────────────────────────────────────
+//  Video → frames (ffmpeg best-effort) 
 
 async function extractVideoFrames(
   source: string,
@@ -275,7 +275,7 @@ function ffmpegAvailable(): boolean {
   return _ffmpegChecked;
 }
 
-// ─── Dispatcher ──────────────────────────────────────────────────────────────
+//  Dispatcher 
 
 export async function runMultimodal(input: MultimodalInput): Promise<MultimodalOutput> {
   switch (input.mode) {

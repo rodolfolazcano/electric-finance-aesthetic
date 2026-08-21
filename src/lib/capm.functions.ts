@@ -1,2 +1,2 @@
-// Shim de compatibilidad: implementación vive en herramientas.
+// Shim de compatibilidad: implementaciÃ³n vive en herramientas.
 export * from "@/lib/herramientas/capm.functions";

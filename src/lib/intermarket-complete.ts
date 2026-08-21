@@ -1,11 +1,11 @@
 // @ts-nocheck
-// ─── Intermarket Complete System — Pure Logic Layer ──────────────
+//  Intermarket Complete System — Pure Logic Layer 
 // Niveles 0-6: Data Layer, 12 Ratios, Estadísticos, Reversión, Cointegración, Secuencia, Score
 
 import pkg from "jstat";
 const { jStat } = pkg;
 
-// ─── CONSTANTS ──────────────────────────────────────────────────────
+//  CONSTANTS 
 
 export const WINDOWS = [21, 63, 126, 252, 504] as const;
 export type WindowKey = (typeof WINDOWS)[number];
@@ -24,7 +24,7 @@ export const WINDOW_CONFIGS: Record<WindowKey, WindowConfig> = {
   504: { days: 504, label: "2y+", purpose: "Ciclo largo / cointegración" },
 };
 
-// ─── RATIO DEFINITIONS ──────────────────────────────────────────────
+//  RATIO DEFINITIONS 
 
 export const RATIO_DEFINITIONS = [
   {
@@ -94,7 +94,7 @@ export const RATIO_DEFINITIONS = [
     formula: "^TNX − ^IRX",
     leading: "Spread 10Y−3M — señal más temprana de recesión",
   },
-  // ─── Nuevos ratios (Cap. 2, 10) ─────────────────────────────────
+  //  Nuevos ratios (Cap. 2, 10) 
   {
     id: "GOLD_SILVER",
     label: "Gold/Silver",
@@ -111,7 +111,7 @@ export const RATIO_DEFINITIONS = [
 
 export type RatioId = (typeof RATIO_DEFINITIONS)[number]["id"];
 
-// ─── COMPLEMENTARY INDICATORS (no son ratios) ─────────────────────
+//  COMPLEMENTARY INDICATORS (no son ratios) 
 
 export interface VixRegimeInfo {
   currentValue: number | null;
@@ -202,7 +202,7 @@ export interface MurphyMarketContext {
   longCycle: LongCycleSnapshot;
 }
 
-// ─── TYPES ──────────────────────────────────────────────────────────
+//  TYPES 
 
 export interface MultiWindowStats {
   windows: Partial<Record<WindowKey, WindowStat>>;
@@ -355,7 +355,7 @@ export interface CompleteIntermarketResult {
   generatedAt: string;
 }
 
-// ─── COINTEGRATION PAIRS (expected per Murphy) ─────────────────────
+//  COINTEGRATION PAIRS (expected per Murphy) 
 
 export const COINTEGRATION_PAIRS: {
   a: RatioId;
@@ -375,7 +375,7 @@ export const COINTEGRATION_PAIRS: {
   { a: "GOLD_OIL", b: "DOW_GOLD", expectedCointegrated: true, label: "Gold/Oil vs Dow/Gold" },
 ];
 
-// ─── COMPOSITE SCORE WEIGHTS ────────────────────────────────────────
+//  COMPOSITE SCORE WEIGHTS 
 
 export const SCORE_WEIGHTS: Record<RatioId, number> = {
   CRB_BONDS: 0.18,
@@ -394,7 +394,7 @@ export const SCORE_WEIGHTS: Record<RatioId, number> = {
   GDX_GLD: 0.01,
 };
 
-// ─── STATISTICAL HELPERS ────────────────────────────────────────────
+//  STATISTICAL HELPERS 
 
 export function computeChangePct(series: number[], days: number): number | null {
   if (series.length < days + 1) return null;
@@ -580,7 +580,7 @@ export function computeZScore(
   return { zScore: Math.round(z * 100) / 100, vsMA: ma, stdDev, category, signal };
 }
 
-// ─── SIMPLIFIED ADF TEST FOR COINTEGRATION ─────────────────────────
+//  SIMPLIFIED ADF TEST FOR COINTEGRATION 
 
 export function adfTest(
   spread: number[],
@@ -697,7 +697,7 @@ export function computeCointegration(
   };
 }
 
-// ─── RATIO ANALYSIS ─────────────────────────────────────────────────
+//  RATIO ANALYSIS 
 
 export function analyzeRatioSeries(
   id: RatioId,
@@ -758,7 +758,7 @@ export function analyzeRatioSeries(
   };
 }
 
-// ─── REVERSAL SIGNALS ───────────────────────────────────────────────
+//  REVERSAL SIGNALS 
 
 export function detectReversalSignals(ratios: RatioAnalysis[]): ReversalSignal[] {
   const signals: ReversalSignal[] = [];
@@ -827,7 +827,7 @@ export function detectReversalSignals(ratios: RatioAnalysis[]): ReversalSignal[]
   return signals;
 }
 
-// ─── SEQUENTIAL ANALYSIS (5 Steps) ──────────────────────────────────
+//  SEQUENTIAL ANALYSIS (5 Steps) 
 
 export function computeSequentialAnalysis(
   ratios: RatioAnalysis[],
@@ -1045,7 +1045,7 @@ export function computeSequentialAnalysis(
   return { steps, finalRegime, finalStage };
 }
 
-// ─── COMPOSITE SCORE ────────────────────────────────────────────────
+//  COMPOSITE SCORE 
 
 export function computeCompositeScore(ratios: RatioAnalysis[]): CompositeScore {
   const components: ScoreComponent[] = [];
@@ -1102,14 +1102,14 @@ export function computeCompositeScore(ratios: RatioAnalysis[]): CompositeScore {
       .filter((c) => c.signalValue !== 0)
       .map((c) => {
         const ratioLabel = RATIO_DEFINITIONS.find((r) => r.id === c.ratioId)?.label ?? c.ratioId;
-        return `${ratioLabel}: ${c.signalValue > 0 ? "🟢" : "🔴"} (${c.cointegrationMultiplier < 1 ? "confianza reducida" : "confianza normal"})`;
+        return `${ratioLabel}: ${c.signalValue > 0 ? "[VERDE]" : "[ROJO]"} (${c.cointegrationMultiplier < 1 ? "confianza reducida" : "confianza normal"})`;
       })
       .join(". ");
 
   return { score, components, label, riskProfile, interpretation };
 }
 
-// ─── COMPLEMENTARY INDICATORS ANALYSIS ─────────────────────────────
+//  COMPLEMENTARY INDICATORS ANALYSIS 
 
 export function analyzeVixRegime(vixSeries: number[]): VixRegimeInfo {
   if (vixSeries.length < 21) {
@@ -1361,16 +1361,16 @@ export function analyzeFedFundsCycle(
 
     if (fedVsSpread.fedAboveSpread && yieldCurveSpread < 0) {
       fedVsSpread.interpretation =
-        "🔴 Fed Funds por encima de la curva invertida — señal clásica de tightening excesivo. Recesión probable en 6-12 meses.";
+        "[ROJO] Fed Funds por encima de la curva invertida — señal clásica de tightening excesivo. Recesión probable en 6-12 meses.";
     } else if (fedVsSpread.fedAboveSpread && yieldCurveSpread > 0) {
       fedVsSpread.interpretation =
-        "🟡 Fed Funds elevado vs curva positiva — política restrictiva pero curva aún normal. Monitorear desaceleración.";
+        "[AMARILLO] Fed Funds elevado vs curva positiva — política restrictiva pero curva aún normal. Monitorear desaceleración.";
     } else if (!fedVsSpread.fedAboveSpread && yieldCurveSpread < 0) {
       fedVsSpread.interpretation =
         "🟠 Curva invertida pero Fed por debajo — el mercado descuenta recortes. Posible aterrizaje suave.";
     } else {
       fedVsSpread.interpretation =
-        "🟢 Fed Funds coherente con la curva — política monetaria neutral o acomodaticia.";
+        "[VERDE] Fed Funds coherente con la curva — política monetaria neutral o acomodaticia.";
     }
   }
 
@@ -1383,7 +1383,7 @@ export function analyzeFedFundsCycle(
   };
 }
 
-// ─── MAIN ANALYSIS FUNCTION ─────────────────────────────────────────
+//  MAIN ANALYSIS FUNCTION 
 
 export function computeCompleteAnalysis(
   ratioSeriesMap: Record<RatioId, number[]>,

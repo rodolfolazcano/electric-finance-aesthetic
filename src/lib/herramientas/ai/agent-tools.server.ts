@@ -1,11 +1,17 @@
 // @ts-nocheck
-// Herramientas para el agente autónomo. Server-only.
-// Cada herramienta recibe parámetros y devuelve string (resultado legible).
+// Herramientas para el agente autÃ³nomo. Server-only.
+// Cada herramienta recibe parÃ¡metros y devuelve string (resultado legible).
 import "./env.server";
 
 import { searchWeb, readWebPage, buildWebBlock } from "./web.server";
 import { runSandbox } from "./sandbox.server";
 import { searchLibrary } from "./context-library.server";
+import {
+  sendTelegramMessage as _sendTelegramMessage,
+  sendTelegramSignal as _sendTelegramSignal,
+  telegramGetBotInfo as _telegramGetBotInfo,
+  telegramGetUpdates as _telegramGetUpdates,
+} from "@/lib/telegram.server";
 
 const IS_WIN = process.platform === "win32";
 const MAX_OUT = 8_000;
@@ -44,7 +50,7 @@ export async function toolReadFile(args: ToolReadFileArgs): Promise<string> {
     const [s, e] = args.range_.split("-").map(Number);
     const lines = text.split("\n");
     const snippet = lines.slice((s || 1) - 1, e || lines.length).join("\n");
-    return snippet || "(rango vacío)";
+    return snippet || "(rango vacÃ­o)";
   } catch (e: any) {
     return `[ERROR leyendo archivo]: ${e.message ?? String(e)}`;
   }
@@ -62,7 +68,7 @@ export async function toolWriteFile(args: ToolWriteFileArgs): Promise<string> {
     if (dir) fs.mkdirSync(dir, { recursive: true });
     if (args.append) {
       fs.appendFileSync(args.path, args.content, "utf-8");
-      return `[OK: ${args.content.length} chars añadidos a ${args.path}]`;
+      return `[OK: ${args.content.length} chars aÃ±adidos a ${args.path}]`;
     }
     fs.writeFileSync(args.path, args.content, "utf-8");
     return `[OK: ${args.content.length} chars escritos en ${args.path}]`;
@@ -95,7 +101,7 @@ export async function toolBrowseFilesystem(args: ToolBrowseFsArgs): Promise<stri
       } catch {}
       return `  ${s} ${e.name}`;
     });
-    return `?? ${base}\n${lines.slice(0, 120).join("\n")}${entries.length > 120 ? `\n  ... y ${entries.length - 120} más` : ""}`;
+    return `?? ${base}\n${lines.slice(0, 120).join("\n")}${entries.length > 120 ? `\n  ... y ${entries.length - 120} mÃ¡s` : ""}`;
   } catch (e: any) {
     return `[ERROR explorando]: ${e.message ?? String(e)}`;
   }
@@ -159,7 +165,7 @@ export async function toolWebReadPage(args: ToolWebReadArgs): Promise<string> {
   try {
     return await readWebPage(args.url, args.maxChars ?? 10_000);
   } catch (e: any) {
-    return `[ERROR leyendo página]: ${e.message ?? String(e)}`;
+    return `[ERROR leyendo pÃ¡gina]: ${e.message ?? String(e)}`;
   }
 }
 
@@ -203,7 +209,7 @@ export async function toolLibSearch(args: ToolLibSearchArgs): Promise<string> {
 }
 
 // --- financial_query -----------------------------------------------------------
-// Consulta los endpoints del backend Flask de análisis financiero.
+// Consulta los endpoints del backend Flask de anÃ¡lisis financiero.
 // Flask corre en http://localhost:5000, sirve datos de yfinance, IOL, BCRA, etc.
 
 const FLASK_URL = process.env.FLASK_API_URL || "http://localhost:5000";
@@ -239,7 +245,7 @@ export async function toolFinancialQuery(args: ToolFinancialQueryArgs): Promise<
   try {
     // Health check cacheado (solo 1 vez por sesion, 1.5s)
     const ok = await checkFlask();
-    if (!ok) return `[FLASK NO DISPONIBLE] Servidor Flask en ${FLASK_URL} no responde. Ejecutá 'python server/server.py'. Usá fetch_stock_data, search_web o run_sandbox como alternativa.`;
+    if (!ok) return `[FLASK NO DISPONIBLE] Servidor Flask en ${FLASK_URL} no responde. EjecutÃ¡ 'python server/server.py'. UsÃ¡ fetch_stock_data, search_web o run_sandbox como alternativa.`;
     if (args.params && Object.keys(args.params).length > 0) {
       const res = await fetch(url, {
         method: "POST",
@@ -262,6 +268,44 @@ export async function toolFinancialQuery(args: ToolFinancialQueryArgs): Promise<
   }
 }
 
+// --- telegram â€” coronar_inversiones_bot ------------------------------------------------
+
+export type ToolTelegramSignalArgs = {
+  ticker: string;
+  senal: string;
+  precio?: number;
+  variacion1d?: number;
+  motivo?: string;
+  nivel?: string;
+  chatId?: string;
+};
+
+export async function toolTelegramSignal(args: ToolTelegramSignalArgs): Promise<string> {
+  if (!args.ticker?.trim() || !args.senal?.trim()) return "[TELEGRAM ERROR] ticker y senal son obligatorios";
+  return _sendTelegramSignal({
+    ticker: args.ticker,
+    senal: args.senal,
+    precio: args.precio ?? null,
+    variacion1d: args.variacion1d ?? null,
+    motivo: args.motivo,
+    nivel: args.nivel,
+    chatId: args.chatId,
+  });
+}
+
+export type ToolTelegramMessageArgs = { text: string; chatId?: string };
+
+export async function toolTelegramMessage(args: ToolTelegramMessageArgs): Promise<string> {
+  if (!args.text?.trim()) return "[TELEGRAM ERROR] text es obligatorio";
+  return _sendTelegramMessage({ text: args.text, chatId: args.chatId, parseMode: "HTML" });
+}
+
+export async function toolTelegramInfo(): Promise<string> {
+  const info = await _telegramGetBotInfo();
+  const updates = await _telegramGetUpdates();
+  return `${info}\n---\n${updates}`;
+}
+
 // --- fetch_stock_data ----------------------------------------------------------
 // Obtiene datos de Yahoo Finance directamente (sin depender del servidor Flask).
 
@@ -270,7 +314,7 @@ export type ToolStockDataArgs = { ticker: string; period?: string };
 export async function toolStockData(args: ToolStockDataArgs): Promise<string> {
   try {
     const ticker = args.ticker.toUpperCase().trim();
-    // Intentar con yahoo-finance2 si está instalado
+    // Intentar con yahoo-finance2 si estÃ¡ instalado
     try {
       const yfMod = await import("yahoo-finance2");
       const yf = typeof yfMod.default === "function" ? new (yfMod.default as any)() : yfMod;
@@ -333,7 +377,7 @@ export async function toolStockData(args: ToolStockDataArgs): Promise<string> {
 }
 
 // --- Mapa de herramientas ----------------------------------------------------
-// Esquemas para OpenAI tool-calling y enrutador a implementación.
+// Esquemas para OpenAI tool-calling y enrutador a implementaciÃ³n.
 
 export type ToolRecord = {
   name: string;
@@ -346,7 +390,7 @@ export type ToolRecord = {
 export const AGENT_TOOLS: ToolRecord[] = [
   {
     name: "run_command",
-    description: "Ejecuta un comando en el shell del servidor (PowerShell en Windows, bash en Linux). Útil para scripts, git, npm, node, explorar el proyecto.",
+    description: "Ejecuta un comando en el shell del servidor (PowerShell en Windows, bash en Linux). Ãštil para scripts, git, npm, node, explorar el proyecto.",
     params: { command: { type: "string", description: "Comando a ejecutar" } },
     required: ["command"],
     run: (a) => toolRunCommand(a as ToolRunCommandArgs),
@@ -354,65 +398,97 @@ export const AGENT_TOOLS: ToolRecord[] = [
   {
     name: "read_file",
     description: "Lee el contenido de un archivo del sistema de archivos del proyecto.",
-    params: { path: { type: "string", description: "Ruta absoluta o relativa" }, range_: { type: "string", description: "Rango opcional de líneas: '10-50'" } },
+    params: { path: { type: "string", description: "Ruta absoluta o relativa" }, range_: { type: "string", description: "Rango opcional de lÃ­neas: '10-50'" } },
     required: ["path"],
     run: (a) => toolReadFile(a as ToolReadFileArgs),
   },
   {
     name: "write_file",
     description: "Crea o escribe un archivo en el sistema de archivos. Crea directorios padres si no existen.",
-    params: { path: { type: "string", description: "Ruta del archivo" }, content: { type: "string", description: "Contenido a escribir" }, append: { type: "boolean", description: "Si es true, añade al final en vez de sobrescribir" } },
+    params: { path: { type: "string", description: "Ruta del archivo" }, content: { type: "string", description: "Contenido a escribir" }, append: { type: "boolean", description: "Si es true, aÃ±ade al final en vez de sobrescribir" } },
     required: ["path", "content"],
     run: (a) => toolWriteFile(a as ToolWriteFileArgs),
   },
   {
     name: "browse_filesystem",
-    description: "Lista el contenido de un directorio del proyecto. Útil para explorar la estructura del código.",
+    description: "Lista el contenido de un directorio del proyecto. Ãštil para explorar la estructura del cÃ³digo.",
     params: { path: { type: "string", description: "Ruta del directorio a explorar" } },
     required: ["path"],
     run: (a) => toolBrowseFilesystem(a as ToolBrowseFsArgs),
   },
   {
     name: "search_web",
-    description: "Busca información actualizada en la web (DuckDuckGo + Wikipedia). Útil para ver datos recientes, noticias, precios de activos.",
-    params: { query: { type: "string", description: "Consulta de búsqueda" }, limit: { type: "integer", description: "Máximo de resultados (default 6)" } },
+    description: "Busca informaciÃ³n actualizada en la web (DuckDuckGo + Wikipedia). Ãštil para ver datos recientes, noticias, precios de activos.",
+    params: { query: { type: "string", description: "Consulta de bÃºsqueda" }, limit: { type: "integer", description: "MÃ¡ximo de resultados (default 6)" } },
     required: ["query"],
     run: (a) => toolWebSearch(a as ToolWebSearchArgs),
   },
   {
     name: "read_web_page",
-    description: "Lee el texto de una página web desde su URL. Útil para profundizar en un resultado de búsqueda web.",
-    params: { url: { type: "string", description: "URL completa de la página" }, maxChars: { type: "integer", description: "Máx caracteres a leer (default 10000)" } },
+    description: "Lee el texto de una pÃ¡gina web desde su URL. Ãštil para profundizar en un resultado de bÃºsqueda web.",
+    params: { url: { type: "string", description: "URL completa de la pÃ¡gina" }, maxChars: { type: "integer", description: "MÃ¡x caracteres a leer (default 10000)" } },
     required: ["url"],
     run: (a) => toolWebReadPage(a as ToolWebReadArgs),
   },
   {
     name: "supabase_storage_list",
-    description: "Lista los archivos de un prefijo del bucket 'clarity-data' de Supabase. Usá '' para ver raíz, 'libros/' para PDFs, 'contexto/' para MDs.",
+    description: "Lista los archivos de un prefijo del bucket 'clarity-data' de Supabase. UsÃ¡ '' para ver raÃ­z, 'libros/' para PDFs, 'contexto/' para MDs.",
     params: { prefix: { type: "string", description: "Prefijo opcional (ej: 'libros/', 'data/')" } },
     required: [],
     run: (a) => toolSupaStorageList(a as ToolSupaListArgs),
   },
   {
     name: "supabase_storage_text",
-    description: "Descarga el texto de un archivo del bucket 'clarity-data' (markdown, txt, JSON). Útil para leer documentación y contexto del proyecto.",
+    description: "Descarga el texto de un archivo del bucket 'clarity-data' (markdown, txt, JSON). Ãštil para leer documentaciÃ³n y contexto del proyecto.",
     params: { path: { type: "string", description: "Ruta completa: 'contexto/murphy-metodologia.json'" } },
     required: ["path"],
     run: (a) => toolSupaStorageText(a as ToolSupaTextArgs),
   },
   {
     name: "run_sandbox",
-    description: "Ejecuta código JavaScript en un sandbox seguro (sin red, sin filesystem, timeout 15s). Ideal para cálculos, validaciones numéricas, transformación de datos.",
-    params: { code: { type: "string", description: "Código JS. Recibe `files` (contexto cargado), `log()`, `table()`. Usá `return` para devolver valor." }, files: { type: "array", items: { type: "object" }, description: "Archivos de contexto opcionales (name, kind, text)" } },
+    description: "Ejecuta cÃ³digo JavaScript en un sandbox seguro (sin red, sin filesystem, timeout 15s). Ideal para cÃ¡lculos, validaciones numÃ©ricas, transformaciÃ³n de datos.",
+    params: { code: { type: "string", description: "CÃ³digo JS. Recibe `files` (contexto cargado), `log()`, `table()`. UsÃ¡ `return` para devolver valor." }, files: { type: "array", items: { type: "object" }, description: "Archivos de contexto opcionales (name, kind, text)" } },
     required: ["code"],
     run: (a) => toolSandbox(a as ToolSandboxArgs),
   },
   {
     name: "context_library_search",
-    description: "Busca en la biblioteca de contexto indexada (PDFs, manuales, libros subidos a Supabase Storage). Búsqueda léxica por palabras clave.",
-    params: { query: { type: "string", description: "Palabras clave para buscar (mín 5 caracteres cada una)" }, limit: { type: "integer", description: "Máximo de resultados (default 4)" } },
+    description: "Busca en la biblioteca de contexto indexada (PDFs, manuales, libros subidos a Supabase Storage). BÃºsqueda lÃ©xica por palabras clave.",
+    params: { query: { type: "string", description: "Palabras clave para buscar (mÃ­n 5 caracteres cada una)" }, limit: { type: "integer", description: "MÃ¡ximo de resultados (default 4)" } },
     required: ["query"],
     run: (a) => toolLibSearch(a as ToolLibSearchArgs),
+  },
+  {
+    name: "telegram_enviar_senal",
+    description: "ENVIA una senal de trading/analisis a Telegram via @coronar_inversiones_bot. USAR cuando el usuario pide que las senales se envien a Telegram, o cuando detectas una oportunidad/valor intrinseco/score que el usuario quiere notificar. Requiere TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID configurados en .env (obtenidos de @BotFather). ticker y senal son obligatorios; precio/variacion/motivo opcionales. Sin emojis en el mensaje.",
+    params: {
+      ticker: { type: "string", description: "Ticker (ej: GGAL.BA, AAPL, SPY)" },
+      senal: { type: "string", description: "Senal: COMPRA, COMPRA CON CAUTELA, MANTENER, REDUCIR, VENTA u otra descripcion" },
+      precio: { type: "number", description: "Precio actual opcional" },
+      variacion1d: { type: "number", description: "Variacion % 1 dia opcional (ej: 2.5)" },
+      motivo: { type: "string", description: "Motivo breve opcional (ej: Score 82/100, RSI sobreventa)" },
+      nivel: { type: "string", description: "Nivel de confianza o horizonte opcional" },
+      chatId: { type: "string", description: "Chat ID opcional (si no se pasa usa TELEGRAM_CHAT_ID)" },
+    },
+    required: ["ticker", "senal"],
+    run: (a) => toolTelegramSignal(a as ToolTelegramSignalArgs),
+  },
+  {
+    name: "telegram_enviar_mensaje",
+    description: "ENVIA un mensaje libre a Telegram via @coronar_inversiones_bot. USAR para notificaciones generales, resumenes de cartera, alertas de ciclo u otro texto. Requiere TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID en .env. Usa formato HTML.",
+    params: {
+      text: { type: "string", description: "Texto del mensaje (max 4000 chars, HTML permitido: <b>, <i>, <code>)" },
+      chatId: { type: "string", description: "Chat ID opcional" },
+    },
+    required: ["text"],
+    run: (a) => toolTelegramMessage(a as ToolTelegramMessageArgs),
+  },
+  {
+    name: "telegram_estado",
+    description: "CONSULTA el estado del bot de Telegram @coronar_inversiones_bot: verifica token, muestra info del bot (username, id) y ultimos chat_ids via getUpdates. USAR para diagnosticar si el bot esta configurado correctamente.",
+    params: {},
+    required: [],
+    run: () => toolTelegramInfo(),
   },
   {
     name: "fetch_stock_data",
@@ -425,7 +501,7 @@ export const AGENT_TOOLS: ToolRecord[] = [
     name: "financial_query",
     description: "CONSULTA los endpoints del backend Flask de analisis financiero. USAR para obtener: precios actuales (endpoint: api/price, params: ticker=GGAL), noticias (api/news, ticker=AAPL, count=10), analisis de portfolio (api/analyze), contexto macroeconomico (api/macro-context), analisis sectorial (api/sector/valuation o api/sector/performance), analisis fundamental/cuantitativo (api/quantitative), WACC (api/wacc), DCF (api/dcf), valuacion por multiples (api/multiples), comparacion contra benchmark (api/comparar), ciclo intermarket (api/intermarket/cycle). TODOS los endpoints devuelven JSON. El servidor Flask debe estar corriendo en localhost:5000.",
     params: {
-      endpoint: { type: "string", description: "Endpoint Flask (ej: 'api/price', 'api/macro-context', 'api/analyze', 'api/sector/valuation', 'api/intermarket/cycle'). Ver descripción de la tool para lista completa." },
+      endpoint: { type: "string", description: "Endpoint Flask (ej: 'api/price', 'api/macro-context', 'api/analyze', 'api/sector/valuation', 'api/intermarket/cycle'). Ver descripciÃ³n de la tool para lista completa." },
       params: { type: "object", description: "Parametros opcionales para el endpoint (como objeto JSON). Para GET: ej {ticker:'GGAL'}. Para POST: ej {tickers:['GGAL','YPF'], period:'1y'}" },
     },
     required: ["endpoint"],
@@ -433,29 +509,29 @@ export const AGENT_TOOLS: ToolRecord[] = [
   },
   {
     name: "crm_importar",
-    description: "IMPORTA uno o más clientes al CRM (Supabase tabla clientes). Recibe un array de objetos con datos del cliente. Útil después de parsear CSV/JSON/TXT. Cada cliente requiere nombre, opcional: apellido, email, telefono, direccion, notas, perfil_inversor (conservador|moderado|agresivo), activos (array de strings).",
+    description: "IMPORTA uno o mÃ¡s clientes al CRM (Supabase tabla clientes). Recibe un array de objetos con datos del cliente. Ãštil despuÃ©s de parsear CSV/JSON/TXT. Cada cliente requiere nombre, opcional: apellido, email, telefono, direccion, notas, perfil_inversor (conservador|moderado|agresivo), activos (array de strings).",
     params: { clientes: { type: "array", items: { type: "object" }, description: "Array de clientes a importar. Cada item: {nombre, apellido?, email?, telefono?, direccion?, notas?, perfil_inversor?, activos?[]}" } },
     required: ["clientes"],
     run: (a) => toolCrmImportar(a as ToolCrmImportArgs),
   },
   {
     name: "crm_listar",
-    description: "LISTA los clientes registrados en el CRM. Devuelve nombre, email, perfil, activos y fecha de creación. Parámetro opcional: límite de resultados.",
-    params: { limite: { type: "integer", description: "Máximo de clientes a listar (default 50)" } },
+    description: "LISTA los clientes registrados en el CRM. Devuelve nombre, email, perfil, activos y fecha de creaciÃ³n. ParÃ¡metro opcional: lÃ­mite de resultados.",
+    params: { limite: { type: "integer", description: "MÃ¡ximo de clientes a listar (default 50)" } },
     required: [],
     run: (a) => toolCrmListar(a as ToolCrmListarArgs),
   },
   {
     name: "local_models",
-    description: "LISTA los modelos locales instalados en Ollama (qwen2.5-coder, all-minilm, nemotron-cascade-2, Buddy, etc). Útil para saber qué razonamiento/generación local está disponible sin consumir API cloud.",
+    description: "LISTA los modelos locales instalados en Ollama (qwen2.5-coder, all-minilm, nemotron-cascade-2, Buddy, etc). Ãštil para saber quÃ© razonamiento/generaciÃ³n local estÃ¡ disponible sin consumir API cloud.",
     params: { query: { type: "string", description: "Filtro opcional por nombre de modelo" } },
     required: [],
     run: (a) => toolLocalModels(a as ToolLocalModelsArgs),
   },
   {
     name: "route_task",
-    description: "EJECUTA el primer agente router: analiza la petición del usuario y asigna el modelo MÁS AVANZADO disponible para esa tarea (cloud + respaldo local). Usar antes de delegar a cualquier generador o razonamiento profundo.",
-    params: { message: { type: "string", description: "La solicitud del usuario a rutear" }, hasAttachment: { type: "boolean", description: "Si el usuario adjuntó una imagen/video" } },
+    description: "EJECUTA el primer agente router: analiza la peticiÃ³n del usuario y asigna el modelo MÃS AVANZADO disponible para esa tarea (cloud + respaldo local). Usar antes de delegar a cualquier generador o razonamiento profundo.",
+    params: { message: { type: "string", description: "La solicitud del usuario a rutear" }, hasAttachment: { type: "boolean", description: "Si el usuario adjuntÃ³ una imagen/video" } },
     required: ["message"],
     run: (a) => toolRouteTask(a as { message: string; hasAttachment?: boolean }),
   },
@@ -469,35 +545,35 @@ export const AGENT_TOOLS: ToolRecord[] = [
   {
     name: "generate_image",
     description: "GENERA una imagen a partir de texto (text-to-image). Ejecuta el pipeline obligatorio: router ? cascada (nemotron-cascade-2) ? mejorador de prompt (Ollama) ? generador. Devuelve la URL del asset. El prompt se arma server-side.",
-    params: { mode: { type: "string", description: "Siempre 'text_to_image'" }, message: { type: "string", description: "Descripción de la imagen a generar" } },
+    params: { mode: { type: "string", description: "Siempre 'text_to_image'" }, message: { type: "string", description: "DescripciÃ³n de la imagen a generar" } },
     required: ["mode", "message"],
     run: (a) => toolMultimodal(a as any),
   },
   {
     name: "edit_image",
-    description: "EDITA una imagen adjunta (image-to-image): quitar fondo, agregar borde o recortar. Recibe la URL de la imagen y la instrucción.",
-    params: { mode: { type: "string", description: "Siempre 'image_to_image'" }, message: { type: "string", description: "Instrucción de edición (quitar fondo, agregar borde, recortar)" }, attachmentUrl: { type: "string", description: "URL de la imagen a editar" } },
+    description: "EDITA una imagen adjunta (image-to-image): quitar fondo, agregar borde o recortar. Recibe la URL de la imagen y la instrucciÃ³n.",
+    params: { mode: { type: "string", description: "Siempre 'image_to_image'" }, message: { type: "string", description: "InstrucciÃ³n de ediciÃ³n (quitar fondo, agregar borde, recortar)" }, attachmentUrl: { type: "string", description: "URL de la imagen a editar" } },
     required: ["mode", "message"],
     run: (a) => toolMultimodal(a as any),
   },
   {
     name: "generate_video",
-    description: "GENERA un video a partir de texto (text-to-video) o de una imagen (image-to-video). Usa Cosmos 3 (NVIDIA) si está configurado o motion graphics (GIF) como fallback. NUNCA genera personas.",
-    params: { mode: { type: "string", description: "'text_to_video' o 'image_to_video'" }, message: { type: "string", description: "Descripción del video" }, attachmentUrl: { type: "string", description: "URL de la imagen de arranque (solo image_to_video)" } },
+    description: "GENERA un video a partir de texto (text-to-video) o de una imagen (image-to-video). Usa Cosmos 3 (NVIDIA) si estÃ¡ configurado o motion graphics (GIF) como fallback. NUNCA genera personas.",
+    params: { mode: { type: "string", description: "'text_to_video' o 'image_to_video'" }, message: { type: "string", description: "DescripciÃ³n del video" }, attachmentUrl: { type: "string", description: "URL de la imagen de arranque (solo image_to_video)" } },
     required: ["mode", "message"],
     run: (a) => toolMultimodal(a as any),
   },
   {
     name: "describe_image",
-    description: "TRANSCRIBE o analiza una imagen adjunta (image-to-text). Ideal para leer tablas, textos y números de capturas financieras.",
-    params: { mode: { type: "string", description: "Siempre 'image_to_text'" }, message: { type: "string", description: "Instrucción de transcripción/análisis" }, attachmentUrl: { type: "string", description: "URL o data URI de la imagen" } },
+    description: "TRANSCRIBE o analiza una imagen adjunta (image-to-text). Ideal para leer tablas, textos y nÃºmeros de capturas financieras.",
+    params: { mode: { type: "string", description: "Siempre 'image_to_text'" }, message: { type: "string", description: "InstrucciÃ³n de transcripciÃ³n/anÃ¡lisis" }, attachmentUrl: { type: "string", description: "URL o data URI de la imagen" } },
     required: ["mode", "message"],
     run: (a) => toolMultimodal(a as any),
   },
   {
     name: "transcribe_video",
-    description: "TRANSCRIBE un video adjunto (video-to-text): extrae frames con ffmpeg y los analiza con un modelo de visión. Devuelve el texto/tablas visibles.",
-    params: { mode: { type: "string", description: "Siempre 'video_to_text'" }, message: { type: "string", description: "Instrucción opcional" }, attachmentUrl: { type: "string", description: "URL del video (.mp4/.webm)" } },
+    description: "TRANSCRIBE un video adjunto (video-to-text): extrae frames con ffmpeg y los analiza con un modelo de visiÃ³n. Devuelve el texto/tablas visibles.",
+    params: { mode: { type: "string", description: "Siempre 'video_to_text'" }, message: { type: "string", description: "InstrucciÃ³n opcional" }, attachmentUrl: { type: "string", description: "URL del video (.mp4/.webm)" } },
     required: ["mode", "message"],
     run: (a) => toolMultimodal(a as any),
   },
@@ -508,7 +584,7 @@ export const AGENT_TOOLS: ToolRecord[] = [
 export type ToolLocalModelsArgs = { query?: string };
 
 export async function toolLocalModels(_args: ToolLocalModelsArgs): Promise<string> {
-  return "[Modelos locales deshabilitados] La aplicación usa modelos cloud (NVIDIA).";
+  return "[Modelos locales deshabilitados] La aplicaciÃ³n usa modelos cloud (NVIDIA).";
 }
 
 /** Ejecuta el pipeline completo: router ? cascada ? mejorador ? generador. */
@@ -546,7 +622,7 @@ export async function toolMultimodal(args: {
   }
 }
 
-/** Rutea la petición con el primer agente y devuelve el modelo asignado. */
+/** Rutea la peticiÃ³n con el primer agente y devuelve el modelo asignado. */
 export async function toolRouteTask(args: { message: string; hasAttachment?: boolean }): Promise<string> {
   try {
     const { routeTask } = await import("./router-agent.server");
@@ -558,7 +634,7 @@ export async function toolRouteTask(args: { message: string; hasAttachment?: boo
       `[ROUTER] ${decision.rationale}`,
       `  Modelo asignado: ${decision.assignedModel}`,
       decision.localBackup ? `  Respaldo local: ${decision.localBackup}` : "",
-      `  Tarea: ${decision.task} · Modalidad: ${decision.modalidad ?? "—"}`,
+      `  Tarea: ${decision.task} Â· Modalidad: ${decision.modalidad ?? "Â—"}`,
     ]
       .filter(Boolean)
       .join("\n");
@@ -578,7 +654,7 @@ export async function toolCascadeReason(args: { message: string }): Promise<stri
   }
 }
 
-/** Convierte AGENT_TOOLS al formato de función-calling de OpenAI */
+/** Convierte AGENT_TOOLS al formato de funciÃ³n-calling de OpenAI */
 export function buildToolsSchema(): Record<string, any>[] {
   return AGENT_TOOLS.map((t) => ({
     type: "function",
@@ -644,7 +720,7 @@ export async function toolCrmListar(args: ToolCrmListarArgs): Promise<string> {
     if (error) return `[ERROR] ${error.message}`;
     if (!data?.length) return "CRM: no hay clientes registrados.";
     const lines = data.map((c: { nombre: string; apellido: string | null; email: string | null; perfil_inversor: string | null; activos: string[] | null; created_at: string | null }) =>
-      `  ${c.nombre} ${c.apellido ?? ""} | ${c.email ?? "—"} | ${c.perfil_inversor ?? "—"} | Activos: ${(c.activos ?? []).join(", ") || "—"} | Creado: ${c.created_at?.slice(0, 10)}`
+      `  ${c.nombre} ${c.apellido ?? ""} | ${c.email ?? "Â—"} | ${c.perfil_inversor ?? "Â—"} | Activos: ${(c.activos ?? []).join(", ") || "Â—"} | Creado: ${c.created_at?.slice(0, 10)}`
     );
     return `CRM: ${data.length} clientes\n${lines.join("\n")}`;
   } catch (e: any) {
@@ -652,7 +728,7 @@ export async function toolCrmListar(args: ToolCrmListarArgs): Promise<string> {
   }
 }
 
-/** Enruta un tool_call a la implementación */
+/** Enruta un tool_call a la implementaciÃ³n */
 export async function executeToolCall(name: string, args: Record<string, any>): Promise<string> {
   const tool = AGENT_TOOLS.find((t) => t.name === name);
   if (!tool) return `[ERROR: herramienta desconocida '${name}']`;

@@ -160,7 +160,7 @@ export interface QuoteSummaryResult {
   secFilings?: { filings?: Array<Record<string, any>> };
 }
 
-/** Perfil de empresa (m�dulo assetProfile de quoteSummary) � usado por fundamental-af. */
+/** Perfil de empresa (mdulo assetProfile de quoteSummary)  usado por fundamental-af. */
 export interface CompanyOfficer {
   name?: string;
   title?: Record<string, unknown> | string;

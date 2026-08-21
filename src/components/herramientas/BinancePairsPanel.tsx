@@ -460,9 +460,9 @@ export function BinancePairsPanel() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-8">
+          <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-8">
             <div>
-              <Label className="text-[10px] text-muted-foreground">Par</Label>
+              <Label className="text-[13px] text-muted-foreground">Par</Label>
               <div className="flex gap-1 mt-1">
                 {PARES_PREDEFINIDOS.map((p) => (
                   <button
@@ -474,7 +474,7 @@ export function BinancePairsPanel() {
                       setObiHistory([]);
                       setZScoreHistory([]);
                     }}
-                    className={`text-[10px] px-1.5 py-0.5 rounded border ${symbol === p ? "border-primary bg-primary/10 text-foreground" : "border-border/60 text-muted-foreground"}`}
+                    className={`text-[13px] px-1.5 py-0.5 rounded border ${symbol === p ? "border-primary bg-primary/10 text-foreground" : "border-border/60 text-muted-foreground"}`}
                   >
                     {p.replace("USDT", "")}
                   </button>
@@ -491,12 +491,12 @@ export function BinancePairsPanel() {
                     setZScoreHistory([]);
                   }
                 }}
-                className="mt-1 h-7 text-[11px] bg-background/40 border-border/60 font-mono"
+                className="mt-1 h-7 text-[14px] bg-background/40 border-border/60 font-mono"
                 placeholder="SYMBOLUSDT"
               />
             </div>
             <div>
-              <Label className="text-[10px] text-muted-foreground">Umbral Z</Label>
+              <Label className="text-[13px] text-muted-foreground">Umbral Z</Label>
               <input
                 type="range"
                 min="1"
@@ -506,53 +506,53 @@ export function BinancePairsPanel() {
                 onChange={(e) => setUmbral(parseFloat(e.target.value))}
                 className="mt-2 w-full"
               />
-              <div className="text-[10px] text-center text-muted-foreground">
+              <div className="text-[13px] text-center text-muted-foreground">
                 {umbral.toFixed(1)}σ
               </div>
             </div>
             <div>
-              <Label className="text-[10px] text-muted-foreground">Warmup</Label>
+              <Label className="text-[13px] text-muted-foreground">Warmup</Label>
               <Input
                 type="number"
                 value={warmup}
                 onChange={(e) => setWarmup(parseInt(e.target.value) || 100)}
-                className="mt-1 h-7 text-[11px] bg-background/40 border-border/60 font-mono"
+                className="mt-1 h-7 text-[14px] bg-background/40 border-border/60 font-mono"
               />
             </div>
             <div>
-              <Label className="text-[10px] text-muted-foreground">ATR Period</Label>
+              <Label className="text-[13px] text-muted-foreground">ATR Period</Label>
               <Input
                 type="number"
                 value={atrPeriod}
                 onChange={(e) => setAtrPeriod(parseInt(e.target.value) || 14)}
-                className="mt-1 h-7 text-[11px] bg-background/40 border-border/60 font-mono"
+                className="mt-1 h-7 text-[14px] bg-background/40 border-border/60 font-mono"
               />
             </div>
             <div>
-              <Label className="text-[10px] text-muted-foreground">SL Multi</Label>
+              <Label className="text-[13px] text-muted-foreground">SL Multi</Label>
               <Input
                 type="number"
                 value={slMult}
                 onChange={(e) => setSlMult(parseFloat(e.target.value) || 2)}
-                className="mt-1 h-7 text-[11px] bg-background/40 border-border/60 font-mono"
+                className="mt-1 h-7 text-[14px] bg-background/40 border-border/60 font-mono"
                 step="0.5"
               />
             </div>
             <div>
-              <Label className="text-[10px] text-muted-foreground">TP Multi</Label>
+              <Label className="text-[13px] text-muted-foreground">TP Multi</Label>
               <Input
                 type="number"
                 value={tpMult}
                 onChange={(e) => setTpMult(parseFloat(e.target.value) || 7)}
-                className="mt-1 h-7 text-[11px] bg-background/40 border-border/60 font-mono"
+                className="mt-1 h-7 text-[14px] bg-background/40 border-border/60 font-mono"
                 step="0.5"
               />
             </div>
           </div>
           {/* Binance API Keys + Demo Mode */}
           <details className="mt-3 [&>summary]:cursor-pointer">
-            <summary className="mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground select-none">
-              🔑 Binance API Keys {apiKey ? "(✓)" : ""}
+            <summary className="mono text-[13px] uppercase tracking-[0.18em] text-muted-foreground select-none">
+               Binance API Keys {apiKey ? "()" : ""}
             </summary>
             <div className="mt-2 space-y-2 border border-border/40 rounded p-2 bg-muted/10">
               <input
@@ -560,36 +560,36 @@ export function BinancePairsPanel() {
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder="API Key"
                 type="password"
-                className="w-full h-7 text-[10px] font-mono bg-background/40 border border-border/60 rounded px-2 outline-none focus:border-primary/60"
+                className="w-full h-7 text-[13px] font-mono bg-background/40 border border-border/60 rounded px-2 outline-none focus:border-primary/60"
               />
               <input
                 value={apiSecret}
                 onChange={(e) => setApiSecret(e.target.value)}
                 placeholder="API Secret"
                 type="password"
-                className="w-full h-7 text-[10px] font-mono bg-background/40 border border-border/60 rounded px-2 outline-none focus:border-primary/60"
+                className="w-full h-7 text-[13px] font-mono bg-background/40 border border-border/60 rounded px-2 outline-none focus:border-primary/60"
               />
               <div className="flex gap-2">
                 <button
                   onClick={saveKeys}
-                  className="flex-1 rounded bg-primary/20 px-2 py-1 text-[10px] font-mono text-primary hover:bg-primary/30"
+                  className="flex-1 rounded bg-primary/20 px-2 py-1 text-[13px] font-mono text-primary hover:bg-primary/30"
                 >
                   Guardar
                 </button>
                 <button
                   onClick={clearKeys}
-                  className="rounded bg-danger/20 px-2 py-1 text-[10px] font-mono text-danger hover:bg-danger/30"
+                  className="rounded bg-danger/20 px-2 py-1 text-[13px] font-mono text-danger hover:bg-danger/30"
                 >
                   Eliminar
                 </button>
               </div>
               <div className="flex items-center justify-between border-t border-border/40 pt-2">
-                <span className="text-[10px] font-mono text-muted-foreground">
+                <span className="text-[13px] font-mono text-muted-foreground">
                   Modo Demo (testnet)
                 </span>
                 <button
                   onClick={() => setDemoMode((d) => !d)}
-                  className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${demoMode ? "bg-success/20 text-success" : "bg-muted/20 text-muted-foreground"}`}
+                  className={`px-2 py-0.5 rounded text-[13px] font-mono transition-colors ${demoMode ? "bg-success/20 text-success" : "bg-muted/20 text-muted-foreground"}`}
                 >
                   {demoMode ? "ACTIVO" : "INACTIVO"}
                 </button>
@@ -600,12 +600,12 @@ export function BinancePairsPanel() {
       </Card>
 
       {error && (
-        <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 font-mono text-[11px] text-red-400">
+        <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 font-mono text-[14px] text-red-400">
           {error}
         </div>
       )}
       {/* Status Card */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="bg-surface border-border/60 lg:col-span-2">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
@@ -616,33 +616,33 @@ export function BinancePairsPanel() {
                 <span
                   className={`h-2 w-2 rounded-full ${ws.connected ? "bg-green-400 animate-pulse" : "bg-red-400"}`}
                 />
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-[13px] text-muted-foreground">
                   {ws.connected ? "LIVE" : "Desconectado"}
                 </span>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
               <div>
-                <div className="text-[10px] text-muted-foreground">Precio</div>
+                <div className="text-[13px] text-muted-foreground">Precio</div>
                 <div className="text-lg font-mono font-medium">
                   ${fmtNum(ws.ticker?.lastPrice ?? ws.orderBook?.midPrice ?? null)}
                   <span
-                    className={`ml-2 text-[11px] ${(ws.ticker?.priceChangePercent ?? 0) >= 0 ? "text-green-400" : "text-red-400"}`}
+                    className={`ml-2 text-[14px] ${(ws.ticker?.priceChangePercent ?? 0) >= 0 ? "text-green-400" : "text-red-400"}`}
                   >
                     {fmtPct(ws.ticker?.priceChangePercent ?? null, 2)}
                   </span>
                 </div>
               </div>
               <div>
-                <div className="text-[10px] text-muted-foreground">OBI</div>
+                <div className="text-[13px] text-muted-foreground">OBI</div>
                 <div className="text-lg font-mono">
                   {currentObiCalc ? fmtNum(currentObiCalc.obi, 3) : "\u2014"}
                 </div>
               </div>
               <div>
-                <div className="text-[10px] text-muted-foreground">Z-Score</div>
+                <div className="text-[13px] text-muted-foreground">Z-Score</div>
                 <div
                   className={`text-lg font-mono ${currentObiCalc ? (Math.abs(currentObiCalc.zScore) >= umbral ? "text-yellow-400" : "") : ""}`}
                 >
@@ -650,7 +650,7 @@ export function BinancePairsPanel() {
                 </div>
               </div>
               <div>
-                <div className="text-[10px] text-muted-foreground">ATR (14)</div>
+                <div className="text-[13px] text-muted-foreground">ATR (14)</div>
                 <div className="text-lg font-mono">{atr ? fmtPct(atr.atrPct, 2) : "\u2014"}</div>
               </div>
             </div>
@@ -661,10 +661,10 @@ export function BinancePairsPanel() {
                 <div
                   className={`mt-2 rounded-md px-3 py-2 text-sm font-semibold animate-pulse ${currentObiCalc.zScore > 0 ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
                 >
-                  {currentObiCalc.zScore > 0 ? "▲ SEÑAL LONG" : "▼ SEÑAL SHORT"}
+                  {currentObiCalc.zScore > 0 ? " SEÑAL LONG" : " SEÑAL SHORT"}
                 </div>
               )}
-            <div className="mt-2 grid grid-cols-2 gap-2 text-[10px] text-muted-foreground">
+            <div className="mt-2 grid grid-cols-2 gap-2 text-[13px] text-muted-foreground">
               <span>
                 Best Bid: ${fmtNum(ws.orderBook?.bestBid)} (Vol:{" "}
                 {fmtNum(ws.orderBook?.bids[0]?.volume, 4)})
@@ -691,16 +691,16 @@ export function BinancePairsPanel() {
         <Card className="bg-surface border-border/60">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <CardTitle className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Cuenta Binance {demoMode ? "Testnet" : ""}
               </CardTitle>
               <div className="flex items-center gap-2">
                 {accountBalance?.canTrade && (
-                  <span className="text-[9px] font-mono text-success">Trade ✓</span>
+                  <span className="text-[13px] font-mono text-success">Trade </span>
                 )}
                 <button
                   onClick={fetchBalance}
-                  className="text-[9px] px-1.5 py-0.5 rounded border border-border/40 text-muted-foreground hover:text-foreground"
+                  className="text-[13px] px-1.5 py-0.5 rounded border border-border/40 text-muted-foreground hover:text-foreground"
                   disabled={balanceLoading}
                 >
                   {balanceLoading ? "..." : "Actualizar"}
@@ -709,7 +709,7 @@ export function BinancePairsPanel() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-1.5 text-[11px] font-mono">
+            <div className="space-y-1.5 text-[14px] font-mono">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Maker</span>
                 <span>{accountBalance != null ? fmtPct(accountBalance.maker, 3) : "\u2014"}</span>
@@ -733,18 +733,18 @@ export function BinancePairsPanel() {
       <Card className="bg-surface border-border/60">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            <CardTitle className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
               Resultados del Backtesting
             </CardTitle>
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[13px] text-muted-foreground">
               {metrics.totalClosed} trades cerrados
             </span>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
             <div>
-              <div className="text-[9px] text-muted-foreground">Win Rate</div>
+              <div className="text-[13px] text-muted-foreground">Win Rate</div>
               <div
                 className={`text-sm font-mono font-semibold ${metrics.winRate >= 0.5 ? "text-emerald-400" : "text-red-400"}`}
               >
@@ -752,7 +752,7 @@ export function BinancePairsPanel() {
               </div>
             </div>
             <div>
-              <div className="text-[9px] text-muted-foreground">P&L Total</div>
+              <div className="text-[13px] text-muted-foreground">P&L Total</div>
               <div
                 className={`text-sm font-mono font-semibold ${metrics.avgReturn >= 0 ? "text-emerald-400" : "text-red-400"}`}
               >
@@ -760,7 +760,7 @@ export function BinancePairsPanel() {
               </div>
             </div>
             <div>
-              <div className="text-[9px] text-muted-foreground">Sharpe</div>
+              <div className="text-[13px] text-muted-foreground">Sharpe</div>
               <div
                 className={`text-sm font-mono font-semibold ${metrics.sharpe >= 1 ? "text-emerald-400" : metrics.sharpe >= 0 ? "text-amber-400" : "text-red-400"}`}
               >
@@ -768,13 +768,13 @@ export function BinancePairsPanel() {
               </div>
             </div>
             <div>
-              <div className="text-[9px] text-muted-foreground">Max Drawdown</div>
+              <div className="text-[13px] text-muted-foreground">Max Drawdown</div>
               <div className="text-sm font-mono font-semibold text-red-400">
                 {fmtPct(-metrics.maxDrawdown * 100, 2)}
               </div>
             </div>
             <div>
-              <div className="text-[9px] text-muted-foreground">Profit Factor</div>
+              <div className="text-[13px] text-muted-foreground">Profit Factor</div>
               <div
                 className={`text-sm font-mono font-semibold ${metrics.profitFactor >= 1.5 ? "text-emerald-400" : metrics.profitFactor >= 1 ? "text-amber-400" : "text-red-400"}`}
               >
@@ -782,7 +782,7 @@ export function BinancePairsPanel() {
               </div>
             </div>
             <div>
-              <div className="text-[9px] text-muted-foreground">Retorno Promedio</div>
+              <div className="text-[13px] text-muted-foreground">Retorno Promedio</div>
               <div
                 className={`text-sm font-mono font-semibold ${metrics.avgReturn >= 0 ? "text-emerald-400" : "text-red-400"}`}
               >
@@ -790,13 +790,13 @@ export function BinancePairsPanel() {
               </div>
             </div>
             <div>
-              <div className="text-[9px] text-muted-foreground">Win Rate LONG</div>
+              <div className="text-[13px] text-muted-foreground">Win Rate LONG</div>
               <div className="text-sm font-mono font-semibold text-emerald-400">
                 {fmtPct(metrics.longWinRate * 100, 1)}
               </div>
             </div>
             <div>
-              <div className="text-[9px] text-muted-foreground">Win Rate SHORT</div>
+              <div className="text-[13px] text-muted-foreground">Win Rate SHORT</div>
               <div className="text-sm font-mono font-semibold text-red-400">
                 {fmtPct(metrics.shortWinRate * 100, 1)}
               </div>
@@ -804,7 +804,7 @@ export function BinancePairsPanel() {
           </div>
           {demoMode && signals.filter((s) => s.status === "abierta").length > 0 && (
             <div className="mt-3 space-y-1 border-t border-border/40 pt-2">
-              <div className="text-[9px] text-muted-foreground mb-1">Posiciones abiertas:</div>
+              <div className="text-[13px] text-muted-foreground mb-1">Posiciones abiertas:</div>
               {signals
                 .filter((s) => s.status === "abierta")
                 .map((s) => (
@@ -814,18 +814,18 @@ export function BinancePairsPanel() {
                   >
                     <div>
                       <span
-                        className={`text-[10px] font-semibold ${s.type === "LONG" ? "text-green-400" : "text-red-400"}`}
+                        className={`text-[13px] font-semibold ${s.type === "LONG" ? "text-green-400" : "text-red-400"}`}
                       >
                         {s.type} {symbol.replace("USDT", "")}
                       </span>
-                      <div className="text-[9px] text-muted-foreground">
+                      <div className="text-[13px] text-muted-foreground">
                         ${fmtNum(s.entryPrice)} · {s.quantity} · Order #{s.binanceOrderId}
                       </div>
                     </div>
                     <button
                       onClick={() => closePosition(s)}
                       disabled={orderLoading === `closing_${s.timestamp}`}
-                      className="text-[9px] rounded bg-danger/20 px-2 py-0.5 font-mono text-danger hover:bg-danger/30 disabled:opacity-50"
+                      className="text-[13px] rounded bg-danger/20 px-2 py-0.5 font-mono text-danger hover:bg-danger/30 disabled:opacity-50"
                     >
                       {orderLoading === `closing_${s.timestamp}` ? "..." : "Cerrar"}
                     </button>
@@ -834,7 +834,7 @@ export function BinancePairsPanel() {
             </div>
           )}
           {orderLoading?.startsWith("placing") && (
-            <div className="mt-2 text-[10px] font-mono text-yellow-400 animate-pulse">
+            <div className="mt-2 text-[13px] font-mono text-yellow-400 animate-pulse">
               Enviando orden... {orderLoading}
             </div>
           )}
@@ -868,7 +868,7 @@ export function BinancePairsPanel() {
               variant="outline"
               size="sm"
               onClick={() => setSignals([])}
-              className="h-7 text-[10px] border-border/60 text-muted-foreground"
+              className="h-7 text-[13px] border-border/60 text-muted-foreground"
             >
               Limpiar señales
             </Button>
@@ -881,7 +881,7 @@ export function BinancePairsPanel() {
         <Card className="bg-surface border-border/60">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Order Book Depth
               </h3>
               <span

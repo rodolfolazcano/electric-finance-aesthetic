@@ -1,7 +1,7 @@
 // @ts-nocheck
-// ─── Murphy Validator — Server Function ──────────────────────────────
+//  Murphy Validator — Server Function 
 // Orquesta: fetch de datos → validación pura → reporte estructurado
-// ─────────────────────────────────────────────────────────────────────
+// 
 
 import { createServerFn } from "@tanstack/react-start";
 import { getCached, setCache } from "./cache";
@@ -24,12 +24,12 @@ import {
 import { detectCyclePhase } from "./cycle-phase-detector";
 import { computePearsonCorrelation } from "./intermarket-complete";
 
-// ─── Constantes ──────────────────────────────────────────────────────
+//  Constantes 
 
 const CACHE_TTL = 10 * 60 * 1000; // 10 min
 const CACHE_KEY = "murphy-validator-v1";
 
-// ─── Helpers (copiados de intermarket-murphy.functions.ts para mantener pureza) ──
+//  Helpers (copiados de intermarket-murphy.functions.ts para mantener pureza) 
 
 async function fetchYahooHistory(ticker: string, period: string): Promise<{ date: string; close: number }[]> {
   try {
@@ -173,14 +173,14 @@ function buildRatioData(
   };
 }
 
-// ─── Server Function Principal ───────────────────────────────────────
+//  Server Function Principal 
 
 export const getMurphyValidatorReport = createServerFn({ method: "GET" }).handler(
   async (): Promise<MurphyReport> => {
     const cached = getCached<MurphyReport>(CACHE_KEY, CACHE_TTL);
     if (cached) return cached;
 
-    // ── 1. FETCH todos los tickers en paralelo ──
+    //  1. FETCH todos los tickers en paralelo 
     const [
       crbData, tltData, spyData, dxyData,
       gldData, slvData, usoData,
@@ -228,14 +228,14 @@ export const getMurphyValidatorReport = createServerFn({ method: "GET" }).handle
       fetchYahooHistory("EWJ", "1y"),          // Japan
     ]);
 
-    // ── 2. COMPUTE returns ──
+    //  2. COMPUTE returns 
     const crbRets = computeReturns(crbData);
     const tltRets = computeReturns(tltData);
     const spyRets = computeReturns(spyData);
     const dxyRets = computeReturns(dxyData);
     const crbRetsFull = crbRets; // used for lead-lag
 
-    // ── 3. BUILD data structures for the validator ──
+    //  3. BUILD data structures for the validator 
 
     // CRB/Bonds ratio
     const crbBonds: RatioData = buildRatioData(crbData, tltData);
@@ -455,7 +455,7 @@ export const getMurphyValidatorReport = createServerFn({ method: "GET" }).handle
     // EWJ/SPY ratio — Japan leading indicator (Murphy p.84-87)
     const ewjSpy: RatioData = buildRatioData(ewjData, spyData);
 
-    // ── 4. ENSAMBLAR MurphyValidationData ──
+    //  4. ENSAMBLAR MurphyValidationData 
     const validationData: MurphyValidationData = {
       crbBonds,
       commoditiesStocks,
@@ -484,10 +484,10 @@ export const getMurphyValidatorReport = createServerFn({ method: "GET" }).handle
       vixLevel,
     };
 
-    // ── 5. GENERAR REPORTE ──
+    //  5. GENERAR REPORTE 
     const report = generateMurphyReport(validationData);
 
-    // ── 6. CACHEAR Y RETORNAR ──
+    //  6. CACHEAR Y RETORNAR 
     setCache(CACHE_KEY, report);
     return report;
   },

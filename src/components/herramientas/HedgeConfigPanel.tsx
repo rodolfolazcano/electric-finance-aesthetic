@@ -60,25 +60,25 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
     <div className="space-y-4 rounded-lg border border-border/40 bg-muted/5 p-4">
       <h3 className="font-mono text-xs font-medium text-foreground">Configuración de Cobertura</h3>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-1.5">
           <div className="flex items-center justify-between">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Benchmark(s)
             </label>
             <button
               onClick={toggleAuto}
-              className={`font-mono text-[9px] px-2 py-0.5 rounded border transition-colors ${
+              className={`font-mono text-[13px] px-2 py-0.5 rounded border transition-colors ${
                 autoDetect
                   ? "border-primary/60 bg-primary/10 text-foreground"
                   : "border-border/60 text-muted-foreground hover:text-foreground"
               }`}
             >
-              {autoDetect ? "Auto ◆" : "Auto ◇"}
+              {autoDetect ? "Auto " : "Auto "}
             </button>
           </div>
           {autoDetect ? (
-            <div className="rounded border border-primary/20 bg-primary/5 p-2 text-[10px] font-mono text-muted-foreground text-center">
+            <div className="rounded border border-primary/20 bg-primary/5 p-2 text-[13px] font-mono text-muted-foreground text-center">
               Auto-detecting best benchmark (mayor R²) de {BENCHMARK_OPTIONS.length} factores
             </div>
           ) : (
@@ -94,7 +94,7 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
                         : [...config.benchmarks, b.ticker];
                       set("benchmarks", next.length > 0 ? next : [b.ticker]);
                     }}
-                    className={`whitespace-nowrap rounded border px-2 py-1 font-mono text-[10px] transition-colors ${
+                    className={`whitespace-nowrap rounded border px-2 py-1 font-mono text-[13px] transition-colors ${
                       active
                         ? "border-primary/60 bg-primary/10 text-foreground"
                         : "border-border/60 text-muted-foreground hover:text-foreground"
@@ -109,7 +109,7 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
         </div>
 
         <div className="space-y-1.5">
-          <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Universo de cobertura
           </label>
           <div className="flex flex-wrap gap-1">
@@ -117,7 +117,7 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
               <button
                 key={u.value}
                 onClick={() => set("universe", u.value)}
-                className={`rounded border px-2 py-1 font-mono text-[11px] transition-colors ${
+                className={`rounded border px-2 py-1 font-mono text-[14px] transition-colors ${
                   config.universe === u.value
                     ? "border-primary/60 bg-primary/10 text-foreground"
                     : "border-border/60 text-muted-foreground hover:text-foreground"
@@ -132,13 +132,13 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
               value={config.manualUniverseTickers}
               onChange={(e) => set("manualUniverseTickers", e.target.value)}
               placeholder="SPY, QQQ, XLK, XLF, ..."
-              className="mt-1 w-full rounded border border-border/40 bg-background px-2 py-1 font-mono text-[11px] outline-none focus:border-primary/60"
+              className="mt-1 w-full rounded border border-border/40 bg-background px-2 py-1 font-mono text-[14px] outline-none focus:border-primary/60"
             />
           )}
         </div>
 
         <div className="space-y-1.5">
-          <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Período
           </label>
           <div className="flex flex-wrap gap-1">
@@ -146,7 +146,7 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
               <button
                 key={p.value}
                 onClick={() => set("period", p.value)}
-                className={`rounded border px-2.5 py-1 font-mono text-[11px] transition-colors ${
+                className={`rounded border px-2.5 py-1 font-mono text-[14px] transition-colors ${
                   config.period === p.value
                     ? "border-primary/60 bg-primary/10 text-foreground"
                     : "border-border/60 text-muted-foreground hover:text-foreground"
@@ -159,9 +159,9 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1.5">
-          <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Regularización (λ): {config.lambda.toFixed(2)}
           </label>
           <input
@@ -176,7 +176,7 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
         </div>
 
         <div className="space-y-1.5">
-          <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Tipo de cobertura
           </label>
           <div className="flex flex-wrap gap-1">
@@ -184,7 +184,7 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
               <button
                 key={t.value}
                 onClick={() => set("hedgeType", t.value)}
-                className={`rounded border px-2 py-1 font-mono text-[11px] transition-colors ${
+                className={`rounded border px-2 py-1 font-mono text-[14px] transition-colors ${
                   config.hedgeType === t.value
                     ? "border-primary/60 bg-primary/10 text-foreground"
                     : "border-border/60 text-muted-foreground hover:text-foreground"
@@ -197,7 +197,7 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
         </div>
 
         <div className="space-y-1.5">
-          <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Saldo disponible (USD)
           </label>
           <div className="flex items-center gap-2">
@@ -207,12 +207,12 @@ export function HedgeConfigPanel({ config, onChange, source, iolAvailableCash }:
               step="0.1"
               value={config.availableCash}
               onChange={(e) => set("availableCash", Math.max(0, parseFloat(e.target.value) || 0))}
-              className="w-full rounded border border-border/40 bg-background px-2 py-1 font-mono text-[11px] outline-none focus:border-primary/60"
+              className="w-full rounded border border-border/40 bg-background px-2 py-1 font-mono text-[14px] outline-none focus:border-primary/60"
             />
             {source === "iol" && iolAvailableCash !== undefined && (
               <button
                 onClick={() => set("availableCash", iolAvailableCash)}
-                className="shrink-0 rounded border border-border/40 px-2 py-1 font-mono text-[10px] text-muted-foreground hover:text-foreground"
+                className="shrink-0 rounded border border-border/40 px-2 py-1 font-mono text-[13px] text-muted-foreground hover:text-foreground"
                 title={`Usar saldo IOL: $${iolAvailableCash.toFixed(2)}`}
               >
                 IOL

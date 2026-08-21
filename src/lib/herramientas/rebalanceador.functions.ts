@@ -18,7 +18,7 @@ function dailyReturns(prices: number[]): number[] {
   return out;
 }
 
-// ─── Sector lookup from sectores.json ────────────────────────────────
+//  Sector lookup from sectores.json 
 
 import sectoresData from "./sectores.json";
 
@@ -77,9 +77,9 @@ function lookupSector(ticker: string): { sector?: string; industria?: string } {
   return {};
 }
 
-// ─── Currency detection ──────────────────────────────────────────────
+//  Currency detection 
 
-// ─── Currency detection ──────────────────────────────────────────────
+//  Currency detection 
 
 function detectCurrency(ticker: string): string {
   const t = ticker.toUpperCase();

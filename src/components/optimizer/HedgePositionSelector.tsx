@@ -24,13 +24,13 @@ export function HedgePositionSelector({ positions, onToggle, onSelectAllNegative
               : "Posiciones por Sector"}
         </h3>
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[11px] text-muted-foreground">
+          <span className="font-mono text-[14px] text-muted-foreground">
             Total: <span className="text-foreground">${totalValorUSD.toFixed(2)} USD</span>
           </span>
           {negCount > 0 && (
             <button
               onClick={onSelectAllNegative}
-              className="rounded border border-danger/40 bg-danger/10 px-2.5 py-1 font-mono text-[11px] text-danger transition-colors hover:bg-danger/20"
+              className="rounded border border-danger/40 bg-danger/10 px-2.5 py-1 font-mono text-[14px] text-danger transition-colors hover:bg-danger/20"
             >
               Seleccionar todas las negativas ({negCount})
             </button>
@@ -38,7 +38,7 @@ export function HedgePositionSelector({ positions, onToggle, onSelectAllNegative
         </div>
       </div>
       {positions.some((p) => p.valorARS > 0) && (
-        <div className="text-[10px] font-mono text-muted-foreground/60 px-1">
+        <div className="text-[13px] font-mono text-muted-foreground/60 px-1">
           * Valores ARS convertidos a USD aprox. (tipo de cambio referencial)
         </div>
       )}
@@ -51,9 +51,9 @@ export function HedgePositionSelector({ positions, onToggle, onSelectAllNegative
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border/40">
-          <table className="w-full text-left font-mono text-[11px]">
+          <table className="w-full text-left font-mono text-[14px]">
             <thead>
-              <tr className="border-b border-border/40 bg-muted/20 text-[10px] uppercase tracking-wider text-muted-foreground">
+              <tr className="border-b border-border/40 bg-muted/20 text-[13px] uppercase tracking-wider text-muted-foreground">
                 <th className="w-8 px-3 py-2"></th>
                 <th className="px-3 py-2">Ticker</th>
                 <th className="px-3 py-2">Descripción</th>

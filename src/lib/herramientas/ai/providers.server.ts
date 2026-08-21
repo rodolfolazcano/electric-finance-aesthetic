@@ -655,9 +655,9 @@ export async function resilientVision(
   });
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // AGENTE: variant con tool-calling (devuelve content + tool_calls)
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 
 /** Tipado del mensaje completo del asistente para el agente. */
 export type AgentResponse = {

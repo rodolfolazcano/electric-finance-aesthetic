@@ -129,7 +129,7 @@ export function OnsLadderPanel({
         </div>
       </div>
 
-      {/* ── Manual ticker selector ── */}
+      {/*  Manual ticker selector  */}
       {showManual && (
         <div className="space-y-2 p-3 bg-muted/20 rounded-md">
           <div className="text-[11px] text-muted-foreground">
@@ -171,7 +171,7 @@ export function OnsLadderPanel({
         </div>
       )}
 
-      {/* ── Automatic ladder mode ── */}
+      {/*  Automatic ladder mode  */}
       {ladderMode && (
         <div className="space-y-3 p-3 bg-muted/20 rounded-md">
           <div className="text-[11px] text-muted-foreground">

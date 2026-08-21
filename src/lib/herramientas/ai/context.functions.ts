@@ -129,7 +129,7 @@ export const listLearningNotes = createServerFn({ method: "GET" }).handler(async
   return { ok: true as const, error: null, items: data ?? [] };
 });
 
-// ─── Session snapshots (save/load full session state) ──────────────────────
+//  Session snapshots (save/load full session state) 
 
 const sessionSnapshotSchema = z.object({
   sessionId: z.string().min(1),

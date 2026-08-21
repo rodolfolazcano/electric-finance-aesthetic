@@ -16,7 +16,7 @@ import {
 import { fetchHistoricoValuacion, type HistoricoValuacionResult } from "@/lib/sectores/historico-metricas.functions";
 import type { SectorTickerValuation } from "@/lib/sector-valuation.functions";
 
-// ─── types ─────────────────────────────────────────────────────────
+//  types 
 
 interface Props {
   ticker: SectorTickerValuation;
@@ -41,9 +41,9 @@ function BadgeConf({ confiabilidad }: { confiabilidad: Interpretacion["confiabil
 
 function TonoIcon({ tono }: { tono: Interpretacion["tono"] }) {
   if (tono === "sin-dato") return <span className="text-muted-foreground text-[10px]">—</span>;
-  if (tono === "positivo") return <span className="text-emerald-400 text-[10px]">◉</span>;
-  if (tono === "negativo") return <span className="text-red-400 text-[10px]">◉</span>;
-  return <span className="text-muted-foreground text-[10px]">◉</span>;
+  if (tono === "positivo") return <span className="text-emerald-400 text-[10px]"></span>;
+  if (tono === "negativo") return <span className="text-red-400 text-[10px]"></span>;
+  return <span className="text-muted-foreground text-[10px]"></span>;
 }
 
 function BloqueInterpretacion({ label, interpretacion }: { label: string; interpretacion?: Interpretacion | null }) {
@@ -63,7 +63,7 @@ function BloqueInterpretacion({ label, interpretacion }: { label: string; interp
   );
 }
 
-// ─── Componente principal ─────────────────────────────────────────
+//  Componente principal 
 
 export function InterpretacionPopover({ ticker }: Props) {
   const [historial, setHistorial] = useState<HistoricoValuacionResult | null>(null);
@@ -124,7 +124,7 @@ export function InterpretacionPopover({ ticker }: Props) {
           className="inline-flex items-center justify-center h-5 w-5 rounded text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors cursor-help"
           title="Ver interpretación de métricas"
         >
-          ⓘ
+          
         </button>
       </PopoverTrigger>
       <PopoverContent

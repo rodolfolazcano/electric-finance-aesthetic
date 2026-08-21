@@ -152,7 +152,7 @@ export const PERFILES_SECTOR: Record<string, PerfilSector> = {
   },
 };
 
-// ─── Mapa de normalización: nombres en sectores.json → clave de PERFILES_SECTOR ───
+//  Mapa de normalización: nombres en sectores.json → clave de PERFILES_SECTOR 
 const MAP_SECTOR_A_PERFIL: Record<string, string> = {
   Technology: "Tecnología",
   Tecnología: "Tecnología",
@@ -184,7 +184,7 @@ const MAP_SECTOR_A_PERFIL: Record<string, string> = {
   "Bienes raíces": "Bienes Raíces",
 };
 
-// ─── Índice invertido: ticker → sector (primer match gana) ───
+//  Índice invertido: ticker → sector (primer match gana) 
 const TICKER_TO_SECTOR = new Map<string, string>();
 for (const [sector, industrias] of Object.entries(sectoresData)) {
   for (const tickers of Object.values(industrias as Record<string, unknown>)) {

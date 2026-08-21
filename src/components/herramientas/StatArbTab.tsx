@@ -14,7 +14,7 @@ export interface SharedPairConfig {
   stopThresh: number;
   capitalPerPair: number;
   txCost: number;
-  // ─── Labadie: parámetros de ejecución óptima ───
+  //  Labadie: parámetros de ejecución óptima 
   executionAlgo: "pairs" | "tc" | "is";
   pValue: number;
   marketImpactGamma: number;
@@ -51,7 +51,7 @@ export function StatArbTab() {
       <div className="flex gap-1.5 border-b border-border/40 pb-2">
         <button
           onClick={() => setSubtab("pairs")}
-          className={`font-mono text-[11px] px-3 py-1.5 rounded-md border transition-colors ${
+          className={`font-mono text-[14px] px-3 py-1.5 rounded-md border transition-colors ${
             subtab === "pairs"
               ? "border-primary/60 bg-primary/10 text-foreground"
               : "border-border/60 text-muted-foreground hover:text-foreground"
@@ -61,7 +61,7 @@ export function StatArbTab() {
         </button>
         <button
           onClick={() => setSubtab("backtest")}
-          className={`font-mono text-[11px] px-3 py-1.5 rounded-md border transition-colors ${
+          className={`font-mono text-[14px] px-3 py-1.5 rounded-md border transition-colors ${
             subtab === "backtest"
               ? "border-primary/60 bg-primary/10 text-foreground"
               : "border-border/60 text-muted-foreground hover:text-foreground"

@@ -1,5 +1,5 @@
 // @ts-nocheck
-// ─── Motor Intermarket — funciones puras compartidas ───────────
+//  Motor Intermarket — funciones puras compartidas 
 // Separado de motor-recomendacion.functions.ts para evitar que
 // server functions importen de otros archivos server function.
 
@@ -10,7 +10,7 @@ import {
   type TrendArrow,
 } from "./cycle-phase-detector";
 
-// ─── Tipos ─────────────────────────────────────────────────────
+//  Tipos 
 
 export interface PatronHistorico {
   id: "1987" | "1990" | "geopolitico";
@@ -57,7 +57,7 @@ export interface LecturaIntermarket {
   };
 }
 
-// ─── PARTE 1: 4 REGLAS NÚCLEO MURPHY (Cap. 1) ─────────────────
+//  PARTE 1: 4 REGLAS NÚCLEO MURPHY (Cap. 1) 
 
 /** Fuente: Murphy, "Intermarket Analysis", cap. 1 */
 export function reglaDolarCommodities(dxyTrend: number | null, dbcTrend: number | null): number {
@@ -69,7 +69,7 @@ export function reglaDolarCommodities(dxyTrend: number | null, dbcTrend: number 
   return -Math.min(1, mag / 12);
 }
 
-// ─── REGLA DÓLAR EXTENDIDA (Cap. 6) ─────────────────────────────
+//  REGLA DÓLAR EXTENDIDA (Cap. 6) 
 // Murphy: "A rising dollar is good for U.S. bonds and stocks"
 // "A weak dollar favors large multinational stocks"
 // "A rising dollar favors small-cap stocks more than large-cap"
@@ -161,7 +161,7 @@ export function reglaDolarExtendida(params: {
   };
 }
 
-// ─── TESTS DIRECCIONALES (validación post-implementación) ───────
+//  TESTS DIRECCIONALES (validación post-implementación) 
 // Test 1: Dólar alcista sintético (dxyReturn60d = 5%) → efectoDirectoBondsStocks = "positivo"
 // Test 2: Dólar bajista sintético (dxyReturn60d = -5%) → efectoDirectoBondsStocks = "negativo"
 // Ambos tests pasan según la lógica implementada en líneas 100-107
@@ -216,7 +216,7 @@ export function reglaOroPetroleoVsAcciones(
   return 0;
 }
 
-// ─── DETECTOR DE DESACOPLE DEFLACIONARIO (Cap. 12) ─────────────
+//  DETECTOR DE DESACOPLE DEFLACIONARIO (Cap. 12) 
 // Murphy: "In a deflationary climate, stocks and commodities fall together — but bond prices rise"
 // Precedentes históricos: 1929-1931, 2000-2003
 
@@ -326,7 +326,7 @@ export function detectarDesacopleDeflacionario(params: {
   };
 }
 
-// ─── TEST SINTÉTICO (validación post-implementación) ─────────────
+//  TEST SINTÉTICO (validación post-implementación) 
 // Test: bonos+10%, acciones-10% en 60d → desacoplado=true, interpretacion='senal_deflacionaria'
 // Ejemplo de uso:
 // const testBondPrices = Array.from({length: 60}, (_, i) => 100 * (1 + 0.10 * i / 59));
@@ -354,7 +354,7 @@ export function indicePresionInflacionaria(params: {
   return scores.reduce((a, b) => a + b, 0) / scores.length;
 }
 
-// ─── CLASIFICAR REGIMEN INTERMARKET (PASO 10 — Murphy) ────────
+//  CLASIFICAR REGIMEN INTERMARKET (PASO 10 — Murphy) 
 
 /** Fuente: Murphy, "Intermarket Analysis", cap. 6 (extensión propia para clasificación de regimen) */
 export function clasificarRegimenIntermarket(input: {
@@ -458,7 +458,7 @@ export function clasificarRegimenIntermarket(input: {
   };
 }
 
-// ─── RATIO CRB/BONDS (PASO 11) ─────────────────────────────────
+//  RATIO CRB/BONDS (PASO 11) 
 
 /** Fuente: Murphy, "Intermarket Analysis", cap. 3-4 */
 export function evaluarRatioCRBBonds(
@@ -489,7 +489,7 @@ export function evaluarRatioCRBBonds(
   return { confirmacion: 0, detalle: "Ratio CRB/Bonos no confirma sesgo sectorial específico" };
 }
 
-// ─── RUEDA DE STOVALL (PASO 12) ────────────────────────────────
+//  RUEDA DE STOVALL (PASO 12) 
 // @deprecated: Usar CANONICAL_SECTOR_ROTATION directamente. Esta tabla se mantiene por compatibilidad.
 
 /** Fuente: Murphy, "Intermarket Analysis", cap. 13 (rueda de Stovall) */
@@ -549,7 +549,7 @@ export function inferirEtapaCiclo(datos: {
   return { etapaEstimada: null, certeza: "baja", sectoresLideres: [] };
 }
 
-// ─── PARTE 2: DETECTOR DE PATRONES HISTÓRICOS ──────────────────
+//  PARTE 2: DETECTOR DE PATRONES HISTÓRICOS 
 
 /** Fuente: Murphy, "Intermarket Analysis", cap. 5 (1987 setup), cap. 6 (1990 setup), cap. 15 (geopolítico) */
 export function detectarPatronHistorico(params: {
@@ -692,7 +692,7 @@ export function detectarPatronHistorico(params: {
   return resultados;
 }
 
-// ─── PARTE 3: LEAD-LAG Y MEMORIA DE SECUENCIA ─────────────────
+//  PARTE 3: LEAD-LAG Y MEMORIA DE SECUENCIA 
 
 /** Fuente: Murphy, "Intermarket Analysis", cap. 15 (secuencia de giros) */
 export function registrarSecuenciaDeGiros(params: {
@@ -764,7 +764,7 @@ export function registrarSecuenciaDeGiros(params: {
   };
 }
 
-// ─── PARTE 3: VALIDAR SECUENCIA DE ROTACIÓN (3 etapas) ────────
+//  PARTE 3: VALIDAR SECUENCIA DE ROTACIÓN (3 etapas) 
 
 /** Fuente: Murphy, "Intermarket Analysis", cap. 15 (secuencia de rotación 3 etapas) */
 export function validarSecuenciaRotacionCompleta(params: {
@@ -823,7 +823,7 @@ export function validarSecuenciaRotacionCompleta(params: {
   };
 }
 
-// ─── PARTE 4: DETECTOR DE BEAR MARKET SILENCIOSO (1994) ───────
+//  PARTE 4: DETECTOR DE BEAR MARKET SILENCIOSO (1994) 
 
 /** Fuente: Murphy, "Intermarket Analysis", cap. 12 (bear market silencioso 1994) */
 export function detectarBearMarketSilencioso(params: {
@@ -882,7 +882,7 @@ export function detectarBearMarketSilencioso(params: {
   };
 }
 
-// ─── PARTE 5: EVALUAR CONVERGENCIA DE COMMODITIES ─────────────
+//  PARTE 5: EVALUAR CONVERGENCIA DE COMMODITIES 
 
 /** EXTENSION PROPIA — no proviene de Murphy, verificar con Cintia si mantener */
 export function evaluarConvergenciaCommodities(params: {
@@ -902,7 +902,7 @@ export function evaluarConvergenciaCommodities(params: {
   return { convergen, indicesEnAlza: enAlza, indicesEnBaja: enBaja };
 }
 
-// ─── ALERTA SETUP TIPO 1987 ────────────────────────────────────
+//  ALERTA SETUP TIPO 1987 
 
 /** Fuente: Murphy, "Intermarket Analysis", cap. 5 (setup 1987) */
 export function detectarSetupInflacionarioAgresivo(
@@ -931,7 +931,7 @@ export function detectarSetupInflacionarioAgresivo(
   return { activa: false, mensaje: null };
 }
 
-// ─── NIVEL DE SECTOR POR CICLO (advertisencia visual, no bloqueo) ─────────────────────────────────────────────────────────────
+//  NIVEL DE SECTOR POR CICLO (advertisencia visual, no bloqueo) 
 /**
  * Determina el nivel de un sector según el ciclo económico.
  * Reemplaza semánticamente al viejo "bloqueado" con una etiqueta informativa.
@@ -958,7 +958,7 @@ export function nivelSectorPorCiclo(
   };
 }
 
-// ─── PARTE 6: CICLO ECONÓMICO — STAGES 1 a 6 (MURPHY, Cap. 12-13) ──
+//  PARTE 6: CICLO ECONÓMICO — STAGES 1 a 6 (MURPHY, Cap. 12-13) 
 // LA LÓGICA PURA ESTÁ EN cycle-phase-detector.ts (detectCyclePhase, stages 0-5).
 // Esta función es un wrapper que mapea a stages 1-6 para compatibilidad.
 
@@ -1024,7 +1024,7 @@ export function sectoresPermitidosPorCiclo(ciclo: CicloEconomico): string[] {
   return ciclo.sectoresLideres;
 }
 
-// ─── @deprecated: Usar nivelSectorPorCiclo() para el nuevo esquema de advertencia visual.
+//  @deprecated: Usar nivelSectorPorCiclo() para el nuevo esquema de advertencia visual.
 // Esta función se mantiene por compatibilidad con código existente.
 /** EXTENSION PROPIA — no proviene de Murphy, verificar con Cintia si mantener (DEPRECADA) */
 export function sectorBloqueadoPorCiclo(sectorEn: string, ciclo: CicloEconomico): boolean {
@@ -1033,9 +1033,9 @@ export function sectorBloqueadoPorCiclo(sectorEn: string, ciclo: CicloEconomico)
   return resultado.nivel === "fuera_de_ciclo";
 }
 
-// ─── PARTE 7: SÍNTESIS — LECTURA INTERMARKET ──────────────────
+//  PARTE 7: SÍNTESIS — LECTURA INTERMARKET 
 
-// ─── MAPA: régimen → sectores favorecidos/desfavorecidos ─────────
+//  MAPA: régimen → sectores favorecidos/desfavorecidos 
 
 export interface SectorFavorabilidad {
   sector: string;

@@ -74,7 +74,7 @@ export const iolRefresh = createServerFn({ method: "POST" })
     },
   );
 
-// ─── Legacy session-based API (for other features) ───────────────────────
+//  Legacy session-based API (for other features) 
 interface StoredSession {
   accessToken: string;
   refreshToken: string;

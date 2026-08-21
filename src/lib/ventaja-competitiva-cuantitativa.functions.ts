@@ -163,7 +163,7 @@ export function calcularVentajaCompetitivaCuantitativa(
     if (s.fuerza !== "no_disponible") senalesEvaluadas++;
   }
 
-  // ── Señal 1: Premium de margen sostenido ──
+  //  Señal 1: Premium de margen sostenido 
   const bandaMargen = extraerBanda("margen neto", fortalezas, debilidades);
   const tendenciaMargen = calcularTendenciaMargen(periodos);
   const bandaMargenFavorable = bandaMargen ? esBandaFavorable(bandaMargen.banda) : false;
@@ -207,7 +207,7 @@ export function calcularVentajaCompetitivaCuantitativa(
     });
   }
 
-  // ── Señal 2: Premium de crecimiento de ingresos ──
+  //  Señal 2: Premium de crecimiento de ingresos 
   const bandaGrowth = extraerBanda("crecimiento de ingresos", fortalezas, debilidades);
   const tendenciaGrowth = calcularTendenciaCrecimiento(periodos);
 
@@ -280,7 +280,7 @@ export function calcularVentajaCompetitivaCuantitativa(
     }
   }
 
-  // ── Señal 3: I+D traducido en resultado ──
+  //  Señal 3: I+D traducido en resultado 
   const sectorStr = (result.sector ?? "").toLowerCase();
   const esSectorRd = SECTORES_RD.some((s) => sectorStr.includes(s));
 
@@ -330,7 +330,7 @@ export function calcularVentajaCompetitivaCuantitativa(
     });
   }
 
-  // ── Señal 4: Momentum de revisión de analistas ──
+  //  Señal 4: Momentum de revisión de analistas 
   if (result.revisionEstimadosPct != null) {
     const peersRev = peers
       .map((p) => p.revisionEstimadosPct)

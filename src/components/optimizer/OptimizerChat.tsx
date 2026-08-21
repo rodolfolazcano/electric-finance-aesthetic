@@ -398,14 +398,14 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
           <button
             type="button"
             onClick={reopenChat}
-            className="flex w-full items-center gap-1.5 text-left text-[11px] font-semibold text-foreground transition-colors hover:text-primary"
+            className="flex w-full items-center gap-1.5 text-left text-[14px] font-semibold text-foreground transition-colors hover:text-primary"
             title="Reabrir chat"
           >
             <Sparkles className="size-3.5 shrink-0 text-primary" />
             <span className="truncate">Reabrir Asistente IA · Optimizador</span>
             <ChevronUp className="size-3.5 shrink-0 text-muted-foreground" />
           </button>
-          <div className="mt-0.5 text-[9px] text-muted-foreground">
+          <div className="mt-0.5 text-[13px] text-muted-foreground">
             {sessions.length} sesión(es) guardadas
           </div>
         </div>
@@ -416,7 +416,7 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
             <button
               type="button"
               onClick={toggleMinimized}
-              className="flex min-w-0 items-center gap-1.5 text-[11px] font-semibold text-foreground"
+              className="flex min-w-0 items-center gap-1.5 text-[14px] font-semibold text-foreground"
               title={minimized ? "Expandir chat" : "Minimizar chat"}
             >
               <Sparkles className="size-3.5 shrink-0 text-primary" />
@@ -428,7 +428,7 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
               )}
             </button>
             <div className="relative flex items-center gap-1">
-              <span className="mono text-[9px] text-muted-foreground">
+              <span className="mono text-[13px] text-muted-foreground">
                 {sessions.length} sesión(es)
               </span>
               <button
@@ -465,7 +465,7 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                 <div className="absolute right-0 top-full z-30 mt-1 w-64 overflow-hidden rounded-lg border border-border/60 bg-background shadow-xl">
                   <div className="max-h-64 overflow-y-auto p-1.5">
                     {sessions.length === 0 && (
-                      <p className="px-2 py-3 text-center text-[11px] text-muted-foreground">
+                      <p className="px-2 py-3 text-center text-[14px] text-muted-foreground">
                         Sin sesiones guardadas
                       </p>
                     )}
@@ -482,10 +482,10 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                           onClick={() => openSession(s.id)}
                           className="min-w-0 flex-1 text-left"
                         >
-                          <span className="block truncate text-[11px] font-medium text-foreground">
+                          <span className="block truncate text-[14px] font-medium text-foreground">
                             {s.title}
                           </span>
-                          <span className="block text-[9px] text-muted-foreground">
+                          <span className="block text-[13px] text-muted-foreground">
                             {fmtDate(s.updatedAt)} · {totalMessages(s)} msgs
                           </span>
                         </button>
@@ -504,7 +504,7 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                     <button
                       type="button"
                       onClick={createSession}
-                      className="flex w-full items-center justify-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-2 py-1.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/20"
+                      className="flex w-full items-center justify-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-2 py-1.5 text-[14px] font-medium text-primary transition-colors hover:bg-primary/20"
                     >
                       <Plus className="size-3.5" />
                       Nueva sesión
@@ -516,7 +516,7 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
           </div>
 
           {minimized ? (
-            <div className="px-3 py-1.5 text-[10px] text-muted-foreground">
+            <div className="px-3 py-1.5 text-[13px] text-muted-foreground">
               Chat minimizado. Las sesiones quedan guardadas.
             </div>
           ) : (
@@ -541,7 +541,7 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                   </div>
                 ))}
                 {busy && (
-                  <div className="flex items-center gap-1.5 pl-1 text-[11px] text-muted-foreground">
+                  <div className="flex items-center gap-1.5 pl-1 text-[14px] text-muted-foreground">
                     <Loader2 className="size-3 animate-spin" /> pensando...
                   </div>
                 )}
@@ -553,7 +553,7 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                   type="button"
                   onClick={() => setShowPaste((v) => !v)}
                   className={cn(
-                    "flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-mono transition-colors",
+                    "flex items-center gap-1 rounded-md border px-2 py-1 text-[13px] font-mono transition-colors",
                     showPaste
                       ? "border-primary/50 bg-primary/10 text-foreground"
                       : "border-border/50 text-muted-foreground hover:text-foreground",
@@ -564,12 +564,12 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                 </button>
                 {holdings.length > 0 && (
                   <>
-                    <span className="rounded-md border border-border/50 px-2 py-1 text-[10px] font-mono text-muted-foreground">
+                    <span className="rounded-md border border-border/50 px-2 py-1 text-[13px] font-mono text-muted-foreground">
                       {holdings.length} tickers
                     </span>
                     {sinD > 0 && (
                       <span
-                        className="rounded-md border border-warning/30 bg-warning/5 px-2 py-1 text-[10px] font-mono text-warning"
+                        className="rounded-md border border-warning/30 bg-warning/5 px-2 py-1 text-[13px] font-mono text-warning"
                         title="No tienen variante especie D"
                       >
                         {sinD} sin D
@@ -589,14 +589,14 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                     placeholder={
                       "Pegá acá el resumen de tenencias de IOL (ticker, cantidad, etc.) o una lista simple:\nNU, MELI, AAPL, MSFT, SPY..."
                     }
-                    className="w-full resize-none rounded-md border border-border/50 bg-background/40 px-2.5 py-2 text-[11px] font-mono text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary"
+                    className="w-full resize-none rounded-md border border-border/50 bg-background/40 px-2.5 py-2 text-[14px] font-mono text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary"
                   />
                   <div className="flex gap-1.5">
                     <button
                       type="button"
                       onClick={detect}
                       disabled={detecting || !raw.trim()}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-2 py-1.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/20 disabled:opacity-40"
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-2 py-1.5 text-[14px] font-medium text-primary transition-colors hover:bg-primary/20 disabled:opacity-40"
                     >
                       {detecting ? (
                         <Loader2 className="size-3.5 animate-spin" />
@@ -608,17 +608,17 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                     <button
                       type="button"
                       onClick={clearPaste}
-                      className="rounded-md border border-border/50 px-2 py-1.5 text-[11px] text-muted-foreground hover:text-foreground"
+                      className="rounded-md border border-border/50 px-2 py-1.5 text-[14px] text-muted-foreground hover:text-foreground"
                     >
                       <X className="size-3.5" />
                     </button>
                   </div>
 
-                  {error && <p className="text-[11px] text-danger">{error}</p>}
+                  {error && <p className="text-[14px] text-danger">{error}</p>}
 
                   {holdings.length > 0 && (
                     <div className="overflow-hidden rounded-md border border-border/40 bg-background/30">
-                      <div className="grid grid-cols-[auto_auto_1fr] gap-x-2 border-b border-border/40 px-2 py-1 text-[9px] uppercase tracking-wider text-muted-foreground">
+                      <div className="grid w-full grid-cols-[auto_auto_1fr] gap-x-2 border-b border-border/40 px-2 py-1 text-[13px] uppercase tracking-wider text-muted-foreground">
                         <span>Código</span>
                         <span>Cant.</span>
                         <span>Nombre</span>
@@ -627,21 +627,21 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                         {holdings.map((h) => (
                           <div
                             key={h.code}
-                            className="grid grid-cols-[auto_auto_1fr] items-baseline gap-x-2 border-b border-border/20 px-2 py-1 last:border-0"
+                            className="grid w-full grid-cols-[auto_auto_1fr] items-baseline gap-x-2 border-b border-border/20 px-2 py-1 last:border-0"
                           >
-                            <span className="font-mono text-[11px] text-foreground">
+                            <span className="font-mono text-[14px] text-foreground">
                               {h.code}
                               {h.esCedear && (
-                                <span className="ml-1 align-middle text-[8px] text-primary">
+                                <span className="ml-1 align-middle text-[12px] text-primary">
                                   CED
                                 </span>
                               )}
                             </span>
-                            <span className="font-mono text-[10px] text-muted-foreground">
+                            <span className="font-mono text-[13px] text-muted-foreground">
                               {h.qty ?? "—"}
                             </span>
                             <span
-                              className="truncate text-[10px] text-muted-foreground"
+                              className="truncate text-[13px] text-muted-foreground"
                               title={h.nombre}
                             >
                               {h.nombre}
@@ -653,7 +653,7 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                   )}
 
                   {unknown.length > 0 && (
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="text-[13px] text-muted-foreground">
                       Sin resolver en el diccionario: {unknown.join(", ")}
                     </p>
                   )}
@@ -662,14 +662,14 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                     <>
                       {/* Especie selector */}
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] font-mono uppercase text-muted-foreground">
+                        <span className="text-[13px] font-mono uppercase text-muted-foreground">
                           Especie
                         </span>
                         <button
                           type="button"
                           onClick={() => patchActive((s) => ({ ...s, especie: "USD" }))}
                           className={cn(
-                            "rounded border px-2 py-1 text-[10px] font-mono transition-colors",
+                            "rounded border px-2 py-1 text-[13px] font-mono transition-colors",
                             especie === "USD"
                               ? "border-primary/60 bg-primary/10 text-foreground"
                               : "border-border/50 text-muted-foreground hover:text-foreground",
@@ -682,7 +682,7 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                           type="button"
                           onClick={() => patchActive((s) => ({ ...s, especie: "ARS" }))}
                           className={cn(
-                            "rounded border px-2 py-1 text-[10px] font-mono transition-colors",
+                            "rounded border px-2 py-1 text-[13px] font-mono transition-colors",
                             especie === "ARS"
                               ? "border-primary/60 bg-primary/10 text-foreground"
                               : "border-border/50 text-muted-foreground hover:text-foreground",
@@ -696,14 +696,14 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                       {/* Generated list */}
                       <div className="rounded-md border border-border/40 bg-background/30 p-2">
                         <div className="mb-1 flex items-center justify-between">
-                          <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+                          <span className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
                             Lista generada
                           </span>
                           <div className="flex gap-1">
                             <button
                               type="button"
                               onClick={copyList}
-                              className="flex items-center gap-1 rounded border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground"
+                              className="flex items-center gap-1 rounded border border-border/50 px-1.5 py-0.5 text-[13px] text-muted-foreground hover:text-foreground"
                             >
                               {copied ? (
                                 <Check className="size-3 text-success" />
@@ -715,14 +715,14 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                             <button
                               type="button"
                               onClick={applyList}
-                              className="flex items-center gap-1 rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-medium text-primary hover:bg-primary/25"
+                              className="flex items-center gap-1 rounded bg-primary/15 px-1.5 py-0.5 text-[13px] font-medium text-primary hover:bg-primary/25"
                             >
                               <Sparkles className="size-3" />
                               Usar en el optimizador
                             </button>
                           </div>
                         </div>
-                        <p className="break-all font-mono text-[10px] leading-relaxed text-foreground/90">
+                        <p className="break-all font-mono text-[13px] leading-relaxed text-foreground/90">
                           {lista}
                         </p>
                       </div>
@@ -745,7 +745,7 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                     }}
                     placeholder="Ej: pasáme la lista en especie D, ¿qué conviene mantener?"
                     disabled={busy}
-                    className="min-w-0 flex-1 rounded-lg border border-border/50 bg-background/40 px-2.5 py-1.5 text-[11px] text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary disabled:opacity-50"
+                    className="min-w-0 flex-1 rounded-lg border border-border/50 bg-background/40 px-2.5 py-1.5 text-[14px] text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary disabled:opacity-50"
                   />
                   <button
                     type="button"
@@ -758,12 +758,12 @@ export function OptimizerChat({ onApplyTickers, currentTickers }: OptimizerChatP
                 </div>
                 <div className="mt-1 flex items-center gap-1">
                   {holdings.length === 0 ? (
-                    <span className="flex items-center gap-1 text-[9px] text-muted-foreground/70">
+                    <span className="flex items-center gap-1 text-[13px] text-muted-foreground/70">
                       <ChevronRight className="size-3" />
                       Pegá tu portafolio y detectá tickers para convertirlos a especie D.
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 text-[9px] text-muted-foreground/70">
+                    <span className="flex items-center gap-1 text-[13px] text-muted-foreground/70">
                       <ChevronDown className="size-3" />
                       {lista}
                     </span>

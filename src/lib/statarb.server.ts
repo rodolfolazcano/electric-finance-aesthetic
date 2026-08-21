@@ -119,7 +119,7 @@ export const computePairAnalysis = createServerFn({ method: "POST" })
         source: SourceSchema,
         token: z.string().nullable().optional().default(null),
         mercado: z.string().optional().default("BCBA"),
-        // ─── Labadie params ───
+        //  Labadie params 
         executionAlgo: z.enum(["pairs", "tc", "is"]).optional().default("pairs"),
         pValue: z.number().min(1.1).max(4).optional().default(2),
         marketImpactGamma: z.number().min(0).max(1).optional().default(0.5),
@@ -151,7 +151,7 @@ export const computePairAnalysis = createServerFn({ method: "POST" })
       stopThresh: data.stopThresh,
       capitalPerPair: data.capitalPerPair,
       txCost: data.txCost,
-      // ─── Labadie params ───
+      //  Labadie params 
       executionAlgo: data.executionAlgo,
       pValue: data.pValue,
       marketImpactGamma: data.marketImpactGamma,
@@ -184,7 +184,7 @@ export const computeBacktestGrid = createServerFn({ method: "POST" })
         source: SourceSchema,
         token: z.string().nullable().optional().default(null),
         mercado: z.string().optional().default("BCBA"),
-        // ─── Labadie params ───
+        //  Labadie params 
         pValue: z.number().min(1.1).max(4).optional().default(2),
         marketImpactGamma: z.number().min(0).max(1).optional().default(0.5),
         participationRate: z.number().min(0).max(0.5).optional().default(0.1),
@@ -221,7 +221,7 @@ export const computeBacktestGrid = createServerFn({ method: "POST" })
       bMax: data.bMax,
       bStep: data.bStep,
       metric: data.metric,
-      // ─── Labadie params ───
+      //  Labadie params 
       pValue: data.pValue,
       marketImpactGamma: data.marketImpactGamma,
       participationRate: data.participationRate,

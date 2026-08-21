@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getIOLPortafolio, getIOLEstadoCuenta, getIOLClientes } from "./iol-portfolio.functions";
 import type { PortfolioAssetInput, FuentePrecio } from "./diagnostico-types";
 
-// ─── Tipos de salida ──────────────────────────────────────────────────
+//  Tipos de salida 
 
 export interface SyncEstadoCuenta {
   disponibleOperar: number;
@@ -33,7 +33,7 @@ export interface IOLClientSummary {
   perfilInversor: string;
 }
 
-// ─── Normalizar un activo IOL a formato plano ──────────────────────
+//  Normalizar un activo IOL a formato plano 
 
 interface FlatItem {
   simbolo: string;
@@ -81,7 +81,7 @@ function detectarFuente(tipo: string, mercado: string): FuentePrecio {
   return "Yahoo";
 }
 
-// ─── Server function: sincronizar portafolio IOL ─────────────────
+//  Server function: sincronizar portafolio IOL 
 
 export const syncIOLPortfolio = createServerFn({ method: "POST" })
   .validator((input: unknown) =>
@@ -183,7 +183,7 @@ export const syncIOLPortfolio = createServerFn({ method: "POST" })
     }
   });
 
-// ─── Server function: obtener clientes del asesor ───────────────
+//  Server function: obtener clientes del asesor 
 
 export const syncIOLAdvisorClients = createServerFn({ method: "POST" })
   .validator((input: unknown) =>

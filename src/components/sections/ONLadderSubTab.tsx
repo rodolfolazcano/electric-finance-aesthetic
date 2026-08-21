@@ -164,7 +164,7 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="mono text-[11px] uppercase tracking-[0.22em] text-primary/80">Escalera de Obligaciones Negociables</div>
+      <div className="mono text-[14px] uppercase tracking-[0.22em] text-primary/80">Escalera de Obligaciones Negociables</div>
       <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">
         ONs Corporativas — <span className="text-emerald-400">USD</span>
       </h2>
@@ -172,26 +172,26 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
       {/* Portfolio stats — inversión, cupones, total */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-1 rounded-lg border border-border/40 overflow-hidden bg-border/40">
         <div className="bg-background/40 p-4">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Inversión total</div>
+          <div className="text-[13px] uppercase tracking-wider text-muted-foreground">Inversión total</div>
           <div className="text-xl font-bold font-mono">u$s {fmt(portfolioStats.inversionTotal,0)}</div>
-          <div className="text-[10px] text-muted-foreground">{portfolioStats.totalNominal.toLocaleString('es-AR')} VN · {portfolioStats.total} ONs</div>
+          <div className="text-[13px] text-muted-foreground">{portfolioStats.totalNominal.toLocaleString('es-AR')} VN · {portfolioStats.total} ONs</div>
         </div>
         <div className="bg-background/40 p-4">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Cupones a cobrar</div>
+          <div className="text-[13px] uppercase tracking-wider text-muted-foreground">Cupones a cobrar</div>
           <div className="text-xl font-bold font-mono text-emerald-400">u$s {fmt(portfolioStats.totalCupones,0)}</div>
-          <div className="text-[10px] text-muted-foreground">TIR cartera: {portfolioStats.tirPonderada.toFixed(2)}%</div>
+          <div className="text-[13px] text-muted-foreground">TIR cartera: {portfolioStats.tirPonderada.toFixed(2)}%</div>
         </div>
         <div className="bg-background/40 p-4">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Amortización total</div>
+          <div className="text-[13px] uppercase tracking-wider text-muted-foreground">Amortización total</div>
           <div className="text-xl font-bold font-mono text-amber-400">u$s {fmt(portfolioStats.totalAmort,0)}</div>
-          <div className="text-[10px] text-muted-foreground">Duration: {portfolioStats.durPonderada.toFixed(2)} años</div>
+          <div className="text-[13px] text-muted-foreground">Duration: {portfolioStats.durPonderada.toFixed(2)} años</div>
         </div>
         <div className="bg-background/40 p-4">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total a recibir (vida entera)</div>
+          <div className="text-[13px] uppercase tracking-wider text-muted-foreground">Total a recibir (vida entera)</div>
           <div className="text-xl font-bold font-mono" style={{color:portfolioStats.ganancia>=0?'#10B981':'#E8735A'}}>
             u$s {fmt(portfolioStats.totalFlujo,0)}
           </div>
-          <div className="text-[10px] text-muted-foreground">
+          <div className="text-[13px] text-muted-foreground">
             Ganancia: <span style={{color:portfolioStats.ganancia>=0?'#10B981':'#E8735A'}}>
               {portfolioStats.ganancia>=0?'+':''}u$s {fmt(portfolioStats.ganancia,0)}
             </span>
@@ -202,13 +202,13 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
       {/* Sector & Plazos breakdown */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-lg border border-border/40 p-4">
-          <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">Composición por sector</div>
+          <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">Composición por sector</div>
           <div className="space-y-2">
             {portfolioStats.sectores.map(([sector, monto]) => {
               const pct = portfolioStats.inversionTotal>0 ? (monto/portfolioStats.inversionTotal*100) : 0;
               return (
                 <div key={sector}>
-                  <div className="flex justify-between text-[11px] mb-1">
+                  <div className="flex justify-between text-[14px] mb-1">
                     <span className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full" style={{background:SECTOR_COLORS[sector]||'#666'}}/>
                       {sector}
@@ -224,13 +224,13 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
           </div>
         </div>
         <div className="rounded-lg border border-border/40 p-4">
-          <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">Distribución por vencimiento</div>
+          <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">Distribución por vencimiento</div>
           <div className="space-y-2">
             {portfolioStats.plazos.map(([year, nominal]) => {
               const pct = portfolioStats.totalNominal>0 ? (nominal/portfolioStats.totalNominal*100) : 0;
               return (
                 <div key={year}>
-                  <div className="flex justify-between text-[11px] mb-1">
+                  <div className="flex justify-between text-[14px] mb-1">
                     <span className="font-mono">{year}</span>
                     <span className="font-mono font-semibold">{fmt(nominal,0)} VN ({pct.toFixed(1)}%)</span>
                   </div>
@@ -246,7 +246,7 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
 
       {/* Bar chart: flujo mensual */}
       <div className="rounded-lg border border-border/40 p-4">
-        <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">Flujo de fondos mensual proyectado</div>
+        <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">Flujo de fondos mensual proyectado</div>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={ladder.map(m=>({
             mes: m.fecha.slice(5),
@@ -266,7 +266,7 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-        <div className="flex items-center gap-4 mt-2 text-[9px] text-muted-foreground">
+        <div className="flex items-center gap-4 mt-2 text-[13px] text-muted-foreground">
           <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-500" /> Cupón</span>
           <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5 rounded-sm bg-amber-400" /> Amortización</span>
         </div>
@@ -274,7 +274,7 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
 
       {/* Reinvestment chart */}
       <div className="rounded-lg border border-border/40 p-4">
-        <div className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-3">Valor acumulado con reinversión — TIR {portfolioStats.tirPonderada.toFixed(2)}%</div>
+        <div className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground mb-3">Valor acumulado con reinversión — TIR {portfolioStats.tirPonderada.toFixed(2)}%</div>
         {(()=>{
           // Build reinvestment curve: start with inversionTotal, add coupon income and compound
           const tirMensual = Math.pow(1+portfolioStats.tirPonderada/100, 1/12)-1;
@@ -311,7 +311,7 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
             </ResponsiveContainer>
           );
         })()}
-        <div className="flex items-center gap-4 mt-2 text-[9px] text-muted-foreground">
+        <div className="flex items-center gap-4 mt-2 text-[13px] text-muted-foreground">
           <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5 rounded-sm bg-blue-400" /> Sin reinversión (lineal)</span>
           <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-500" /> Con reinversión a TIR {portfolioStats.tirPonderada.toFixed(2)}%</span>
         </div>
@@ -334,8 +334,8 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
       {/* ONs table */}
       <div className="rounded-lg border border-border/40 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-mono text-[11px]">
-            <thead className="text-[9px] uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <table className="w-full text-left font-mono text-[14px]">
+            <thead className="text-[13px] uppercase tracking-wider text-muted-foreground bg-muted/10">
               <tr><th className="px-3 py-2">Ticker</th><th className="px-3 py-2">Sector</th><th className="px-3 py-2 text-right">Cupón</th><th className="px-3 py-2 text-right">Venc.</th><th className="px-3 py-2 text-right">TIR</th><th className="px-3 py-2 text-right">Precio</th><th className="px-3 py-2 text-right">Var</th><th className="px-3 py-2 text-right">Paridad</th><th className="px-3 py-2 text-right">Señal</th><th className="px-3 py-2 text-right">Duration</th><th className="px-3 py-2 text-right">Cur.Yield</th><th className="px-3 py-2 text-right w-28">Nominales</th></tr>
             </thead>
             <tbody>
@@ -347,20 +347,20 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
                       <span className="font-semibold">{on.ticker}</span>
                     </div>
                   </td>
-                  <td className="px-3 py-2 text-[10px] text-muted-foreground">{on.sector}</td>
+                  <td className="px-3 py-2 text-[13px] text-muted-foreground">{on.sector}</td>
                   <td className="px-3 py-2 text-right font-medium">{on.cuponPct.toFixed(3)}%</td>
-                  <td className="px-3 py-2 text-right text-[10px]">{on.vencimiento.replace(/-/g,'/')}</td>
+                  <td className="px-3 py-2 text-right text-[13px]">{on.vencimiento.replace(/-/g,'/')}</td>
                   <td className="px-3 py-2 text-right font-bold" style={{color:on.tir>8?'#10B981':on.tir>7?'#E8B25A':'#6EA8FE'}}>{on.tir.toFixed(2)}%</td>
                   <td className="px-3 py-2 text-right font-mono">${fmt(on.precio,0)}</td>
-                  <td className={`px-3 py-2 text-right text-[10px] ${on.variacion>=0?'text-emerald-400':'text-red-400'}`}>{on.variacion>=0?'+':''}{on.variacion.toFixed(2)}%</td>
-                  <td className="px-3 py-2 text-right text-[10px]">{on.paridad.toFixed(4)}</td>
+                  <td className={`px-3 py-2 text-right text-[13px] ${on.variacion>=0?'text-emerald-400':'text-red-400'}`}>{on.variacion>=0?'+':''}{on.variacion.toFixed(2)}%</td>
+                  <td className="px-3 py-2 text-right text-[13px]">{on.paridad.toFixed(4)}</td>
                   <td className="px-3 py-2 text-right">
                     {(() => {
                       // Señal basada en TIR vs cupón: si TIR > cupón+1% → compra, si TIR < cupón-1% → venta
                       const diff = on.tir - on.cuponPct;
                       const senal = diff > 1.5 ? "COMPRA" : diff < -1.5 ? "VENTA" : diff > 0.5 ? "COMPRA PARCIAL" : diff < -0.5 ? "VENTA PARCIAL" : "MANTENER";
                       const color = senal.includes("COMPRA") ? "#10B981" : senal.includes("VENTA") ? "#EF4444" : "#E8B25A";
-                      return <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded" style={{background: color+"20", color}}>{senal}</span>;
+                      return <span className="inline-flex items-center gap-1 text-[13px] font-bold px-1.5 py-0.5 rounded" style={{background: color+"20", color}}>{senal}</span>;
                     })()}
                   </td>
                   <td className="px-3 py-2 text-right">{on.duration.toFixed(2)}</td>
@@ -368,7 +368,7 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
                   <td className="px-3 py-2 text-right">
                     <input type="number" step={100} min={0} value={nominales[on.ticker]||0}
                       onChange={e=>setNominales(p=>({...p,[on.ticker]:+e.target.value||0}))}
-                      className="w-full max-w-[80px] text-right bg-background/40 border border-border/40 rounded px-1.5 py-1 text-[11px] outline-none focus:border-primary/60" />
+                      className="w-full max-w-[80px] text-right bg-background/40 border border-border/40 rounded px-1.5 py-1 text-[14px] outline-none focus:border-primary/60" />
                   </td>
                 </tr>
               ))}
@@ -380,17 +380,17 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
       {/* Ladder with year grouping */}
       <div className="rounded-lg border border-border/40 overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 bg-muted/10 border-b border-border/40">
-          <span className="mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+          <span className="mono text-[13px] uppercase tracking-[0.16em] text-muted-foreground">
             Escalera de pagos · <span className="text-amber-400">{sorted.length} ONs</span> · montos en USD
           </span>
-          <div className="flex items-center gap-3 text-[9px]">
+          <div className="flex items-center gap-3 text-[13px]">
             <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-emerald-400/70" /> Cupón</span>
             <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-amber-400/70" /> Amortización</span>
           </div>
         </div>
         <div className="overflow-x-auto max-h-[480px] overflow-y-auto">
-          <table className="w-full text-left font-mono text-[10px]">
-            <thead className="text-[8px] uppercase tracking-wider text-muted-foreground bg-muted/5 sticky top-0 z-10">
+          <table className="w-full text-left font-mono text-[13px]">
+            <thead className="text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/5 sticky top-0 z-10">
               <tr><th className="px-3 py-1.5 border-b border-border/20 w-24">Mes</th><th className="px-3 py-1.5 border-b border-border/20">Pagos del período</th><th className="px-3 py-1.5 border-b border-border/20 text-right w-28">Total mes</th></tr>
             </thead>
             <tbody>
@@ -408,8 +408,8 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
                     {/* Year separator */}
                     <tr className="bg-muted/20 border-b border-t-2 border-t-emerald-500/20">
                       <td colSpan={3} className="px-3 py-1.5">
-                        <span className="text-[11px] font-bold text-emerald-400">{yg.year}</span>
-                        <span className="text-[8px] text-muted-foreground ml-2">
+                        <span className="text-[14px] font-bold text-emerald-400">{yg.year}</span>
+                        <span className="text-[12px] text-muted-foreground ml-2">
                           {yg.months.reduce((s,m)=>s+m.pagos.filter(p=>p.tipo==='amort').length,0)} amortizaciones ·
                           ${fmt(yg.months.reduce((s,m)=>s+m.totalMes,0))} total
                         </span>
@@ -419,11 +419,11 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
                       const totalAmortMes = m.pagos.filter(p=>p.tipo==='amort').reduce((s,p)=>s+p.total,0);
                       return (
                         <tr key={m.fecha} className={`border-b border-border/10 hover:bg-muted/10 transition-colors ${i%2===0?'bg-muted/5':''}`}>
-                          <td className="px-3 py-2 text-muted-foreground whitespace-nowrap text-[10px] font-medium">{m.fecha}</td>
+                          <td className="px-3 py-2 text-muted-foreground whitespace-nowrap text-[13px] font-medium">{m.fecha}</td>
                           <td className="px-3 py-2">
                             <div className="flex flex-wrap gap-1">
                               {m.pagos.map((p,j)=>(
-                                <span key={j} className={`inline-flex items-center gap-1.5 text-[9px] px-2 py-0.5 rounded-md border ${p.tipo==='amort'?'bg-amber-500/10 text-amber-400 border-amber-500/25':'bg-emerald-500/8 text-emerald-400 border-emerald-500/20'}`}
+                                <span key={j} className={`inline-flex items-center gap-1.5 text-[13px] px-2 py-0.5 rounded-md border ${p.tipo==='amort'?'bg-amber-500/10 text-amber-400 border-amber-500/25':'bg-emerald-500/8 text-emerald-400 border-emerald-500/20'}`}
                                   title={p.tipo==='amort'?'Amortización de capital':'Pago de cupón'}>
                                   <span className="font-semibold">{p.ticker}</span>
                                   <span className="opacity-80">${fmt(p.total)}</span>
@@ -435,7 +435,7 @@ export function ONLadderSubTab({ iolData }: { iolData?: IOLCotizacion[] }) {
                           <td className="px-3 py-2 text-right">
                             <div className="font-bold text-emerald-400">${fmt(m.totalMes)}</div>
                             {totalAmortMes>0 && (
-                              <div className="text-[8px] text-amber-400/60">
+                              <div className="text-[12px] text-amber-400/60">
                                 cup ${fmt(m.totalMes-totalAmortMes)} + amort ${fmt(totalAmortMes)}
                               </div>
                             )}

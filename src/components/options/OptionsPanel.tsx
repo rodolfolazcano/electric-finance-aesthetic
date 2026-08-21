@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,10 @@ export function OptionsPanel() {
   const [tasaDividendos, setTasaDividendos] = useState(0);
   const [selectedOption, setSelectedOption] = useState<ProcessedOption | null>(null);
   const [vizTab, setVizTab] = useState<VizTab>("payoff");
+  const [vencimiento, setVencimiento] = useState<string>("TODOS");
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [page, setPage] = useState(0);
+  const pageSize = 20;
   const session = useIOLSession();
 
   const loadData = useCallback(async () => {
@@ -118,6 +122,7 @@ export function OptionsPanel() {
       );
       setOptions(processed);
       setSpotPrice(spot);
+      setPage(0);
 
       const s = calcularSkew(processed, spot);
       setSkew(s);
@@ -133,6 +138,25 @@ export function OptionsPanel() {
 
   const highProb = filtrarAltaProbabilidad(options, 0.7);
 
+  // Vencimientos disponibles para tabs
+  const vencimientos = useMemo(() => {
+    const set = new Set<string>();
+    options.forEach((o) => {
+      const v = o.fechaVencimiento ? o.fechaVencimiento.slice(0, 10) : "";
+      if (v) set.add(v);
+    });
+    const sorted = Array.from(set).sort();
+    return ["TODOS", ...sorted];
+  }, [options]);
+
+  const filtered = useMemo(() => {
+    if (vencimiento === "TODOS") return options;
+    return options.filter((o) => o.fechaVencimiento.slice(0, 10) === vencimiento);
+  }, [options, vencimiento]);
+
+  const paged = useMemo(() => filtered.slice(page * pageSize, (page + 1) * pageSize), [filtered, page]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+
   const payoffLegs = selectedOption
     ? [
         {
@@ -146,17 +170,21 @@ export function OptionsPanel() {
     : [];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-mono font-semibold uppercase tracking-wider text-foreground">
-          Panel de Opciones — BCBA
-        </h2>
-        <div className="flex gap-2">
+    <div className="space-y-5">
+      {/* Header con fuentes visibles */}
+      <div className="flex flex-wrap items-start justify-between gap-6">
+        <div>
+          <h2 className="text-[15px] font-semibold tracking-tight">Panel de Opciones — BCBA</h2>
+          <p className="text-[14px] text-muted-foreground mt-1">
+            Fuente: <span className="text-foreground">BYMA</span> · <span className="text-foreground">IOL</span> · Yahoo Finance · Tasa caución BYMA · Delay 15-20’
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-[14px] font-medium text-muted-foreground">Subyacente</label>
           <select
             value={subyacente}
             onChange={(e) => setSubyacente(e.target.value as OpcionSubyacente)}
-            className="h-7 text-[10px] font-mono bg-background border border-border/40 rounded px-2"
+            className="h-9 text-[13px] font-mono bg-background border border-border rounded-lg px-3"
           >
             {OPCIONES_SUBYACENTES.map((s) => (
               <option key={s} value={s}>
@@ -164,167 +192,155 @@ export function OptionsPanel() {
               </option>
             ))}
           </select>
-          <Button onClick={loadData} disabled={loading} size="sm" className="h-7 text-[10px]">
+          <Button onClick={loadData} disabled={loading} size="sm" className="h-9 text-[12px] px-4">
             {loading ? "Cargando..." : "Actualizar"}
           </Button>
         </div>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-5 gap-3">
-        <Card className="p-3 border border-border/40 bg-background/40/80 backdrop-blur-sm">
-          <p className="text-[8px] font-mono text-muted-foreground uppercase">Spot</p>
-          <p className="text-lg font-mono font-semibold text-foreground">
-            {formatPrice(spotPrice)}
-          </p>
-        </Card>
-        <Card className="p-3 border border-border/40 bg-background/40/80 backdrop-blur-sm">
-          <p className="text-[8px] font-mono text-muted-foreground uppercase">Vol. Dinámica</p>
-          <p className="text-lg font-mono font-semibold text-foreground">
-            {formatPct(volatilidad?.din ?? null)}
-          </p>
-        </Card>
-        <Card className="p-3 border border-border/40 bg-background/40/80 backdrop-blur-sm">
-          <p className="text-[8px] font-mono text-muted-foreground uppercase">Tasa (Caución)</p>
-          <p className="text-lg font-mono font-semibold text-foreground">{formatPct(tasaRiesgo)}</p>
-        </Card>
-        <Card className="p-3 border border-border/40 bg-background/40/80 backdrop-blur-sm">
-          <p className="text-[8px] font-mono text-muted-foreground uppercase">Dividend Yield</p>
-          <p className="text-lg font-mono font-semibold text-foreground">
-            {formatPct(tasaDividendos)}
-          </p>
-        </Card>
-        <Card className="p-3 border border-border/40 bg-background/40/80 backdrop-blur-sm">
-          <p className="text-[8px] font-mono text-muted-foreground uppercase">Skew</p>
-          <p className="text-lg font-mono font-semibold text-foreground">
-            {skew ? (
-              <span
-                className={
-                  skew.interpretation === "alcista"
-                    ? "text-emerald-400"
-                    : skew.interpretation === "bajista"
-                      ? "text-red-400"
-                      : "text-amber-400"
-                }
-              >
-                {skew.skewPct.toFixed(1)}%
-              </span>
-            ) : (
-              "\u2014"
-            )}
-          </p>
-        </Card>
-      </div>
+      {/* Configurador */}
+      <Card className="p-6 border border-border/40 bg-card">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-[14px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Parámetros de valuación</h3>
+          <span className="text-[13px] text-muted-foreground">BS + Binomial · Vol dinámica saneada</span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+          <div className="rounded-xl border border-border/40 bg-muted/20 p-5">
+            <p className="text-[14px] font-medium uppercase tracking-wide text-muted-foreground">Spot {subyacente}</p>
+            <p className="text-[18px] font-mono font-semibold mt-1">{formatPrice(spotPrice)}</p>
+            <p className="text-[13px] text-muted-foreground mt-1">IOL último · Yahoo .BA</p>
+          </div>
+          <div className="rounded-xl border border-border/40 bg-muted/20 p-5">
+            <p className="text-[14px] font-medium uppercase tracking-wide text-muted-foreground">Vol. Dinámica</p>
+            <p className="text-[18px] font-mono font-semibold mt-1">{formatPct(volatilidad?.din ?? null)}</p>
+            <p className="text-[13px] text-muted-foreground mt-1">Hist {formatPct(volatilidad?.hist ?? null)} · EWMA 0.94</p>
+          </div>
+          <div className="rounded-xl border border-border/40 bg-muted/20 p-5">
+            <p className="text-[14px] font-medium uppercase tracking-wide text-muted-foreground">Tasa (Caución)</p>
+            <p className="text-[18px] font-mono font-semibold mt-1">{formatPct(tasaRiesgo)}</p>
+            <p className="text-[13px] text-muted-foreground mt-1">BYMA caución promedio</p>
+          </div>
+          <div className="rounded-xl border border-border/40 bg-muted/20 p-5">
+            <p className="text-[14px] font-medium uppercase tracking-wide text-muted-foreground">Dividend Yield</p>
+            <p className="text-[18px] font-mono font-semibold mt-1">{formatPct(tasaDividendos)}</p>
+            <p className="text-[13px] text-muted-foreground mt-1">Yahoo 12m / Spot</p>
+          </div>
+          <div className="rounded-xl border border-border/40 bg-muted/20 p-5">
+            <p className="text-[14px] font-medium uppercase tracking-wide text-muted-foreground">Skew</p>
+            <p className="text-[18px] font-mono font-semibold mt-1">
+              {skew ? (
+                <span className={skew.interpretation === "alcista" ? "text-emerald-400" : skew.interpretation === "bajista" ? "text-red-400" : "text-amber-400"}>
+                  {skew.skewPct.toFixed(1)}%
+                </span>
+              ) : (
+                "\u2014"
+              )}
+            </p>
+            <p className="text-[13px] text-muted-foreground mt-1 capitalize">{skew?.interpretation ?? "—"}</p>
+          </div>
+        </div>
+      </Card>
 
-      {/* Options table */}
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm p-4">
-        <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-3">
-          Opciones ({options.length})
-        </h3>
-        {options.length === 0 && !session.accessToken && (
-          <p className="text-[10px] font-mono text-amber-400 mb-2">
-            Inicie sesión en IOL (botón "IOL" en el navbar) para cargar opciones
-          </p>
+      {/* Cadena de opciones */}
+      <Card className="border border-border/40 bg-card overflow-hidden">
+        <div className="px-4 py-3 border-b border-border/20 flex flex-wrap items-center justify-between gap-5">
+          <div>
+            <h3 className="text-[12px] font-semibold">Cadena de opciones</h3>
+            <p className="text-[14px] text-muted-foreground">Mostrando {filtered.length} de {options.length} contratos · Click en fila para graficar · Spot {formatPrice(spotPrice)}</p>
+          </div>
+          <label className="flex items-center gap-2 text-[14px] font-medium cursor-pointer">
+            <input type="checkbox" checked={showAdvanced} onChange={(e) => setShowAdvanced(e.target.checked)} className="rounded" />
+            Métricas avanzadas
+          </label>
+        </div>
+
+        {!session.accessToken && (
+          <div className="mx-4 mt-3 rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[12px] text-amber-600 dark:text-amber-400">
+            Iniciá sesión en IOL (botón IOL arriba a la derecha) para cargar cotizaciones reales.
+          </div>
         )}
+
+        {/* Tabs por vencimiento */}
+        <div className="px-2 py-2 flex gap-1.5 overflow-x-auto border-b border-border/10 bg-muted/10">
+          {vencimientos.map((v) => (
+            <button
+              key={v}
+              onClick={() => { setVencimiento(v); setPage(0); }}
+              className={`shrink-0 text-[14px] font-mono px-3 py-1.5 rounded-full border transition-colors ${vencimiento === v ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border/40 text-muted-foreground hover:text-foreground"}`}
+            >
+              {v === "TODOS" ? `Todos (${options.length})` : v}
+            </button>
+          ))}
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full text-[9px] font-mono">
-            <thead>
-              <tr className="text-muted-foreground border-b border-border/20">
-                <th className="text-left py-1 pr-2">Símbolo</th>
-                <th className="text-right px-2">Tipo</th>
+          <table className="w-full text-[12px] font-mono">
+            <thead className="sticky top-0 bg-muted/20 backdrop-blur">
+              <tr className="text-muted-foreground border-b border-border/20 text-[14px] uppercase tracking-wide">
+                <th className="text-left py-2.5 px-3">Símbolo</th>
+                <th className="text-center">Tipo</th>
                 <th className="text-right px-2">Strike</th>
                 <th className="text-right px-2">Venc.</th>
-                <th className="text-right px-2">T (años)</th>
                 <th className="text-right px-2">Precio</th>
                 <th className="text-right px-2">BS</th>
-                <th className="text-right px-2">Bin.</th>
-                <th className="text-right px-2">Vol. Imp.</th>
+                <th className="text-right px-2">Vol.Imp</th>
                 <th className="text-right px-2">Delta</th>
-                <th className="text-right px-2">Gamma</th>
-                <th className="text-right px-2">Vega</th>
-                <th className="text-right px-2">Theta</th>
                 <th className="text-right px-2">Prob ITM</th>
-                <th className="text-right px-2">VaR</th>
-                <th className="text-right px-2">Moneyness</th>
+                {showAdvanced && (
+                  <>
+                    <th className="text-right px-2">Gamma</th>
+                    <th className="text-right px-2">Vega</th>
+                    <th className="text-right px-2">Theta</th>
+                    <th className="text-right px-2">VaR</th>
+                  </>
+                )}
+                <th className="text-right pr-3">Moneyness</th>
               </tr>
             </thead>
             <tbody>
-              {options.map((o) => (
-                <tr
-                  key={o.simbolo}
-                  onClick={() => setSelectedOption(o)}
-                  className={`border-b border-border/10 hover:bg-muted/20 cursor-pointer transition-colors ${
-                    selectedOption?.simbolo === o.simbolo ? "bg-primary/5" : ""
-                  }`}
-                >
-                  <td className="py-1 pr-2 text-foreground/90">{o.simbolo}</td>
-                  <td className="text-right px-2">
-                    <span className={o.tipoOpcion === "Call" ? "text-emerald-400" : "text-red-400"}>
-                      {o.tipoOpcion === "Call" ? "C" : "P"}
-                    </span>
+              {paged.map((o) => (
+                <tr key={o.simbolo} onClick={() => setSelectedOption(o)} className={`border-b border-border/10 hover:bg-muted/20 cursor-pointer transition-colors ${selectedOption?.simbolo === o.simbolo ? "bg-primary/10" : ""}`}>
+                  <td className="py-2 px-3 font-medium text-foreground">{o.simbolo}</td>
+                  <td className="text-center">
+                    <span className={`inline-flex h-5 w-5 items-center justify-center rounded text-[13px] font-bold ${o.tipoOpcion === "Call" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>{o.tipoOpcion === "Call" ? "C" : "P"}</span>
                   </td>
-                  <td className="text-right px-2 text-foreground/80">{o.strike.toFixed(0)}</td>
-                  <td className="text-right px-2 text-muted-foreground">
-                    {o.fechaVencimiento.slice(5)}
-                  </td>
-                  <td className="text-right px-2 text-muted-foreground">{o.T.toFixed(2)}</td>
-                  <td className="text-right px-2 text-foreground/90">
-                    {o.precioOpcion.toFixed(2)}
-                  </td>
-                  <td
-                    className={`text-right px-2 ${o.diffBSPct != null && Math.abs(o.diffBSPct) > 5 ? "text-amber-400" : "text-foreground/80"}`}
-                  >
-                    {o.blackScholes?.toFixed(2) ?? "\u2014"}
-                  </td>
-                  <td
-                    className={`text-right px-2 ${o.diffBinPct != null && Math.abs(o.diffBinPct) > 5 ? "text-amber-400" : "text-foreground/80"}`}
-                  >
-                    {o.binomial?.toFixed(2) ?? "\u2014"}
-                  </td>
-                  <td className="text-right px-2 text-foreground/80">
-                    {o.volatilidadImplicita != null ? formatPct(o.volatilidadImplicita) : "\u2014"}
-                  </td>
-                  <td className="text-right px-2">
-                    <DeltaBadge delta={o.greeks?.delta ?? null} />
-                  </td>
-                  <td className="text-right px-2 text-foreground/80">
-                    {o.greeks?.gamma.toFixed(6) ?? "\u2014"}
-                  </td>
-                  <td className="text-right px-2 text-foreground/80">
-                    {o.greeks?.vega.toFixed(4) ?? "\u2014"}
-                  </td>
-                  <td className="text-right px-2 text-foreground/80">
-                    {o.greeks?.theta.toFixed(4) ?? "\u2014"}
-                  </td>
-                  <td className="text-right px-2 text-foreground/80">
-                    {o.probITM != null ? `${(o.probITM * 100).toFixed(1)}%` : "\u2014"}
-                  </td>
-                  <td className="text-right px-2 text-foreground/80">
-                    {o.var != null ? o.var.toFixed(4) : "\u2014"}
-                  </td>
-                  <td className="text-right px-2">
-                    <Badge
-                      variant="outline"
-                      className={`text-[7px] h-3 px-1 ${
-                        o.moneyness === "ITM"
-                          ? "border-emerald-500/30 text-emerald-400"
-                          : o.moneyness === "OTM"
-                            ? "border-red-500/30 text-red-400"
-                            : "border-amber-500/30 text-amber-400"
-                      }`}
-                    >
-                      {o.moneyness}
-                    </Badge>
+                  <td className="text-right px-2">{o.strike.toFixed(0)}</td>
+                  <td className="text-right px-2 text-muted-foreground">{o.fechaVencimiento.slice(5, 10)}</td>
+                  <td className="text-right px-2 font-medium">{o.precioOpcion.toFixed(2)}</td>
+                  <td className={`text-right px-2 ${o.diffBSPct != null && Math.abs(o.diffBSPct) > 5 ? "text-amber-400" : ""}`}>{o.blackScholes?.toFixed(2) ?? "\u2014"}</td>
+                  <td className="text-right px-2">{o.volatilidadImplicita != null ? formatPct(o.volatilidadImplicita) : "\u2014"}</td>
+                  <td className="text-right px-2"><DeltaBadge delta={o.greeks?.delta ?? null} /></td>
+                  <td className="text-right px-2">{o.probITM != null ? `${(o.probITM * 100).toFixed(1)}%` : "\u2014"}</td>
+                  {showAdvanced && (
+                    <>
+                      <td className="text-right px-2 text-muted-foreground">{o.greeks?.gamma.toFixed(5) ?? "\u2014"}</td>
+                      <td className="text-right px-2 text-muted-foreground">{o.greeks?.vega.toFixed(3) ?? "\u2014"}</td>
+                      <td className="text-right px-2 text-muted-foreground">{o.greeks?.theta.toFixed(3) ?? "\u2014"}</td>
+                      <td className="text-right px-2 text-muted-foreground">{o.var != null ? o.var.toFixed(3) : "\u2014"}</td>
+                    </>
+                  )}
+                  <td className="text-right pr-3">
+                    <Badge variant="outline" className={`text-[13px] h-5 px-1.5 ${o.moneyness === "ITM" ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10" : o.moneyness === "OTM" ? "border-red-500/30 text-red-400 bg-red-500/10" : "border-amber-500/30 text-amber-400 bg-amber-500/10"}`}>{o.moneyness}</Badge>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+
+        {/* Paginación + fuentes */}
+        <div className="flex flex-wrap items-center justify-between gap-5 px-4 py-3 border-t border-border/20 bg-muted/5">
+          <p className="text-[14px] text-muted-foreground">Fuente: IOL · BYMA — {subyacente} · {vencimiento} · Página {page + 1} de {totalPages} · {filtered.length} contratos</p>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="h-7 text-[14px]" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>Anterior</Button>
+            <span className="text-[14px] font-mono">{page + 1} / {totalPages}</span>
+            <Button variant="outline" size="sm" className="h-7 text-[14px]" disabled={page >= totalPages - 1} onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}>Siguiente</Button>
+          </div>
+        </div>
       </Card>
 
-      {/* Visualization tabs */}
-      <div className="flex gap-1 border-b border-border/20 pb-1">
+      {/* Visualizaciones */}
+      <div className="flex gap-1.5 border-b border-border/20 overflow-x-auto pb-1">
         {[
           { key: "payoff" as const, label: "Payoff" },
           { key: "smile" as const, label: "Sonrisa Vol." },
@@ -333,94 +349,57 @@ export function OptionsPanel() {
           { key: "griegas" as const, label: "Griegas" },
           { key: "estrategias" as const, label: "Estrategias" },
         ].map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setVizTab(t.key)}
-            className={`text-[9px] font-mono px-2.5 py-1 rounded-t transition-colors ${
-              vizTab === t.key
-                ? "bg-primary/10 text-primary border-b-2 border-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
+          <button key={t.key} onClick={() => setVizTab(t.key)} className={`shrink-0 text-[12px] font-medium px-3.5 py-2 rounded-t-lg border-b-2 transition-colors ${vizTab === t.key ? "bg-primary/10 text-primary border-primary" : "text-muted-foreground hover:text-foreground border-transparent"}`}>
             {t.label}
           </button>
         ))}
       </div>
 
-      {vizTab === "payoff" && spotPrice != null && (
-        <PayoffChart legs={payoffLegs} spotActual={spotPrice} />
+      {vizTab === "payoff" && (
+        spotPrice != null ? <PayoffChart legs={payoffLegs} spotActual={spotPrice} /> : (
+          <Card className="p-8 text-center border border-dashed"><p className="text-[13px] font-medium">Seleccioná una opción de la tabla para ver el Payoff</p><p className="text-[14px] text-muted-foreground mt-1">Click en cualquier fila de la cadena</p></Card>
+        )
       )}
-
-      {vizTab === "smile" && (
-        <SmileChart
-          options={options}
-          spot={spotPrice ?? 0}
-          volHist={volatilidad?.hist}
-          volDin={volatilidad?.din}
-        />
-      )}
-
+      {vizTab === "smile" && <SmileChart options={options} spot={spotPrice ?? 0} volHist={volatilidad?.hist} volDin={volatilidad?.din} />}
       {vizTab === "prob-itm" && <ProbITMChart options={options} spot={spotPrice ?? 0} />}
-
       {vizTab === "var" && <VaRChart options={options} spot={spotPrice ?? 0} />}
-
       {vizTab === "griegas" && selectedOption && spotPrice != null && (
-        <GreeksSensitivity
-          tipo={selectedOption.tipoOpcion}
-          strike={selectedOption.strike}
-          T={selectedOption.T}
-          r={tasaRiesgo}
-          sigma={selectedOption.volatilidadImplicita ?? volatilidad?.din ?? 0.3}
-          spotBase={spotPrice}
-          q={tasaDividendos}
-        />
+        <GreeksSensitivity tipo={selectedOption.tipoOpcion} strike={selectedOption.strike} T={selectedOption.T} r={tasaRiesgo} sigma={selectedOption.volatilidadImplicita ?? volatilidad?.din ?? 0.3} spotBase={spotPrice} q={tasaDividendos} />
       )}
-
       {vizTab === "griegas" && !selectedOption && (
-        <Card className="p-4 border border-border/40 bg-background/40/80 backdrop-blur-sm">
-          <p className="text-[9px] font-mono text-muted-foreground">
-            Seleccione una opción en la tabla para ver sensibilidad de griegas
-          </p>
-        </Card>
+        <Card className="p-10 text-center border border-dashed"><p className="text-[13px] font-medium">Seleccioná una opción para ver sensibilidad de griegas</p><p className="text-[14px] text-muted-foreground mt-1">Delta, Gamma, Vega y Theta vs. Spot</p></Card>
       )}
-
       {vizTab === "estrategias" && <StrategyBuilder />}
 
-      {/* High probability */}
       {(highProb.itm.length > 0 || highProb.otm.length > 0) && (
-        <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm p-4">
-          <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-3">
-            Alta probabilidad (&gt;70%)
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
+        <Card className="border border-border/40 bg-card p-6">
+          <h3 className="text-[12px] font-semibold uppercase tracking-wide mb-3">Alta probabilidad (&gt;70%)</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {highProb.itm.length > 0 && (
-              <div>
-                <p className="text-[8px] font-mono text-emerald-400 mb-1">ITM</p>
-                {highProb.itm.map((o) => (
-                  <div key={o.simbolo} className="text-[9px] font-mono text-foreground/80">
-                    {o.simbolo} — Strike {o.strike.toFixed(0)} — Prob{" "}
-                    {((o.probITM ?? 0) * 100).toFixed(1)}%
-                  </div>
-                ))}
+              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+                <p className="text-[14px] font-semibold text-emerald-400 mb-2">ITM · {highProb.itm.length} contratos</p>
+                <div className="space-y-1">
+                  {highProb.itm.slice(0, 8).map((o) => (
+                    <div key={o.simbolo} className="flex justify-between text-[12px] font-mono"><span>{o.simbolo} · {o.strike.toFixed(0)}</span><span className="text-emerald-400">{((o.probITM ?? 0) * 100).toFixed(1)}%</span></div>
+                  ))}
+                </div>
               </div>
             )}
             {highProb.otm.length > 0 && (
-              <div>
-                <p className="text-[8px] font-mono text-red-400 mb-1">OTM</p>
-                {highProb.otm.map((o) => (
-                  <div key={o.simbolo} className="text-[9px] font-mono text-foreground/80">
-                    {o.simbolo} — Strike {o.strike.toFixed(0)} — Prob OTM{" "}
-                    {((o.probOTM ?? 0) * 100).toFixed(1)}%
-                  </div>
-                ))}
+              <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
+                <p className="text-[14px] font-semibold text-red-400 mb-2">OTM · {highProb.otm.length} contratos</p>
+                <div className="space-y-1">
+                  {highProb.otm.slice(0, 8).map((o) => (
+                    <div key={o.simbolo} className="flex justify-between text-[12px] font-mono"><span>{o.simbolo} · {o.strike.toFixed(0)}</span><span className="text-red-400">{((o.probOTM ?? 0) * 100).toFixed(1)}%</span></div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
         </Card>
       )}
 
-      {/* Disclaimer */}
-      <p className="text-[8px] text-muted-foreground text-center pt-2">{CNV_DISCLAIMER}</p>
+      <p className="text-[14px] text-muted-foreground text-center border-t border-border/10 pt-3">{CNV_DISCLAIMER} — Fuentes: IOL · BYMA · Yahoo Finance</p>
     </div>
   );
 }

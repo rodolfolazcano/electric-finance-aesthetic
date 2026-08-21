@@ -41,9 +41,9 @@ export const PIE_COLORS = [
 export function Metric({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-      <div className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{label}</div>
+      <div className="text-[13px] uppercase tracking-[0.16em] text-muted-foreground">{label}</div>
       <div className="mono mt-1 text-sm">{value}</div>
-      {sub && <div className="mono text-[10px] text-muted-foreground">{sub}</div>}
+      {sub && <div className="mono text-[13px] text-muted-foreground">{sub}</div>}
     </div>
   );
 }
@@ -61,7 +61,7 @@ export function ScorePill({ label, value }: { label: string; value: number }) {
 export function ChartTip({ active, payload, label, prefix = "" }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="glass-2 mono px-3 py-2 text-[11px]">
+    <div className="glass-2 mono px-3 py-2 text-[14px]">
       {label != null && <div className="text-muted-foreground">{label}</div>}
       <div className="text-foreground">
         {prefix}

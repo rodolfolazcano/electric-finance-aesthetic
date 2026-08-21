@@ -13,7 +13,7 @@ import { calcularVolatilidadImplicita } from "./volatility";
 import { calcularVarDeltaGamma } from "./var";
 import { timeToExpiry } from "./market-calendar";
 
-// ─── Moneyness ────────────────────────────────────────────────────────
+//  Moneyness 
 
 const ATM_RANGO = 0.01; // 1% alrededor del spot se considera ATM
 
@@ -29,7 +29,7 @@ export function determinarMoneyness(tipo: OptionType, strike: number, spot: numb
   }
 }
 
-// ─── Procesar una opción individual ──────────────────────────────────
+//  Procesar una opción individual 
 
 export function procesarOpcion(
   contract: OptionContract,
@@ -113,7 +113,7 @@ export function procesarOpcion(
   };
 }
 
-// ─── Procesar lista de opciones (equivalente a procesar_dataframe) ─────
+//  Procesar lista de opciones (equivalente a procesar_dataframe) 
 
 export function procesarOpciones(
   contracts: OptionContract[],
@@ -134,7 +134,7 @@ export function procesarOpciones(
     .filter((x): x is ProcessedOption => x !== null);
 }
 
-// ─── Filtros ──────────────────────────────────────────────────────────
+//  Filtros 
 
 export function filtrarAltaProbabilidad(
   options: ProcessedOption[],
@@ -153,7 +153,7 @@ export function filtrarPorVencimiento(
   return options.filter((o) => o.fechaVencimiento === vencimiento);
 }
 
-// ─── Skew (sesgo) ──────────────────────────────────────────────────────
+//  Skew (sesgo) 
 
 export function calcularSkew(options: ProcessedOption[], spot: number): SkewResult | null {
   const callsOTM = options.filter(
@@ -179,7 +179,7 @@ export function calcularSkew(options: ProcessedOption[], spot: number): SkewResu
   return { skewPct, interpretation };
 }
 
-// ─── Rango de precios (soporte/resistencia) ────────────────────────────
+//  Rango de precios (soporte/resistencia) 
 
 export function calcularRangosPrecios(options: ProcessedOption[], spot: number): RangoPrecios[] {
   const vencimientos = [...new Set(options.map((o) => o.fechaVencimiento))].sort();

@@ -19,9 +19,9 @@ import { z } from "zod";
 
 const FS_BASE = process.env.STUDIO_EXPORTS_DIR ?? "studio-exports";
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // design_direction
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 
 const designSchema = z.object({
   options: z
@@ -127,9 +127,9 @@ export function buildImagePrompt(prompt: string, design: DesignDirection): strin
   return `${prompt}. Visual direction: ${design.name} — palette ${design.palette.join(", ")}, mood ${design.mood}. ${design.referenceDescription}`;
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // generate_image
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 
 /**
  * Genera una imagen y la sube a Studio (devuelve URL firmada + base64).
@@ -167,9 +167,9 @@ export async function generateImage(input: {
   };
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // edit_image — determinístico con @napi-rs/canvas (sin créditos de IA)
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 
 async function bufferFromUrl(url: string): Promise<Buffer> {
   const res = await fetch(url, { signal: AbortSignal.timeout(60_000) });
@@ -286,9 +286,9 @@ export async function editImage(args: {
   return { url, mime: "image/png" };
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // build_pptx — pptxgenjs (sin IA: el modelo solo decide contenido/layout)
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 
 const FORMAT_SIZE: Record<SlideSpec["format"], { w: number; h: number }> = {
   square: { w: 8, h: 8 },
@@ -444,9 +444,9 @@ export async function buildPptx(slides: SlideSpec[]): Promise<{ filePath: string
   return { filePath, url };
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // export_gslides / export_pptx_live — conectores a docs vivos (opt-in por config)
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 
 /**
  * Sube el .pptx a Google Drive pidiendo conversión a Google Slides. Requiere
@@ -534,9 +534,9 @@ export async function exportPptxLive(
   return { itemId: data.id, url: data.webUrl };
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // render_canvas — satori + resvg (HTML/CSS → SVG → PNG/PDF, determinístico)
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 
 /** Carga una fuente del sistema para satori (Windows/Linux/macOS). */
 async function loadSystemFont(): Promise<{
@@ -622,9 +622,9 @@ export async function renderCanvas(input: {
   return { filePath, url };
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // generate_video — NVIDIA Cosmos 3 (Generator NIM o build.nvidia.com alojado)
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // Motor preferido: Cosmos3-Generator. Dos modos según COSMOS_VIDEO_URL:
 // - NIM local:  http://<host>:8000/v1/infer
 // - Hosted:     https://ai.api.nvidia.com/v1/genai/nvidia/cosmos3-nano
@@ -940,9 +940,9 @@ export async function generateVideo(
   return { url, filePath };
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // generate_audio — TTS genérico (Kokoro/XTTS) vía endpoint configurable
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // Reglas duras:
 // - Solo voces sintéticas genéricas (es-AR-generic). Nunca clonación de voces
 //   reales sin consentimiento explícito y documentado.
@@ -974,9 +974,9 @@ export async function generateAudio(
   return { url };
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // Utilidades compartidas: subir a Supabase Studio y firmar URL
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 
 /** Sube bytes al bucket `studio-files` y devuelve una URL firmada. */
 export async function uploadToStudio(

@@ -1,4 +1,4 @@
-// ─── Recession Checklist — 6 condiciones de Murphy (Cap. 14) ──
+//  Recession Checklist — 6 condiciones de Murphy (Cap. 14) 
 // Muestra el checklist de recesión con cada condición y el score total.
 
 import { useMemo } from "react";
@@ -11,18 +11,18 @@ import {
 } from "@/lib/cycle-phase-detector";
 import type { CompleteIntermarketResult } from "@/lib/intermarket-complete";
 
-// ─── Props ───────────────────────────────────────────────────────
+//  Props 
 
 interface RecessionChecklistProps {
   data: CompleteIntermarketResult;
 }
 
-// ─── Helpers visuales ────────────────────────────────────────────
+//  Helpers visuales 
 
 function metIcon(met: boolean | null): string {
-  if (met === true) return "🔴";
-  if (met === false) return "🟢";
-  return "⚪";
+  if (met === true) return "[ROJO]";
+  if (met === false) return "[VERDE]";
+  return "";
 }
 
 function metLabel(met: boolean | null): string {
@@ -37,7 +37,7 @@ function metColor(met: boolean | null): string {
   return "bg-muted/10 border-border/30 text-muted-foreground";
 }
 
-// ─── Componente principal ────────────────────────────────────────
+//  Componente principal 
 
 export function RecessionChecklist({ data }: RecessionChecklistProps) {
   const checklist: RecessionChecklistResult | null = useMemo(() => {
@@ -107,25 +107,25 @@ export function RecessionChecklist({ data }: RecessionChecklistProps) {
 
   return (
     <Card className="p-4 border-amber-500/30">
-      {/* ── Header ──────────────────────────────────────────── */}
+      {/*  Header  */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-sm">⚠️</span>
+          <span className="text-sm">[ADVERTENCIA]</span>
           <div>
             <div className="text-xs font-semibold font-mono uppercase tracking-wider text-foreground">
               Paso 2 — Checklist de Recesión (Murphy Cap. 14)
             </div>
-            <p className="text-[9px] text-muted-foreground/70 mt-0.5">
+            <p className="text-[13px] text-muted-foreground/70 mt-0.5">
               6 condiciones que Murphy usa para anticipar recesiones
             </p>
           </div>
         </div>
-        <div className={cn("text-[10px] px-2 py-1 rounded font-mono font-bold border", scoreColor)}>
+        <div className={cn("text-[13px] px-2 py-1 rounded font-mono font-bold border", scoreColor)}>
           {score}/{conditions.length} — {probability.toUpperCase()}
         </div>
       </div>
 
-      {/* ── Barra de progreso ───────────────────────────────── */}
+      {/*  Barra de progreso  */}
       <div className="h-1.5 bg-muted/30 rounded-full overflow-hidden mb-4">
         <div
           className={cn("h-full rounded-full transition-all duration-500", progressColor)}
@@ -133,7 +133,7 @@ export function RecessionChecklist({ data }: RecessionChecklistProps) {
         />
       </div>
 
-      {/* ── Cada condición ──────────────────────────────────── */}
+      {/*  Cada condición  */}
       {conditions.map((cond) => (
         <div
           key={cond.id}
@@ -152,39 +152,39 @@ export function RecessionChecklist({ data }: RecessionChecklistProps) {
           {/* Cuerpo */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] font-semibold font-mono text-foreground">
+              <span className="text-[13px] font-semibold font-mono text-foreground">
                 {cond.label}
               </span>
               <div className="flex items-center gap-1.5 shrink-0">
                 <span className={cn(
-                  "text-[8px] px-1.5 py-0.5 rounded font-mono border leading-tight",
+                  "text-[12px] px-1.5 py-0.5 rounded font-mono border leading-tight",
                   metColor(cond.met),
                 )}>
                   {metLabel(cond.met)}
                 </span>
-                <span className="text-[8px] font-mono text-muted-foreground/50">
+                <span className="text-[12px] font-mono text-muted-foreground/50">
                   {cond.chapterRef}
                 </span>
               </div>
             </div>
             <div className="flex items-center gap-2 mt-0.5">
               <span className={cn(
-                "text-[9px] font-mono font-medium",
+                "text-[13px] font-mono font-medium",
                 cond.met === true ? "text-red-400" : cond.met === false ? "text-emerald-400" : "text-muted-foreground",
               )}>
                 {cond.value}
               </span>
             </div>
-            <p className="text-[8px] text-muted-foreground/60 mt-0.5 leading-relaxed">
+            <p className="text-[12px] text-muted-foreground/60 mt-0.5 leading-relaxed">
               {cond.detail}
             </p>
           </div>
         </div>
       ))}
 
-      {/* ── Interpretación final ────────────────────────────── */}
+      {/*  Interpretación final  */}
       <div className={cn(
-        "mt-3 px-3 py-2 rounded-lg text-[9px] font-mono leading-relaxed border",
+        "mt-3 px-3 py-2 rounded-lg text-[13px] font-mono leading-relaxed border",
         probability === "inminente"
           ? "bg-rose-500/10 border-rose-500/20 text-rose-300"
           : probability === "alta"

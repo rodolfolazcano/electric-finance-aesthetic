@@ -349,7 +349,7 @@ export const getDashboardDiario = createServerFn({ method: "POST" })
       };
     }
 
-    // ─── Process BONDS_META ────────────────────────────────────────
+    //  Process BONDS_META 
     for (const meta of BONDS_META) {
       const baseTicker = meta.ticker.replace(/[DC]$/, "");
       const bono = BONOS_DB[meta.ticker] ?? BONOS_DB[baseTicker];
@@ -377,7 +377,7 @@ export const getDashboardDiario = createServerFn({ method: "POST" })
       );
     }
 
-    // ─── Process ONs from BONOS_DB ─────────────────────────────────
+    //  Process ONs from BONOS_DB 
     for (const ticker of ON_TICKERS) {
       const bono = BONOS_DB[ticker];
       if (!bono) continue;
@@ -406,7 +406,7 @@ export const getDashboardDiario = createServerFn({ method: "POST" })
       );
     }
 
-    // ─── Process manually added tickers ─────────────────────────────
+    //  Process manually added tickers 
     if (data.tickersManual) {
       for (const ticker of data.tickersManual) {
         const upper = ticker.toUpperCase();
@@ -462,7 +462,7 @@ export const getDashboardDiario = createServerFn({ method: "POST" })
     return results;
   });
 
-// ─── Server fn: ONs que pagan cupón en fechas específicas ─────────────
+//  Server fn: ONs que pagan cupón en fechas específicas 
 // Busca en BONOS_DB + RENTA_FIJA_COMPLETA.json (534+ ONs con flujo de fondos)
 // También incluye especies D (MEP) y C (CCL) sintéticas con precios en vivo IOL
 export const getOnsForLadder = createServerFn({ method: "POST" })
@@ -476,7 +476,7 @@ export const getOnsForLadder = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }): Promise<DashboardRow[]> => {
-    // ── 1a. Fetch live MEP/CCL prices in bulk for synthetic species ──
+    //  1a. Fetch live MEP/CCL prices in bulk for synthetic species 
     const livePriceMap = new Map<string, number>();
     try {
       const livePrices = await fetchLivePricesRaw();
@@ -489,7 +489,7 @@ export const getOnsForLadder = createServerFn({ method: "POST" })
       /* live prices unavailable, use fallbacks */
     }
 
-    // ── 1. Fetch IOL prices for all known ON tickers ──────────────
+    //  1. Fetch IOL prices for all known ON tickers 
     const preciosIOL = new Map<
       string,
       { precio: number; cierre: number | null; volumen: number | null }
@@ -526,12 +526,12 @@ export const getOnsForLadder = createServerFn({ method: "POST" })
       }
     }
 
-    // ── 2. Match by month (YYYY-MM) ─────────────────────────────
+    //  2. Match by month (YYYY-MM) 
     const monthSet = new Set(data.fechasFaltantes.map((f) => f.slice(0, 7)));
     const candidates: Array<{ ticker: string; matchCount: number; row: DashboardRow }> = [];
     const processed = new Set<string>();
 
-    // ── 3. Process ONs from BONOS_DB ────────────────────────────
+    //  3. Process ONs from BONOS_DB 
     for (const ticker of ON_TICKERS) {
       processed.add(ticker);
       const bono = BONOS_DB[ticker];
@@ -593,7 +593,7 @@ export const getOnsForLadder = createServerFn({ method: "POST" })
       }
     }
 
-    // ── 4. Process ONs from RENTA_FIJA_COMPLETA.json + synthetic D/C species ──
+    //  4. Process ONs from RENTA_FIJA_COMPLETA.json + synthetic D/C species 
     for (const on of COMPLETE_ONS_ALL_WITH_FLOWS) {
       if (processed.has(on.ticker)) continue;
       processed.add(on.ticker);
@@ -668,7 +668,7 @@ export const getOnsForLadder = createServerFn({ method: "POST" })
       }
     }
 
-    // ── 5. Filter by investment currency mode if specified ──────
+    //  5. Filter by investment currency mode if specified 
     const filtered = candidates.filter((c) => {
       const s = c.ticker.slice(-1).toUpperCase();
       if (data.invertirEn === "MEP") return s === "D" || c.row.moneda === "USD";
@@ -676,7 +676,7 @@ export const getOnsForLadder = createServerFn({ method: "POST" })
       return s === "O" || (!s.endsWith("D") && !s.endsWith("C"));
     });
 
-    // ── 6. Sort: most matches first, then by volume desc, then by TIR desc ──
+    //  6. Sort: most matches first, then by volume desc, then by TIR desc 
     filtered.sort((a, b) => {
       if (b.matchCount !== a.matchCount) return b.matchCount - a.matchCount;
       const volA = a.row.volumen ?? 0;

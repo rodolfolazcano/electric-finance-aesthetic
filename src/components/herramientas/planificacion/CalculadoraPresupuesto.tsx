@@ -75,9 +75,9 @@ export function CalculadoraPresupuesto() {
   }, [ingresos, gastos, result]);
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+    <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <div className="glass p-5 space-y-4">
-        <h3 className="mono text-[11px] uppercase tracking-[0.18em] text-foreground">Ingresos</h3>
+        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Ingresos</h3>
         <div>
           <label className="text-xs text-muted-foreground">Ingresos mensuales ($)</label>
           <Input
@@ -88,10 +88,10 @@ export function CalculadoraPresupuesto() {
           />
         </div>
         <div className="flex items-center justify-between">
-          <h3 className="mono text-[11px] uppercase tracking-[0.18em] text-foreground">Gastos</h3>
+          <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Gastos</h3>
           <button
             onClick={addGasto}
-            className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
+            className="inline-flex items-center gap-1 text-[13px] text-primary hover:underline"
           >
             <Plus className="h-3 w-3" /> Agregar
           </button>
@@ -129,9 +129,9 @@ export function CalculadoraPresupuesto() {
       <div className="space-y-4">
         {result && (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Ingresos
                 </div>
                 <div className="mono text-lg text-success">
@@ -139,7 +139,7 @@ export function CalculadoraPresupuesto() {
                 </div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Gastos
                 </div>
                 <div
@@ -149,7 +149,7 @@ export function CalculadoraPresupuesto() {
                 </div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Balance
                 </div>
                 <div
@@ -159,7 +159,7 @@ export function CalculadoraPresupuesto() {
                 </div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Tasa ahorro
                 </div>
                 <div
@@ -177,7 +177,7 @@ export function CalculadoraPresupuesto() {
             )}
 
             <div className="glass p-5">
-              <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Distribución de gastos
               </div>
               <div className="h-64">
@@ -214,7 +214,7 @@ export function CalculadoraPresupuesto() {
           </>
         )}
         <div className="flex gap-2">
-          <Button onClick={handleExport} variant="outline" size="sm" className="text-[11px]">
+          <Button onClick={handleExport} variant="outline" size="sm" className="text-[14px]">
             <svg
               className="mr-1.5 h-3.5 w-3.5"
               xmlns="http://www.w3.org/2000/svg"

@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getCached, setCache } from "./cache";
 import { fetchTokens } from "./iol-auth";
 
-// ─── Tipos ─────────────────────────────────────────────────────
+//  Tipos 
 
 export interface PanelItem {
   simbolo: string;
@@ -26,7 +26,7 @@ export interface UniversoOportunidadesResult {
   fuentesFail: string[];
 }
 
-// ─── IOL API fetch con token refresh ───────────────────────────
+//  IOL API fetch con token refresh 
 
 function getTokensFromLS(): { token: string | null; refresh: string | null } {
   if (typeof window === "undefined") return { token: null, refresh: null };
@@ -89,7 +89,7 @@ function normalizarItem(raw: any, tipo: PanelItem["tipo"], mercado: string): Pan
   };
 }
 
-// ─── Server function principal ─────────────────────────────────
+//  Server function principal 
 
 export const getUniversoOportunidades = createServerFn({ method: "POST" })
   .handler(async (): Promise<UniversoOportunidadesResult> => {

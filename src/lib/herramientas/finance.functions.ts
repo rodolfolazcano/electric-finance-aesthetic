@@ -171,7 +171,7 @@ async function fetchQuote(ticker: string): Promise<any | null> {
   }
 }
 
-// ─── PE Percentile helper (uses income statement history) ──────────────
+//  PE Percentile helper (uses income statement history) 
 
 interface PeHistoryPoint {
   year: number;
@@ -293,9 +293,9 @@ function computePePercentileReason(currentPe: number | null, quote: any): string
   return "Historial insuficiente para percentil (< 2 años)";
 }
 
-// ──────────────────────────────────────────────────────────────────
+// 
 // Semáforo (ticker analysis)
-// ──────────────────────────────────────────────────────────────────
+// 
 
 export interface SemaforoSignal {
   label: string;
@@ -879,9 +879,9 @@ export const getSemaforoBatch = createServerFn({ method: "POST" })
     return cachedResults;
   });
 
-// ──────────────────────────────────────────────────────────────────
+// 
 // Portfolio optimization
-// ──────────────────────────────────────────────────────────────────
+// 
 
 const StrategySchema = z.enum([
   "min-variance",
@@ -916,7 +916,7 @@ export interface OptimizeResponse {
   equityCurve: { date: string; value: number }[];
   frontier: EfficientFrontierPoint[];
   frontierPVar?: EfficientFrontierPoint[]; // Labadie §3.2: p-variance frontier
-  // ─── Labadie §3.2: p-variance ───
+  //  Labadie §3.2: p-variance 
   pSharpe?: number;
   pVariance?: number;
 }
@@ -1029,7 +1029,7 @@ export const optimizePortfolio = createServerFn({ method: "POST" })
     }
     frontier.sort((a, b) => a.vol - b.vol);
 
-    // ─── Labadie §3.2: p-variance frontier ───
+    //  Labadie §3.2: p-variance frontier 
     const frontierPVar: EfficientFrontierPoint[] = [];
     for (let step = 0; step <= 30; step++) {
       const targetRet = minR + (maxR - minR) * (step / 30);
@@ -1071,9 +1071,9 @@ export const optimizePortfolio = createServerFn({ method: "POST" })
     };
   });
 
-// ──────────────────────────────────────────────────────────────────
+// 
 // Multi-strategy optimization (all strategies at once + histogram)
-// ──────────────────────────────────────────────────────────────────
+// 
 
 export interface HistogramBin {
   binStart: number;
@@ -1088,7 +1088,7 @@ export interface StrategyResult {
   volatility: number;
   sharpe: number;
   histogram: HistogramBin[];
-  // ─── Labadie §3.2: p-variance ───
+  //  Labadie §3.2: p-variance 
   pSharpe?: number;
   pVariance?: number;
 }
@@ -1134,7 +1134,7 @@ export interface AllPortfoliosResult {
   individual: { ticker: string; meanAnnual: number; volAnnual: number; sharpe: number }[];
   capmBenchmarks: Array<{ benchmark: string; entries: PortfolioCAPMEntry[] }>;
   scenarios: ScenarioRow[];
-  // ─── Labadie §3.2: Hurst del portafolio ───
+  //  Labadie §3.2: Hurst del portafolio 
   portfolioHurst?: number;
 }
 
@@ -1436,7 +1436,7 @@ export const optimizeAllPortfolios = createServerFn({ method: "POST" })
         capmBenchmarks.push({ benchmark: br.bm, entries: br.entries });
       }
 
-      // ─── Labadie §3.2: Portfolio Hurst ───
+      //  Labadie §3.2: Portfolio Hurst 
       const refWeights =
         strategies.length > 0
           ? strategies[0].weights
@@ -1472,9 +1472,9 @@ export const optimizeAllPortfolios = createServerFn({ method: "POST" })
     }
   });
 
-// ──────────────────────────────────────────────────────────────────
+// 
 // Backtest de optimización (Markowitz walk-forward)
-// ──────────────────────────────────────────────────────────────────
+// 
 
 async function fetchHistoryUpTo(
   ticker: string,
@@ -1548,7 +1548,7 @@ export const backtestOptimization = createServerFn({ method: "POST" })
     const cutoff = new Date(cutoffStr + "T12:00:00Z");
     const days = Math.round(365 * years);
 
-    // ── 1. Fetch training data (up to cutoff) ──
+    //  1. Fetch training data (up to cutoff) 
     const histories = await Promise.all(
       tickers.map((t) => fetchHistoryUpTo(t, cutoff, days).catch(() => [])),
     );
@@ -1588,7 +1588,7 @@ export const backtestOptimization = createServerFn({ method: "POST" })
     const volDaily = retsByTicker.map((r) => std(r));
     const cov = covMatrix(returnsRows);
 
-    // ── 2. Run optimization on training data ──
+    //  2. Run optimization on training data 
     const allStrategies: Strategy[] = [
       "min-variance",
       "max-sharpe",
@@ -1680,7 +1680,7 @@ export const backtestOptimization = createServerFn({ method: "POST" })
           : 0,
     }));
 
-    // ── 3. Fetch forward data (cutoff → now) ──
+    //  3. Fetch forward data (cutoff → now) 
     const now = new Date();
     const forwardDays = Math.round((now.getTime() - cutoff.getTime()) / (24 * 60 * 60 * 1000)) + 30;
     const forwardHistories = await Promise.all(
@@ -1793,9 +1793,9 @@ export const backtestOptimization = createServerFn({ method: "POST" })
     };
   });
 
-// ──────────────────────────────────────────────────────────────────
+// 
 // Multi-date Markowitz backtest
-// ──────────────────────────────────────────────────────────────────
+// 
 
 export interface BacktestDateEntry {
   cutoffDate: string;
@@ -1855,7 +1855,7 @@ export const backtestMarkowitzMultidate = createServerFn({ method: "POST" })
       try {
         const cutoff = new Date(cutoffStr + "T12:00:00Z");
 
-        // ── 1. Fetch training data (up to cutoff) ──
+        //  1. Fetch training data (up to cutoff) 
         const histories = await Promise.all(
           tickers.map((t) => fetchHistoryUpTo(t, cutoff, days).catch(() => [])),
         );
@@ -1897,7 +1897,7 @@ export const backtestMarkowitzMultidate = createServerFn({ method: "POST" })
         const trainingStart = commonDates[0];
         const trainingEnd = commonDates[commonDates.length - 1];
 
-        // ── 2. Fetch forward data (cutoff → now) ──
+        //  2. Fetch forward data (cutoff → now) 
         const now = new Date();
         const forwardDays =
           Math.round((now.getTime() - cutoff.getTime()) / (24 * 60 * 60 * 1000)) + 30;
@@ -1993,7 +1993,7 @@ export const backtestMarkowitzMultidate = createServerFn({ method: "POST" })
       }
     }
 
-    // ── Aggregate statistics ──
+    //  Aggregate statistics 
     const totalDates = entries.length;
     const positiveCount = entries.filter((e) => e.success).length;
     const beatCount = entries.filter((e) => e.diff >= 0).length;
@@ -2025,9 +2025,9 @@ export const backtestMarkowitzMultidate = createServerFn({ method: "POST" })
     };
   });
 
-// ──────────────────────────────────────────────────────────────────
+// 
 // Ticker metadata (sector, industry) from Yahoo Finance
-// ──────────────────────────────────────────────────────────────────
+// 
 
 export interface TickerInfo {
   ticker: string;

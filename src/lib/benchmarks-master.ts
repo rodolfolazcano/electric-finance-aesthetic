@@ -188,3 +188,9 @@ export function buscarBenchmark(consulta: string): BenchmarkEntry[] {
 export function benchmarkPorTicker(ticker: string): BenchmarkEntry | undefined {
   return byTicker.get(ticker);
 }
+
+export const BENCHMARKS_CLASIFICACION: { ticker: string; name: string }[] = BENCHMARKS_MASTER.map((e) => ({
+  ticker: e.ticker,
+  name: e.name,
+}));
+

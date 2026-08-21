@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { getIntermarketMurphyIndicators, type IntermarketMurphyResult } from "@/lib/sectores/intermarket-murphy.functions";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────
+//  Helpers 
 
 function fmtPct(n: number | null | undefined, dp = 1): string {
   if (n == null || !Number.isFinite(n)) return "\u2014";
@@ -94,7 +94,7 @@ function RatioCard({ data, title, subtitle }: { data: IntermarketMurphyResult[ke
   );
 }
 
-// ─── Yield Curve Card ─────────────────────────────────────────────────
+//  Yield Curve Card 
 
 function YieldCurveCard({ data }: { data: IntermarketMurphyResult["yieldCurve"] }) {
   return (
@@ -139,7 +139,7 @@ function YieldCurveCard({ data }: { data: IntermarketMurphyResult["yieldCurve"] 
   );
 }
 
-// ─── Cycle Diagnosis Card ────────────────────────────────────────────
+//  Cycle Diagnosis Card 
 
 function CycleCard({ data }: { data: IntermarketMurphyResult["cycle"] }) {
   return (
@@ -198,7 +198,7 @@ function CycleCard({ data }: { data: IntermarketMurphyResult["cycle"] }) {
   );
 }
 
-// ─── Dow Theory Card ─────────────────────────────────────────────────
+//  Dow Theory Card 
 
 function DowTheoryCard({ data }: { data: IntermarketMurphyResult["dowTheory"] }) {
   return (
@@ -229,7 +229,7 @@ function DowTheoryCard({ data }: { data: IntermarketMurphyResult["dowTheory"] })
   );
 }
 
-// ─── Bonds/Stocks Card ───────────────────────────────────────────────
+//  Bonds/Stocks Card 
 
 function BondsStocksCard({ data }: { data: IntermarketMurphyResult["bondsStocks"] }) {
   return (
@@ -267,7 +267,7 @@ function BondsStocksCard({ data }: { data: IntermarketMurphyResult["bondsStocks"
   );
 }
 
-// ─── Lead/Lag Card ───────────────────────────────────────────────────
+//  Lead/Lag Card 
 
 function LeadLagCard({ data }: { data: IntermarketMurphyResult["leadLag"] }) {
   return (
@@ -285,7 +285,7 @@ function LeadLagCard({ data }: { data: IntermarketMurphyResult["leadLag"] }) {
   );
 }
 
-// ─── Cross-Asset Card ───────────────────────────────────────────────
+//  Cross-Asset Card 
 
 function CrossAssetCard({ data }: { data: IntermarketMurphyResult["crossAssetCorrelations"] }) {
   return (
@@ -311,7 +311,7 @@ function CrossAssetCard({ data }: { data: IntermarketMurphyResult["crossAssetCor
   );
 }
 
-// ─── Main Component ──────────────────────────────────────────────────
+//  Main Component 
 
 export function MurphyIntermarketPanel() {
   const fn = useServerFn(getIntermarketMurphyIndicators);
@@ -357,14 +357,14 @@ export function MurphyIntermarketPanel() {
         </div>
       </div>
 
-      {/* ═══════ CYCLE DIAGNOSIS (Principal) ═══════ */}
+      {/*  CYCLE DIAGNOSIS (Principal)  */}
       <div className="grid gap-3 grid-cols-1 lg:grid-cols-3">
         <CycleCard data={data.cycle} />
         <BondsStocksCard data={data.bondsStocks} />
         <YieldCurveCard data={data.yieldCurve} />
       </div>
 
-      {/* ═══════ DOW THEORY + LEAD/LAG ═══════ */}
+      {/*  DOW THEORY + LEAD/LAG  */}
       <div className="grid gap-3 grid-cols-1 lg:grid-cols-3">
         <DowTheoryCard data={data.dowTheory} />
         <LeadLagCard data={data.leadLag} />
@@ -382,7 +382,7 @@ export function MurphyIntermarketPanel() {
         </Card>
       </div>
 
-      {/* ═══════ CORE RATIOS GRID ═══════ */}
+      {/*  CORE RATIOS GRID  */}
       <div>
         <p className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground mb-2">Ratios Clave Intermarket</p>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -401,7 +401,7 @@ export function MurphyIntermarketPanel() {
         </div>
       </div>
 
-      {/* ═══════ CROSS-ASSET CORRELATIONS ═══════ */}
+      {/*  CROSS-ASSET CORRELATIONS  */}
       <div className="grid gap-3 grid-cols-1 lg:grid-cols-3">
         <CrossAssetCard data={data.crossAssetCorrelations} />
         <Card className="border-border/40 bg-background/40/40 p-3 col-span-full lg:col-span-1">

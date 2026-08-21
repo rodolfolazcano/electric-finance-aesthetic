@@ -40,7 +40,7 @@ function num(v: unknown): number | null {
   return null;
 }
 
-// ─── Types ────────────────────────────────────────────────────
+//  Types 
 
 export interface ScreenerItem {
   symbol: string;
@@ -98,7 +98,7 @@ export interface MacroContextAR {
   generatedAt: string;
 }
 
-// ─── 1. getMarketScreeners ────────────────────────────────────
+//  1. getMarketScreeners 
 
 export const getMarketScreeners = createServerFn({ method: "POST" }).handler(
   async (): Promise<MarketScreenersResult> => {
@@ -156,7 +156,7 @@ export const getMarketScreeners = createServerFn({ method: "POST" }).handler(
   },
 );
 
-// ─── 2. getTickerDailySignal ──────────────────────────────────
+//  2. getTickerDailySignal 
 
 export const getTickerDailySignal = createServerFn({ method: "POST" })
   .inputValidator((d: { tickers: string[] }) =>
@@ -356,7 +356,7 @@ export const getTickerDailySignal = createServerFn({ method: "POST" })
     return { signals, errors };
   });
 
-// ─── 3. getMacroContextAR ─────────────────────────────────────
+//  3. getMacroContextAR 
 
 export const getMacroContextAR = createServerFn({ method: "POST" }).handler(
   async (): Promise<MacroContextAR> => {
@@ -406,7 +406,7 @@ export const getMacroContextAR = createServerFn({ method: "POST" }).handler(
   },
 );
 
-// ─── 4. calcularOportunidadScore ──────────────────────────────
+//  4. calcularOportunidadScore 
 
 export interface OportunidadScoreInput {
   rvol: number | null;
@@ -418,7 +418,7 @@ export interface OportunidadScoreInput {
 }
 
 /*
- * ─── Fórmula del Score de Oportunidades ──────────────────────────────
+ *  Fórmula del Score de Oportunidades 
  *
  * El score compuesto (0-100) se calcula como el promedio de 4 sub-scores,
  * cada uno con peso máximo 25:
@@ -462,7 +462,7 @@ export interface OportunidadScoreInput {
  *      sin dato    → null (excluido del promedio)
  *
  * Regla: si menos de 2 componentes tienen datos, el score total es null.
- * ─────────────────────────────────────────────────────────────────────
+ * 
  */
 export function calcularOportunidadScore(input: OportunidadScoreInput): {
   total: number | null;
@@ -540,7 +540,7 @@ export function calcularOportunidadScore(input: OportunidadScoreInput): {
   return { total, detalle: { volumen, valuacion, catalizador, momentum } };
 }
 
-// ─── Score ponderado por perfil de sector ─────────────────────
+//  Score ponderado por perfil de sector 
 
 export function getScorePonderado(
   ticker: string,
@@ -563,7 +563,7 @@ export function getScorePonderado(
     const val = subScores[key];
     if (val == null) {
       missing.push(key);
-      // ⚠ TODO: falta calcular este campo en el repo
+      //  TODO: falta calcular este campo en el repo
       continue;
     }
     sumPonderada += val * peso;
@@ -575,7 +575,7 @@ export function getScorePonderado(
     const val = subScores[key];
     if (val == null) {
       missing.push(key);
-      // ⚠ TODO: falta calcular este campo en el repo
+      //  TODO: falta calcular este campo en el repo
       continue;
     }
     sumPonderada += val * peso;
@@ -592,7 +592,7 @@ export function getScorePonderado(
   return { score, sector, perfil, missing, esDefault };
 }
 
-// ─── Server function unificada para el subtab ────────────────
+//  Server function unificada para el subtab 
 
 export interface DailyOportunidadRow {
   ticker: string;
@@ -630,7 +630,7 @@ export interface DailyOportunidadesResult {
   timestamp: string;
 }
 
-// ─── Detector de anomalías: varianza cero en sub-scores ───────────
+//  Detector de anomalías: varianza cero en sub-scores 
 
 function detectarFallbackSospechoso(rows: DailyOportunidadRow[]): string[] {
   const warnings: string[] = [];
@@ -655,7 +655,7 @@ function detectarFallbackSospechoso(rows: DailyOportunidadRow[]): string[] {
   return warnings;
 }
 
-// ─── Macro contexto unificado ─────────────────────────────────────
+//  Macro contexto unificado 
 
 export interface ContextoMacroUnificado {
   riesgoPais: number | null;
@@ -747,9 +747,9 @@ export const getDailyOportunidades = createServerFn({ method: "POST" })
     const now = new Date().toISOString();
 
     const rows: DailyOportunidadRow[] = signalResult.signals.map((s) => {
-      // ─── Sector-weighted score (nuevo) ─────────────────────────
+      //  Sector-weighted score (nuevo) 
       const subScores: Record<string, number | null> = {
-        // ⚠ TODO: los siguientes campos de perfil-sector aún no se calculan en el repo.
+        //  TODO: los siguientes campos de perfil-sector aún no se calculan en el repo.
         // Se dejan null para que getScorePonderado los detecte como missing.
         // Etapa 4 debe computar y pasar estos valores.
         crecimientoIngresos: null,
@@ -775,7 +775,7 @@ export const getDailyOportunidades = createServerFn({ method: "POST" })
       };
       const sectorScore = getScorePonderado(s.ticker, subScores);
 
-      // ─── Fallback: score clásico hasta que todos los subScores sectoriales existan
+      //  Fallback: score clásico hasta que todos los subScores sectoriales existan
       const input: OportunidadScoreInput = {
         rvol: s.rvol,
         pePercentile: s.pePercentile,

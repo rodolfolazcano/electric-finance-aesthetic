@@ -272,7 +272,7 @@ export function detectarMonedaPosiciones(positions: Array<{ moneda?: string }>):
   return hasARS ? "ARS" : "USD";
 }
 
-// ─── Factor clustering types ────────────────────────────────────────
+//  Factor clustering types 
 
 export interface FactorFit {
   factor: string;
@@ -304,11 +304,11 @@ export interface FactorClusterGroup {
   size: number;
 }
 
-// ─── Hedge mode ─────────────────────────────────────────────────────
+//  Hedge mode 
 
 export type HedgeMode = "pure" | "alpha";
 
-// ─── Broker metadata (para Portafolio Manual multi-broker) ──────────
+//  Broker metadata (para Portafolio Manual multi-broker) 
 
 export type BrokerId = "ninguno" | "iol" | "balanz" | "ppi" | "inviu" | "otro";
 
@@ -319,7 +319,7 @@ export interface ManualRow {
   broker?: BrokerId;
 }
 
-// ─── Updated HedgeConfig ────────────────────────────────────────────
+//  Updated HedgeConfig 
 
 export interface HedgeConfigV2 extends HedgeConfig {
   hedgeMode: HedgeMode;
@@ -334,7 +334,7 @@ export const DEFAULT_HEDGE_CONFIG_V2: HedgeConfigV2 = {
   plFilterEnabled: true,
 };
 
-// ─── Updated HedgeResult ────────────────────────────────────────────
+//  Updated HedgeResult 
 
 export interface HedgeResultV2 extends HedgeResult {
   clusters?: FactorClusterGroup[];

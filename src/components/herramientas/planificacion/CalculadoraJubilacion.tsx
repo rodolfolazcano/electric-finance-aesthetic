@@ -53,9 +53,9 @@ export function CalculadoraJubilacion() {
   }, [inputs, result]);
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+    <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <div className="glass p-5 space-y-4">
-        <h3 className="mono text-[11px] uppercase tracking-[0.18em] text-foreground">Parámetros</h3>
+        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Parámetros</h3>
         {Object.entries(defaultInput).map(([key, _]) => {
           const labelMap: Record<string, string> = {
             edadActual: "Edad actual",
@@ -86,9 +86,9 @@ export function CalculadoraJubilacion() {
       <div className="space-y-4">
         {result && (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Capital proyectado
                 </div>
                 <div className="mono text-lg text-success">
@@ -96,13 +96,13 @@ export function CalculadoraJubilacion() {
                 </div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Capital necesario
                 </div>
                 <div className="mono text-lg">${result.capitalNecesario.toLocaleString()}</div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Brecha
                 </div>
                 <div
@@ -113,7 +113,7 @@ export function CalculadoraJubilacion() {
                 </div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Tasa real
                 </div>
                 <div className="mono text-lg">{result.tasaReal}%</div>
@@ -121,7 +121,7 @@ export function CalculadoraJubilacion() {
             </div>
 
             <div className="glass p-5">
-              <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Evolución del capital
               </div>
               <div className="h-64">
@@ -167,7 +167,7 @@ export function CalculadoraJubilacion() {
           </>
         )}
         <div className="flex gap-2">
-          <Button onClick={handleExport} variant="outline" size="sm" className="text-[11px]">
+          <Button onClick={handleExport} variant="outline" size="sm" className="text-[14px]">
             <svg
               className="mr-1.5 h-3.5 w-3.5"
               xmlns="http://www.w3.org/2000/svg"

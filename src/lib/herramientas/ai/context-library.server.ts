@@ -1,5 +1,5 @@
 // @ts-nocheck
-// Biblioteca de contexto de solo lectura alojada en un bucket p˙blico externo.
+// Biblioteca de contexto de solo lectura alojada en un bucket p√∫blico externo.
 // No se migra nada: se lee por HTTP y se cachea troceado en `context_library`.
 // Server-only.
 
@@ -13,9 +13,9 @@ export const FIXED_CONTEXT_PATHS = [
 
 /** PDFs y textos largos: se trocean y se cachean bajo demanda. */
 export const LIBRARY_DOCS: Array<{ path: string; title: string }> = [
-  { path: "libros/manual-negociacion-libro.pdf", title: "Manual de NegociaciÛn" },
-  { path: "libros/gwr-62-cuello-botella.pdf", title: "GWR #62 ó economÌa cuello de botella" },
-  { path: "libros/gwr-63-liquidez-spreads.pdf", title: "GWR #63 ó liquidez y spreads" },
+  { path: "libros/manual-negociacion-libro.pdf", title: "Manual de Negociaci√≥n" },
+  { path: "libros/gwr-62-cuello-botella.pdf", title: "GWR #62 ¬ó econom√≠a cuello de botella" },
+  { path: "libros/gwr-63-liquidez-spreads.pdf", title: "GWR #63 ¬ó liquidez y spreads" },
   { path: "libros/informe-renta-fija-100726.pdf", title: "Informe renta fija 10/07" },
   { path: "libros/informe-renta-fija-140726.pdf", title: "Informe renta fija 14/07" },
   { path: "contexto/contabilidad-finanzas-completo.txt", title: "Contabilidad y Finanzas" },
@@ -57,7 +57,7 @@ export async function fetchLibraryBytes(path: string): Promise<Uint8Array | null
   return res ? new Uint8Array(await res.arrayBuffer()) : null;
 }
 
-// --- Bloque fijo de metodologÌa --------------------------------------------
+// --- Bloque fijo de metodolog√≠a --------------------------------------------
 
 type MurphyChapter = { n?: number | string; titulo?: string; reglaClave?: string };
 
@@ -68,7 +68,7 @@ function renderMurphy(raw: string): string {
       divergenciasDetectables?: string[];
     };
     const chapters = (data.capitulos ?? [])
-      .map((c) => `Cap. ${c.n} ó ${c.titulo}: ${c.reglaClave}`)
+      .map((c) => `Cap. ${c.n} ¬ó ${c.titulo}: ${c.reglaClave}`)
       .join("\n");
     const divergences = (data.divergenciasDetectables ?? []).map((d) => `- ${d}`).join("\n");
     return `${chapters}${divergences ? `\n\nDivergencias detectables:\n${divergences}` : ""}`;
@@ -80,7 +80,7 @@ function renderMurphy(raw: string): string {
 let methodologyCache: { value: string; at: number } | null = null;
 const METHODOLOGY_TTL_MS = 30 * 60 * 1000;
 
-/** Marco Murphy + metodologÌa plan-mode, cacheado en memoria del worker. */
+/** Marco Murphy + metodolog√≠a plan-mode, cacheado en memoria del worker. */
 export async function getMethodologyBlock(): Promise<string> {
   if (methodologyCache && Date.now() - methodologyCache.at < METHODOLOGY_TTL_MS) {
     return methodologyCache.value;
@@ -94,11 +94,11 @@ export async function getMethodologyBlock(): Promise<string> {
 
   const parts: string[] = [];
   if (murphyRaw) {
-    parts.push(`MARCO INTERMARKET (John Murphy ó 15 capÌtulos) [contexto:murphy]:\n${renderMurphy(murphyRaw)}`);
+    parts.push(`MARCO INTERMARKET (John Murphy ¬ó 15 cap√≠tulos) [contexto:murphy]:\n${renderMurphy(murphyRaw)}`);
   }
   if (planMode) {
     parts.push(
-      `METODOLOGÕA PLAN-MODE CORONAR AI [contexto:metodologia]:\n${planMode.slice(0, 12_000)}`,
+      `METODOLOG√çA PLAN-MODE CORONAR AI [contexto:metodologia]:\n${planMode.slice(0, 12_000)}`,
     );
   }
   const value = parts.join("\n\n");
@@ -135,7 +135,7 @@ async function extractPdfText(bytes: Uint8Array): Promise<string> {
 }
 
 /**
- * Trae el documento, lo trocea y lo guarda en `context_library`. Si ya est·
+ * Trae el documento, lo trocea y lo guarda en `context_library`. Si ya est√°
  * cacheado no vuelve a pegarle al bucket.
  */
 export async function ensureLibraryDocIndexed(path: string, title: string): Promise<number> {
@@ -179,14 +179,14 @@ export async function indexLibrary(): Promise<Array<{ title: string; chunks: num
     try {
       out.push({ title: doc.title, chunks: await ensureLibraryDocIndexed(doc.path, doc.title) });
     } catch (error) {
-      console.error("[context-library] indexado fallÛ", doc.path, error);
+      console.error("[context-library] indexado fall√≥", doc.path, error);
       out.push({ title: doc.title, chunks: 0 });
     }
   }
   return out;
 }
 
-/** B˙squeda lÈxica simple sobre los fragmentos cacheados. */
+/** B√∫squeda l√©xica simple sobre los fragmentos cacheados. */
 export async function searchLibrary(query: string, limit = 4): Promise<
   Array<{ title: string; path: string; text: string }>
 > {

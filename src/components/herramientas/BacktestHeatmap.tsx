@@ -62,7 +62,7 @@ export function BacktestHeatmap({ grid, optimalA, optimalB, metric }: Props) {
               : "Max DD"}
       </h3>
       <div className="overflow-x-auto rounded-lg border border-border/40">
-        <table className="w-full text-center font-mono text-[10px]">
+        <table className="w-full text-center font-mono text-[13px]">
           <thead>
             <tr>
               <th className="sticky left-0 bg-background px-2 py-1 text-muted-foreground">a\\b</th>

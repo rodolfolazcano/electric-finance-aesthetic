@@ -92,7 +92,7 @@ async function capturar<T>(p: Promise<T>): Promise<T | null> {
   }
 }
 
-// ─── Moat (copia de calcularMoatSimplificado, schvarz-recomendacion.functions.ts:135) ──
+//  Moat (copia de calcularMoatSimplificado, schvarz-recomendacion.functions.ts:135) 
 
 function calcularMoatSimplificado(
   f: Partial<FundamentalAFResult> | null,

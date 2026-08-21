@@ -11,7 +11,7 @@ import {
 const CACHE_TTL = 10 * 60 * 1000;
 const CACHE_KEY = "intermarket-complete";
 
-// ─── Ratio ticker mappings ──────────────────────────────────────────
+//  Ratio ticker mappings 
 
 interface RatioTickers {
   numerator: string;
@@ -38,7 +38,7 @@ const CONTEXT_TICKERS = {
 } as const;
 
 const RATIO_TICKERS: Record<string, RatioTickers> = {
-  // ─── 12 ratios originales de Murphy ──
+  //  12 ratios originales de Murphy 
   CRB_BONDS: { numerator: "DBC", denominator: "TLT", numRange: "2y", denRange: "2y" },
   BONDS_STOCKS: { numerator: "TLT", denominator: "SPY", numRange: "2y", denRange: "2y" },
   COMMODITIES_STOCKS: { numerator: "DBC", denominator: "SPY", numRange: "2y", denRange: "2y" },
@@ -51,7 +51,7 @@ const RATIO_TICKERS: Record<string, RatioTickers> = {
   HYG_LQD: { numerator: "HYG", denominator: "LQD", numRange: "2y", denRange: "2y" },
   DOW_GOLD: { numerator: "^DJI", denominator: "GLD", numRange: "2y", denRange: "2y" },
   YIELD_CURVE: { numerator: "^TNX", denominator: "^IRX", numRange: "2y", denRange: "2y", operation: "difference" },
-  // ─── Nuevos ratios (Cap. 2, 10, 14, 15) ──
+  //  Nuevos ratios (Cap. 2, 10, 14, 15) 
   GOLD_SILVER: { numerator: "GLD", denominator: "SLV", numRange: "2y", denRange: "2y" },
   GDX_GLD: { numerator: "GDX", denominator: "GLD", numRange: "2y", denRange: "2y" },
 };
@@ -98,7 +98,7 @@ async function fetchAlignedSeries(
   return ratios;
 }
 
-// ─── Server function ────────────────────────────────────────────────
+//  Server function 
 
 export const getCompleteIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
   async (): Promise<CompleteIntermarketResult> => {
@@ -133,7 +133,7 @@ export const getCompleteIntermarketAnalysis = createServerFn({ method: "GET" }).
         }
       }
 
-      // ─── Fetch complementary indicators ──────────────────────────────
+      //  Fetch complementary indicators 
       const [vixResult, fedFundsResult, xlreResult, bilResult] = await Promise.allSettled([
         yahooChartCloses("^VIX", "2y"),
         yahooChartCloses("^FF", "2y"),

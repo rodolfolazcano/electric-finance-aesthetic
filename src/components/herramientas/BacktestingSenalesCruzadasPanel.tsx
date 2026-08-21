@@ -47,7 +47,7 @@ export default function BacktestingSenalesCruzadasPanel() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end gap-4">
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+          <label className="block text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
             Ticker
           </label>
           <input
@@ -57,7 +57,7 @@ export default function BacktestingSenalesCruzadasPanel() {
           />
         </div>
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+          <label className="block text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
             Período
           </label>
           <select
@@ -72,7 +72,7 @@ export default function BacktestingSenalesCruzadasPanel() {
           </select>
         </div>
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+          <label className="block text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
             Ventana (días)
           </label>
           <input
@@ -84,7 +84,7 @@ export default function BacktestingSenalesCruzadasPanel() {
             className="mono w-16 rounded border border-border/40 bg-background px-2 py-1.5 text-xs text-right"
           />
         </div>
-        <p className="text-[9px] text-muted-foreground/60">
+        <p className="text-[13px] text-muted-foreground/60">
           Señales combinadas: semáforo + fundamental en ≤{ventana} días
         </p>
       </div>
@@ -101,7 +101,7 @@ export default function BacktestingSenalesCruzadasPanel() {
             <h3 className="text-xs font-semibold text-muted-foreground mb-3">
               Comparativa: técnica sola vs fundamental sola vs cruzada
             </h3>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto w-full">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-border/40 text-muted-foreground">
@@ -147,7 +147,7 @@ export default function BacktestingSenalesCruzadasPanel() {
                   {cruzadasAlcista && (
                     <tr className="border-b border-border/10 bg-success/5">
                       <td className="py-1.5 pr-2 font-mono font-semibold text-success">
-                        ▲ Cruzada alcista
+                         Cruzada alcista
                       </td>
                       <td className="p-1.5 text-right">{cruzadasAlcista.ocurrencias}</td>
                       <td
@@ -165,7 +165,7 @@ export default function BacktestingSenalesCruzadasPanel() {
                   {cruzadasBajista && (
                     <tr className="border-b border-border/10 bg-danger/5">
                       <td className="py-1.5 pr-2 font-mono font-semibold text-danger">
-                        ▼ Cruzada bajista
+                         Cruzada bajista
                       </td>
                       <td className="p-1.5 text-right">{cruzadasBajista.ocurrencias}</td>
                       <td
@@ -263,29 +263,29 @@ export default function BacktestingSenalesCruzadasPanel() {
                     .reverse()
                     .map((c, i) => (
                       <tr key={i} className="border-b border-border/10 hover:bg-muted/10">
-                        <td className="py-1.5 pr-2 font-mono text-[10px] text-muted-foreground">
+                        <td className="py-1.5 pr-2 font-mono text-[13px] text-muted-foreground">
                           {c.fechaConfirmacion}
                         </td>
                         <td className="p-1.5">
                           <span
-                            className="text-[9px] font-semibold"
+                            className="text-[13px] font-semibold"
                             style={{ color: DIR_COLORS[c.direccion] }}
                           >
                             {c.direccion === "alcista"
-                              ? "▲"
+                              ? ""
                               : c.direccion === "bajista"
-                                ? "▼"
-                                : "●"}{" "}
+                                ? ""
+                                : ""}{" "}
                             {c.direccion}
                           </span>
                         </td>
-                        <td className="p-1.5 text-[9px] max-w-28 truncate text-muted-foreground">
+                        <td className="p-1.5 text-[13px] max-w-28 truncate text-muted-foreground">
                           {c.senalSemaforo}
                         </td>
-                        <td className="p-1.5 text-[9px] text-muted-foreground">
+                        <td className="p-1.5 text-[13px] text-muted-foreground">
                           {c.senalFundamental}
                         </td>
-                        <td className="p-1.5 text-right font-mono text-[10px]">
+                        <td className="p-1.5 text-right font-mono text-[13px]">
                           {c.diasEntreSenales}
                         </td>
                         <td className="p-1.5 text-right font-mono">
@@ -294,7 +294,7 @@ export default function BacktestingSenalesCruzadasPanel() {
                         {[c.retorno5d, c.retorno20d, c.retorno60d].map((r, j) => (
                           <td
                             key={j}
-                            className={`p-1.5 text-right font-mono text-[10px] ${
+                            className={`p-1.5 text-right font-mono text-[13px] ${
                               r == null
                                 ? "text-muted-foreground/40"
                                 : r >= 0
@@ -327,7 +327,7 @@ export default function BacktestingSenalesCruzadasPanel() {
 function ChartTip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-border bg-surface px-3 py-2 text-[10px] font-mono shadow-sm">
+    <div className="rounded-lg border border-border bg-surface px-3 py-2 text-[13px] font-mono shadow-sm">
       {payload.map((p: any) => (
         <div key={p.name} style={{ color: p.color }}>
           {p.name}: {(p.value as number).toFixed(3)}

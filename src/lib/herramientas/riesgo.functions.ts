@@ -249,7 +249,7 @@ export interface DistribStats {
   interval: string;
   period: string;
   annualFactor: number;
-  // ─── Labadie §3.2: p-variance, Hurst, medidas de riesgo avanzadas ───
+  //  Labadie §3.2: p-variance, Hurst, medidas de riesgo avanzadas 
   hurstExponent?: number; // H: 0.5=random, <0.5=mean-rev, >0.5=trending
   pVariance?: number; // E[|r-μ|^p]^(1/p)
   pSharpe?: number; // Sharpe con p-variance
@@ -348,23 +348,23 @@ export const getRiesgoAnalysis = createServerFn({ method: "POST" })
       const priceMed = percentile(prices, 50);
       const priceMod = mode(prices);
 
-      // ─── Labadie §3.2: Hurst exponent ───
+      //  Labadie §3.2: Hurst exponent 
       const hurst = n >= 100 ? computeHurst(prices) : 0.5;
       const volatilityAnnualH = sigma * Math.pow(actualFactor, hurst); // scaling self-similar
 
-      // ─── Labadie §3.2: p-variance ───
+      //  Labadie §3.2: p-variance 
       const pVar = computePVariance(returns, pValue);
       const pStd = pVar > 0 ? Math.pow(pVar, 1 / pValue) : 0;
       const volatilityAnnual_p = pStd * Math.pow(actualFactor, 1 / pValue);
       const pSharpeRatio =
         volatilityAnnual_p > 0 ? (meanAnnual - getRiskFreeRateSync("USD")) / volatilityAnnual_p : 0;
 
-      // ─── Labadie §3.2: implied p = 1/H ───
+      //  Labadie §3.2: implied p = 1/H 
       const impliedPCalc = hurst > 0 ? Math.min(10, Math.max(1.1, 1 / hurst)) : 2;
       const impliedPFromReturnsVal =
         returns.length >= 100 ? impliedPFromReturns(returns) : undefined;
 
-      // ─── Labadie §4 (eq.21): implied p regression ───
+      //  Labadie §4 (eq.21): implied p regression 
       const avgPrice = priceMean;
       const avgMI =
         prices.length > 0
@@ -375,7 +375,7 @@ export const getRiesgoAnalysis = createServerFn({ method: "POST" })
         Math.max(1.1, 2.35 + 0.14 * avgMI * 100 - 1.79 * sigma * Math.sqrt(actualFactor)),
       );
 
-      // ─── CVaR (Expected Shortfall) al 95% — tail mean, not all negative returns ───
+      //  CVaR (Expected Shortfall) al 95% — tail mean, not all negative returns 
       const sortedRets = [...returns].sort((a, b) => a - b);
       const tailIdx = Math.max(1, Math.floor(sortedRets.length * 0.05));
       const tailReturns = sortedRets.slice(0, tailIdx);
@@ -384,7 +384,7 @@ export const getRiesgoAnalysis = createServerFn({ method: "POST" })
           ? tailReturns.reduce((s, v) => s + v, 0) / tailReturns.length
           : var95;
 
-      // ─── Max Drawdown ───
+      //  Max Drawdown 
       let maxDrawdown = 0;
       let peak = prices[0];
       for (const p of prices) {
@@ -437,7 +437,7 @@ export const getRiesgoAnalysis = createServerFn({ method: "POST" })
         interval,
         period,
         annualFactor: actualFactor,
-        // ─── Labadie ───
+        //  Labadie 
         hurstExponent: hurst !== 0.5 ? hurst : undefined,
         pVariance: pVar > 0 ? pVar : undefined,
         pSharpe: pSharpeRatio,

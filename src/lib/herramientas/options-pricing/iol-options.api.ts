@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { IOLOptionResponse, OptionContract, CaucionData } from "./options.types";
 import { timeToExpiry } from "./market-calendar";
 
-// ─── Opciones desde IOL ───────────────────────────────────────────────
+//  Opciones desde IOL 
 
 export const fetchOpcionesIOL = createServerFn({ method: "POST" })
   .validator((input: unknown) =>
@@ -82,7 +82,7 @@ function mapperIOLtoContract(simbolo: string) {
   };
 }
 
-// ─── Caución (tasa libre de riesgo) ────────────────────────────────────
+//  Caución (tasa libre de riesgo) 
 
 export const fetchCauciones = createServerFn({ method: "GET" }).handler(
   async (): Promise<CaucionData | null> => {
@@ -112,7 +112,7 @@ export const fetchCauciones = createServerFn({ method: "GET" }).handler(
   },
 );
 
-// ─── Resolver subyacentes disponibles ──────────────────────────────────
+//  Resolver subyacentes disponibles 
 
 export const OPCIONES_SUBYACENTES = ["COME", "GGAL", "YPFD", "PAMP", "BMA"] as const;
 

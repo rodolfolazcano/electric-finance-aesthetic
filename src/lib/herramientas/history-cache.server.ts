@@ -9,7 +9,7 @@
 
 import { supabase } from "./supabase-stub";
 
-// ── Types ────────────────────────────────────────────────────────────
+//  Types 
 
 interface HistoryPayload {
   data: { date: string; close: number }[];
@@ -17,97 +17,30 @@ interface HistoryPayload {
   lastUpdated: string; // ISO timestamp
 }
 
-// ── Yahoo Finance vía HTTP directo (sin dependencia yahoo-finance2) ──
+//  Yahoo Finance singleton 
 
-import { fetchYahooQuoteSummaryJson, yahooHeaders } from "./yahoo-http";
-
-interface ChartEnvelope {
-  chart?: {
-    result?: Array<{
-      meta?: {
-        symbol?: string;
-        currency?: string;
-        regularMarketPrice?: number;
-        regularMarketTime?: number;
-        chartPreviousClose?: number;
-        shortName?: string;
-        longName?: string;
-      };
-      timestamp?: number[];
-      indicators?: { quote?: Array<{ close?: (number | null)[] }> };
-    }>;
-  };
-}
-
-async function chartRango(
-  ticker: string,
-  period1: Date,
-  period2: Date,
-): Promise<{ date: string; close: number }[]> {
-  const p1 = Math.floor(period1.getTime() / 1000);
-  const p2 = Math.floor(period2.getTime() / 1000);
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
-    ticker,
-  )}?period1=${p1}&period2=${p2}&interval=1d&events=div%2Csplit`;
+let _yf: any = null;
+async function getYF(): Promise<any> {
+  if (_yf) return _yf;
+  const mod: any = await import("yahoo-finance2");
+  const YF = mod.default ?? mod;
   try {
-    const res = await fetch(url, { headers: yahooHeaders() });
-    if (!res.ok) return [];
-    const json = (await res.json()) as ChartEnvelope;
-    const r = json.chart?.result?.[0];
-    const ts = r?.timestamp ?? [];
-    const closes = r?.indicators?.quote?.[0]?.close ?? [];
-    const out: { date: string; close: number }[] = [];
-    for (let i = 0; i < ts.length; i++) {
-      const c = closes[i];
-      const t = ts[i];
-      if (typeof c === "number" && isFinite(c) && t != null) {
-        out.push({ date: new Date(t * 1000).toISOString().slice(0, 10), close: c });
-      }
-    }
-    return out;
+    _yf = typeof YF === "function" ? new YF() : YF;
   } catch {
-    return [];
+    _yf = YF;
   }
-}
-
-/** Quote compatible con la forma usada de yahoo-finance2 (campos mínimos). */
-async function quoteDirecto(ticker: string): Promise<any> {
   try {
-    const [chartRes, summary] = await Promise.all([
-      chartRango(ticker, new Date(Date.now() - 10 * 86400000), new Date()),
-      fetchYahooQuoteSummaryJson<any>(ticker, ["price", "summaryDetail"]).catch(() => null),
-    ]);
-    const meta = chartRes.length ? null : null;
-    void meta;
-    const ultimo = chartRes.length ? chartRes[chartRes.length - 1]!.close : null;
-    const price = summary?.json?.quoteSummary?.result?.[0];
-    const p = price?.price ?? {};
-    const sd = price?.summaryDetail ?? {};
-    return {
-      symbol: ticker,
-      regularMarketPrice: p.regularMarketPrice ?? ultimo ?? null,
-      regularMarketPreviousClose:
-        p.regularMarketPreviousClose ??
-        sd.previousClose ??
-        (chartRes.length > 1 ? chartRes[chartRes.length - 2]!.close : null),
-      shortName: p.shortName ?? p.longName ?? ticker,
-      longName: p.longName ?? p.shortName ?? ticker,
-      currency: p.currency ?? null,
-      fullExchangeName: p.fullExchangeName ?? null,
-      marketCap: p.marketCap ?? sd.marketCap ?? null,
-      trailingPE: sd.trailingPE ?? null,
-    };
-  } catch {
-    return null;
-  }
+    _yf.suppressNotices?.(["yahooSurvey", "ripHistorical"]);
+  } catch {}
+  return _yf;
 }
 
-// ── In-memory cache (L1) ─────────────────────────────────────────────
+//  In-memory cache (L1) 
 
 const memCache = new Map<string, { payload: HistoryPayload; expiresAt: number }>();
 const MEM_TTL_MS = 5 * 60 * 1000; // 5 min in-memory before re-checking Supabase
 
-// ── Supabase helpers (L2) ────────────────────────────────────────────
+//  Supabase helpers (L2) 
 
 const CACHE_TTL_SECONDS = 30 * 86400; // 30 days — historical data rarely changes
 
@@ -148,16 +81,19 @@ async function supabaseSet(key: string, payload: HistoryPayload): Promise<void> 
   }
 }
 
-// ── Incremental fetch from Yahoo ─────────────────────────────────────
+//  Incremental fetch from Yahoo 
 
 async function fetchRange(
   ticker: string,
   period1: Date,
   period2: Date,
 ): Promise<{ date: string; close: number }[]> {
+  const yf = await getYF();
   try {
-    const rows = await chartRango(ticker, period1, period2);
-    return rows.filter((q) => q.date != null && q.close != null);
+    const rows = await yf.chart(ticker, { period1, period2, interval: "1d" });
+    return (rows?.quotes ?? [])
+      .filter((q: any) => q.date != null && q.close != null)
+      .map((q: any) => ({ date: q.date.toISOString().slice(0, 10), close: q.close as number }));
   } catch {
     return [];
   }
@@ -178,7 +114,7 @@ async function fetchFullHistory(ticker: string, days: number): Promise<HistoryPa
   };
 }
 
-// ── Public API ───────────────────────────────────────────────────────
+//  Public API 
 
 /**
  * Get historical daily closes for a ticker.
@@ -273,7 +209,7 @@ export async function getHistories(
   return results;
 }
 
-// ── Quote cache (live prices, short TTL) ──────────────────────────────
+//  Quote cache (live prices, short TTL) 
 
 const QUOTE_TTL_MS = 5 * 60 * 1000;
 const _quoteCache = new Map<string, { data: any; timestamp: number }>();
@@ -283,8 +219,9 @@ export async function getQuote(ticker: string): Promise<any> {
   if (cached && Date.now() - cached.timestamp < QUOTE_TTL_MS) {
     return cached.data;
   }
+  const yf = await getYF();
   try {
-    const quote = await quoteDirecto(ticker);
+    const quote = await yf.quote(ticker);
     if (quote) {
       _quoteCache.set(ticker, { data: quote, timestamp: Date.now() });
     }

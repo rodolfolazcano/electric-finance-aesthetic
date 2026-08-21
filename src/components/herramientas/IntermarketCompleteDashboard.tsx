@@ -44,18 +44,18 @@ function fmtZ(z: number | null | undefined): string {
 }
 
 function TrendBadge({ change }: { change: number | null }) {
-  if (change == null) return <span className="text-[10px] text-muted-foreground">--</span>;
+  if (change == null) return <span className="text-[13px] text-muted-foreground">--</span>;
   if (change > 2)
-    return <span className="text-[10px] text-green-400 font-mono">▲ +{change.toFixed(1)}%</span>;
+    return <span className="text-[13px] text-green-400 font-mono"> +{change.toFixed(1)}%</span>;
   if (change < -2)
-    return <span className="text-[10px] text-red-400 font-mono">▼ {change.toFixed(1)}%</span>;
+    return <span className="text-[13px] text-red-400 font-mono"> {change.toFixed(1)}%</span>;
   return (
-    <span className="text-[10px] text-muted-foreground font-mono">▬ {change.toFixed(1)}%</span>
+    <span className="text-[13px] text-muted-foreground font-mono"> {change.toFixed(1)}%</span>
   );
 }
 
 function PercentileBadge({ p }: { p: PercentileInfo | null }) {
-  if (!p) return <span className="text-[10px] text-muted-foreground">--</span>;
+  if (!p) return <span className="text-[13px] text-muted-foreground">--</span>;
   const colors: Record<string, string> = {
     oversold_extreme: "text-emerald-300",
     low: "text-emerald-500",
@@ -64,27 +64,27 @@ function PercentileBadge({ p }: { p: PercentileInfo | null }) {
     overbought_extreme: "text-red-400",
   };
   return (
-    <span className={cn("text-[10px] font-mono", colors[p.category])}>
+    <span className={cn("text-[13px] font-mono", colors[p.category])}>
       Pct: {p.rank.toFixed(0)}%
     </span>
   );
 }
 
 function ZScoreBadge({ z }: { z: ZScoreInfo | null }) {
-  if (!z) return <span className="text-[10px] text-muted-foreground">--</span>;
+  if (!z) return <span className="text-[13px] text-muted-foreground">--</span>;
   const colors: Record<string, string> = {
     overbought: "text-red-400",
     normal: "text-muted-foreground",
     overSold: "text-emerald-300",
   };
   return (
-    <span className={cn("text-[10px] font-mono", colors[z.category])}>
+    <span className={cn("text-[13px] font-mono", colors[z.category])}>
       Z: {z.zScore.toFixed(1)}
     </span>
   );
 }
 
-// ─── MiniCard for one ratio ─────────────────────────────────────
+//  MiniCard for one ratio 
 
 function RatioMiniCard({ ratio }: { ratio: RatioAnalysisType }) {
   const w63 = ratio.stats.windows[63];
@@ -102,12 +102,12 @@ function RatioMiniCard({ ratio }: { ratio: RatioAnalysisType }) {
       )}
     >
       <div className="flex items-center justify-between">
-        <span className="font-semibold text-[11px] font-mono text-foreground">{ratio.label}</span>
+        <span className="font-semibold text-[14px] font-mono text-foreground">{ratio.label}</span>
         {isAnomalous && (
-          <span className="text-[8px] text-yellow-400 bg-yellow-500/10 px-1 rounded">⚠</span>
+          <span className="text-[12px] text-yellow-400 bg-yellow-500/10 px-1 rounded"></span>
         )}
       </div>
-      <div className="text-[10px] text-muted-foreground">{ratio.leading}</div>
+      <div className="text-[13px] text-muted-foreground">{ratio.leading}</div>
       <div className="flex items-center gap-2">
         <span className="text-sm font-mono text-foreground">{fmtNum(w63?.value)}</span>
         <TrendBadge change={w63?.changePct ?? null} />
@@ -117,7 +117,7 @@ function RatioMiniCard({ ratio }: { ratio: RatioAnalysisType }) {
         <ZScoreBadge z={w63?.zScore ?? null} />
       </div>
       {w252 && w252.changePct != null && (
-        <div className="text-[9px] text-muted-foreground">
+        <div className="text-[13px] text-muted-foreground">
           Estructural (1y): {w252.changePct > 0 ? "+" : ""}
           {w252.changePct.toFixed(1)}%
         </div>
@@ -127,12 +127,12 @@ function RatioMiniCard({ ratio }: { ratio: RatioAnalysisType }) {
           {ratio.cointegration.map((c, i) => (
             <div
               key={`${c.pairLabel}-${i}`}
-              className="text-[8px] text-muted-foreground flex items-center gap-1"
+              className="text-[12px] text-muted-foreground flex items-center gap-1"
             >
               <span>{c.pairLabel}</span>
-              {c.cointegrated === true && <span className="text-green-500">✓</span>}
-              {c.cointegrated === false && <span className="text-red-400">✗</span>}
-              {c.regimeAnomalous === true && <span className="text-yellow-400">⚠ anómalo</span>}
+              {c.cointegrated === true && <span className="text-green-500"></span>}
+              {c.cointegrated === false && <span className="text-red-400"></span>}
+              {c.regimeAnomalous === true && <span className="text-yellow-400"> anómalo</span>}
             </div>
           ))}
         </div>
@@ -141,7 +141,7 @@ function RatioMiniCard({ ratio }: { ratio: RatioAnalysisType }) {
   );
 }
 
-// ─── Reversal Signals Panel ────────────────────────────────────
+//  Reversal Signals Panel 
 
 function ReversalSignalsPanel({ signals }: { signals: ReversalSignal[] }) {
   if (signals.length === 0) {
@@ -167,23 +167,23 @@ function ReversalSignalsPanel({ signals }: { signals: ReversalSignal[] }) {
           )}
         >
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-[11px] font-mono">
-              {s.divergenceDirection === "bearish" ? "🔴" : "🟢"} {s.signal}
+            <span className="font-semibold text-[14px] font-mono">
+              {s.divergenceDirection === "bearish" ? "[ROJO]" : "[VERDE]"} {s.signal}
             </span>
-            <span className="text-[9px] text-muted-foreground">
+            <span className="text-[13px] text-muted-foreground">
               Confianza: {(s.confidence * 100).toFixed(0)}%
             </span>
           </div>
-          <div className="text-[10px] text-muted-foreground">{s.interpretation}</div>
-          <div className="flex items-center gap-2 text-[9px]">
+          <div className="text-[13px] text-muted-foreground">{s.interpretation}</div>
+          <div className="flex items-center gap-2 text-[13px]">
             <span className={s.layer1Percentile ? "text-green-400" : "text-muted-foreground"}>
-              Capa1:{s.layer1Percentile ? "✓" : "✗"}
+              Capa1:{s.layer1Percentile ? "" : ""}
             </span>
             <span className={s.layer2ZScore ? "text-green-400" : "text-muted-foreground"}>
-              Capa2:{s.layer2ZScore ? "✓" : "✗"}
+              Capa2:{s.layer2ZScore ? "" : ""}
             </span>
             <span className={s.layer3Divergence ? "text-green-400" : "text-muted-foreground"}>
-              Capa3:{s.layer3Divergence ? "✓" : "✗"}
+              Capa3:{s.layer3Divergence ? "" : ""}
             </span>
           </div>
         </Card>
@@ -192,7 +192,7 @@ function ReversalSignalsPanel({ signals }: { signals: ReversalSignal[] }) {
   );
 }
 
-// ─── Sequential Steps Panel ────────────────────────────────────
+//  Sequential Steps Panel 
 
 function SequentialPanel({
   steps,
@@ -210,10 +210,10 @@ function SequentialPanel({
     warning: "text-yellow-400 border-yellow-500/30 bg-yellow-500/10",
   };
   const signalIcons: Record<string, string> = {
-    bullish: "🟢",
-    bearish: "🔴",
-    neutral: "⚪",
-    warning: "🟡",
+    bullish: "[VERDE]",
+    bearish: "[ROJO]",
+    neutral: "",
+    warning: "[AMARILLO]",
   };
 
   return (
@@ -225,13 +225,13 @@ function SequentialPanel({
         >
           <div className="flex items-center gap-2">
             <span className="text-sm">{signalIcons[step.signal]}</span>
-            <span className="font-semibold text-[11px] font-mono">
+            <span className="font-semibold text-[14px] font-mono">
               PASO {step.step}: {step.name}
             </span>
           </div>
-          <div className="text-[10px] text-muted-foreground">{step.result}</div>
+          <div className="text-[13px] text-muted-foreground">{step.result}</div>
           {step.nextStep > 0 && (
-            <div className="text-[9px] text-muted-foreground/70">
+            <div className="text-[13px] text-muted-foreground/70">
               → Siguiente: PASO {step.nextStep}
             </div>
           )}
@@ -239,14 +239,14 @@ function SequentialPanel({
       ))}
       <Card className="p-3 border-t-2 border-t-primary/30 mt-3">
         <div className="text-xs font-semibold font-mono">Resultado Final</div>
-        <div className="text-[11px] text-muted-foreground mt-1">{finalRegime}</div>
-        <div className="text-[10px] text-muted-foreground">{finalStage}</div>
+        <div className="text-[14px] text-muted-foreground mt-1">{finalRegime}</div>
+        <div className="text-[13px] text-muted-foreground">{finalStage}</div>
       </Card>
     </div>
   );
 }
 
-// ─── Composite Score Panel ─────────────────────────────────────
+//  Composite Score Panel 
 
 function CompositeScorePanel({ score }: { score: CompositeScore }) {
   const colors: Record<string, string> = {
@@ -284,18 +284,18 @@ function CompositeScorePanel({ score }: { score: CompositeScore }) {
             }}
           />
         </div>
-        <div className="flex justify-between text-[9px] text-muted-foreground mt-1">
+        <div className="flex justify-between text-[13px] text-muted-foreground mt-1">
           <span>Risk-Off</span>
           <span>Neutral</span>
           <span>Risk-On</span>
         </div>
       </Card>
-      <div className="grid gap-1.5">
+      <div className="grid w-full gap-1.5">
         {score.components.map((c, i) => (
           <ComponentRow key={c.ratioId} component={c} />
         ))}
       </div>
-      <div className="text-[10px] text-muted-foreground leading-relaxed">
+      <div className="text-[13px] text-muted-foreground leading-relaxed">
         {score.interpretation}
       </div>
     </div>
@@ -307,7 +307,7 @@ function ComponentRow({ component }: { component: ScoreComponent }) {
   const weightPct = (component.weight * 100).toFixed(0);
 
   return (
-    <div className="flex items-center justify-between text-[11px] font-mono py-1 border-b border-border/20 last:border-0">
+    <div className="flex items-center justify-between text-[14px] font-mono py-1 border-b border-border/20 last:border-0">
       <div className="flex items-center gap-2">
         <span
           className={cn(
@@ -319,14 +319,14 @@ function ComponentRow({ component }: { component: ScoreComponent }) {
                 : "text-muted-foreground",
           )}
         >
-          {component.signalValue > 0 ? "▲" : component.signalValue < 0 ? "▼" : "▬"}
+          {component.signalValue > 0 ? "" : component.signalValue < 0 ? "" : ""}
         </span>
         <span className="text-foreground">{def?.label ?? component.ratioId}</span>
-        <span className="text-[9px] text-muted-foreground">({weightPct}%)</span>
+        <span className="text-[13px] text-muted-foreground">({weightPct}%)</span>
       </div>
       <div className="flex items-center gap-2">
         {component.cointegrationMultiplier < 1 && (
-          <span className="text-[8px] text-yellow-400">×0.5</span>
+          <span className="text-[12px] text-yellow-400">×0.5</span>
         )}
         <span
           className={cn(
@@ -346,7 +346,7 @@ function ComponentRow({ component }: { component: ScoreComponent }) {
   );
 }
 
-// ─── Cointegration Matrix ──────────────────────────────────────
+//  Cointegration Matrix 
 
 function CointegrationMatrixCard({ result }: { result: CompleteIntermarketResult }) {
   const pairs = result.ratios.flatMap((r) => r.cointegration);
@@ -357,12 +357,12 @@ function CointegrationMatrixCard({ result }: { result: CompleteIntermarketResult
       {pairs.map((c, i) => (
         <div
           key={`${c.pairLabel}-${i}`}
-          className="flex items-center justify-between text-[10px] font-mono py-1 border-b border-border/20 last:border-0"
+          className="flex items-center justify-between text-[13px] font-mono py-1 border-b border-border/20 last:border-0"
         >
           <div className="flex items-center gap-1">
             <span className="text-foreground">{c.pairLabel}</span>
             {c.expectedPerMurphy && (
-              <span className="text-[8px] text-blue-400">(Murphy espera sí)</span>
+              <span className="text-[12px] text-blue-400">(Murphy espera sí)</span>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -371,16 +371,16 @@ function CointegrationMatrixCard({ result }: { result: CompleteIntermarketResult
                 <span className="text-muted-foreground">ADF: {c.adfStatistic.toFixed(2)}</span>
                 <span
                   className={cn(
-                    "px-1 rounded text-[9px]",
+                    "px-1 rounded text-[13px]",
                     c.cointegrated
                       ? "bg-green-500/10 text-green-400"
                       : "bg-red-500/10 text-red-400",
                   )}
                 >
-                  {c.cointegrated ? "✓ Cointegrado" : "✗ No cointegrado"}
+                  {c.cointegrated ? " Cointegrado" : " No cointegrado"}
                 </span>
                 {c.regimeAnomalous === true && (
-                  <span className="text-yellow-400 text-[8px]">⚠ Anómalo</span>
+                  <span className="text-yellow-400 text-[12px]"> Anómalo</span>
                 )}
               </>
             ) : (
@@ -393,7 +393,7 @@ function CointegrationMatrixCard({ result }: { result: CompleteIntermarketResult
   );
 }
 
-// ─── Multi-window detail for a single ratio ────────────────────
+//  Multi-window detail for a single ratio 
 
 function RatioDetailCard({ ratio }: { ratio: RatioAnalysisType }) {
   const windows: WindowKey[] = [21, 63, 126, 252, 504];
@@ -403,11 +403,11 @@ function RatioDetailCard({ ratio }: { ratio: RatioAnalysisType }) {
       <div className="flex items-center justify-between">
         <div>
           <span className="text-xs font-bold font-mono text-foreground">{ratio.label}</span>
-          <span className="text-[9px] text-muted-foreground ml-2">{ratio.formula}</span>
+          <span className="text-[13px] text-muted-foreground ml-2">{ratio.formula}</span>
         </div>
         <span
           className={cn(
-            "text-[10px] px-2 py-0.5 rounded font-mono",
+            "text-[13px] px-2 py-0.5 rounded font-mono",
             ratio.signal.regime === "bullish"
               ? "bg-green-500/10 text-green-400"
               : ratio.signal.regime === "bearish"
@@ -415,12 +415,12 @@ function RatioDetailCard({ ratio }: { ratio: RatioAnalysisType }) {
                 : "bg-muted/10 text-muted-foreground",
           )}
         >
-          {ratio.signal.regime === "bullish" ? "▲" : ratio.signal.regime === "bearish" ? "▼" : "▬"}{" "}
+          {ratio.signal.regime === "bullish" ? "" : ratio.signal.regime === "bearish" ? "" : ""}{" "}
           {ratio.signal.regime.toUpperCase()}
         </span>
       </div>
-      <div className="text-[9px] text-muted-foreground">{ratio.leading}</div>
-      <div className="grid grid-cols-5 gap-1">
+      <div className="text-[13px] text-muted-foreground">{ratio.leading}</div>
+      <div className="grid w-full grid-cols-5 gap-1">
         {windows.map((w) => {
           const ws = ratio.stats.windows[w];
           const cfg = WINDOW_CONFIGS[w];
@@ -428,7 +428,7 @@ function RatioDetailCard({ ratio }: { ratio: RatioAnalysisType }) {
             <div
               key={w}
               className={cn(
-                "p-1.5 rounded text-[9px] text-center",
+                "p-1.5 rounded text-[13px] text-center",
                 ws?.changePct != null && ws.changePct > 2
                   ? "bg-green-500/5"
                   : ws?.changePct != null && ws.changePct < -2
@@ -436,8 +436,8 @@ function RatioDetailCard({ ratio }: { ratio: RatioAnalysisType }) {
                     : "bg-muted/5",
               )}
             >
-              <div className="text-[8px] text-muted-foreground">{cfg.label}</div>
-              <div className="font-mono text-[10px] text-foreground">{fmtNum(ws?.value, 4)}</div>
+              <div className="text-[12px] text-muted-foreground">{cfg.label}</div>
+              <div className="font-mono text-[13px] text-foreground">{fmtNum(ws?.value, 4)}</div>
               <TrendBadge change={ws?.changePct ?? null} />
               <PercentileBadge p={ws?.percentile ?? null} />
               <ZScoreBadge z={ws?.zScore ?? null} />
@@ -447,9 +447,9 @@ function RatioDetailCard({ ratio }: { ratio: RatioAnalysisType }) {
       </div>
       {ratio.cointegration.length > 0 && (
         <div className="border-t border-border/20 pt-1.5 space-y-0.5">
-          <span className="text-[9px] text-muted-foreground font-mono">Cointegración:</span>
+          <span className="text-[13px] text-muted-foreground font-mono">Cointegración:</span>
           {ratio.cointegration.map((c, i) => (
-            <div key={i} className="text-[8px] text-muted-foreground flex items-center gap-1">
+            <div key={i} className="text-[12px] text-muted-foreground flex items-center gap-1">
               <span>{c.pairLabel}:</span>
               {c.cointegrated == null ? (
                 <span className="text-yellow-400">sin datos</span>
@@ -471,7 +471,7 @@ function RatioDetailCard({ ratio }: { ratio: RatioAnalysisType }) {
   );
 }
 
-// ─── VIX Regime Panel ────────────────────────────────────────────
+//  VIX Regime Panel 
 
 function VixRegimeCard({ vix }: { vix: VixRegimeInfo }) {
   const colors: Record<string, string> = {
@@ -495,7 +495,7 @@ function VixRegimeCard({ vix }: { vix: VixRegimeInfo }) {
         </span>
         <span
           className={cn(
-            "text-[10px] px-2 py-0.5 rounded font-mono",
+            "text-[13px] px-2 py-0.5 rounded font-mono",
             colors[vix.category ?? "normal"],
           )}
         >
@@ -503,29 +503,29 @@ function VixRegimeCard({ vix }: { vix: VixRegimeInfo }) {
         </span>
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-[11px] font-mono font-semibold">
+        <span className="text-[14px] font-mono font-semibold">
           {vix.category ? labels[vix.category] : "Sin datos"}
         </span>
         {vix.trend21d != null && <TrendBadge change={vix.trend21d} />}
       </div>
       {vix.percentile && (
-        <div className="flex items-center gap-3 text-[9px] font-mono text-muted-foreground">
+        <div className="flex items-center gap-3 text-[13px] font-mono text-muted-foreground">
           <PercentileBadge p={vix.percentile} />
           {vix.zScore && <ZScoreBadge z={vix.zScore} />}
         </div>
       )}
       {vix.category === "panic" && (
-        <div className="text-[9px] text-red-400/80">
+        <div className="text-[13px] text-red-400/80">
           VIX en extremo — posible bottom de mercado cercano.
         </div>
       )}
       {vix.category === "elevated" && (
-        <div className="text-[9px] text-orange-400/80">
+        <div className="text-[13px] text-orange-400/80">
           Volatilidad elevada — mantener precaución.
         </div>
       )}
       {vix.category === "low_vol" && (
-        <div className="text-[9px] text-green-400/80">
+        <div className="text-[13px] text-green-400/80">
           Volatilidad baja — entorno favorable para riesgo.
         </div>
       )}
@@ -533,7 +533,7 @@ function VixRegimeCard({ vix }: { vix: VixRegimeInfo }) {
   );
 }
 
-// ─── Fed Funds Panel ─────────────────────────────────────────────
+//  Fed Funds Panel 
 
 function FedFundsCard({ fed }: { fed: FedFundsInfo }) {
   const phaseColors: Record<string, string> = {
@@ -555,34 +555,34 @@ function FedFundsCard({ fed }: { fed: FedFundsInfo }) {
         <span className="text-xs font-semibold font-mono text-foreground">
           Fed Funds — Ciclo Monetario
         </span>
-        <span className="text-[11px] font-mono font-semibold">
+        <span className="text-[14px] font-mono font-semibold">
           {fed.currentRate != null ? `${fed.currentRate.toFixed(2)}%` : "--"}
         </span>
       </div>
       <div
         className={cn(
-          "text-[10px] px-2 py-0.5 rounded font-mono inline-block",
+          "text-[13px] px-2 py-0.5 rounded font-mono inline-block",
           phaseColors[fed.cyclePhase ?? "neutral"],
         )}
       >
         {phaseLabels[fed.cyclePhase ?? "neutral"]}
       </div>
       {fed.spread10y2y != null && (
-        <div className="text-[9px] font-mono text-muted-foreground">
+        <div className="text-[13px] font-mono text-muted-foreground">
           Spread 10Y-2Y: {fed.spread10y2y.toFixed(2)} bps
           {fed.fedVsSpread.fedAboveSpread != null && (
             <> · Fed {fed.fedVsSpread.fedAboveSpread ? ">" : "<"} curva</>
           )}
         </div>
       )}
-      <div className="text-[9px] text-muted-foreground/80 leading-relaxed pt-1 border-t border-border/20">
+      <div className="text-[13px] text-muted-foreground/80 leading-relaxed pt-1 border-t border-border/20">
         {fed.fedVsSpread.interpretation}
       </div>
     </Card>
   );
 }
 
-// ─── Asset Classes Snapshot ──────────────────────────────────────
+//  Asset Classes Snapshot 
 
 function AssetClassesCard({ ac }: { ac: AssetClassSnapshot }) {
   return (
@@ -590,27 +590,27 @@ function AssetClassesCard({ ac }: { ac: AssetClassSnapshot }) {
       <span className="text-xs font-semibold font-mono text-foreground block mb-2">
         Clases de Activo Adicionales
       </span>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid w-full grid-cols-2 gap-3">
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono text-foreground">Real Estate (XLRE)</span>
-            <span className="text-[11px] font-mono">
+            <span className="text-[13px] font-mono text-foreground">Real Estate (XLRE)</span>
+            <span className="text-[14px] font-mono">
               {ac.xlre.price != null ? `$${ac.xlre.price.toFixed(2)}` : "--"}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-[9px]">
+          <div className="flex items-center gap-2 text-[13px]">
             <TrendBadge change={ac.xlre.change21d} />
             {ac.xlre.percentile && <PercentileBadge p={ac.xlre.percentile} />}
           </div>
         </div>
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono text-foreground">T-Bills (BIL)</span>
-            <span className="text-[11px] font-mono">
+            <span className="text-[13px] font-mono text-foreground">T-Bills (BIL)</span>
+            <span className="text-[14px] font-mono">
               {ac.bil.yield != null ? `$${ac.bil.yield.toFixed(2)}` : "--"}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-[9px]">
+          <div className="flex items-center gap-2 text-[13px]">
             <TrendBadge change={ac.bil.change21d} />
           </div>
         </div>
@@ -619,7 +619,7 @@ function AssetClassesCard({ ac }: { ac: AssetClassSnapshot }) {
   );
 }
 
-// ─── MAIN DASHBOARD ──────────────────────────────────────────────
+//  MAIN DASHBOARD 
 
 export function IntermarketCompleteDashboard() {
   const getAnalysis = useServerFn(getCompleteIntermarketAnalysis);
@@ -639,7 +639,7 @@ export function IntermarketCompleteDashboard() {
           <span className="animate-pulse">⏳</span>
           <span>Cargando analisis intermarket (datos de mercado)...</span>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+        <div className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {Array.from({ length: 14 }).map((_, i) => (
             <Skeleton key={i} className="h-32" />
           ))}
@@ -654,7 +654,7 @@ export function IntermarketCompleteDashboard() {
         <div className="text-xs font-semibold font-mono uppercase tracking-wider text-amber-400 mb-1">
           Analisis Intermarket — Sin Datos
         </div>
-        <p className="text-[9px] text-muted-foreground/70">
+        <p className="text-[13px] text-muted-foreground/70">
           {error
             ? "Error al obtener datos de mercado (Yahoo Finance)."
             : "No hay datos suficientes para el analisis completo."}{" "}
@@ -700,7 +700,7 @@ export function IntermarketCompleteDashboard() {
       </Card>
 
       {/* Indicadores Complementarios: VIX, Fed Funds, Asset Classes */}
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid w-full gap-3 md:grid-cols-3">
         <VixRegimeCard vix={data.complementary.vix} />
         <FedFundsCard fed={data.complementary.fedFunds} />
         <AssetClassesCard ac={data.complementary.assetClasses} />
@@ -730,7 +730,7 @@ export function IntermarketCompleteDashboard() {
           Nivel 1-2 — Los 14 Ratios Esenciales (Murphy) + Estadísticos Multi-ventana
         </div>
         <div className="space-y-3">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+          <div className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             {data.ratios.map((ratio) => (
               <RatioMiniCard key={ratio.id} ratio={ratio} />
             ))}
@@ -750,7 +750,7 @@ export function IntermarketCompleteDashboard() {
         </div>
       </Card>
 
-      <div className="text-[9px] text-muted-foreground font-mono text-right">
+      <div className="text-[13px] text-muted-foreground font-mono text-right">
         Generado: {new Date(data.generatedAt).toLocaleString("es-AR")}
       </div>
     </div>

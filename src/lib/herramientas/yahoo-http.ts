@@ -18,7 +18,7 @@ interface YahooSession {
 let sessionCache: YahooSession | null = null;
 let sessionPromise: Promise<YahooSession | null> | null = null;
 
-// ─── Concurrency limiter (max 3 parallel requests to Yahoo) ─────────
+//  Concurrency limiter (max 3 parallel requests to Yahoo) 
 let activeRequests = 0;
 const MAX_CONCURRENT = 3;
 const pendingQueue: Array<() => void> = [];
@@ -53,14 +53,14 @@ async function withConcurrencyLimit<T>(fn: () => Promise<T>): Promise<T> {
   }
 }
 
-// ─── Cache helpers ──────────────────────────────────────────────────
+//  Cache helpers 
 const YAHOO_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
 function yahooCacheKey(prefix: string, symbol: string, ...args: string[]): string {
   return `yahoo:${prefix}:${symbol}:${args.join(":")}`;
 }
 
-// ─── Session management ─────────────────────────────────────────────
+//  Session management 
 function getSetCookies(headers: Headers): string[] {
   const withGetSetCookie = headers as Headers & { getSetCookie?: () => string[] };
   const setCookies = withGetSetCookie.getSetCookie?.();
@@ -179,7 +179,7 @@ async function getYahooSessionInner(): Promise<YahooSession | null> {
   return null;
 }
 
-// ─── quoteSummary con cache + rate-limit controlada ─────────────────
+//  quoteSummary con cache + rate-limit controlada 
 async function yahooQuoteSummaryInner<T>(
   symbol: string,
   modules: string[],
@@ -263,7 +263,7 @@ export async function fetchYahooQuoteSummaryJson<T>(
   );
 }
 
-// ─── Chart data con cache + concurrencia ────────────────────────────
+//  Chart data con cache + concurrencia 
 async function yahooChartInner(
   symbol: string,
   range: string,
@@ -334,7 +334,7 @@ export function yahooHeaders(): HeadersInit {
   return { "User-Agent": YAHOO_UA, Accept: "application/json" };
 }
 
-// ─── Yahoo Finance Search / News ──────────────────────────────────
+//  Yahoo Finance Search / News 
 export interface YahooNewsItem {
   uuid: string;
   title: string;

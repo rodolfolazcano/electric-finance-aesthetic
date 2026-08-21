@@ -92,7 +92,7 @@ export function BinanceAccountPanel() {
                 size="sm"
                 onClick={loadAll}
                 disabled={loading}
-                className="h-7 text-[10px] border-border/60"
+                className="h-7 text-[13px] border-border/60"
               >
                 {loading ? "Cargando..." : "Actualizar"}
               </Button>
@@ -101,13 +101,13 @@ export function BinanceAccountPanel() {
         </CardHeader>
         <CardContent>
           {error && (
-            <div className="mb-3 rounded-md bg-red-500/10 px-3 py-2 text-[11px] text-red-400">
+            <div className="mb-3 rounded-md bg-red-500/10 px-3 py-2 text-[14px] text-red-400">
               {error}
             </div>
           )}
           {!account && !loading && (
             <div className="flex flex-col items-center gap-3 py-6">
-              <p className="text-[11px] text-muted-foreground text-center">
+              <p className="text-[14px] text-muted-foreground text-center">
                 Conectá con tu cuenta demo de Binance para ver balances, órdenes y trades.
               </p>
               <Button
@@ -120,11 +120,11 @@ export function BinanceAccountPanel() {
           )}
           {loading && (
             <div className="flex justify-center py-6">
-              <p className="text-[11px] text-muted-foreground">Conectando con Binance Testnet...</p>
+              <p className="text-[14px] text-muted-foreground">Conectando con Binance Testnet...</p>
             </div>
           )}
           {account && (
-            <div className="grid grid-cols-2 gap-3 mb-4 sm:grid-cols-4 text-[11px] font-mono">
+            <div className="grid w-full grid-cols-2 gap-3 mb-4 sm:grid-cols-4 text-[14px] font-mono">
               <div>
                 <span className="text-muted-foreground">Maker</span>
                 <br />
@@ -138,7 +138,7 @@ export function BinanceAccountPanel() {
               <div>
                 <span className="text-muted-foreground">Trade</span>
                 <br />
-                {account.canTrade ? "✓" : "✗"}
+                {account.canTrade ? "" : ""}
               </div>
               <div>
                 <span className="text-muted-foreground">USDT Libre</span>
@@ -152,16 +152,16 @@ export function BinanceAccountPanel() {
 
       <Card className="bg-surface border-border/60">
         <CardHeader className="pb-2">
-          <CardTitle className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+          <CardTitle className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
             Balances
           </CardTitle>
         </CardHeader>
         <CardContent>
           {balances.length === 0 ? (
-            <div className="text-[11px] text-muted-foreground">No hay balances con saldo</div>
+            <div className="text-[14px] text-muted-foreground">No hay balances con saldo</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-[11px] font-mono">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-[14px] font-mono">
                 <thead>
                   <tr className="text-muted-foreground border-b border-border/40">
                     <th className="text-left py-1 pr-3">Asset</th>
@@ -186,7 +186,7 @@ export function BinanceAccountPanel() {
 
       <Card className="bg-surface border-border/60">
         <CardHeader className="pb-2">
-          <CardTitle className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+          <CardTitle className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
             Órdenes Abiertas
           </CardTitle>
         </CardHeader>
@@ -196,22 +196,22 @@ export function BinanceAccountPanel() {
               value={orderSymbol}
               onChange={(e) => setOrderSymbol(e.target.value.toUpperCase())}
               placeholder="Symbol (opcional)"
-              className="h-7 text-[11px] bg-background/40 border-border/60 font-mono w-40"
+              className="h-7 text-[14px] bg-background/40 border-border/60 font-mono w-40"
             />
             <Button
               variant="outline"
               size="sm"
               onClick={loadOrders}
-              className="h-7 text-[10px] border-border/60"
+              className="h-7 text-[13px] border-border/60"
             >
               Buscar
             </Button>
           </div>
           {orders.length === 0 ? (
-            <div className="text-[11px] text-muted-foreground">Sin órdenes abiertas</div>
+            <div className="text-[14px] text-muted-foreground">Sin órdenes abiertas</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-[11px] font-mono">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-[14px] font-mono">
                 <thead>
                   <tr className="text-muted-foreground border-b border-border/40">
                     <th className="text-left py-1 pr-2">Symbol</th>
@@ -246,7 +246,7 @@ export function BinanceAccountPanel() {
 
       <Card className="bg-surface border-border/60">
         <CardHeader className="pb-2">
-          <CardTitle className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+          <CardTitle className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
             Trades Recientes
           </CardTitle>
         </CardHeader>
@@ -256,22 +256,22 @@ export function BinanceAccountPanel() {
               value={tradeSymbol}
               onChange={(e) => setTradeSymbol(e.target.value.toUpperCase())}
               placeholder="Symbol"
-              className="h-7 text-[11px] bg-background/40 border-border/60 font-mono w-40"
+              className="h-7 text-[14px] bg-background/40 border-border/60 font-mono w-40"
             />
             <Button
               variant="outline"
               size="sm"
               onClick={loadTrades}
-              className="h-7 text-[10px] border-border/60"
+              className="h-7 text-[13px] border-border/60"
             >
               Buscar
             </Button>
           </div>
           {trades.length === 0 ? (
-            <div className="text-[11px] text-muted-foreground">Sin trades recientes</div>
+            <div className="text-[14px] text-muted-foreground">Sin trades recientes</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-[11px] font-mono">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-[14px] font-mono">
                 <thead>
                   <tr className="text-muted-foreground border-b border-border/40">
                     <th className="text-left py-1 pr-2">Hora</th>

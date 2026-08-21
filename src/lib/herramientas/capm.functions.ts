@@ -34,7 +34,7 @@ export interface CAPMResult {
   fStatistic?: number;
   fPValue?: number;
   bestAvgR2?: number;
-  // ─── Labadie §3.2: p-variance beta + Hurst ───
+  //  Labadie §3.2: p-variance beta + Hurst 
   betaP?: number; // beta con p-variance
   alphaP?: number; // alpha con p-variance
   pVarianceAsset?: number; // p-variance del activo
@@ -267,7 +267,7 @@ function computeSingle(
   const tStat = seSlope > 0 ? beta / seSlope : 0;
   const pValue = 2 * (1 - tCdf(Math.abs(tStat), n - 2));
 
-  // ─── Labadie §3.2: Hurst exponent, p-variance, implied p ───
+  //  Labadie §3.2: Hurst exponent, p-variance, implied p 
   // Reconstruir precios desde returns para calcular Hurst
   const pricesFromRets: number[] = [];
   let p = 100;
@@ -323,7 +323,7 @@ function computeSingle(
     pValue: Math.round(pValue * 10000) / 10000,
     stdErr: Math.round(seSlope * 10000) / 10000,
     observations: n,
-    // ─── Labadie §3.2 ───
+    //  Labadie §3.2 
     betaP: betaP != null ? Math.round(betaP * 10000) / 10000 : undefined,
     alphaP: alphaP != null ? Math.round(alphaP * 10000) / 10000 : undefined,
     pVarianceAsset: pVarianceAsset != null ? Math.round(pVarianceAsset * 10000) / 10000 : undefined,
@@ -429,7 +429,7 @@ function computeMultilinear(
   };
 }
 
-// ─── Matrix helpers ────────────────────────────────────────────────────────
+//  Matrix helpers 
 
 function transpose(m: number[][]): number[][] {
   return m[0].map((_, i) => m.map((row) => row[i]));
@@ -472,7 +472,7 @@ function invert(M: number[][]): number[][] | null {
   return aug.map((row) => row.slice(n));
 }
 
-// ─── Statistics ─────────────────────────────────────────────────────────────
+//  Statistics 
 
 function tCdf(t: number, df: number): number {
   const x = df / (df + t * t);
@@ -525,7 +525,7 @@ function contFrac(a: number, b: number, x: number): number {
   return h;
 }
 
-// ─── Matriz de correlación entre activos ──────────────────────────────
+//  Matriz de correlación entre activos 
 
 export interface MatrizCAPMResult {
   tickers: string[];

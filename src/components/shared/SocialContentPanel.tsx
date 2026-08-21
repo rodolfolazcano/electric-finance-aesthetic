@@ -48,11 +48,11 @@ export function SocialContentPanel({ input, anomalyReport }: SocialContentPanelP
     <Card className="w-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center justify-between">
-          <span>📱 Contenido para Redes Sociales</span>
+          <span> Contenido para Redes Sociales</span>
           <div className="flex gap-1 items-center">
             {anomalyReport?.hasAnomaly && (
               <Badge variant="destructive" className="text-[10px]">
-                ⚠️ {anomalyReport.flags.length} anomalía(s)
+                [ADVERTENCIA] {anomalyReport.flags.length} anomalía(s)
               </Badge>
             )}
             <Button variant="outline" size="sm" className="h-7 text-xs" onClick={handleGenerate}>
@@ -69,10 +69,10 @@ export function SocialContentPanel({ input, anomalyReport }: SocialContentPanelP
         ) : (
           <Tabs defaultValue="twitter" className="w-full">
             <TabsList className="grid grid-cols-4 h-8">
-              <TabsTrigger value="twitter" className="text-xs">🐦 Twitter</TabsTrigger>
-              <TabsTrigger value="linkedin" className="text-xs">💼 LinkedIn</TabsTrigger>
-              <TabsTrigger value="instagram" className="text-xs">📸 Instagram</TabsTrigger>
-              <TabsTrigger value="whatsapp" className="text-xs">💬 WhatsApp</TabsTrigger>
+              <TabsTrigger value="twitter" className="text-xs"> Twitter</TabsTrigger>
+              <TabsTrigger value="linkedin" className="text-xs"> LinkedIn</TabsTrigger>
+              <TabsTrigger value="instagram" className="text-xs"> Instagram</TabsTrigger>
+              <TabsTrigger value="whatsapp" className="text-xs"> WhatsApp</TabsTrigger>
             </TabsList>
 
             {(["twitter", "linkedin", "instagram", "whatsapp"] as const).map((platform) => {
@@ -100,7 +100,7 @@ export function SocialContentPanel({ input, anomalyReport }: SocialContentPanelP
                         className="h-6 text-xs"
                         onClick={() => handleCopy(post.body, platform)}
                       >
-                        {copied === platform ? "✅ Copiado" : "📋 Copiar"}
+                        {copied === platform ? "[OK] Copiado" : " Copiar"}
                       </Button>
                     </div>
                   </div>

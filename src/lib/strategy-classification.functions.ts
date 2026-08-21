@@ -7,7 +7,7 @@ import { BENCHMARKS_CLASIFICACION as _BENCHMARKS } from "./benchmarks-master";
 export const BENCHMARKS_CLASIFICACION = _BENCHMARKS;
 
 /*
- * ─── Score combinado técnico + fundamental ─────────────────────────
+ *  Score combinado técnico + fundamental 
  * Misma lógica de puntuación escalonada que calcularScoreFundamental
  * (sector-analysis.functions.ts) y scoreTecnico (oportunidades-dia.functions.ts).
  *
@@ -27,7 +27,7 @@ export function calcularScoreCombinado(asset: StrategyAsset): number {
   let earned = 0;
   let maxPts = 0;
 
-  // ── Técnico ────────────────────────────────────────────────────
+  //  Técnico 
   // 1. R² (20 pts): qué tan bien explica el benchmark los movimientos
   const r2 = asset.rSquared;
   if (r2 >= 0) {
@@ -47,7 +47,7 @@ export function calcularScoreCombinado(asset: StrategyAsset): number {
   earned += corr >= 0.9 ? 15 : corr >= 0.7 ? 10 : corr >= 0.5 ? 5 : 0;
   maxPts += 15;
 
-  // ── Fundamental ────────────────────────────────────────────────
+  //  Fundamental 
   // 4. Alpha anualizado (25 pts): retorno en exceso del benchmark
   const alpha = asset.annualizedAlpha;
   if (alpha >= 0) {
@@ -167,7 +167,7 @@ export type StrategyType =
   | "hedge-fund"
   | "uncorrelated"
   | "unclassified"
-  // ─── Labadie §3.2: basadas en Hurst exponent ───
+  //  Labadie §3.2: basadas en Hurst exponent 
   | "momentum"        // H > 0.6 → trending, seguir tendencia
   | "mean-reversion"  // H < 0.4 → mean-reverting, contrarian
   | "market-neutral"; // beta ~ 0 + H ~ 0.5, sin exposición directional
@@ -187,7 +187,7 @@ export interface StrategyAsset {
   pValue: number;
   bestBenchmark?: string;
   classificationConfidence?: "alta" | "media" | "baja";
-  // ─── Labadie §3.2: Hurst + p-variance ───
+  //  Labadie §3.2: Hurst + p-variance 
   hurstExponent?: number;
   impliedP?: number;
   pVariance?: number;
@@ -222,7 +222,7 @@ function classify(
   rSquared: number,
   pValueAlpha: number,
   pValueBeta: number,
-  // ─── Labadie §3.2: Hurst como factor de clasificación ───
+  //  Labadie §3.2: Hurst como factor de clasificación 
   hurst?: number,
 ): StrategyType {
   // Paso 4 — Filtro de significancia estadística
@@ -233,7 +233,7 @@ function classify(
   const absAlpha = Math.abs(effectiveAlpha);
   const H = hurst ?? 0.5;
 
-  // ─── Labadie §3.2: Clasificación por Hurst (memoria del proceso) ───
+  //  Labadie §3.2: Clasificación por Hurst (memoria del proceso) 
   // H > 0.6 → trending (momentum); H < 0.4 → mean-reverting
   const isTrending = H > 0.6;
   const isMeanReverting = H < 0.4;
@@ -478,7 +478,7 @@ export const getStrategyClassification = createServerFn({ method: "POST" })
           ))
         : null;
 
-      // ─── Labadie §3.2: Calcular Hurst exponent y p-variance ───
+      //  Labadie §3.2: Calcular Hurst exponent y p-variance 
       const prices = Array.from(tickerMap.values()).sort();
       const returns = prices.length > 1 ? prices.slice(1).map((p, i) => (p - prices[i]) / prices[i]) : [];
       const hurstExponent = prices.length >= 100 ? computeHurst(prices) : undefined;
@@ -499,7 +499,7 @@ export const getStrategyClassification = createServerFn({ method: "POST" })
         pValue: ols.pValue,
         bestBenchmark: effectiveBenchmark,
         classificationConfidence: conf,
-        // ─── Labadie §3.2 ───
+        //  Labadie §3.2 
         hurstExponent,
         impliedP,
         pVariance,

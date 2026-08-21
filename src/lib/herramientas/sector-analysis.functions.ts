@@ -611,7 +611,7 @@ export const getSectorAnalysis = createServerFn({ method: "POST" })
           matrix.push(row);
         }
 
-        // ─── Best-fit benchmark per industry & per ticker ─────────────
+        //  Best-fit benchmark per industry & per ticker 
         // (calculado primero para usar los mejores benchmarks en vez del default del sector)
         const elapsedMs = Date.now() - startTime;
         const BENCH_TIME_BUDGET = 20_000; // 20s max for benchmarks
@@ -792,7 +792,7 @@ function buildPairwiseReturns(x: number[], y: number[]): { x: number[]; y: numbe
   };
 }
 
-// ─── ETF Fit Analysis ──────────────────────────────────────────────
+//  ETF Fit Analysis 
 // Compare the equal‑weight average of all tickers in a sector/industry
 // against a comprehensive list of ETFs and rank by R².
 

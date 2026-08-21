@@ -84,7 +84,7 @@ export function BacktestingPanel({
           source,
           token,
           mercado: source === "iol" ? iolMercado : undefined,
-          // ─── Labadie params ───
+          //  Labadie params 
           pValue: config.pValue,
           marketImpactGamma: config.marketImpactGamma,
           participationRate: config.participationRate,
@@ -123,10 +123,10 @@ export function BacktestingPanel({
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between px-4 py-2.5 font-mono text-xs text-foreground hover:bg-muted/10 transition-colors">
             <span>¿Cómo interpretar el Backtesting?</span>
-            <span className="text-muted-foreground">{tutorialOpen ? "▾" : "▸"}</span>
+            <span className="text-muted-foreground">{tutorialOpen ? "" : ""}</span>
           </CollapsibleTrigger>
           <CollapsibleContent className="px-4 pb-3 pt-0">
-            <div className="space-y-2 font-mono text-[10px] leading-relaxed text-muted-foreground">
+            <div className="space-y-2 font-mono text-[13px] leading-relaxed text-muted-foreground">
               <p>
                 El <strong>backtesting</strong> evalúa cómo se habría comportado una estrategia de
                 pairs trading en el pasado. Divide los datos en dos partes:{" "}
@@ -167,14 +167,14 @@ export function BacktestingPanel({
 
         {/* Par display — leído desde Pairs Trading, no editable aquí */}
         <div className="rounded-lg border border-border/40 bg-muted/5 px-4 py-3">
-          <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+          <div className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
             Par desde Pairs Trading
           </div>
           <div className="flex items-center gap-3 text-sm">
             <span className="font-semibold text-primary">{shared.asset1}</span>
             <span className="text-muted-foreground">/</span>
             <span className="font-semibold text-primary">{shared.asset2}</span>
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[13px] text-muted-foreground">
               ·{" "}
               {shared.period >= 365 ? `${(shared.period / 365).toFixed(0)}y` : `${shared.period}d`}·
               ventana {shared.window}· {shared.interval === "1d" ? "Diario" : shared.interval}· tx{" "}
@@ -183,9 +183,9 @@ export function BacktestingPanel({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               IS/OOS %
               <InfoTip>
                 In-Sample vs Out-of-Sample. El porcentaje indica cuántos datos se usan para entrenar
@@ -202,15 +202,15 @@ export function BacktestingPanel({
                 onChange={(e) =>
                   set("insamplePct", Math.max(50, Math.min(95, parseInt(e.target.value) || 70)))
                 }
-                className="w-16 rounded border border-border/40 bg-background px-2 py-1 font-mono text-[11px] outline-none focus:border-primary/60"
+                className="w-16 rounded border border-border/40 bg-background px-2 py-1 font-mono text-[14px] outline-none focus:border-primary/60"
               />
-              <span className="font-mono text-[10px] text-muted-foreground">
+              <span className="font-mono text-[13px] text-muted-foreground">
                 IS / {100 - config.insamplePct}% OOS
               </span>
             </div>
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Grid a: min
               <InfoTip>
                 a = umbral de entrada en Z-Score. Se prueban todas las combinaciones entre min y max
@@ -226,7 +226,7 @@ export function BacktestingPanel({
                 step={0.05}
                 value={config.aMin}
                 onChange={(e) => set("aMin", parseFloat(e.target.value) || 0.5)}
-                className="w-14 rounded border border-border/40 bg-background px-1 py-1 font-mono text-[11px] outline-none focus:border-primary/60"
+                className="w-14 rounded border border-border/40 bg-background px-1 py-1 font-mono text-[14px] outline-none focus:border-primary/60"
               />
               <input
                 type="number"
@@ -235,12 +235,12 @@ export function BacktestingPanel({
                 step={0.05}
                 value={config.aMax}
                 onChange={(e) => set("aMax", parseFloat(e.target.value) || 3)}
-                className="w-14 rounded border border-border/40 bg-background px-1 py-1 font-mono text-[11px] outline-none focus:border-primary/60"
+                className="w-14 rounded border border-border/40 bg-background px-1 py-1 font-mono text-[14px] outline-none focus:border-primary/60"
               />
               <select
                 value={config.aStep}
                 onChange={(e) => set("aStep", parseFloat(e.target.value))}
-                className="rounded border border-border/40 bg-background px-1 py-1 font-mono text-[11px] outline-none"
+                className="rounded border border-border/40 bg-background px-1 py-1 font-mono text-[14px] outline-none"
               >
                 <option value={0.1}>0.1</option>
                 <option value={0.25}>0.25</option>
@@ -249,7 +249,7 @@ export function BacktestingPanel({
             </div>
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Grid b: min
               <InfoTip>
                 b = umbral de stop-loss en Z-Score. Se prueba en grid junto con "a". La combinación
@@ -265,7 +265,7 @@ export function BacktestingPanel({
                 step={0.05}
                 value={config.bMin}
                 onChange={(e) => set("bMin", parseFloat(e.target.value) || 1)}
-                className="w-14 rounded border border-border/40 bg-background px-1 py-1 font-mono text-[11px] outline-none focus:border-primary/60"
+                className="w-14 rounded border border-border/40 bg-background px-1 py-1 font-mono text-[14px] outline-none focus:border-primary/60"
               />
               <input
                 type="number"
@@ -274,12 +274,12 @@ export function BacktestingPanel({
                 step={0.05}
                 value={config.bMax}
                 onChange={(e) => set("bMax", parseFloat(e.target.value) || 4)}
-                className="w-14 rounded border border-border/40 bg-background px-1 py-1 font-mono text-[11px] outline-none focus:border-primary/60"
+                className="w-14 rounded border border-border/40 bg-background px-1 py-1 font-mono text-[14px] outline-none focus:border-primary/60"
               />
               <select
                 value={config.bStep}
                 onChange={(e) => set("bStep", parseFloat(e.target.value))}
-                className="rounded border border-border/40 bg-background px-1 py-1 font-mono text-[11px] outline-none"
+                className="rounded border border-border/40 bg-background px-1 py-1 font-mono text-[14px] outline-none"
               >
                 <option value={0.1}>0.1</option>
                 <option value={0.25}>0.25</option>
@@ -288,7 +288,7 @@ export function BacktestingPanel({
             </div>
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Métrica
               <InfoTip>
                 La métrica que el grid search intenta maximizar en In-Sample. Sharpe da el mejor
@@ -301,7 +301,7 @@ export function BacktestingPanel({
                 <button
                   key={m.value}
                   onClick={() => set("metric", m.value)}
-                  className={`rounded border px-1.5 py-1 font-mono text-[10px] transition-colors ${config.metric === m.value ? "border-primary/60 bg-primary/10 text-foreground" : "border-border/60 text-muted-foreground hover:text-foreground"}`}
+                  className={`rounded border px-1.5 py-1 font-mono text-[13px] transition-colors ${config.metric === m.value ? "border-primary/60 bg-primary/10 text-foreground" : "border-border/60 text-muted-foreground hover:text-foreground"}`}
                 >
                   {m.label}
                 </button>
@@ -310,10 +310,10 @@ export function BacktestingPanel({
           </div>
         </div>
 
-        {/* ─── Labadie: Algoritmo, pValue, impacto de mercado ─── */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {/*  Labadie: Algoritmo, pValue, impacto de mercado  */}
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Algoritmo
               <InfoTip>
                 Labadie §2.3-2.4: "pairs" = Z-score; "tc" = Target Close; "is" = Implementation
@@ -323,7 +323,7 @@ export function BacktestingPanel({
             <select
               value={config.executionAlgo ?? "pairs"}
               onChange={(e) => set("executionAlgo", e.target.value as "pairs" | "tc" | "is")}
-              className="w-full rounded border border-border/40 bg-background px-2 py-1 font-mono text-[11px] outline-none focus:border-primary/60"
+              className="w-full rounded border border-border/40 bg-background px-2 py-1 font-mono text-[14px] outline-none focus:border-primary/60"
             >
               <option value="pairs">Pairs (Z-score)</option>
               <option value="tc">Target Close</option>
@@ -331,7 +331,7 @@ export function BacktestingPanel({
             </select>
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               p (p-variance): {config.pValue?.toFixed(1) ?? "2.0"}
               <InfoTip>
                 Labadie §3.2: p para p-variance. p=2 → clásico; p≠2 → riesgo generalizado.
@@ -348,7 +348,7 @@ export function BacktestingPanel({
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Impacto γ: {config.marketImpactGamma?.toFixed(2) ?? "0.50"}
               <InfoTip>Labadie §2.1: exponente de impacto. I(v) = σ × |v/V|^γ × τ^(1/p).</InfoTip>
             </label>
@@ -363,7 +363,7 @@ export function BacktestingPanel({
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Participación: {((config.participationRate ?? 0.1) * 100).toFixed(0)}%
               <InfoTip>
                 Labadie §2.2: PVol. % del volumen por intervalo. Menor = menos impacto.
@@ -385,7 +385,7 @@ export function BacktestingPanel({
           <div className="flex gap-1 rounded-lg border border-border/40 p-0.5">
             <button
               onClick={() => onSourceChange("yahoo")}
-              className={`rounded px-2 py-0.5 font-mono text-[10px] transition-colors ${source === "yahoo" ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              className={`rounded px-2 py-0.5 font-mono text-[13px] transition-colors ${source === "yahoo" ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               Yahoo Finance
             </button>
@@ -397,7 +397,7 @@ export function BacktestingPanel({
                   ? undefined
                   : "Inicia sesión en IOL (panel superior) para habilitar esta fuente"
               }
-              className={`rounded px-2 py-0.5 font-mono text-[10px] transition-colors ${source === "iol" ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground"} ${accessToken ? "" : "opacity-40 cursor-not-allowed"}`}
+              className={`rounded px-2 py-0.5 font-mono text-[13px] transition-colors ${source === "iol" ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground"} ${accessToken ? "" : "opacity-40 cursor-not-allowed"}`}
             >
               IOL{!accessToken ? " · sin sesión" : ""}
             </button>
@@ -405,7 +405,7 @@ export function BacktestingPanel({
               <select
                 value={iolMercado}
                 onChange={(e) => onIolMercadoChange(e.target.value)}
-                className="ml-1 rounded border border-border/40 bg-background px-1.5 py-0.5 text-[10px] font-mono outline-none"
+                className="ml-1 rounded border border-border/40 bg-background px-1.5 py-0.5 text-[13px] font-mono outline-none"
               >
                 <option value="BCBA">BCBA</option>
                 <option value="NYSE">NYSE</option>
@@ -435,7 +435,7 @@ export function BacktestingPanel({
         </div>
 
         {error && (
-          <div className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 font-mono text-[11px] text-danger">
+          <div className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 font-mono text-[14px] text-danger">
             {error}
           </div>
         )}
@@ -444,7 +444,7 @@ export function BacktestingPanel({
           <div className="space-y-5">
             {/* Robustness banner */}
             <div
-              className={`rounded-lg border px-4 py-3 font-mono text-[11px] ${
+              className={`rounded-lg border px-4 py-3 font-mono text-[14px] ${
                 result.isRobust
                   ? "border-success/40 bg-success/10 text-success"
                   : "border-warning/40 bg-warning/10 text-warning"
@@ -465,14 +465,14 @@ export function BacktestingPanel({
             </div>
 
             {/* Optimal params card */}
-            <div className="grid grid-cols-1 gap-4 rounded-lg border border-border/40 bg-muted/5 p-4 lg:grid-cols-2">
+            <div className="grid w-full grid-cols-1 gap-4 rounded-lg border border-border/40 bg-muted/5 p-4 lg:grid-cols-2">
               <div>
                 <h3 className="mb-2 font-mono text-xs font-medium text-foreground">
                   Parámetros Óptimos (In-Sample)
                 </h3>
-                <div className="grid grid-cols-2 gap-3 text-[11px]">
+                <div className="grid w-full grid-cols-2 gap-3 text-[14px]">
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       a*
                       <InfoTip>
                         Umbral de entrada en Z-Score. Cuando el spread normalizado supera este
@@ -487,7 +487,7 @@ export function BacktestingPanel({
                     </p>
                   </div>
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       b*
                       <InfoTip>
                         Umbral de stop-loss en Z-Score. Si el spread sigue divergiendo y supera este
@@ -501,7 +501,7 @@ export function BacktestingPanel({
                     </p>
                   </div>
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       Sharpe IS
                       <InfoTip>
                         Ratio de Sharpe en datos de entrenamiento (In-Sample). Un Sharpe IS alto
@@ -514,7 +514,7 @@ export function BacktestingPanel({
                     </p>
                   </div>
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       Sharpe OOS
                       <InfoTip>
                         Ratio de Sharpe en datos no vistos (Out-of-Sample). Es la métrica más
@@ -529,7 +529,7 @@ export function BacktestingPanel({
                     </p>
                   </div>
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       PNL IS
                       <InfoTip>
                         Rentabilidad total acumulada en datos de entrenamiento (In-Sample). Un PNL
@@ -545,7 +545,7 @@ export function BacktestingPanel({
                     </p>
                   </div>
                   <div>
-                    <span className="font-mono text-[10px] text-muted-foreground">
+                    <span className="font-mono text-[13px] text-muted-foreground">
                       PNL OOS
                       <InfoTip>
                         Rentabilidad total acumulada en datos no vistos (Out-of-Sample). Es la
@@ -567,9 +567,9 @@ export function BacktestingPanel({
                 <h3 className="mb-2 font-mono text-xs font-medium text-foreground">
                   Comparativa IS vs OOS
                 </h3>
-                <table className="w-full text-left font-mono text-[11px]">
+                <table className="w-full text-left font-mono text-[14px]">
                   <thead>
-                    <tr className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <tr className="text-[13px] uppercase tracking-wider text-muted-foreground">
                       <th className="px-2 py-1">Métrica</th>
                       <th className="px-2 py-1 text-right">IS</th>
                       <th className="px-2 py-1 text-right">OOS</th>
@@ -634,7 +634,7 @@ export function BacktestingPanel({
                         </td>
                         <td className="px-2 py-1 text-right">
                           <span className={r.ok ? "text-success" : "text-warning"}>
-                            {r.ok ? "" : "️"}
+                            {r.ok ? "" : ""}
                           </span>
                         </td>
                       </tr>
@@ -646,7 +646,7 @@ export function BacktestingPanel({
 
             {/* Top 5 params */}
             <div className="rounded-lg border border-border/40 p-3">
-              <h3 className="mb-2 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              <h3 className="mb-2 font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
                 Top 5 combinaciones (a, b) por Sharpe IS
                 <InfoTip>
                   Las 5 combinaciones de umbrales (a, b) con mejor Sharpe en In-Sample. Idealmente,
@@ -654,9 +654,9 @@ export function BacktestingPanel({
                   OOS pero el #3 es bueno, considera usar parámetros más conservadores.
                 </InfoTip>
               </h3>
-              <table className="w-full text-left font-mono text-[11px]">
+              <table className="w-full text-left font-mono text-[14px]">
                 <thead>
-                  <tr className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <tr className="text-[13px] uppercase tracking-wider text-muted-foreground">
                     <th className="px-2 py-1">#</th>
                     <th className="px-2 py-1">a</th>
                     <th className="px-2 py-1">b</th>
@@ -715,7 +715,7 @@ export function BacktestingPanel({
             </div>
 
             {/* Equity curves */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2">
               <div className="space-y-2">
                 <h3 className="font-mono text-xs font-medium text-foreground">
                   Curva Equity
@@ -730,7 +730,7 @@ export function BacktestingPanel({
                 <PnLChart data={oosPnL.length > 0 ? oosPnL : [{ date: "", pnl: 0 }]} />
               </div>
               <div className="rounded-lg border border-border/40 p-4">
-                <h3 className="mb-2 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                <h3 className="mb-2 font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
                   Trades OOS
                   <InfoTip>
                     Operaciones ejecutadas en el período Out-of-Sample con los parámetros óptimos

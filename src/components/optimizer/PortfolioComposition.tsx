@@ -10,7 +10,7 @@ import {
 } from "@/lib/api/iol-cotizaciones";
 import { useIOLSession } from "@/lib/iol-context";
 
-// ─── Cliente IOL reutilizado (pre-chequeo, paso 1) ─────────────────────────
+//  Cliente IOL reutilizado (pre-chequeo, paso 1) 
 // Se reutiliza el cliente IOL existente del repo:
 //   src/lib/api/iol-cotizaciones.ts (resolveToken / IOL_EXTERNAL_TOKEN | bearerToken)
 // Única excepción "sin fetchers nuevos": se le AGREGARON ahí los wrappers
@@ -18,7 +18,7 @@ import { useIOLSession } from "@/lib/iol-context";
 //   GET /api/v2/{pais}/Titulos/Cotizacion/Instrumentos → iolInstrumentosPorPais
 // El token llega desde useIOLSession() (IOLProvider, __root.tsx:155).
 
-// ─── Types ────────────────────────────────────────────────────────────────
+//  Types 
 
 export type PortfolioClassification =
   "ARGENTINA - EEUU" | "ARGENTINA - RENTA FIJA" | "ARGENTINA - RENTA VARIABLE" | "ARS" | "USD";
@@ -60,7 +60,7 @@ export interface Portfolio {
   assets: PortfolioAsset[];
 }
 
-// ─── Mapeos de FALLBACK (NO-IOL) ───────────────────────────────────────────
+//  Mapeos de FALLBACK (NO-IOL) 
 // Los 3 mapeos estáticos originales ya NO son la fuente primaria:
 // para fuente "IOL" la clasificación/mercado/moneda salen de la API de IOL
 // (estado `instrumentosPorPais` + respuesta de /Titulos/{simbolo}).
@@ -110,7 +110,7 @@ const FALLBACK_MONEDA_POR_MERCADO: Record<string, "ARS" | "USD"> = {
   OTRO: "USD",
 };
 
-// ─── Mapeos IOL → enums TS existentes ─────────────────────────────────────
+//  Mapeos IOL → enums TS existentes 
 // Los valores vienen de la API IOL (tipo/mercado/moneda de /Titulos/{simbolo}
 // y de /Titulos/Cotizacion/Instrumentos). Si un valor no tiene equivalente en
 // los enums TS, NO se castea a la fuerza: se marca `# REVISAR` y se usa "Otro".
@@ -274,14 +274,14 @@ function savePortfolios(portfolios: Portfolio[]) {
   }
 }
 
-// ─── Component ────────────────────────────────────────────────────────────
+//  Component 
 
 export function PortfolioComposition() {
   const [portfolios, setPortfolios] = useState<Portfolio[]>(loadPortfolios);
   const [activePortfolioId, setActivePortfolioId] = useState<string | null>(null);
   const [newPortfolioName, setNewPortfolioName] = useState("");
 
-  // ── New asset form state ──
+  //  New asset form state 
   const [newTicker, setNewTicker] = useState("");
   const [newCantidad, setNewCantidad] = useState(0);
   const [newFuente, setNewFuente] = useState<AssetFuente>("IOL");
@@ -291,7 +291,7 @@ export function PortfolioComposition() {
   const [newMoneda, setNewMoneda] = useState<"ARS" | "USD">("ARS");
   const [revisarNota, setRevisarNota] = useState("");
 
-  // ── IOL: estado configurable en vez de los mapeos estáticos ──
+  //  IOL: estado configurable en vez de los mapeos estáticos 
   const { accessToken } = useIOLSession();
   const iolTituloFn = useServerFn(iolObtenerTitulo);
   const iolInstrumentosFn = useServerFn(iolInstrumentosPorPais);
@@ -385,7 +385,7 @@ export function PortfolioComposition() {
     }
   }, [portfolios, activePortfolioId]);
 
-  // ── Portfolio CRUD ──
+  //  Portfolio CRUD 
   const createPortfolio = useCallback(() => {
     const name = newPortfolioName.trim() || `Portafolio ${portfolios.length + 1}`;
     const newPort: Portfolio = {
@@ -423,7 +423,7 @@ export function PortfolioComposition() {
     setPortfolios((prev) => prev.map((p) => (p.id === id ? { ...p, name } : p)));
   }, []);
 
-  // ── Asset CRUD ──
+  //  Asset CRUD 
   const addAsset = useCallback(() => {
     const ticker = newTicker.trim().toUpperCase();
     if (!ticker) return;
@@ -538,7 +538,7 @@ export function PortfolioComposition() {
     [],
   );
 
-  // ── Computed ──
+  //  Computed 
   const totalValorizado = activePortfolio?.assets.reduce((s, a) => s + a.valorizado, 0) ?? 0;
   const totalARS =
     activePortfolio?.assets
@@ -556,7 +556,7 @@ export function PortfolioComposition() {
 
   return (
     <div className="space-y-5">
-      {/* ── Header ── */}
+      {/*  Header  */}
       <div>
         <h1 className="text-2xl font-light tracking-tight sm:text-3xl">
           Composición del <span className="italic text-primary">portafolio</span>
@@ -566,20 +566,20 @@ export function PortfolioComposition() {
         </p>
       </div>
 
-      {/* ── Portfolio selector / creator ── */}
+      {/*  Portfolio selector / creator  */}
       <div className="flex flex-wrap items-center gap-2">
         {portfolios.map((p) => (
           <button
             key={p.id}
             onClick={() => setActivePortfolioId(p.id)}
-            className={`font-mono text-[11px] px-3 py-1.5 rounded-md border transition-colors ${
+            className={`font-mono text-[14px] px-3 py-1.5 rounded-md border transition-colors ${
               p.id === activePortfolioId
                 ? "border-primary/60 bg-primary/10 text-foreground"
                 : "border-border/60 text-muted-foreground hover:text-foreground"
             }`}
           >
             {p.name}
-            {p.id === activePortfolioId && <span className="ml-1.5 text-[9px] opacity-60">✎</span>}
+            {p.id === activePortfolioId && <span className="ml-1.5 text-[13px] opacity-60"></span>}
           </button>
         ))}
         <div className="flex items-center gap-1.5">
@@ -591,11 +591,11 @@ export function PortfolioComposition() {
               if (e.key === "Enter") createPortfolio();
             }}
             placeholder="+ Nuevo"
-            className="w-24 h-7 rounded border border-border/40 bg-background/60 px-2 text-[10px] font-mono text-foreground outline-none focus:border-primary/60 placeholder:text-muted-foreground/40"
+            className="w-24 h-7 rounded border border-border/40 bg-background/60 px-2 text-[13px] font-mono text-foreground outline-none focus:border-primary/60 placeholder:text-muted-foreground/40"
           />
           <button
             onClick={createPortfolio}
-            className="h-7 px-2.5 rounded text-[10px] font-mono font-semibold bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30 transition-colors"
+            className="h-7 px-2.5 rounded text-[13px] font-mono font-semibold bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30 transition-colors"
           >
             +
           </button>
@@ -604,21 +604,21 @@ export function PortfolioComposition() {
 
       {activePortfolio ? (
         <>
-          {/* ── Portfolio classification / name editor ── */}
+          {/*  Portfolio classification / name editor  */}
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex flex-col gap-1">
-              <label className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+              <label className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
                 Nombre
               </label>
               <input
                 type="text"
                 value={activePortfolio.name}
                 onChange={(e) => updatePortfolioName(activePortfolio.id, e.target.value)}
-                className="h-7 rounded border border-border/40 bg-background/60 px-2 text-[11px] font-mono text-foreground outline-none focus:border-primary/60"
+                className="h-7 rounded border border-border/40 bg-background/60 px-2 text-[14px] font-mono text-foreground outline-none focus:border-primary/60"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+              <label className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
                 Clasificación
               </label>
               <select
@@ -629,7 +629,7 @@ export function PortfolioComposition() {
                     e.target.value as PortfolioClassification,
                   )
                 }
-                className="h-7 rounded border border-border/40 bg-background/60 px-2 text-[10px] font-mono text-foreground outline-none focus:border-primary/60"
+                className="h-7 rounded border border-border/40 bg-background/60 px-2 text-[13px] font-mono text-foreground outline-none focus:border-primary/60"
               >
                 <option value="ARGENTINA - EEUU">ARGENTINA - EEUU</option>
                 <option value="ARGENTINA - RENTA FIJA">ARGENTINA - RENTA FIJA</option>
@@ -645,27 +645,27 @@ export function PortfolioComposition() {
                     prev.map((p) => (p.id === activePortfolio.id ? { ...p, assets: [] } : p)),
                   );
                 }}
-                className="h-7 px-3 rounded text-[10px] font-mono text-red-400 border border-red-400/40 hover:bg-red-400/10 transition-colors"
+                className="h-7 px-3 rounded text-[13px] font-mono text-red-400 border border-red-400/40 hover:bg-red-400/10 transition-colors"
               >
                 Limpiar todo
               </button>
             )}
             <button
               onClick={() => deletePortfolio(activePortfolio.id)}
-              className="h-7 px-3 rounded text-[10px] font-mono text-red-400 border border-red-400/40 hover:bg-red-400/10 transition-colors"
+              className="h-7 px-3 rounded text-[13px] font-mono text-red-400 border border-red-400/40 hover:bg-red-400/10 transition-colors"
             >
               Eliminar portafolio
             </button>
           </div>
 
-          {/* ── Add asset form ── */}
+          {/*  Add asset form  */}
           <div className="rounded border border-border/40 bg-background/40 p-4 space-y-3">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+            <p className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
               + Agregar activo
             </p>
             <div className="flex flex-wrap items-end gap-3">
               <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+                <label className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
                   Ticker
                 </label>
                 <input
@@ -676,11 +676,11 @@ export function PortfolioComposition() {
                     if (e.key === "Enter") addAsset();
                   }}
                   placeholder="GGAL"
-                  className="w-24 h-7 rounded border border-border/40 bg-background/60 px-2 text-[11px] font-mono text-foreground outline-none focus:border-primary/60 placeholder:text-muted-foreground/40"
+                  className="w-24 h-7 rounded border border-border/40 bg-background/60 px-2 text-[14px] font-mono text-foreground outline-none focus:border-primary/60 placeholder:text-muted-foreground/40"
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+                <label className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
                   Cantidad
                 </label>
                 <input
@@ -689,11 +689,11 @@ export function PortfolioComposition() {
                   value={newCantidad || ""}
                   onChange={(e) => setNewCantidad(Number(e.target.value))}
                   placeholder="100"
-                  className="w-24 h-7 rounded border border-border/40 bg-background/60 px-2 text-[11px] font-mono text-foreground outline-none focus:border-primary/60 placeholder:text-muted-foreground/40"
+                  className="w-24 h-7 rounded border border-border/40 bg-background/60 px-2 text-[14px] font-mono text-foreground outline-none focus:border-primary/60 placeholder:text-muted-foreground/40"
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+                <label className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
                   Fuente
                 </label>
                 <select
@@ -707,7 +707,7 @@ export function PortfolioComposition() {
                       setNewClasificacion(available[0]);
                     }
                   }}
-                  className="h-7 rounded border border-border/40 bg-background/60 px-2 text-[10px] font-mono text-foreground outline-none focus:border-primary/60"
+                  className="h-7 rounded border border-border/40 bg-background/60 px-2 text-[13px] font-mono text-foreground outline-none focus:border-primary/60"
                 >
                   <option value="IOL">IOL</option>
                   <option value="Yahoo">Yahoo</option>
@@ -715,13 +715,13 @@ export function PortfolioComposition() {
                 </select>
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+                <label className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
                   Clasificación
                 </label>
                 <select
                   value={newClasificacion}
                   onChange={(e) => setNewClasificacion(e.target.value as AssetClasificacion)}
-                  className="h-7 rounded border border-border/40 bg-background/60 px-2 text-[10px] font-mono text-foreground outline-none focus:border-primary/60"
+                  className="h-7 rounded border border-border/40 bg-background/60 px-2 text-[13px] font-mono text-foreground outline-none focus:border-primary/60"
                 >
                   {clasificacionesDisponibles.map((c) => (
                     <option key={c} value={c}>
@@ -731,7 +731,7 @@ export function PortfolioComposition() {
                 </select>
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+                <label className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
                   Precio
                 </label>
                 <input
@@ -741,29 +741,29 @@ export function PortfolioComposition() {
                   value={newPrecio ?? ""}
                   onChange={(e) => setNewPrecio(e.target.value ? Number(e.target.value) : null)}
                   placeholder="0.00"
-                  className="w-24 h-7 rounded border border-border/40 bg-background/60 px-2 text-[11px] font-mono text-foreground outline-none focus:border-primary/60 placeholder:text-muted-foreground/40"
+                  className="w-24 h-7 rounded border border-border/40 bg-background/60 px-2 text-[14px] font-mono text-foreground outline-none focus:border-primary/60 placeholder:text-muted-foreground/40"
                 />
               </div>
               <button
                 onClick={addAsset}
                 disabled={!newTicker.trim()}
-                className="h-7 px-4 rounded text-[10px] font-mono font-semibold bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30 transition-colors disabled:opacity-40"
+                className="h-7 px-4 rounded text-[13px] font-mono font-semibold bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30 transition-colors disabled:opacity-40"
               >
                 + Agregar activo
               </button>
             </div>
             {revisarNota && (
-              <p className="text-[10px] font-mono text-amber-400/90 bg-amber-400/5 border border-amber-400/20 rounded px-2 py-1.5">
+              <p className="text-[13px] font-mono text-amber-400/90 bg-amber-400/5 border border-amber-400/20 rounded px-2 py-1.5">
                 {revisarNota}
               </p>
             )}
           </div>
 
-          {/* ── Assets table ── */}
+          {/*  Assets table  */}
           {activePortfolio.assets.length > 0 ? (
             <div className="overflow-x-auto rounded border border-border/40">
-              <table className="w-full text-left font-mono text-[11px]">
-                <thead className="text-[9px] uppercase tracking-wider text-muted-foreground border-b border-border/40 bg-background/40">
+              <table className="w-full text-left font-mono text-[14px]">
+                <thead className="text-[13px] uppercase tracking-wider text-muted-foreground border-b border-border/40 bg-background/40">
                   <tr>
                     <th className="px-2 py-1.5">Ticker</th>
                     <th className="px-2 py-1.5 text-right w-20">Cantidad</th>
@@ -799,7 +799,7 @@ export function PortfolioComposition() {
                                 Math.max(0, parseInt(e.target.value) || 0),
                               )
                             }
-                            className="w-16 text-right bg-transparent border-b border-border/30 text-[10px] font-mono text-foreground outline-none focus:border-primary/60"
+                            className="w-16 text-right bg-transparent border-b border-border/30 text-[13px] font-mono text-foreground outline-none focus:border-primary/60"
                           />
                         </td>
                         <td className="px-2 py-1">
@@ -812,7 +812,7 @@ export function PortfolioComposition() {
                                 e.target.value as AssetFuente,
                               )
                             }
-                            className="bg-transparent border-b border-border/30 text-[10px] font-mono text-foreground outline-none focus:border-primary/60"
+                            className="bg-transparent border-b border-border/30 text-[13px] font-mono text-foreground outline-none focus:border-primary/60"
                           >
                             <option value="IOL">IOL</option>
                             <option value="Yahoo">Yahoo</option>
@@ -829,7 +829,7 @@ export function PortfolioComposition() {
                                 e.target.value as AssetClasificacion,
                               )
                             }
-                            className="bg-transparent border-b border-border/30 text-[10px] font-mono text-foreground outline-none focus:border-primary/60 max-w-[90px]"
+                            className="bg-transparent border-b border-border/30 text-[13px] font-mono text-foreground outline-none focus:border-primary/60 max-w-[90px]"
                           >
                             {clasificacionesParaFuente(a.fuente).map((c) => (
                               <option key={c} value={c}>
@@ -838,8 +838,8 @@ export function PortfolioComposition() {
                             ))}
                           </select>
                         </td>
-                        <td className="px-2 py-1 text-[10px] text-muted-foreground">{a.mercado}</td>
-                        <td className="px-2 py-1 text-center text-[9px] text-muted-foreground">
+                        <td className="px-2 py-1 text-[13px] text-muted-foreground">{a.mercado}</td>
+                        <td className="px-2 py-1 text-center text-[13px] text-muted-foreground">
                           {a.moneda}
                         </td>
                         <td className="px-2 py-1 text-right">
@@ -855,7 +855,7 @@ export function PortfolioComposition() {
                                 Number(e.target.value) || 0,
                               )
                             }
-                            className="w-16 text-right bg-transparent border-b border-border/30 text-[10px] font-mono text-foreground outline-none focus:border-primary/60"
+                            className="w-16 text-right bg-transparent border-b border-border/30 text-[13px] font-mono text-foreground outline-none focus:border-primary/60"
                           />
                         </td>
                         <td className="px-2 py-1 text-right font-semibold text-foreground">
@@ -865,9 +865,9 @@ export function PortfolioComposition() {
                         <td className="px-2 py-1 text-center">
                           <button
                             onClick={() => removeAsset(activePortfolio.id, a.id)}
-                            className="text-[9px] text-red-400 hover:text-red-300"
+                            className="text-[13px] text-red-400 hover:text-red-300"
                           >
-                            ✕
+                            
                           </button>
                         </td>
                       </tr>
@@ -876,15 +876,15 @@ export function PortfolioComposition() {
                 </tbody>
                 <tfoot className="border-t border-border/40 bg-muted/10">
                   <tr>
-                    <td className="px-2 py-1.5 text-[10px] font-bold text-foreground">TOTAL</td>
-                    <td className="px-2 py-1.5 text-right text-[10px] font-bold">
+                    <td className="px-2 py-1.5 text-[13px] font-bold text-foreground">TOTAL</td>
+                    <td className="px-2 py-1.5 text-right text-[13px] font-bold">
                       {activePortfolio.assets.length}
                     </td>
                     <td colSpan={5}></td>
-                    <td className="px-2 py-1.5 text-right text-[10px] font-bold text-foreground">
+                    <td className="px-2 py-1.5 text-right text-[13px] font-bold text-foreground">
                       ${fmtNum(totalValorizado)}
                     </td>
-                    <td className="px-2 py-1.5 text-right text-[10px] font-bold text-foreground">
+                    <td className="px-2 py-1.5 text-right text-[13px] font-bold text-foreground">
                       100%
                     </td>
                     <td></td>
@@ -893,16 +893,16 @@ export function PortfolioComposition() {
               </table>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-32 rounded border border-dashed border-border/40 text-muted-foreground text-[10px] font-mono">
+            <div className="flex items-center justify-center h-32 rounded border border-dashed border-border/40 text-muted-foreground text-[13px] font-mono">
               No hay activos en este portafolio. Usá el formulario de arriba para agregar activos.
             </div>
           )}
 
-          {/* ── Summary cards ── */}
+          {/*  Summary cards  */}
           {activePortfolio.assets.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid w-full grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="rounded border border-border/40 bg-background/40 p-3">
-                <p className="mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+                <p className="mono text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
                   Valor Total
                 </p>
                 <p className="mt-1 font-mono text-sm font-bold text-foreground">
@@ -910,7 +910,7 @@ export function PortfolioComposition() {
                 </p>
               </div>
               <div className="rounded border border-border/40 bg-background/40 p-3">
-                <p className="mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+                <p className="mono text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
                   Total ARS
                 </p>
                 <p className="mt-1 font-mono text-sm font-bold text-foreground">
@@ -918,7 +918,7 @@ export function PortfolioComposition() {
                 </p>
               </div>
               <div className="rounded border border-border/40 bg-background/40 p-3">
-                <p className="mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+                <p className="mono text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
                   Total USD
                 </p>
                 <p className="mt-1 font-mono text-sm font-bold text-foreground">
@@ -928,9 +928,9 @@ export function PortfolioComposition() {
             </div>
           )}
 
-          {/* ── Classification info ── */}
+          {/*  Classification info  */}
           <div className="rounded border border-border/40 bg-background/40 p-3">
-            <p className="text-[10px] font-mono text-muted-foreground">
+            <p className="text-[13px] font-mono text-muted-foreground">
               Clasificación del portafolio:{" "}
               <span className="text-foreground font-semibold">
                 {activePortfolio.classification}
@@ -944,14 +944,14 @@ export function PortfolioComposition() {
                 {[...new Set(activePortfolio.assets.map((a) => a.moneda))].join(" / ")}
               </span>
             </p>
-            <p className="text-[9px] font-mono text-muted-foreground/60 mt-1">
+            <p className="text-[13px] font-mono text-muted-foreground/60 mt-1">
               Fuentes disponibles: IOL · Yahoo Finance · ArgDatos — Clasificaciones según cada
               fuente
             </p>
           </div>
         </>
       ) : (
-        <div className="flex items-center justify-center h-40 rounded border border-dashed border-border/40 text-muted-foreground text-[10px] font-mono">
+        <div className="flex items-center justify-center h-40 rounded border border-dashed border-border/40 text-muted-foreground text-[13px] font-mono">
           Creá un portafolio usando el campo "+ Nuevo" de arriba
         </div>
       )}

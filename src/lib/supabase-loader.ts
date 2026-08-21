@@ -16,7 +16,7 @@ import { supabase } from "./supabase";
 
 const BUCKET = "clarity-data";
 
-// ── Caché en memoria (evita re-descargar en la misma sesión) ──
+//  Caché en memoria (evita re-descargar en la misma sesión) 
 const cache = new Map<string, any>();
 
 /**

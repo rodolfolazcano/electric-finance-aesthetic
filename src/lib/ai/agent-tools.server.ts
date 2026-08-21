@@ -1,15 +1,21 @@
-﻿// Herramientas para el agente autónomo. Server-only.
+// Herramientas para el agente autónomo. Server-only.
 // Cada herramienta recibe parámetros y devuelve string (resultado legible).
 import "./env.server";
 
 import { searchWeb, readWebPage, buildWebBlock } from "./web.server";
 import { runSandbox } from "./sandbox.server";
 import { searchLibrary } from "./context-library.server";
+import {
+  sendTelegramMessage as _sendTelegramMessage,
+  sendTelegramSignal as _sendTelegramSignal,
+  telegramGetBotInfo as _telegramGetBotInfo,
+  telegramGetUpdates as _telegramGetUpdates,
+} from "@/lib/telegram.server";
 
 const IS_WIN = process.platform === "win32";
 const MAX_OUT = 8_000;
 
-// ─── run_command ─────────────────────────────────────────────────────────────
+//  run_command 
 
 export type ToolRunCommandArgs = { command: string };
 
@@ -30,7 +36,7 @@ export async function toolRunCommand(args: ToolRunCommandArgs): Promise<string> 
   }
 }
 
-// ─── read_file ───────────────────────────────────────────────────────────────
+//  read_file 
 
 export type ToolReadFileArgs = { path: string; range_?: string };
 
@@ -49,7 +55,7 @@ export async function toolReadFile(args: ToolReadFileArgs): Promise<string> {
   }
 }
 
-// ─── write_file ──────────────────────────────────────────────────────────────
+//  write_file 
 
 export type ToolWriteFileArgs = { path: string; content: string; append?: boolean };
 
@@ -70,7 +76,7 @@ export async function toolWriteFile(args: ToolWriteFileArgs): Promise<string> {
   }
 }
 
-// ─── browse_filesystem ───────────────────────────────────────────────────────
+//  browse_filesystem 
 
 export type ToolBrowseFsArgs = { path: string };
 
@@ -87,20 +93,20 @@ export async function toolBrowseFilesystem(args: ToolBrowseFsArgs): Promise<stri
     const entries = fs.readdirSync(base, { withFileTypes: true });
     const lines = entries.map((e) => {
       const full = path.join(base, e.name);
-      let s = e.isDirectory() ? "📁" : "📄";
+      let s = e.isDirectory() ? "" : "";
       try {
         const st = fs.statSync(full);
         s += e.isDirectory() ? "" : ` (${st.size.toLocaleString()} B)`;
       } catch {}
       return `  ${s} ${e.name}`;
     });
-    return `📂 ${base}\n${lines.slice(0, 120).join("\n")}${entries.length > 120 ? `\n  ... y ${entries.length - 120} más` : ""}`;
+    return ` ${base}\n${lines.slice(0, 120).join("\n")}${entries.length > 120 ? `\n  ... y ${entries.length - 120} más` : ""}`;
   } catch (e: any) {
     return `[ERROR explorando]: ${e.message ?? String(e)}`;
   }
 }
 
-// ─── supabase_storage_list ───────────────────────────────────────────────────
+//  supabase_storage_list 
 
 export type ToolSupaListArgs = { prefix?: string };
 
@@ -118,7 +124,7 @@ export async function toolSupaStorageList(args: ToolSupaListArgs): Promise<strin
   }
 }
 
-// ─── supabase_storage_text ───────────────────────────────────────────────────
+//  supabase_storage_text 
 
 export type ToolSupaTextArgs = { path: string };
 
@@ -136,7 +142,7 @@ export async function toolSupaStorageText(args: ToolSupaTextArgs): Promise<strin
   }
 }
 
-// ─── web_search ──────────────────────────────────────────────────────────────
+//  web_search 
 
 export type ToolWebSearchArgs = { query: string; limit?: number };
 
@@ -150,7 +156,7 @@ export async function toolWebSearch(args: ToolWebSearchArgs): Promise<string> {
   }
 }
 
-// ─── web_read_page ───────────────────────────────────────────────────────────
+//  web_read_page 
 
 export type ToolWebReadArgs = { url: string; maxChars?: number };
 
@@ -162,7 +168,7 @@ export async function toolWebReadPage(args: ToolWebReadArgs): Promise<string> {
   }
 }
 
-// ─── sandbox ─────────────────────────────────────────────────────────────────
+//  sandbox 
 
 export type ToolSandboxArgs = { code: string; files?: Array<{ name: string; kind: string; text: string }> };
 
@@ -184,7 +190,7 @@ export async function toolSandbox(args: ToolSandboxArgs): Promise<string> {
   }
 }
 
-// ─── context_library_search ──────────────────────────────────────────────────
+//  context_library_search 
 
 export type ToolLibSearchArgs = { query: string; limit?: number };
 
@@ -201,7 +207,7 @@ export async function toolLibSearch(args: ToolLibSearchArgs): Promise<string> {
   }
 }
 
-// ─── financial_query ───────────────────────────────────────────────────────────
+//  financial_query 
 // Consulta los endpoints del backend Flask de análisis financiero.
 // Flask corre en http://localhost:5000, sirve datos de yfinance, IOL, BCRA, etc.
 
@@ -261,7 +267,45 @@ export async function toolFinancialQuery(args: ToolFinancialQueryArgs): Promise<
   }
 }
 
-// ─── fetch_stock_data ──────────────────────────────────────────────────────────
+//  telegram — coronar_inversiones_bot
+
+export type ToolTelegramSignalArgs = {
+  ticker: string;
+  senal: string;
+  precio?: number;
+  variacion1d?: number;
+  motivo?: string;
+  nivel?: string;
+  chatId?: string;
+};
+
+export async function toolTelegramSignal(args: ToolTelegramSignalArgs): Promise<string> {
+  if (!args.ticker?.trim() || !args.senal?.trim()) return "[TELEGRAM ERROR] ticker y senal son obligatorios";
+  return _sendTelegramSignal({
+    ticker: args.ticker,
+    senal: args.senal,
+    precio: args.precio ?? null,
+    variacion1d: args.variacion1d ?? null,
+    motivo: args.motivo,
+    nivel: args.nivel,
+    chatId: args.chatId,
+  });
+}
+
+export type ToolTelegramMessageArgs = { text: string; chatId?: string };
+
+export async function toolTelegramMessage(args: ToolTelegramMessageArgs): Promise<string> {
+  if (!args.text?.trim()) return "[TELEGRAM ERROR] text es obligatorio";
+  return _sendTelegramMessage({ text: args.text, chatId: args.chatId, parseMode: "HTML" });
+}
+
+export async function toolTelegramInfo(): Promise<string> {
+  const info = await _telegramGetBotInfo();
+  const updates = await _telegramGetUpdates();
+  return `${info}\n---\n${updates}`;
+}
+
+//  fetch_stock_data 
 // Obtiene datos de Yahoo Finance directamente (sin depender del servidor Flask).
 
 export type ToolStockDataArgs = { ticker: string; period?: string };
@@ -331,7 +375,7 @@ export async function toolStockData(args: ToolStockDataArgs): Promise<string> {
   }
 }
 
-// ─── Mapa de herramientas ────────────────────────────────────────────────────
+//  Mapa de herramientas 
 // Esquemas para OpenAI tool-calling y enrutador a implementación.
 
 export type ToolRecord = {
@@ -412,6 +456,38 @@ export const AGENT_TOOLS: ToolRecord[] = [
     params: { query: { type: "string", description: "Palabras clave para buscar (mín 5 caracteres cada una)" }, limit: { type: "integer", description: "Máximo de resultados (default 4)" } },
     required: ["query"],
     run: (a) => toolLibSearch(a as ToolLibSearchArgs),
+  },
+  {
+    name: "telegram_enviar_senal",
+    description: "ENVIA una senal de trading/analisis a Telegram via @coronar_inversiones_bot. USAR cuando el usuario pide que las senales se envien a Telegram, o cuando detectas una oportunidad/valor intrinseco/score que el usuario quiere notificar. Requiere TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID configurados en .env (obtenidos de @BotFather). ticker y senal son obligatorios; precio/variacion/motivo opcionales. Sin emojis en el mensaje.",
+    params: {
+      ticker: { type: "string", description: "Ticker (ej: GGAL.BA, AAPL, SPY)" },
+      senal: { type: "string", description: "Senal: COMPRA, COMPRA CON CAUTELA, MANTENER, REDUCIR, VENTA u otra descripcion" },
+      precio: { type: "number", description: "Precio actual opcional" },
+      variacion1d: { type: "number", description: "Variacion % 1 dia opcional (ej: 2.5)" },
+      motivo: { type: "string", description: "Motivo breve opcional (ej: Score 82/100, RSI sobreventa)" },
+      nivel: { type: "string", description: "Nivel de confianza o horizonte opcional" },
+      chatId: { type: "string", description: "Chat ID opcional (si no se pasa usa TELEGRAM_CHAT_ID)" },
+    },
+    required: ["ticker", "senal"],
+    run: (a) => toolTelegramSignal(a as ToolTelegramSignalArgs),
+  },
+  {
+    name: "telegram_enviar_mensaje",
+    description: "ENVIA un mensaje libre a Telegram via @coronar_inversiones_bot. USAR para notificaciones generales, resumenes de cartera, alertas de ciclo u otro texto. Requiere TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID en .env. Usa formato HTML.",
+    params: {
+      text: { type: "string", description: "Texto del mensaje (max 4000 chars, HTML permitido: <b>, <i>, <code>)" },
+      chatId: { type: "string", description: "Chat ID opcional" },
+    },
+    required: ["text"],
+    run: (a) => toolTelegramMessage(a as ToolTelegramMessageArgs),
+  },
+  {
+    name: "telegram_estado",
+    description: "CONSULTA el estado del bot de Telegram @coronar_inversiones_bot: verifica token, muestra info del bot (username, id) y ultimos chat_ids via getUpdates. USAR para diagnosticar si el bot esta configurado correctamente.",
+    params: {},
+    required: [],
+    run: () => toolTelegramInfo(),
   },
   {
     name: "fetch_stock_data",
@@ -502,7 +578,7 @@ export const AGENT_TOOLS: ToolRecord[] = [
   },
 ];
 
-// ─── Modelos locales (Ollama) ────────────────────────────────────────────────
+//  Modelos locales (Ollama) 
 
 export type ToolLocalModelsArgs = { query?: string };
 
@@ -593,7 +669,7 @@ export function buildToolsSchema(): Record<string, any>[] {
   }));
 }
 
-// ─── CRM: clientes ─────────────────────────────────────────────────────────
+//  CRM: clientes 
 
 export type ToolCrmImportArgs = { clientes: Array<{
   nombre: string; apellido?: string; email?: string; telefono?: string;

@@ -16,7 +16,7 @@
 import type { ScoreTecnicoResult } from "./semaforo-tecnico";
 import type { InfoActivo } from "./detector-activo";
 
-// ─── Tipos ──────────────────────────────────────────────────────────
+//  Tipos 
 
 export interface ScoreFundamentalInput {
   /** P/E ratio */
@@ -81,7 +81,7 @@ export interface SenalUnificada {
   peso: number;
 }
 
-// ─── Pesos por tipo de activo ──────────────────────────────────────
+//  Pesos por tipo de activo 
 
 const PESOS_POR_TIPO: Record<string, { tecnico: number; fundamental: number }> = {
   ACCION: { tecnico: 0.4, fundamental: 0.6 },
@@ -93,7 +93,7 @@ const PESOS_POR_TIPO: Record<string, { tecnico: number; fundamental: number }> =
   OTRO: { tecnico: 0.9, fundamental: 0.1 },
 };
 
-// ─── Cálculo de score fundamental ──────────────────────────────────
+//  Cálculo de score fundamental 
 
 export function calcularScoreFundamental(fin: ScoreFundamentalInput): {
   score: number;
@@ -277,7 +277,7 @@ export function calcularScoreFundamental(fin: ScoreFundamentalInput): {
   return { score: Math.round(score * 10) / 10, detalle };
 }
 
-// ─── Detección de contradicciones ──────────────────────────────────
+//  Detección de contradicciones 
 
 export function detectarContradiccion(
   tecnicoScore: number,
@@ -309,7 +309,7 @@ export function detectarContradiccion(
   return null;
 }
 
-// ─── Coherencia entre métodos de valuación (BLOQUE 3) ────────────────
+//  Coherencia entre métodos de valuación (BLOQUE 3) 
 // Fuente: Pascale, Cap. 13, punto 13.4 (tabla de los 3 métodos de VPN).
 // Bajo condiciones teóricas normales de mercado, WACC y APV deben converger
 // al mismo resultado. Si divergen > umbral (en puntos porcentuales de margen
@@ -343,7 +343,7 @@ export function detectarDivergenciaMetodosValuacion(
   };
 }
 
-// ─── Score unificado principal ─────────────────────────────────────
+//  Score unificado principal 
 // LEGACY: cálculo propio conservado (ver FASE 6 en cabecera de archivo).
 
 export function calcularScoreUnificado(
@@ -378,7 +378,7 @@ export function calcularScoreUnificado(
   // Interpretación
   let interpretacion: string;
   if (contradiccion) {
-    interpretacion = `⚠️ Señales mixtas: ${contradiccion.descripcion}`;
+    interpretacion = `[ADVERTENCIA] Señales mixtas: ${contradiccion.descripcion}`;
   } else if (total > 3) {
     interpretacion = `Perspectiva favorable: el análisis ${infoActivo.soportaFundamental ? "técnico y fundamental" : "técnico"} coinciden en una visión positiva.`;
   } else if (total < -3) {

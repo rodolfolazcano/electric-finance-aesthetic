@@ -1,5 +1,5 @@
 // @ts-nocheck
-// ─── Módulo: Interpretación Sectorial Inteligente ────────────────────────────
+//  Módulo: Interpretación Sectorial Inteligente 
 // Capa de interpretación sobre la comparación sectorial existente.
 // No emite recomendaciones de compra/venta — describe posicionamiento relativo.
 // Cumple reglas CNV: lenguaje descriptivo, no imperativo.
@@ -11,7 +11,7 @@ import {
   getBottleneckWarning,
 } from "@/lib/herramientas/sectores/escasez-taxonomia";
 
-// ─── Tipos públicos ─────────────────────────────────────────────────────────
+//  Tipos públicos 
 
 export interface PosicionRelativa {
   posicion:
@@ -37,7 +37,7 @@ export interface ConclusionSectorialInteligente {
   advertencias: string[];
 }
 
-// ─── Dirección de métricas (mismo criterio que dinámicas.ts) ────────────────
+//  Dirección de métricas (mismo criterio que dinámicas.ts) 
 
 const METRIC_DIRECTION: Record<string, "menor_mejor" | "mayor_mejor"> = {
   trailingPE: "menor_mejor",
@@ -75,7 +75,7 @@ const METRIC_LABELS: Record<string, string> = {
   upsidePct: "upside según consenso",
 };
 
-// ─── Helpers internos ────────────────────────────────────────────────────────
+//  Helpers internos 
 
 function extraerValores(peers: FundamentalAFResult[], key: keyof FundamentalAFResult): number[] {
   return peers.map((p) => p[key] as number).filter((v) => v != null && Number.isFinite(v));
@@ -88,7 +88,7 @@ function mediana(arr: number[]): number | null {
   return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 }
 
-// ─── 1. Clasificar posición relativa con p25/p75 ────────────────────────────
+//  1. Clasificar posición relativa con p25/p75 
 
 export function clasificarPosicionRelativa(
   valorTicker: number,
@@ -165,7 +165,7 @@ export function clasificarPosicionRelativa(
   return { posicion, percentilAprox, interpretacion };
 }
 
-// ─── 2. Ajustar umbrales por sector ─────────────────────────────────────────
+//  2. Ajustar umbrales por sector 
 
 const SECTOR_UMBRALES_BASE: Record<string, UmbralesMetrica> = {
   trailingPE: { menorMejor: true, toleranciaPct: 25 },
@@ -259,7 +259,7 @@ export function ajustarUmbralesPorSector(
   return umbrales;
 }
 
-// ─── 3. Conclusión sectorial inteligente ────────────────────────────────────
+//  3. Conclusión sectorial inteligente 
 
 const METRICAS_EVALUAR: (keyof FundamentalAFResult)[] = [
   "trailingPE",
@@ -297,7 +297,7 @@ export function generarConclusionSectorialInteligente(
   const muestraInsuficiente = peersValidos.length < 3;
   if (muestraInsuficiente) {
     advertencias.push(
-      `Muestra insuficiente: solo ${peersValidos.length} pares válidos. Las conclusiones sobre posicionamiento sectorial tienen baja significación estadística. Los bullets de fortalezas/debilidades incluyen el marcador "⚠ dato preliminar" para indicar baja confianza.`,
+      `Muestra insuficiente: solo ${peersValidos.length} pares válidos. Las conclusiones sobre posicionamiento sectorial tienen baja significación estadística. Los bullets de fortalezas/debilidades incluyen el marcador " dato preliminar" para indicar baja confianza.`,
     );
   }
 
@@ -388,7 +388,7 @@ export function generarConclusionSectorialInteligente(
 
   // Separar fortalezas y debilidades (lógica determinística: no depende de strings de interpretación)
   const prefijoMuestra = muestraInsuficiente
-    ? `⚠ dato preliminar (n=${peersValidos.length}): `
+    ? ` dato preliminar (n=${peersValidos.length}): `
     : "";
 
   for (const c of clasificaciones) {
@@ -479,7 +479,7 @@ export function generarConclusionSectorialInteligente(
     }
   }
 
-  // ─── Cuello de Botella Estructural + Riesgo Geopolítico ────────
+  //  Cuello de Botella Estructural + Riesgo Geopolítico 
   const escasez = getEscasezPerfil(sector);
   if (escasez.tipoEscasez === "estructural" || escasez.leadTimeYears >= 5) {
     advertencias.push(

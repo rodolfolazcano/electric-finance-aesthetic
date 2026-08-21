@@ -89,7 +89,7 @@ function recommendationBadge(r: string) {
     VENTA: "bg-danger/15 text-danger",
   };
   return (
-    <span className={`rounded border px-1.5 py-0.5 text-[10px] font-mono ${m[r] ?? m.MANTENER}`}>
+    <span className={`rounded border px-1.5 py-0.5 text-[13px] font-mono ${m[r] ?? m.MANTENER}`}>
       {r}
     </span>
   );
@@ -129,7 +129,7 @@ export function PortfolioAssetTable({
   const arsCount = useMemo(() => data.filter((d) => d.currency === "ARS").length, [data]);
   const usdCount = useMemo(() => data.filter((d) => d.currency === "USD").length, [data]);
 
-  const headerLabels: Record<ColumnMode, { label: string; align?: string; 宽?: number }[]> = {
+  const headerLabels: Record<ColumnMode, { label: string; align?: string; width?: number }[]> = {
     price: [
       { label: "Ticker" },
       { label: "Moneda" },
@@ -208,7 +208,7 @@ export function PortfolioAssetTable({
                   onClick={() => onRemoveTicker(d.ticker)}
                   className="text-red-400/60 hover:text-red-400 text-xs"
                 >
-                  ✕
+                  
                 </button>
               </td>
             )}
@@ -242,7 +242,7 @@ export function PortfolioAssetTable({
                   onClick={() => onRemoveTicker(d.ticker)}
                   className="text-red-400/60 hover:text-red-400 text-xs"
                 >
-                  ✕
+                  
                 </button>
               </td>
             )}
@@ -276,7 +276,7 @@ export function PortfolioAssetTable({
                   onClick={() => onRemoveTicker(d.ticker)}
                   className="text-red-400/60 hover:text-red-400 text-xs"
                 >
-                  ✕
+                  
                 </button>
               </td>
             )}
@@ -319,7 +319,7 @@ export function PortfolioAssetTable({
                   onClick={() => onRemoveTicker(d.ticker)}
                   className="text-red-400/60 hover:text-red-400 text-xs"
                 >
-                  ✕
+                  
                 </button>
               </td>
             )}
@@ -352,7 +352,7 @@ export function PortfolioAssetTable({
                   onClick={() => onRemoveTicker(d.ticker)}
                   className="text-red-400/60 hover:text-red-400 text-xs"
                 >
-                  ✕
+                  
                 </button>
               </td>
             )}
@@ -367,15 +367,15 @@ export function PortfolioAssetTable({
     <div className="space-y-2">
       {/* Currency header + view mode toggle */}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+        <div className="font-mono text-[14px] uppercase tracking-[0.22em] text-muted-foreground">
           {view === "ARS" ? (
-            <>🇦🇷 Portafolio ARS</>
+            <> Portafolio ARS</>
           ) : view === "USD" ? (
-            <>🇺🇸 Portafolio USD</>
+            <> Portafolio USD</>
           ) : (
-            <>🇦🇷 Portafolio ARS + USD</>
+            <> Portafolio ARS + USD</>
           )}
-          <span className="ml-2 text-[10px] text-muted-foreground/60">
+          <span className="ml-2 text-[13px] text-muted-foreground/60">
             {filtered.length} activo{filtered.length !== 1 ? "s" : ""}
             {view === "all" && data.length > 0 && (
               <span className="text-muted-foreground/50">
@@ -392,7 +392,7 @@ export function PortfolioAssetTable({
               type="button"
               onClick={() => setView("ARS")}
               className={cn(
-                "px-2.5 py-1 text-[10px] font-mono transition-colors",
+                "px-2.5 py-1 text-[13px] font-mono transition-colors",
                 view === "ARS"
                   ? "bg-primary/20 text-primary"
                   : "bg-transparent text-muted-foreground hover:text-foreground",
@@ -404,7 +404,7 @@ export function PortfolioAssetTable({
               type="button"
               onClick={() => setView("all")}
               className={cn(
-                "px-2.5 py-1 text-[10px] font-mono transition-colors",
+                "px-2.5 py-1 text-[13px] font-mono transition-colors",
                 view === "all"
                   ? "bg-primary/20 text-primary"
                   : "bg-transparent text-muted-foreground hover:text-foreground",
@@ -416,7 +416,7 @@ export function PortfolioAssetTable({
               type="button"
               onClick={() => setView("USD")}
               className={cn(
-                "px-2.5 py-1 text-[10px] font-mono transition-colors",
+                "px-2.5 py-1 text-[13px] font-mono transition-colors",
                 view === "USD"
                   ? "bg-success/20 text-success"
                   : "bg-transparent text-muted-foreground hover:text-foreground",
@@ -435,7 +435,7 @@ export function PortfolioAssetTable({
             key={m.value}
             onClick={() => setColumnMode(m.value)}
             className={cn(
-              "px-3 py-1 text-[10px] font-mono transition-colors",
+              "px-3 py-1 text-[13px] font-mono transition-colors",
               columnMode === m.value
                 ? "bg-primary/20 text-primary"
                 : "bg-transparent text-muted-foreground hover:text-foreground",
@@ -449,22 +449,22 @@ export function PortfolioAssetTable({
       {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-border/40 bg-background/40">
         {loading && (
-          <div className="flex items-center justify-center py-8 text-[11px] text-muted-foreground">
+          <div className="flex items-center justify-center py-8 text-[14px] text-muted-foreground">
             Cargando análisis...
           </div>
         )}
-        {error && <div className="px-4 py-3 text-[10px] text-danger">{error}</div>}
+        {error && <div className="px-4 py-3 text-[13px] text-danger">{error}</div>}
         {!loading && !error && filtered.length === 0 && (
-          <div className="flex items-center justify-center py-8 text-[11px] text-muted-foreground">
+          <div className="flex items-center justify-center py-8 text-[14px] text-muted-foreground">
             {view === "all"
               ? "Agregá tickers para ver el análisis"
               : `Sin activos en ${view}. Cambiá el modo de visualización.`}
           </div>
         )}
         {!loading && filtered.length > 0 && (
-          <table className="mono w-full text-[11px]">
+          <table className="mono w-full text-[14px]">
             <thead>
-              <tr className="border-b border-border/60 text-[10px] uppercase tracking-wider text-muted-foreground">
+              <tr className="border-b border-border/60 text-[13px] uppercase tracking-wider text-muted-foreground">
                 {headers.map((h) => (
                   <th key={h.label} className={`px-2 py-2 ${h.align ?? "text-left"}`}>
                     {h.label}

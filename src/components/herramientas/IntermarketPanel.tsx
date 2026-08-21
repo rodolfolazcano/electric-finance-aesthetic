@@ -64,7 +64,7 @@ function fmtPct(n: number | null | undefined, dp = 2): string {
   return `${n >= 0 ? "+" : ""}${n.toFixed(dp)}%`;
 }
 
-// ─── Componente de correlación (ampliado) ──────────────────────
+//  Componente de correlación (ampliado) 
 
 function CorrelationGauge({
   value,
@@ -103,7 +103,7 @@ function CorrelationGauge({
                   <Info className="h-3 w-3" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-[220px] text-[10px] leading-relaxed">
+              <TooltipContent side="top" className="max-w-[220px] text-[13px] leading-relaxed">
                 {infoTooltip}
               </TooltipContent>
             </UiTooltip>
@@ -114,9 +114,9 @@ function CorrelationGauge({
         <span className="text-2xl font-bold font-mono text-foreground">
           {value != null ? fmtNum(value, 2) : "\u2014"}
         </span>
-        <span className="text-[10px] text-muted-foreground">correlación</span>
+        <span className="text-[13px] text-muted-foreground">correlación</span>
         {correlacionEstructural != null && (
-          <span className="ml-auto text-[9px] text-muted-foreground/60 font-mono">
+          <span className="ml-auto text-[13px] text-muted-foreground/60 font-mono">
             estructural (1a): {fmtNum(correlacionEstructural, 2)}
           </span>
         )}
@@ -127,15 +127,15 @@ function CorrelationGauge({
           style={{ width: `${pct}%` }}
         />
         <div className="absolute left-1/2 top-0 h-full w-px bg-muted-foreground/40" />
-        <div className="absolute -left-1 -top-4 text-[9px] text-muted-foreground">-1</div>
-        <div className="absolute left-1/2 -translate-x-1/2 -top-4 text-[9px] text-muted-foreground">
+        <div className="absolute -left-1 -top-4 text-[13px] text-muted-foreground">-1</div>
+        <div className="absolute left-1/2 -translate-x-1/2 -top-4 text-[13px] text-muted-foreground">
           0
         </div>
-        <div className="absolute -right-1 -top-4 text-[9px] text-muted-foreground">+1</div>
+        <div className="absolute -right-1 -top-4 text-[13px] text-muted-foreground">+1</div>
       </div>
-      <p className="text-[10px] text-muted-foreground leading-relaxed">{interpretation}</p>
+      <p className="text-[13px] text-muted-foreground leading-relaxed">{interpretation}</p>
       {leadLagText && (
-        <div className="mt-1 rounded border border-border/30 bg-border/10 px-1.5 py-0.5 text-[8px] font-mono text-muted-foreground/70 leading-relaxed">
+        <div className="mt-1 rounded border border-border/30 bg-border/10 px-1.5 py-0.5 text-[12px] font-mono text-muted-foreground/70 leading-relaxed">
           {leadLagText}
         </div>
       )}
@@ -143,16 +143,16 @@ function CorrelationGauge({
   );
 }
 
-// ─── PASO 13: Relative Strength chart ──────────────────────────
+//  PASO 13: Relative Strength chart 
 
 function RelativeStrengthChart({ ratio }: { ratio: RelativeStrengthRatio }) {
   if (ratio.datos.length === 0) {
     return (
       <Card className="border-border/40 bg-background/40/40 p-4">
-        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
           {ratio.label}
         </div>
-        <div className="mt-2 text-[10px] text-muted-foreground">Sin datos históricos</div>
+        <div className="mt-2 text-[13px] text-muted-foreground">Sin datos históricos</div>
       </Card>
     );
   }
@@ -163,7 +163,7 @@ function RelativeStrengthChart({ ratio }: { ratio: RelativeStrengthRatio }) {
   return (
     <Card className="border-border/40 bg-background/40/40 p-4">
       <div className="flex items-center justify-between mb-2">
-        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
           Relative Strength: {ratio.label}
         </div>
         <div className="flex items-center gap-2 font-mono text-xs">
@@ -175,7 +175,7 @@ function RelativeStrengthChart({ ratio }: { ratio: RelativeStrengthRatio }) {
           )}
         </div>
       </div>
-      <div className="text-[9px] text-muted-foreground mb-2 leading-relaxed">
+      <div className="text-[13px] text-muted-foreground mb-2 leading-relaxed">
         {ratio.interpretacion}
       </div>
       <ResponsiveContainer width="100%" height={120}>
@@ -210,12 +210,12 @@ function RelativeStrengthChart({ ratio }: { ratio: RelativeStrengthRatio }) {
           <Line type="monotone" dataKey="valor" stroke="#c9a84c" strokeWidth={1.5} dot={false} />
         </LineChart>
       </ResponsiveContainer>
-      <p className="mt-1 text-[8px] text-muted-foreground leading-relaxed">{ratio.descripcion}</p>
+      <p className="mt-1 text-[12px] text-muted-foreground leading-relaxed">{ratio.descripcion}</p>
     </Card>
   );
 }
 
-// ─── Componente Lectura Intermarket (colapsable) ──────────────
+//  Componente Lectura Intermarket (colapsable) 
 
 function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult> }) {
   const li = data.lecturaIntermarket;
@@ -247,11 +247,11 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
               Lectura Intermarket
             </span>
             <span
-              className={`rounded px-1.5 py-0.5 font-mono text-[9px] uppercase ${regimenColorMap[li.regimen] ?? "text-muted-foreground"} bg-current/10`}
+              className={`rounded px-1.5 py-0.5 font-mono text-[13px] uppercase ${regimenColorMap[li.regimen] ?? "text-muted-foreground"} bg-current/10`}
             >
               {li.regimen}
             </span>
-            <span className="font-mono text-[9px] text-muted-foreground">
+            <span className="font-mono text-[13px] text-muted-foreground">
               confianza {li.confianza}%
             </span>
           </div>
@@ -261,25 +261,25 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
         <CollapsibleContent className="mt-3 space-y-3">
           {/* Barra de confianza */}
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[9px] text-muted-foreground shrink-0">Confianza</span>
+            <span className="font-mono text-[13px] text-muted-foreground shrink-0">Confianza</span>
             <div className="relative h-1.5 flex-1 rounded-full bg-border/30">
               <div
                 className={`absolute left-0 top-0 h-full rounded-full transition-all ${li.confianza >= 70 ? "bg-success" : li.confianza >= 40 ? "bg-warning" : "bg-danger"}`}
                 style={{ width: `${li.confianza}%` }}
               />
             </div>
-            <span className="font-mono text-[9px] text-muted-foreground w-8 text-right">
+            <span className="font-mono text-[13px] text-muted-foreground w-8 text-right">
               {li.confianza}%
             </span>
           </div>
 
           {/* Índice de presión inflacionaria */}
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[9px] text-muted-foreground">
+            <span className="font-mono text-[13px] text-muted-foreground">
               Presión inflacionaria
             </span>
             <span
-              className={`font-mono text-[10px] font-semibold ${li.indicePresion > 0.3 ? "text-danger" : li.indicePresion < -0.3 ? "text-success" : "text-muted-foreground"}`}
+              className={`font-mono text-[13px] font-semibold ${li.indicePresion > 0.3 ? "text-danger" : li.indicePresion < -0.3 ? "text-success" : "text-muted-foreground"}`}
             >
               {fmtNum(li.indicePresion, 2)}
             </span>
@@ -287,7 +287,7 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
 
           {/* Contexto histórico */}
           {li.contextoHistorico && (
-            <p className="text-[9px] text-muted-foreground/70 italic leading-relaxed">
+            <p className="text-[13px] text-muted-foreground/70 italic leading-relaxed">
               {li.contextoHistorico}
             </p>
           )}
@@ -296,11 +296,11 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
           {li.patronHistoricoDetectado && (
             <div className="rounded border border-border/30 bg-border/5 px-2 py-1.5">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-[9px] font-semibold text-foreground">
+                <span className="font-mono text-[13px] font-semibold text-foreground">
                   {li.patronHistoricoDetectado.nombre}
                 </span>
                 <span
-                  className={`font-mono text-[8px] px-1 py-0.5 rounded ${li.matchPatron >= 70 ? "bg-warning/20 text-warning" : "bg-border/20 text-muted-foreground"}`}
+                  className={`font-mono text-[12px] px-1 py-0.5 rounded ${li.matchPatron >= 70 ? "bg-warning/20 text-warning" : "bg-border/20 text-muted-foreground"}`}
                 >
                   match {li.matchPatron}%
                 </span>
@@ -310,16 +310,16 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
 
           {/* Alerta activa */}
           {li.alertaActiva && (
-            <div className="rounded border border-warning/40 bg-warning/10 px-2 py-1.5 text-[9px] font-mono text-warning leading-relaxed">
+            <div className="rounded border border-warning/40 bg-warning/10 px-2 py-1.5 text-[13px] font-mono text-warning leading-relaxed">
               {""} {li.alertaActiva}
             </div>
           )}
 
           {/* Sesgo */}
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[9px] text-muted-foreground">Sesgo recomendado</span>
+            <span className="font-mono text-[13px] text-muted-foreground">Sesgo recomendado</span>
             <span
-              className={`rounded px-1.5 py-0.5 font-mono text-[9px] uppercase ${
+              className={`rounded px-1.5 py-0.5 font-mono text-[13px] uppercase ${
                 li.recomendacionSesgo === "cauteloso"
                   ? "text-danger bg-danger/10"
                   : li.recomendacionSesgo === "favorable"
@@ -332,18 +332,18 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
           </div>
 
           {/* Secuencia de giros */}
-          <p className="text-[8px] text-muted-foreground/60 font-mono leading-relaxed">
+          <p className="text-[12px] text-muted-foreground/60 font-mono leading-relaxed">
             {li.secuenciaGiros.detalle}
           </p>
 
           {/* Cap. 3: Ratio Commodities/Bonos */}
           <div className="rounded border border-border/30 bg-border/5 px-2 py-1.5">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[9px] text-muted-foreground">
+              <span className="font-mono text-[13px] text-muted-foreground">
                 Ratio Commodities/Bonos
               </span>
               <span
-                className={`font-mono text-[9px] font-semibold ${
+                className={`font-mono text-[13px] font-semibold ${
                   li.ratioCommoditiesBonos.tendencia === "alcista"
                     ? "text-warning"
                     : li.ratioCommoditiesBonos.tendencia === "bajista"
@@ -354,22 +354,22 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
                 {li.ratioCommoditiesBonos.tendencia}
               </span>
             </div>
-            <p className="text-[8px] text-muted-foreground/70 font-mono mt-1 leading-relaxed">
+            <p className="text-[12px] text-muted-foreground/70 font-mono mt-1 leading-relaxed">
               {li.ratioCommoditiesBonos.sesgoSectorial}
             </p>
           </div>
 
           {/* Cap. 3: Secuencia de rotación */}
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[9px] text-muted-foreground">Rotación 3 etapas</span>
+            <span className="font-mono text-[13px] text-muted-foreground">Rotación 3 etapas</span>
             <span
-              className={`font-mono text-[9px] ${li.secuenciaRotacion.ordenConfirmado ? "text-success" : "text-muted-foreground"}`}
+              className={`font-mono text-[13px] ${li.secuenciaRotacion.ordenConfirmado ? "text-success" : "text-muted-foreground"}`}
             >
               {li.secuenciaRotacion.ordenConfirmado ? "Confirmada" : "No confirmada"}
             </span>
           </div>
           {li.secuenciaRotacion.lagEstimadoProximaEtapa && (
-            <p className="text-[8px] text-muted-foreground/60 font-mono leading-relaxed">
+            <p className="text-[12px] text-muted-foreground/60 font-mono leading-relaxed">
               {li.secuenciaRotacion.lagEstimadoProximaEtapa}
             </p>
           )}
@@ -379,15 +379,15 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
             li.convergenciaCommodities.indicesEnBaja.length >
             0 && (
             <div className="flex flex-wrap gap-2">
-              <span className="font-mono text-[9px] text-muted-foreground">
+              <span className="font-mono text-[13px] text-muted-foreground">
                 Convergencia commodities
               </span>
               {li.convergenciaCommodities.convergen ? (
-                <span className="font-mono text-[9px] text-success">
+                <span className="font-mono text-[13px] text-success">
                   Confirmada (todos los índices alineados)
                 </span>
               ) : (
-                <span className="font-mono text-[9px] text-muted-foreground">
+                <span className="font-mono text-[13px] text-muted-foreground">
                   Mixta — {li.convergenciaCommodities.indicesEnAlza.length} en alza,{" "}
                   {li.convergenciaCommodities.indicesEnBaja.length} en baja
                 </span>
@@ -398,7 +398,7 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
           {/* Cap. 3: Bear market silencioso */}
           {li.bearMarketSilencioso.detectado && (
             <div className="rounded border border-warning/40 bg-warning/10 px-2 py-1.5">
-              <p className="text-[9px] font-mono text-warning leading-relaxed">
+              <p className="text-[13px] font-mono text-warning leading-relaxed">
                 {""} {li.bearMarketSilencioso.contextoHistorico}
               </p>
             </div>
@@ -409,14 +409,14 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
   );
 }
 
-// ─── Componente principal ──────────────────────────────────────
+//  Componente principal 
 
 export function IntermarketPanel() {
   const getAnalysis = useServerFn(getIntermarketAnalysis);
   const getMurphyIndicators = useServerFn(getIntermarketMurphyIndicators);
   const tavilySearch = useServerFn(searchTavily);
 
-  // ─── Tavily ──────────────────────────────────────────
+  //  Tavily 
   const [tavilyQuery, setTavilyQuery] = useState("");
   const [tavilyResults, setTavilyResults] = useState<TavilyResult[]>([]);
   const [tavilyAnswer, setTavilyAnswer] = useState("");
@@ -461,7 +461,7 @@ export function IntermarketPanel() {
     [tavilySearch],
   );
 
-  // ─── Earth2 ──────────────────────────────────────────
+  //  Earth2 
   const [earth2Status, setEarth2Status] = useState<string | null>(null);
   const [earth2Models, setEarth2Models] = useState<{ id: string; name: string }[]>([]);
   const [earth2Forecast, setEarth2Forecast] = useState<Earth2ForecastResponse | null>(null);
@@ -487,7 +487,7 @@ export function IntermarketPanel() {
     }
   }, []);
 
-  // ─── Earth2 auto-check ───────────────────────────────
+  //  Earth2 auto-check 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["intermarket-analysis"],
     queryFn: () => getAnalysis(),
@@ -495,7 +495,7 @@ export function IntermarketPanel() {
     refetchInterval: 15 * 60 * 1000,
   });
 
-  // ─── Murphy Indicators (Stovall sector rotation) ───────
+  //  Murphy Indicators (Stovall sector rotation) 
   const { data: murphyData, isLoading: murphyLoading } = useQuery({
     queryKey: ["intermarket-murphy"],
     queryFn: () => getMurphyIndicators(),
@@ -505,7 +505,7 @@ export function IntermarketPanel() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid w-full gap-3 sm:grid-cols-2">
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-40 w-full rounded-lg" />
         ))}
@@ -525,14 +525,14 @@ export function IntermarketPanel() {
     <div className="space-y-6">
       {/* Alerta 1987 condicional */}
       {data.alerta1987.activa && (
-        <div className="rounded-md border border-warning/50 bg-warning/10 px-4 py-2.5 text-[10px] font-mono leading-relaxed text-warning">
+        <div className="rounded-md border border-warning/50 bg-warning/10 px-4 py-2.5 text-[13px] font-mono leading-relaxed text-warning">
           {""} {data.alerta1987.mensaje}
         </div>
       )}
 
       {/* Divergencia Oil/XLE condicional */}
       {data.divergenciaOilXLE.detectada && (
-        <div className="rounded-md border border-warning/50 bg-warning/10 px-4 py-2.5 text-[10px] font-mono leading-relaxed text-warning">
+        <div className="rounded-md border border-warning/50 bg-warning/10 px-4 py-2.5 text-[13px] font-mono leading-relaxed text-warning">
           {""} {data.divergenciaOilXLE.mensaje}
         </div>
       )}
@@ -542,10 +542,10 @@ export function IntermarketPanel() {
         <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Correlaciones entre clases de activos (ventana 60 ruedas)
         </h3>
-        <p className="mb-3 text-[8px] text-muted-foreground/50 font-mono leading-relaxed">
+        <p className="mb-3 text-[12px] text-muted-foreground/50 font-mono leading-relaxed">
           * DBC utilizado como proxy del índice CRB clásico
         </p>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid w-full gap-3 sm:grid-cols-2">
           {data.correlations.map((c: RollingCorrelation) => (
             <CorrelationGauge
               key={c.label}
@@ -566,23 +566,23 @@ export function IntermarketPanel() {
       {/* Evaluación del lag del dólar */}
       {data.evaluacionLagDolar.correlacion60d != null && (
         <Card className="border-border/40 bg-background/40/40 p-4">
-          <h4 className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <h4 className="mb-2 font-mono text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">
             Lag del Dólar (evaluación multi-ventana)
           </h4>
           <div className="flex flex-wrap gap-3 mb-2">
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-[9px] text-muted-foreground">60d:</span>
+              <span className="font-mono text-[13px] text-muted-foreground">60d:</span>
               <span
-                className={`font-mono text-[10px] font-semibold ${data.evaluacionLagDolar.correlacion60d != null && Math.abs(data.evaluacionLagDolar.correlacion60d) > 0.3 ? (data.evaluacionLagDolar.correlacion60d < 0 ? "text-success" : "text-danger") : "text-muted-foreground"}`}
+                className={`font-mono text-[13px] font-semibold ${data.evaluacionLagDolar.correlacion60d != null && Math.abs(data.evaluacionLagDolar.correlacion60d) > 0.3 ? (data.evaluacionLagDolar.correlacion60d < 0 ? "text-success" : "text-danger") : "text-muted-foreground"}`}
               >
                 {fmtNum(data.evaluacionLagDolar.correlacion60d, 2)}
               </span>
             </div>
             {data.evaluacionLagDolar.correlacion250d != null && (
               <div className="flex items-center gap-1.5">
-                <span className="font-mono text-[9px] text-muted-foreground">250d:</span>
+                <span className="font-mono text-[13px] text-muted-foreground">250d:</span>
                 <span
-                  className={`font-mono text-[10px] font-semibold ${Math.abs(data.evaluacionLagDolar.correlacion250d) > 0.3 ? (data.evaluacionLagDolar.correlacion250d < 0 ? "text-success" : "text-danger") : "text-muted-foreground"}`}
+                  className={`font-mono text-[13px] font-semibold ${Math.abs(data.evaluacionLagDolar.correlacion250d) > 0.3 ? (data.evaluacionLagDolar.correlacion250d < 0 ? "text-success" : "text-danger") : "text-muted-foreground"}`}
                 >
                   {fmtNum(data.evaluacionLagDolar.correlacion250d, 2)}
                 </span>
@@ -590,16 +590,16 @@ export function IntermarketPanel() {
             )}
             {data.evaluacionLagDolar.correlacion500d != null && (
               <div className="flex items-center gap-1.5">
-                <span className="font-mono text-[9px] text-muted-foreground">500d:</span>
+                <span className="font-mono text-[13px] text-muted-foreground">500d:</span>
                 <span
-                  className={`font-mono text-[10px] font-semibold ${Math.abs(data.evaluacionLagDolar.correlacion500d) > 0.3 ? (data.evaluacionLagDolar.correlacion500d < 0 ? "text-success" : "text-danger") : "text-muted-foreground"}`}
+                  className={`font-mono text-[13px] font-semibold ${Math.abs(data.evaluacionLagDolar.correlacion500d) > 0.3 ? (data.evaluacionLagDolar.correlacion500d < 0 ? "text-success" : "text-danger") : "text-muted-foreground"}`}
                 >
                   {fmtNum(data.evaluacionLagDolar.correlacion500d, 2)}
                 </span>
               </div>
             )}
           </div>
-          <p className="text-[9px] text-muted-foreground/70 font-mono leading-relaxed">
+          <p className="text-[13px] text-muted-foreground/70 font-mono leading-relaxed">
             {data.evaluacionLagDolar.interpretacion}
           </p>
         </Card>
@@ -610,7 +610,7 @@ export function IntermarketPanel() {
         <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Argentina en el contexto global
         </h3>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid w-full gap-3 sm:grid-cols-2">
           {data.argentina.map((a: ArgentinaCorrelation) => (
             <CorrelationGauge
               key={a.label}
@@ -627,13 +627,13 @@ export function IntermarketPanel() {
         <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Relative Strength — ratios sectoriales (Murphy, Cap. 3, 4, 11 y 13)
         </h3>
-        <p className="mb-3 text-[9px] text-muted-foreground leading-relaxed">
+        <p className="mb-3 text-[13px] text-muted-foreground leading-relaxed">
           A diferencia de los gauges de correlación de Pearson (arriba), estos ratios miden
           liderazgo relativo: si un ratio sube, el numerador está superando al denominador. Es la
           herramienta principal que usa John Murphy para identificar rotación sectorial y presión en
           tasas.
         </p>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid w-full gap-3 sm:grid-cols-2">
           {data.relativeStrength.map((r: RelativeStrengthRatio) => (
             <RelativeStrengthChart key={r.label} ratio={r} />
           ))}
@@ -658,16 +658,16 @@ export function IntermarketPanel() {
             <div className="flex items-center gap-2 flex-wrap">
               <Badge
                 variant="secondary"
-                className="text-[8px] font-mono bg-primary/20 text-primary border-primary/30"
+                className="text-[12px] font-mono bg-primary/20 text-primary border-primary/30"
               >
                 Fase actual: {murphyData.cycle.label}
               </Badge>
-              <span className="text-[8px] text-muted-foreground font-mono">
+              <span className="text-[12px] text-muted-foreground font-mono">
                 Stage {murphyData.cycle.stage}
               </span>
             </div>
             <div className="rounded-md border border-border/30 bg-muted/20 p-3">
-              <h4 className="mb-2 text-[9px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">
+              <h4 className="mb-2 text-[13px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">
                 Sectores líderes (según ciclo)
               </h4>
               <div className="flex flex-wrap gap-1.5">
@@ -675,38 +675,38 @@ export function IntermarketPanel() {
                   <Badge
                     key={sector}
                     variant="outline"
-                    className="text-[8px] font-mono border-border/50"
+                    className="text-[12px] font-mono border-border/50"
                   >
                     {sector}
                   </Badge>
                 ))}
               </div>
             </div>
-            <p className="text-[8px] text-muted-foreground/70 font-mono leading-relaxed">
+            <p className="text-[12px] text-muted-foreground/70 font-mono leading-relaxed">
               {murphyData.cycle.description}
             </p>
           </div>
         ) : (
-          <div className="text-[9px] text-muted-foreground">Datos no disponibles</div>
+          <div className="text-[13px] text-muted-foreground">Datos no disponibles</div>
         )}
       </Card>
 
-      {/* ─── Sección 4: Tavily AI + Clima (análisis enriquecido) ─── */}
+      {/*  Sección 4: Tavily AI + Clima (análisis enriquecido)  */}
       <Card className="border-border/40 bg-background/40/40 p-4">
         <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Análisis enriquecido — Noticias AI + Clima
         </h3>
         <Tabs defaultValue="tavily" className="w-full">
           <TabsList className="mb-3">
-            <TabsTrigger value="tavily" className="text-[10px] font-mono gap-1">
+            <TabsTrigger value="tavily" className="text-[13px] font-mono gap-1">
               <Search className="size-3" /> Noticias AI
             </TabsTrigger>
-            <TabsTrigger value="clima" className="text-[10px] font-mono gap-1">
+            <TabsTrigger value="clima" className="text-[13px] font-mono gap-1">
               <CloudSun className="size-3" /> Clima
             </TabsTrigger>
           </TabsList>
 
-          {/* ── Tavily ── */}
+          {/*  Tavily  */}
           <TabsContent value="tavily" className="mt-0">
             {/* Búsqueda rápida */}
             <div className="mb-3 flex flex-wrap gap-1.5">
@@ -717,7 +717,7 @@ export function IntermarketPanel() {
                     setTavilyQuery(q);
                     handleTavilySearch(q);
                   }}
-                  className="rounded-md border border-border/40 bg-muted/30 px-2 py-1 text-[9px] font-mono text-muted-foreground hover:bg-muted/60 transition-colors"
+                  className="rounded-md border border-border/40 bg-muted/30 px-2 py-1 text-[13px] font-mono text-muted-foreground hover:bg-muted/60 transition-colors"
                 >
                   {q.length > 40 ? q.slice(0, 40) + "…" : q}
                 </button>
@@ -726,7 +726,7 @@ export function IntermarketPanel() {
             {/* Input custom */}
             <div className="flex gap-2 mb-3">
               <input
-                className="flex-1 rounded-md border border-border/40 bg-background px-2.5 py-1.5 text-[10px] font-mono outline-none focus:border-primary/50"
+                className="flex-1 rounded-md border border-border/40 bg-background px-2.5 py-1.5 text-[13px] font-mono outline-none focus:border-primary/50"
                 placeholder="Buscar noticias financieras…"
                 value={tavilyQuery}
                 onChange={(e) => setTavilyQuery(e.target.value)}
@@ -740,21 +740,21 @@ export function IntermarketPanel() {
                 size="sm"
                 disabled={tavilyLoading || !tavilyQuery.trim()}
                 onClick={() => handleTavilySearch(tavilyQuery.trim())}
-                className="text-[10px] font-mono h-8"
+                className="text-[13px] font-mono h-8"
               >
                 {tavilyLoading ? "Buscando…" : "Buscar"}
               </Button>
             </div>
             {/* Error */}
             {tavilyError && (
-              <div className="mb-2 rounded border border-danger/30 bg-danger/10 px-2.5 py-1.5 text-[9px] font-mono text-danger">
+              <div className="mb-2 rounded border border-danger/30 bg-danger/10 px-2.5 py-1.5 text-[13px] font-mono text-danger">
                 {tavilyError}
               </div>
             )}
             {/* Answer */}
             {tavilyAnswer && (
-              <div className="mb-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-[9px] font-mono text-foreground/80 leading-relaxed">
-                <span className="font-semibold text-primary text-[9px]">AI:</span> {tavilyAnswer}
+              <div className="mb-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-[13px] font-mono text-foreground/80 leading-relaxed">
+                <span className="font-semibold text-primary text-[13px]">AI:</span> {tavilyAnswer}
               </div>
             )}
             {/* Results */}
@@ -764,7 +764,7 @@ export function IntermarketPanel() {
                   <Skeleton key={i} className="h-14 w-full rounded-md" />
                 ))
               ) : tavilyResults.length === 0 ? (
-                <p className="text-[9px] text-muted-foreground/50 font-mono italic">
+                <p className="text-[13px] text-muted-foreground/50 font-mono italic">
                   Seleccioná un tema predefinido o escribí una búsqueda personalizada.
                 </p>
               ) : (
@@ -777,14 +777,14 @@ export function IntermarketPanel() {
                     className="block rounded-md border border-border/30 bg-background/60 px-3 py-2 hover:bg-muted/30 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <span className="text-[10px] font-mono font-semibold text-foreground/90 leading-tight">
+                      <span className="text-[13px] font-mono font-semibold text-foreground/90 leading-tight">
                         {r.title}
                       </span>
                       <Badge variant="outline" className="text-[7px] font-mono shrink-0">
                         {r.score?.toFixed(2)}
                       </Badge>
                     </div>
-                    <p className="mt-0.5 text-[8px] text-muted-foreground/60 font-mono line-clamp-2">
+                    <p className="mt-0.5 text-[12px] text-muted-foreground/60 font-mono line-clamp-2">
                       {r.content}
                     </p>
                   </a>
@@ -793,7 +793,7 @@ export function IntermarketPanel() {
             </div>
           </TabsContent>
 
-          {/* ── Clima ── */}
+          {/*  Clima  */}
           <TabsContent value="clima" className="mt-0">
             {earth2Status === null && !earth2Loading && (
               <div className="text-center py-6">
@@ -801,7 +801,7 @@ export function IntermarketPanel() {
                   variant="outline"
                   size="sm"
                   onClick={checkEarth2}
-                  className="text-[10px] font-mono"
+                  className="text-[13px] font-mono"
                 >
                   Conectar con Earth2Studio
                 </Button>
@@ -814,7 +814,7 @@ export function IntermarketPanel() {
               </div>
             )}
             {earth2Error && (
-              <div className="rounded border border-danger/30 bg-danger/10 px-2.5 py-1.5 text-[9px] font-mono text-danger">
+              <div className="rounded border border-danger/30 bg-danger/10 px-2.5 py-1.5 text-[13px] font-mono text-danger">
                 {earth2Error}
               </div>
             )}
@@ -823,11 +823,11 @@ export function IntermarketPanel() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <Badge
                     variant="secondary"
-                    className="text-[8px] font-mono bg-success/20 text-success border-success/30"
+                    className="text-[12px] font-mono bg-success/20 text-success border-success/30"
                   >
                     Earth2 activo
                   </Badge>
-                  <span className="text-[8px] text-muted-foreground font-mono">
+                  <span className="text-[12px] text-muted-foreground font-mono">
                     Modelo: {earth2Forecast.forecast.model} &middot; Pasos:{" "}
                     {earth2Forecast.forecast.total_steps}
                   </span>
@@ -836,10 +836,10 @@ export function IntermarketPanel() {
                 {earth2Forecast.forecast.steps.length > 0 && (
                   <>
                     <div className="rounded-md border border-border/30 bg-background/60 p-3">
-                      <h4 className="mb-2 text-[9px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">
+                      <h4 className="mb-2 text-[13px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">
                         Último paso — variables
                       </h4>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      <div className="grid w-full grid-cols-2 sm:grid-cols-3 gap-2">
                         {Object.entries(
                           earth2Forecast.forecast.steps[earth2Forecast.forecast.steps.length - 1]
                             .data,
@@ -850,10 +850,10 @@ export function IntermarketPanel() {
                               key={key}
                               className="rounded border border-border/20 bg-muted/20 p-2"
                             >
-                              <div className="text-[8px] font-mono text-muted-foreground/60">
+                              <div className="text-[12px] font-mono text-muted-foreground/60">
                                 {key}
                               </div>
-                              <div className="text-[9px] font-mono font-semibold">
+                              <div className="text-[13px] font-mono font-semibold">
                                 {typeof val === "number" ? val.toFixed(2) : String(val)}
                               </div>
                             </div>
@@ -870,7 +870,7 @@ export function IntermarketPanel() {
                       }));
                       return (
                         <div className="h-48">
-                          <p className="mb-1 text-[8px] font-mono text-muted-foreground/60">
+                          <p className="mb-1 text-[12px] font-mono text-muted-foreground/60">
                             {firstVar}
                           </p>
                           <ResponsiveContainer width="100%" height="100%">
@@ -910,13 +910,13 @@ export function IntermarketPanel() {
                 {/* Financial analysis summary */}
                 {earth2Forecast.analysis.summary.length > 0 && (
                   <div className="rounded-md border border-border/30 bg-muted/20 p-3">
-                    <h4 className="mb-1.5 text-[9px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">
+                    <h4 className="mb-1.5 text-[13px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">
                       Análisis financiero climático
                     </h4>
                     {earth2Forecast.analysis.summary.map((line, i) => (
                       <p
                         key={i}
-                        className="text-[8px] font-mono text-foreground/70 leading-relaxed"
+                        className="text-[12px] font-mono text-foreground/70 leading-relaxed"
                       >
                         {line}
                       </p>

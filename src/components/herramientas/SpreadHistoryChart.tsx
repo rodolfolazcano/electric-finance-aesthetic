@@ -31,7 +31,7 @@ export function SpreadHistoryChart({ history }: { history: SpreadHistoryPoint[] 
 
   return (
     <div>
-      <div className="mono mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="mono mb-2 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
         Histórico de Spreads (2h)
       </div>
       <div className="h-48">

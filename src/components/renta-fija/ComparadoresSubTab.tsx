@@ -268,9 +268,9 @@ function ComparadorRenderer({
   }
 }
 
-// ════════════════════════════════════════════════════════════
+// 
 // COMPARADOR A — Hard Dollar vs UST10Y
-// ════════════════════════════════════════════════════════════
+// 
 
 function ComparadorAView({
   data,
@@ -482,9 +482,9 @@ function ComparadorAView({
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR B — PF vs LECAP vs Inflación
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 function ComparadorBView({ data }: { data: ComparadorResultado["data"] }) {
   const d = data as any;
@@ -609,9 +609,9 @@ function ComparadorBView({ data }: { data: ComparadorResultado["data"] }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR C — Bono CER vs Inflación (retorno real)
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 function ComparadorCView({ data }: { data: ComparadorResultado["data"] }) {
   const d = data as any;
@@ -776,9 +776,9 @@ function ComparadorCView({ data }: { data: ComparadorResultado["data"] }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR D — Breakeven CER vs Tasa Fija
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 function ComparadorDView({ data }: { data: ComparadorResultado["data"] }) {
   const d = data as any;
@@ -849,9 +849,9 @@ function ComparadorDView({ data }: { data: ComparadorResultado["data"] }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR E — Dollar-Linked vs Hard Dollar vs CER
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 function ComparadorEView({ data }: { data: ComparadorResultado["data"] }) {
   const d = data as any;
@@ -904,9 +904,9 @@ function ComparadorEView({ data }: { data: ComparadorResultado["data"] }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR F — FCI vs Instrumento Directo
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 function ComparadorFView({ data }: { data: ComparadorResultado["data"] }) {
   const d = data as any;
@@ -989,9 +989,9 @@ function ComparadorFView({ data }: { data: ComparadorResultado["data"] }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// 
 // COMPARADOR G — BADLAR/TAMAR vs Tasa Fija
-// ═══════════════════════════════════════════════════════════════════════
+// 
 
 function ComparadorGView({ data }: { data: ComparadorResultado["data"] }) {
   const d = data as any;

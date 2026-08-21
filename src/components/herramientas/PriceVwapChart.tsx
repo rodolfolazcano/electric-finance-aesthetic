@@ -36,7 +36,7 @@ export function PriceVwapChart({
 
   return (
     <div>
-      <div className="mono mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="mono mb-2 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
         Precio + VWAP
       </div>
       <div className="h-[300px]">

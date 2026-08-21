@@ -65,7 +65,7 @@ export function PortfolioDraftPanel({
     [allTickers],
   );
 
-  // ── Computed values ──
+  //  Computed values 
   const computed = useMemo(() => {
     const totalValorARS = assets
       .filter((a) => a.moneda === "ARS" && a.ultimoPrecio != null)
@@ -121,7 +121,7 @@ export function PortfolioDraftPanel({
     };
   }, [assets]);
 
-  // ── Sector grouping ──
+  //  Sector grouping 
   const sectorGroups = useMemo(() => {
     const map = new Map<string, DraftAsset[]>();
     for (const a of assets) {
@@ -148,7 +148,7 @@ export function PortfolioDraftPanel({
       });
   }, [assets, computed.totalValor]);
 
-  // ── Industry grouping ──
+  //  Industry grouping 
   const industryGroups = useMemo(() => {
     const map = new Map<string, DraftAsset[]>();
     for (const a of assets) {
@@ -190,10 +190,10 @@ export function PortfolioDraftPanel({
 
   return (
     <div className="glass p-4 space-y-4">
-      {/* ── KPI cards ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      {/*  KPI cards  */}
+      <div className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <div className="rounded border border-border/40 bg-background/40 p-3">
-          <p className="mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="mono text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
             Retorno esp.
           </p>
           <p
@@ -203,21 +203,21 @@ export function PortfolioDraftPanel({
           </p>
         </div>
         <div className="rounded border border-border/40 bg-background/40 p-3">
-          <p className="mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="mono text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
             Volatilidad
           </p>
           <p className="mt-1 font-mono text-sm font-bold text-foreground">
             {computed.portVol != null ? `${(computed.portVol * 100).toFixed(1)}%` : "\u2014"}
             {assets.filter((a) => a.dailyLogReturns.length >= 20).length < 2 &&
               assets.length >= 1 && (
-                <span className="ml-1 text-[8px] text-muted-foreground font-normal">
+                <span className="ml-1 text-[12px] text-muted-foreground font-normal">
                   (individual)
                 </span>
               )}
           </p>
         </div>
         <div className="rounded border border-border/40 bg-background/40 p-3">
-          <p className="mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="mono text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
             Sharpe
           </p>
           <p
@@ -227,7 +227,7 @@ export function PortfolioDraftPanel({
           </p>
         </div>
         <div className="rounded border border-border/40 bg-background/40 p-3">
-          <p className="mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="mono text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
             Valor USD
           </p>
           <p className="mt-1 font-mono text-sm font-bold text-foreground">
@@ -235,7 +235,7 @@ export function PortfolioDraftPanel({
           </p>
         </div>
         <div className="rounded border border-border/40 bg-background/40 p-3">
-          <p className="mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="mono text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
             Valor ARS
           </p>
           <p className="mt-1 font-mono text-sm font-bold text-foreground">
@@ -244,24 +244,24 @@ export function PortfolioDraftPanel({
         </div>
       </div>
 
-      {/* ── Tabs ── */}
+      {/*  Tabs  */}
       <div className="flex gap-1.5 border-b border-border/40 pb-2">
         {(["composicion", "sector", "industria"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`font-mono text-[10px] px-2.5 py-1 rounded-md border transition-colors ${tab === t ? "border-primary/60 bg-primary/10 text-foreground" : "border-border/60 text-muted-foreground hover:text-foreground"}`}
+            className={`font-mono text-[13px] px-2.5 py-1 rounded-md border transition-colors ${tab === t ? "border-primary/60 bg-primary/10 text-foreground" : "border-border/60 text-muted-foreground hover:text-foreground"}`}
           >
             {t === "composicion" ? "Composición" : t === "sector" ? "Por Sector" : "Por Industria"}
           </button>
         ))}
       </div>
 
-      {/* ── Tab content: Composición ── */}
+      {/*  Tab content: Composición  */}
       {tab === "composicion" && (
         <div className="overflow-x-auto rounded border border-border/40">
-          <table className="w-full text-left font-mono text-[11px]">
-            <thead className="text-[9px] uppercase tracking-wider text-muted-foreground border-b border-border/40 bg-background/40">
+          <table className="w-full text-left font-mono text-[14px]">
+            <thead className="text-[13px] uppercase tracking-wider text-muted-foreground border-b border-border/40 bg-background/40">
               <tr>
                 <th className="px-2 py-1.5">Ticker</th>
                 <th className="px-2 py-1.5 text-center w-12">Mon</th>
@@ -292,12 +292,12 @@ export function PortfolioDraftPanel({
                       )}
                       {a.fetchStatus === "error" && (
                         <span
-                          className="ml-1 text-[8px] text-red-400"
+                          className="ml-1 text-[12px] text-red-400"
                           title={a.fetchError ?? ""}
                         ></span>
                       )}
                     </td>
-                    <td className="px-2 py-1 text-center text-[9px] text-muted-foreground">
+                    <td className="px-2 py-1 text-center text-[13px] text-muted-foreground">
                       {a.moneda}
                     </td>
                     <td className="px-2 py-1 text-right">
@@ -309,7 +309,7 @@ export function PortfolioDraftPanel({
                         onChange={(e) =>
                           onUpdateCantidad(a.symbol, Math.max(0, parseInt(e.target.value) || 0))
                         }
-                        className="w-16 text-right bg-transparent border-b border-border/30 text-[10px] font-mono text-foreground outline-none focus:border-primary/60"
+                        className="w-16 text-right bg-transparent border-b border-border/30 text-[13px] font-mono text-foreground outline-none focus:border-primary/60"
                       />
                     </td>
                     <td className="px-2 py-1 text-right text-muted-foreground">
@@ -333,18 +333,18 @@ export function PortfolioDraftPanel({
                     <td className="px-2 py-1 text-right text-muted-foreground">
                       {a.beta != null ? f(a.beta, 2) : "\u2014"}
                     </td>
-                    <td className="px-2 py-1 text-[9px] text-muted-foreground">
+                    <td className="px-2 py-1 text-[13px] text-muted-foreground">
                       {a.sector ?? "\u2014"}
                     </td>
-                    <td className="px-2 py-1 text-[9px] text-muted-foreground">
+                    <td className="px-2 py-1 text-[13px] text-muted-foreground">
                       {a.industry ?? "\u2014"}
                     </td>
                     <td className="px-2 py-1 text-center">
                       <button
                         onClick={() => onRemove(a.symbol)}
-                        className="text-[9px] text-red-400 hover:text-red-300"
+                        className="text-[13px] text-red-400 hover:text-red-300"
                       >
-                        🗑
+                        
                       </button>
                     </td>
                   </tr>
@@ -354,20 +354,20 @@ export function PortfolioDraftPanel({
             {computed.totalValor > 0 && (
               <tfoot className="border-t border-border/40 bg-muted/10">
                 <tr>
-                  <td colSpan={2} className="px-2 py-1.5 text-[10px] font-bold text-foreground">
+                  <td colSpan={2} className="px-2 py-1.5 text-[13px] font-bold text-foreground">
                     TOTAL
                   </td>
-                  <td className="px-2 py-1.5 text-right text-[10px] font-bold">{computed.n}</td>
+                  <td className="px-2 py-1.5 text-right text-[13px] font-bold">{computed.n}</td>
                   <td className="px-2 py-1.5"></td>
-                  <td className="px-2 py-1.5 text-right text-[10px] font-bold text-foreground">
+                  <td className="px-2 py-1.5 text-right text-[13px] font-bold text-foreground">
                     100%
                   </td>
                   <td
-                    className={`px-2 py-1.5 text-right text-[10px] font-bold ${computed.portRet != null && computed.portRet >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                    className={`px-2 py-1.5 text-right text-[13px] font-bold ${computed.portRet != null && computed.portRet >= 0 ? "text-emerald-400" : "text-red-400"}`}
                   >
                     {fmtPct(computed.portRet, 1)}
                   </td>
-                  <td className="px-2 py-1.5 text-right text-[10px] font-bold">
+                  <td className="px-2 py-1.5 text-right text-[13px] font-bold">
                     {computed.portVol != null
                       ? `${(computed.portVol * 100).toFixed(1)}%`
                       : "\u2014"}
@@ -380,11 +380,11 @@ export function PortfolioDraftPanel({
         </div>
       )}
 
-      {/* ── Tab content: Por Sector ── */}
+      {/*  Tab content: Por Sector  */}
       {tab === "sector" && (
         <div className="overflow-x-auto rounded border border-border/40">
-          <table className="w-full text-left font-mono text-[11px]">
-            <thead className="text-[9px] uppercase tracking-wider text-muted-foreground border-b border-border/40 bg-background/40">
+          <table className="w-full text-left font-mono text-[14px]">
+            <thead className="text-[13px] uppercase tracking-wider text-muted-foreground border-b border-border/40 bg-background/40">
               <tr>
                 <th className="px-2 py-1.5">Sector</th>
                 <th className="px-2 py-1.5 text-right">Peso Total</th>
@@ -396,17 +396,17 @@ export function PortfolioDraftPanel({
             <tbody>
               {sectorGroups.map((sg) => (
                 <tr key={sg.sector} className="border-b border-border/20 hover:bg-muted/10">
-                  <td className="px-2 py-1.5 text-[10px] font-semibold text-foreground">
+                  <td className="px-2 py-1.5 text-[13px] font-semibold text-foreground">
                     {sg.sector}
                   </td>
-                  <td className="px-2 py-1.5 text-right text-[10px] font-semibold">
+                  <td className="px-2 py-1.5 text-right text-[13px] font-semibold">
                     {(sg.totalWeight * 100).toFixed(1)}%
                   </td>
-                  <td className="px-2 py-1.5 text-right text-[10px] text-emerald-400">
+                  <td className="px-2 py-1.5 text-right text-[13px] text-emerald-400">
                     {fmtPct(sg.avgRet, 1)}
                   </td>
-                  <td className="px-2 py-1.5 text-right text-[10px]">{sg.items.length}</td>
-                  <td className="px-2 py-1.5 text-[9px] text-muted-foreground">
+                  <td className="px-2 py-1.5 text-right text-[13px]">{sg.items.length}</td>
+                  <td className="px-2 py-1.5 text-[13px] text-muted-foreground">
                     {sg.items.map((i) => i.symbol).join(", ")}
                   </td>
                 </tr>
@@ -416,11 +416,11 @@ export function PortfolioDraftPanel({
         </div>
       )}
 
-      {/* ── Tab content: Por Industria ── */}
+      {/*  Tab content: Por Industria  */}
       {tab === "industria" && (
         <div className="overflow-x-auto rounded border border-border/40">
-          <table className="w-full text-left font-mono text-[11px]">
-            <thead className="text-[9px] uppercase tracking-wider text-muted-foreground border-b border-border/40 bg-background/40">
+          <table className="w-full text-left font-mono text-[14px]">
+            <thead className="text-[13px] uppercase tracking-wider text-muted-foreground border-b border-border/40 bg-background/40">
               <tr>
                 <th className="px-2 py-1.5">Sector</th>
                 <th className="px-2 py-1.5">Industria</th>
@@ -436,18 +436,18 @@ export function PortfolioDraftPanel({
                   key={`${ig.sector}::${ig.industry}`}
                   className="border-b border-border/20 hover:bg-muted/10"
                 >
-                  <td className="px-2 py-1.5 text-[9px] text-muted-foreground">{ig.sector}</td>
-                  <td className="px-2 py-1.5 text-[10px] font-semibold text-foreground">
+                  <td className="px-2 py-1.5 text-[13px] text-muted-foreground">{ig.sector}</td>
+                  <td className="px-2 py-1.5 text-[13px] font-semibold text-foreground">
                     {ig.industry}
                   </td>
-                  <td className="px-2 py-1.5 text-right text-[10px] font-semibold">
+                  <td className="px-2 py-1.5 text-right text-[13px] font-semibold">
                     {(ig.totalWeight * 100).toFixed(1)}%
                   </td>
-                  <td className="px-2 py-1.5 text-right text-[10px] text-emerald-400">
+                  <td className="px-2 py-1.5 text-right text-[13px] text-emerald-400">
                     {fmtPct(ig.avgRet, 1)}
                   </td>
-                  <td className="px-2 py-1.5 text-right text-[10px]">{ig.items.length}</td>
-                  <td className="px-2 py-1.5 text-[9px] text-muted-foreground">
+                  <td className="px-2 py-1.5 text-right text-[13px]">{ig.items.length}</td>
+                  <td className="px-2 py-1.5 text-[13px] text-muted-foreground">
                     {ig.items.map((i) => i.symbol).join(", ")}
                   </td>
                 </tr>
@@ -457,23 +457,23 @@ export function PortfolioDraftPanel({
         </div>
       )}
 
-      {/* ── Suggestion panel ── */}
+      {/*  Suggestion panel  */}
       <details
         open={suggestOpen}
         onToggle={(e) => setSuggestOpen((e.target as HTMLDetailsElement).open)}
         className="rounded border border-border/40 bg-background/40/60"
       >
-        <summary className="px-3 py-2 text-[10px] font-mono text-muted-foreground cursor-pointer hover:text-foreground select-none">
+        <summary className="px-3 py-2 text-[13px] font-mono text-muted-foreground cursor-pointer hover:text-foreground select-none">
           Sugerir activos por sector/industria
         </summary>
         <div className="px-3 pb-3 space-y-1 max-h-64 overflow-y-auto">
           <div className="flex gap-2 items-center mb-2">
-            <span className="text-[9px] text-muted-foreground">Moneda:</span>
+            <span className="text-[13px] text-muted-foreground">Moneda:</span>
             {(["USD", "ARS"] as const).map((c) => (
               <button
                 key={c}
                 onClick={() => setSuggestCurrency(c)}
-                className={`text-[9px] px-2 py-0.5 rounded border ${suggestCurrency === c ? "border-primary/60 bg-primary/10 text-primary" : "border-border/40 text-muted-foreground"}`}
+                className={`text-[13px] px-2 py-0.5 rounded border ${suggestCurrency === c ? "border-primary/60 bg-primary/10 text-primary" : "border-border/40 text-muted-foreground"}`}
               >
                 {c}
               </button>
@@ -490,9 +490,9 @@ export function PortfolioDraftPanel({
               <div key={sector}>
                 <button
                   onClick={() => toggleSector(sector)}
-                  className="w-full text-left text-[10px] font-mono text-foreground hover:text-primary py-1 px-1 rounded hover:bg-muted/10"
+                  className="w-full text-left text-[13px] font-mono text-foreground hover:text-primary py-1 px-1 rounded hover:bg-muted/10"
                 >
-                  {isOpen ? "▾" : "▸"} {sector} ({tickersInSector.length})
+                  {isOpen ? "" : ""} {sector} ({tickersInSector.length})
                 </button>
                 {isOpen && (
                   <div className="ml-3 space-y-1">
@@ -500,7 +500,7 @@ export function PortfolioDraftPanel({
                       const tks = tickersInSector.filter((t) => t.industria === ind);
                       return (
                         <div key={ind} className="border-l border-border/20 pl-2">
-                          <p className="text-[8px] text-muted-foreground uppercase tracking-wider mt-1">
+                          <p className="text-[12px] text-muted-foreground uppercase tracking-wider mt-1">
                             {ind}
                           </p>
                           <div className="flex flex-wrap gap-1 mt-0.5">
@@ -508,7 +508,7 @@ export function PortfolioDraftPanel({
                               <button
                                 key={t.ticker}
                                 onClick={() => onAddTicker(t.ticker, suggestCurrency)}
-                                className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-border/30 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                                className="text-[13px] font-mono px-1.5 py-0.5 rounded border border-border/30 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
                                 title={t.nombre}
                               >
                                 {t.ticker}

@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import { ChatWidget } from "@/components/ChatWidget";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { IOLProvider } from "@/lib/iol-context";
 
 function NotFoundComponent() {
   return (
@@ -121,9 +122,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <ChatWidget />
+      <IOLProvider>
+        <Outlet />
+        <ChatWidget />
+      </IOLProvider>
     </QueryClientProvider>
   );
 }

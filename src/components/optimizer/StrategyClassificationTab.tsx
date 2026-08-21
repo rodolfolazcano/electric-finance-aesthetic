@@ -353,29 +353,29 @@ export function StrategyClassificationTab() {
     <div className="space-y-4">
       <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
         <div className="text-sm font-medium mb-2">Clasificación de Estrategias</div>
-        <p className="text-[10px] text-muted-foreground mb-3">
+        <p className="text-[13px] text-muted-foreground mb-3">
           Mapea correlaciones, R², betas y alphas históricos. Filtra cuáles son óptimos para lograr
           betas y alphas objetivo respecto de un benchmark.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Universe selection */}
         <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
           <div className="flex items-center justify-between mb-2">
-            <div className="mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <div className="mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Universo ({selectedTickers.size})
             </div>
             <div className="flex gap-1">
               <button
                 onClick={selectAll}
-                className="text-[9px] text-primary hover:text-primary/80 px-1"
+                className="text-[13px] text-primary hover:text-primary/80 px-1"
               >
                 Todo
               </button>
               <button
                 onClick={clearAll}
-                className="text-[9px] text-muted-foreground hover:text-foreground px-1"
+                className="text-[13px] text-muted-foreground hover:text-foreground px-1"
               >
                 Ninguno
               </button>
@@ -391,7 +391,7 @@ export function StrategyClassificationTab() {
             />
             <label
               htmlFor="includeBCBA"
-              className="font-mono text-[9px] text-muted-foreground cursor-pointer"
+              className="font-mono text-[13px] text-muted-foreground cursor-pointer"
             >
               Incluir BCBA/CEDEAR
             </label>
@@ -400,7 +400,7 @@ export function StrategyClassificationTab() {
             {effectiveUniverse.map((t) => (
               <label
                 key={t}
-                className="flex items-center gap-1.5 font-mono text-[10px] cursor-pointer hover:bg-muted/10 rounded px-1"
+                className="flex items-center gap-1.5 font-mono text-[13px] cursor-pointer hover:bg-muted/10 rounded px-1"
               >
                 <input
                   type="checkbox"
@@ -417,13 +417,13 @@ export function StrategyClassificationTab() {
         {/* Benchmark & params */}
         <div className="rounded-lg border border-border/60 bg-muted/20 p-3 space-y-3">
           <div>
-            <label className="mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Benchmark de referencia
             </label>
             <select
               value={benchmark}
               onChange={(e) => setBenchmark(e.target.value)}
-              className="mt-1 w-full rounded border border-border/60 bg-input px-2 py-1.5 text-[11px] font-mono"
+              className="mt-1 w-full rounded border border-border/60 bg-input px-2 py-1.5 text-[14px] font-mono"
             >
               <option value="AUTO"> Auto-detectar (mejor R² promedio)</option>
               {BENCHMARKS_CLASIFICACION.map((b) => (
@@ -434,7 +434,7 @@ export function StrategyClassificationTab() {
             </select>
           </div>
           <div>
-            <label className="mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <label className="mono text-[13px] uppercase tracking-wider text-muted-foreground">
               Ventana rolling β (días)
             </label>
             <input
@@ -443,7 +443,7 @@ export function StrategyClassificationTab() {
               onChange={(e) =>
                 setRollingWindow(Math.max(30, Math.min(252, parseInt(e.target.value) || 60)))
               }
-              className="mt-1 w-full rounded border border-border/60 bg-input px-2 py-1.5 text-[11px] font-mono"
+              className="mt-1 w-full rounded border border-border/60 bg-input px-2 py-1.5 text-[14px] font-mono"
             />
           </div>
           <button
@@ -457,57 +457,57 @@ export function StrategyClassificationTab() {
 
         {/* Target filters */}
         <div className="rounded-lg border border-border/60 bg-muted/20 p-3 space-y-3">
-          <div className="mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <div className="mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Filtros objetivo
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid w-full grid-cols-2 gap-2">
             <div>
-              <label className="text-[9px] text-muted-foreground">β min</label>
+              <label className="text-[13px] text-muted-foreground">β min</label>
               <input
                 type="number"
                 step="0.1"
                 value={targetBetaMin}
                 onChange={(e) => setTargetBetaMin(parseFloat(e.target.value) || 0)}
-                className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[10px] font-mono"
+                className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[13px] font-mono"
               />
             </div>
             <div>
-              <label className="text-[9px] text-muted-foreground">β max</label>
+              <label className="text-[13px] text-muted-foreground">β max</label>
               <input
                 type="number"
                 step="0.1"
                 value={targetBetaMax}
                 onChange={(e) => setTargetBetaMax(parseFloat(e.target.value) || 2)}
-                className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[10px] font-mono"
+                className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[13px] font-mono"
               />
             </div>
             <div>
-              <label className="text-[9px] text-muted-foreground">α min %</label>
+              <label className="text-[13px] text-muted-foreground">α min %</label>
               <input
                 type="number"
                 step="0.01"
                 value={targetAlphaMin * 100}
                 onChange={(e) => setTargetAlphaMin((parseFloat(e.target.value) || 0) / 100)}
-                className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[10px] font-mono"
+                className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[13px] font-mono"
               />
             </div>
             <div>
-              <label className="text-[9px] text-muted-foreground">α max %</label>
+              <label className="text-[13px] text-muted-foreground">α max %</label>
               <input
                 type="number"
                 step="0.01"
                 value={targetAlphaMax * 100}
                 onChange={(e) => setTargetAlphaMax((parseFloat(e.target.value) || 50) / 100)}
-                className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[10px] font-mono"
+                className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[13px] font-mono"
               />
             </div>
           </div>
           <div>
-            <label className="text-[9px] text-muted-foreground">Estrategia</label>
+            <label className="text-[13px] text-muted-foreground">Estrategia</label>
             <select
               value={strategyFilter}
               onChange={(e) => setStrategyFilter(e.target.value)}
-              className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[10px] font-mono"
+              className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[13px] font-mono"
             >
               <option value="todas">Todas</option>
               <option value="index-tracker">Index Tracker</option>
@@ -518,20 +518,20 @@ export function StrategyClassificationTab() {
             </select>
           </div>
           <div>
-            <label className="text-[9px] text-muted-foreground">Buscar ticker</label>
+            <label className="text-[13px] text-muted-foreground">Buscar ticker</label>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="AAPL, MSFT..."
-              className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[10px] font-mono"
+              className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[13px] font-mono"
             />
           </div>
         </div>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-[11px] text-danger">
+        <div className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-[14px] text-danger">
           {error}
         </div>
       )}
@@ -541,13 +541,13 @@ export function StrategyClassificationTab() {
         <div className="space-y-4">
           {/* Scatter plot */}
           <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-            <div className="mono text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+            <div className="mono text-[13px] uppercase tracking-wider text-muted-foreground mb-2">
               β vs α Anualizado · {result.benchmark} · {result.assets.length} activos
             </div>
             <div className="flex justify-center">
               <ScatterChart assets={filtered} />
             </div>
-            <div className="flex flex-wrap gap-3 mt-2 text-[9px] text-muted-foreground justify-center">
+            <div className="flex flex-wrap gap-3 mt-2 text-[13px] text-muted-foreground justify-center">
               <span>
                 <span className="inline-block h-2 w-2 rounded-full bg-[#10b981] mr-1" />
                 Index Tracker
@@ -576,7 +576,7 @@ export function StrategyClassificationTab() {
           </div>
 
           {/* Best for each target */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {targetOptions.map((target) => {
               const best = findBestForTarget(target);
               const targetName: Record<string, string> = {
@@ -587,16 +587,16 @@ export function StrategyClassificationTab() {
               };
               return (
                 <div key={target} className="rounded-lg border border-border/60 bg-muted/20 p-2">
-                  <div className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground mb-1">
+                  <div className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
                     {targetName[target]}
                   </div>
                   {best.length === 0 ? (
-                    <div className="text-[9px] text-muted-foreground">Sin activos</div>
+                    <div className="text-[13px] text-muted-foreground">Sin activos</div>
                   ) : (
                     best.map((a) => (
                       <div
                         key={a.ticker}
-                        className="flex items-center justify-between text-[10px] font-mono py-0.5"
+                        className="flex items-center justify-between text-[13px] font-mono py-0.5"
                       >
                         <span className="font-medium">{a.ticker}</span>
                         <span className="text-muted-foreground">
@@ -612,12 +612,12 @@ export function StrategyClassificationTab() {
 
           {/* Results table */}
           <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-            <div className="mono text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+            <div className="mono text-[13px] uppercase tracking-wider text-muted-foreground mb-2">
               Activos clasificados ({filtered.length} de {result.assets.length})
             </div>
-            <div className="overflow-x-auto">
-              <table className="mono w-full text-[10px]">
-                <thead className="text-[9px] uppercase tracking-wider text-muted-foreground">
+            <div className="overflow-x-auto w-full">
+              <table className="mono w-full text-[13px]">
+                <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
                   <tr className="border-b border-border/60">
                     <th className="px-1.5 py-1.5 text-left">Ticker</th>
                     <th className="px-1.5 py-1.5 text-right">β</th>
@@ -649,7 +649,7 @@ export function StrategyClassificationTab() {
                       <td className="px-1.5 py-1.5 text-center">
                         {a.classificationConfidence && (
                           <span
-                            className={`inline-block rounded border px-1 py-0.5 text-[8px] ${badgeConfidence(a.classificationConfidence)}`}
+                            className={`inline-block rounded border px-1 py-0.5 text-[12px] ${badgeConfidence(a.classificationConfidence)}`}
                           >
                             {a.classificationConfidence}
                           </span>
@@ -657,7 +657,7 @@ export function StrategyClassificationTab() {
                       </td>
                       <td className="px-1.5 py-1.5 text-center">
                         <span
-                          className={`inline-block rounded border px-1 py-0.5 text-[8px] ${badgeStrategy(a.strategy)}`}
+                          className={`inline-block rounded border px-1 py-0.5 text-[12px] ${badgeStrategy(a.strategy)}`}
                         >
                           {a.strategyLabel}
                         </span>
@@ -671,7 +671,7 @@ export function StrategyClassificationTab() {
 
           {/* Build Portfolio from selection */}
           <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-            <div className="mono text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+            <div className="mono text-[13px] uppercase tracking-wider text-muted-foreground mb-2">
               Construir Portafolio
             </div>
             <PortfolioBuilder assets={filtered} benchmark={result.benchmark} />
@@ -783,7 +783,7 @@ function PortfolioBuilder({ assets, benchmark }: { assets: StrategyAsset[]; benc
         {["index-tracker", "long-only", "smart-beta", "hedge-fund", "uncorrelated"].map((s) => (
           <label
             key={s}
-            className="flex items-center gap-1.5 font-mono text-[10px] cursor-pointer hover:bg-muted/10 rounded px-1 py-0.5"
+            className="flex items-center gap-1.5 font-mono text-[13px] cursor-pointer hover:bg-muted/10 rounded px-1 py-0.5"
           >
             <input
               type="checkbox"
@@ -795,9 +795,9 @@ function PortfolioBuilder({ assets, benchmark }: { assets: StrategyAsset[]; benc
           </label>
         ))}
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
         <div>
-          <label className="text-[9px] text-muted-foreground">N° activos</label>
+          <label className="text-[13px] text-muted-foreground">N° activos</label>
           <input
             type="number"
             min={1}
@@ -807,18 +807,18 @@ function PortfolioBuilder({ assets, benchmark }: { assets: StrategyAsset[]; benc
               setNumAssets(Math.max(1, Math.min(30, parseInt(e.target.value) || 5)));
               setPortfolio(null);
             }}
-            className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[10px] font-mono"
+            className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[13px] font-mono"
           />
         </div>
         <div>
-          <label className="text-[9px] text-muted-foreground">Optimizar</label>
+          <label className="text-[13px] text-muted-foreground">Optimizar</label>
           <select
             value={optimizeTarget}
             onChange={(e) => {
               setOptimizeTarget(e.target.value as any);
               setPortfolio(null);
             }}
-            className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[10px] font-mono"
+            className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[13px] font-mono"
           >
             <option value="sharpe">Score</option>
             <option value="alpha">Alpha</option>
@@ -827,7 +827,7 @@ function PortfolioBuilder({ assets, benchmark }: { assets: StrategyAsset[]; benc
         </div>
         {optimizeTarget === "beta" && (
           <div>
-            <label className="text-[9px] text-muted-foreground">β objetivo</label>
+            <label className="text-[13px] text-muted-foreground">β objetivo</label>
             <input
               type="number"
               step={0.1}
@@ -838,14 +838,14 @@ function PortfolioBuilder({ assets, benchmark }: { assets: StrategyAsset[]; benc
                 setTargetBeta(parseFloat(e.target.value) || 1);
                 setPortfolio(null);
               }}
-              className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[10px] font-mono"
+              className="w-full rounded border border-border/60 bg-input px-1.5 py-1 text-[13px] font-mono"
             />
           </div>
         )}
         <div className="flex items-end">
           <button
             onClick={buildPortfolio}
-            className="w-full rounded bg-primary px-2 py-1 text-[10px] font-mono font-medium text-primary-foreground hover:opacity-90"
+            className="w-full rounded bg-primary px-2 py-1 text-[13px] font-mono font-medium text-primary-foreground hover:opacity-90"
           >
             Construir Portafolio
           </button>
@@ -853,7 +853,7 @@ function PortfolioBuilder({ assets, benchmark }: { assets: StrategyAsset[]; benc
         <div className="flex items-end">
           <button
             onClick={() => setShowBenchmark(!showBenchmark)}
-            className="w-full rounded border border-border/60 bg-muted/10 px-2 py-1 text-[10px] font-mono text-muted-foreground hover:text-foreground"
+            className="w-full rounded border border-border/60 bg-muted/10 px-2 py-1 text-[13px] font-mono text-muted-foreground hover:text-foreground"
           >
             {showBenchmark ? "Ocultar" : "Ver"} Benchmark: {bmkForTV}
           </button>
@@ -864,7 +864,7 @@ function PortfolioBuilder({ assets, benchmark }: { assets: StrategyAsset[]; benc
         <div className="rounded-lg overflow-hidden border border-border/40">
           <Suspense
             fallback={
-              <div className="flex h-[360px] w-full items-center justify-center text-[11px] text-muted-foreground">
+              <div className="flex h-[360px] w-full items-center justify-center text-[14px] text-muted-foreground">
                 Cargando gráfico…
               </div>
             }
@@ -876,46 +876,46 @@ function PortfolioBuilder({ assets, benchmark }: { assets: StrategyAsset[]; benc
 
       {portfolio && (
         <div className="space-y-2 border-t border-border/30 pt-2">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          <div className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
             <div className="rounded-lg border border-border/30 bg-muted/10 p-3 text-center">
-              <div className="text-[10px] text-muted-foreground">Beta</div>
+              <div className="text-[13px] text-muted-foreground">Beta</div>
               <div className="font-mono text-base font-semibold">{portfolio.beta.toFixed(2)}</div>
-              <div className="text-[8px] text-muted-foreground mt-0.5">Riesgo sistemático</div>
+              <div className="text-[12px] text-muted-foreground mt-0.5">Riesgo sistemático</div>
             </div>
             <div className="rounded-lg border border-border/30 bg-muted/10 p-3 text-center">
-              <div className="text-[10px] text-muted-foreground">Alpha anual</div>
+              <div className="text-[13px] text-muted-foreground">Alpha anual</div>
               <div
                 className={`font-mono text-base font-semibold ${portfolio.alpha >= 0 ? "text-green-400" : "text-red-400"}`}
               >
                 {fmtPct(portfolio.alpha)}
               </div>
-              <div className="text-[8px] text-muted-foreground mt-0.5">Retorno exceso</div>
+              <div className="text-[12px] text-muted-foreground mt-0.5">Retorno exceso</div>
             </div>
             <div className="rounded-lg border border-border/30 bg-muted/10 p-3 text-center">
-              <div className="text-[10px] text-muted-foreground">R² Portafolio</div>
+              <div className="text-[13px] text-muted-foreground">R² Portafolio</div>
               <div className="font-mono text-base font-semibold">
                 {portfolio.rSquared.toFixed(3)}
               </div>
-              <div className="text-[8px] text-muted-foreground mt-0.5">vs {benchmark}</div>
+              <div className="text-[12px] text-muted-foreground mt-0.5">vs {benchmark}</div>
             </div>
             <div className="rounded-lg border border-border/30 bg-muted/10 p-3 text-center">
-              <div className="text-[10px] text-muted-foreground">Score de Selecci�n</div>
+              <div className="text-[13px] text-muted-foreground">Score de Seleccin</div>
               <div
                 className={`font-mono text-base font-semibold ${portfolio.sharpe >= 1 ? "text-green-400" : portfolio.sharpe < 0 ? "text-red-400" : ""}`}
               >
                 {portfolio.sharpe.toFixed(2)}
               </div>
-              <div className="text-[8px] text-muted-foreground mt-0.5">Heur�stico α/β</div>
+              <div className="text-[12px] text-muted-foreground mt-0.5">Heurstico α/β</div>
             </div>
             <div className="rounded-lg border border-border/30 bg-muted/10 p-3 text-center">
-              <div className="text-[10px] text-muted-foreground">Activos</div>
+              <div className="text-[13px] text-muted-foreground">Activos</div>
               <div className="font-mono text-base font-semibold">{portfolio.tickers.length}</div>
-              <div className="text-[8px] text-muted-foreground mt-0.5">En portafolio</div>
+              <div className="text-[12px] text-muted-foreground mt-0.5">En portafolio</div>
             </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="mono w-full text-[10px]">
-              <thead className="text-[9px] uppercase tracking-wider text-muted-foreground">
+          <div className="overflow-x-auto w-full">
+            <table className="mono w-full text-[13px]">
+              <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
                 <tr className="border-b border-border/40">
                   <th className="px-1.5 py-1 text-left">Ticker</th>
                   <th className="px-1.5 py-1 text-right">Peso</th>
@@ -944,7 +944,7 @@ function PortfolioBuilder({ assets, benchmark }: { assets: StrategyAsset[]; benc
                       <td className="px-1.5 py-1 text-center">
                         {a && (
                           <span
-                            className={`inline-block rounded border px-1 py-0.5 text-[8px] ${badgeStrategy(a.strategy)}`}
+                            className={`inline-block rounded border px-1 py-0.5 text-[12px] ${badgeStrategy(a.strategy)}`}
                           >
                             {a.strategyLabel}
                           </span>

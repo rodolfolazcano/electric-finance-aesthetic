@@ -98,14 +98,14 @@ export function ClimateForecastPanel() {
     <Card className="w-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center justify-between">
-          <span>🌦️ Earth2Studio — Pronóstico Climático Determinista</span>
+          <span> Earth2Studio — Pronóstico Climático Determinista</span>
           <div className="flex gap-1">
             {status && (
               <Badge
                 variant={status.earth2_available ? "default" : "secondary"}
-                className="text-[10px]"
+                className="text-[13px]"
               >
-                {status.earth2_available ? "CUDA ✅" : "Simulado 📡"}
+                {status.earth2_available ? "CUDA [OK]" : "Simulado "}
               </Badge>
             )}
             <Button
@@ -132,9 +132,9 @@ export function ClimateForecastPanel() {
         ) : (
           <div className="space-y-3">
             {/* Controls */}
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4">
               <div>
-                <label className="text-[10px] text-muted-foreground">Modelo</label>
+                <label className="text-[13px] text-muted-foreground">Modelo</label>
                 <Select value={selectedModel} onValueChange={setSelectedModel}>
                   <SelectTrigger className="h-7 text-xs">
                     <SelectValue />
@@ -149,7 +149,7 @@ export function ClimateForecastPanel() {
                 </Select>
               </div>
               <div>
-                <label className="text-[10px] text-muted-foreground">Hotspot</label>
+                <label className="text-[13px] text-muted-foreground">Hotspot</label>
                 <Select value={selectedHotspot} onValueChange={setSelectedHotspot}>
                   <SelectTrigger className="h-7 text-xs">
                     <SelectValue />
@@ -164,7 +164,7 @@ export function ClimateForecastPanel() {
                 </Select>
               </div>
               <div>
-                <label className="text-[10px] text-muted-foreground">Horas</label>
+                <label className="text-[13px] text-muted-foreground">Horas</label>
                 <Select
                   value={String(forecastHours)}
                   onValueChange={(v) => setForecastHours(Number(v))}
@@ -195,12 +195,12 @@ export function ClimateForecastPanel() {
 
             {/* Variable selector */}
             <div className="flex flex-wrap gap-1">
-              <span className="text-[10px] text-muted-foreground mr-1 leading-6">Variables:</span>
+              <span className="text-[13px] text-muted-foreground mr-1 leading-6">Variables:</span>
               {Object.entries(variables).map(([k, v]) => (
                 <button
                   key={k}
                   onClick={() => toggleVar(k)}
-                  className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${
+                  className={`text-[13px] px-2 py-0.5 rounded-full border transition-colors ${
                     selectedVars.includes(k)
                       ? "bg-primary/20 border-primary text-primary"
                       : "bg-transparent border-border text-muted-foreground"
@@ -214,28 +214,28 @@ export function ClimateForecastPanel() {
             {/* Results */}
             {result && (
               <Tabs defaultValue="forecast" className="w-full">
-                <TabsList className="grid grid-cols-3 h-7">
+                <TabsList className="grid w-full grid-cols-3 h-7">
                   <TabsTrigger value="forecast" className="text-xs">
-                    📊 Pronóstico
+                     Pronóstico
                   </TabsTrigger>
                   <TabsTrigger value="analysis" className="text-xs">
-                    🔍 Análisis
+                     Análisis
                   </TabsTrigger>
                   <TabsTrigger value="assets" className="text-xs">
-                    💼 Activos
+                     Activos
                   </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="forecast" className="mt-2">
                   <div className="bg-muted/20 rounded-md p-2 max-h-80 overflow-y-auto">
-                    <p className="text-[10px] text-muted-foreground mb-2">
+                    <p className="text-[13px] text-muted-foreground mb-2">
                       Modelo: {result.forecast.model} | Inicio: {result.forecast.init_time} | Pasos:{" "}
                       {result.forecast.total_steps} | Horizonte: {result.forecast.total_hours}h
                       {!result.earth2_available && (
-                        <span className="text-yellow-500 ml-2">📡 Simulado</span>
+                        <span className="text-yellow-500 ml-2"> Simulado</span>
                       )}
                     </p>
-                    <table className="w-full text-[10px] font-mono">
+                    <table className="w-full text-[13px] font-mono">
                       <thead>
                         <tr className="text-muted-foreground border-b border-border">
                           <th className="text-left py-1">Paso</th>
@@ -275,9 +275,9 @@ export function ClimateForecastPanel() {
                     ))}
                     {result.analysis.alerts.length > 0 && (
                       <div className="rounded bg-yellow-500/10 p-2">
-                        <p className="text-[10px] font-semibold mb-1">Alertas</p>
+                        <p className="text-[13px] font-semibold mb-1">Alertas</p>
                         {result.analysis.alerts.map((a, i) => (
-                          <p key={i} className="text-[10px] font-mono">
+                          <p key={i} className="text-[13px] font-mono">
                             {a}
                           </p>
                         ))}
@@ -285,13 +285,13 @@ export function ClimateForecastPanel() {
                     )}
                     {Object.entries(result.analysis.sector_impacts).length > 0 && (
                       <div>
-                        <p className="text-[10px] font-semibold mb-1">Impacto por Sector</p>
+                        <p className="text-[13px] font-semibold mb-1">Impacto por Sector</p>
                         {Object.entries(result.analysis.sector_impacts).map(([sector, info]) => (
                           <div key={sector} className="rounded bg-muted/20 p-2 mb-1">
-                            <p className="text-[10px] font-semibold capitalize">{sector}</p>
-                            <p className="text-[10px] text-muted-foreground">{info.detail}</p>
+                            <p className="text-[13px] font-semibold capitalize">{sector}</p>
+                            <p className="text-[13px] text-muted-foreground">{info.detail}</p>
                             {info.assets.length > 0 && (
-                              <p className="text-[10px] text-muted-foreground">
+                              <p className="text-[13px] text-muted-foreground">
                                 Activos: {info.assets.join(", ")}
                               </p>
                             )}
@@ -301,9 +301,9 @@ export function ClimateForecastPanel() {
                     )}
                     {result.analysis.trading_implications.length > 0 && (
                       <div>
-                        <p className="text-[10px] font-semibold mb-1">Implicancias Trading</p>
+                        <p className="text-[13px] font-semibold mb-1">Implicancias Trading</p>
                         {result.analysis.trading_implications.map((t, i) => (
-                          <p key={i} className="text-[10px] text-muted-foreground">
+                          <p key={i} className="text-[13px] text-muted-foreground">
                             • {t}
                           </p>
                         ))}
@@ -331,17 +331,17 @@ export function ClimateForecastPanel() {
                             >
                               <div className="flex items-center gap-2">
                                 <span className="font-mono text-xs font-semibold">{c.ticker}</span>
-                                <span className="text-[10px] text-muted-foreground">{c.name}</span>
-                                <Badge variant="outline" className="text-[8px] px-1 h-4">
+                                <span className="text-[13px] text-muted-foreground">{c.name}</span>
+                                <Badge variant="outline" className="text-[12px] px-1 h-4">
                                   {c.sector}
                                 </Badge>
                               </div>
                               <div className="flex items-center gap-1">
-                                <span className="text-[10px] text-muted-foreground">
+                                <span className="text-[13px] text-muted-foreground">
                                   {c.weatherSensitivity}
                                 </span>
                                 <Badge
-                                  className={`text-[8px] px-1.5 h-4 ${
+                                  className={`text-[12px] px-1.5 h-4 ${
                                     c.forecastImpact === "positivo"
                                       ? "bg-green-500"
                                       : c.forecastImpact === "negativo"

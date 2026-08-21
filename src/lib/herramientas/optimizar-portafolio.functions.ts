@@ -68,7 +68,7 @@ export const optimizarCarteraPerfil = createServerFn({ method: "POST" })
     const pesosMacro = calcularPesosObjetivo(data.perfil, humor);
     const observaciones: string[] = [];
 
-    // ─── Historial 2A por ticker (Yahoo, cierres diarios) ───
+    //  Historial 2A por ticker (Yahoo, cierres diarios) 
     const { getYahooHistoricalServer } = await import("./market-data.functions");
     const hist = await Promise.all(
       data.tickers.map(async (t) => {
@@ -94,19 +94,19 @@ export const optimizarCarteraPerfil = createServerFn({ method: "POST" })
       throw new Error("Se necesitan al menos 2 tickers con historial de 2 años para optimizar.");
     }
 
-    // ─── Retornos alineados ───
+    //  Retornos alineados 
     const returnsMat = valid.map((v) => logReturns(v.closes));
     const minLen = Math.min(...returnsMat.map((r) => r.length));
     const aligned = returnsMat.map((r) => r.slice(r.length - minLen));
 
-    // ─── Optimización con la estrategia de la política del perfil ───
+    //  Optimización con la estrategia de la política del perfil 
     const result = optimize(POLITICA.estrategiaOptimizador as Strategy, {
       meanDaily: aligned.map((r) => mean(r)),
       volDaily: aligned.map((r) => std(r)),
       cov: covMatrix(aligned),
     });
 
-    // ─── Métricas por activo ───
+    //  Métricas por activo 
     const FACTOR = 252;
     const activos: ActivoOptimizado[] = valid.map((v, i) => {
       const rets = aligned[i]!;

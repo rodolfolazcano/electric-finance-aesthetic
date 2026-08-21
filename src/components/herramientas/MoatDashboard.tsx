@@ -51,10 +51,10 @@ export function MoatDashboard({
   if (loading) {
     return (
       <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           Ventaja Competitiva (Moat)
         </p>
-        <p className="text-[10px] text-muted-foreground">Calculando ventaja competitiva...</p>
+        <p className="text-[13px] text-muted-foreground">Calculando ventaja competitiva...</p>
       </div>
     );
   }
@@ -67,18 +67,18 @@ export function MoatDashboard({
 
   return (
     <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-      <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">
+      <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-1">
         Ventaja Competitiva (Moat)
       </p>
-      <p className="text-[8px] text-muted-foreground/70 mb-3">
+      <p className="text-[12px] text-muted-foreground/70 mb-3">
         Consistencia histórica de rentabilidad y estructura financiera ({moat.aniosAnalizados} años)
       </p>
       <div className="flex items-center justify-between mb-3">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground">
           Ventaja Competitiva
         </p>
         <span
-          className={`text-[8px] font-mono px-1.5 py-0.5 rounded border ${clasificacionBadge(moat.clasificacion)}`}
+          className={`text-[12px] font-mono px-1.5 py-0.5 rounded border ${clasificacionBadge(moat.clasificacion)}`}
         >
           {moat.clasificacion}
         </span>
@@ -96,10 +96,10 @@ export function MoatDashboard({
         </div>
         <span className={`text-[16px] font-bold font-mono ${scoreTextColor(moat.score)}`}>
           {moat.score}
-          <span className="text-[10px] text-muted-foreground font-normal">
+          <span className="text-[13px] text-muted-foreground font-normal">
             /{maxPuntosDisplay}
             {hasComponentesExcluidos && (
-              <span className="text-[8px] text-amber-400 ml-1">
+              <span className="text-[12px] text-amber-400 ml-1">
                 ({moat.componentesExcluidos.join(", ")} no disponible
                 {moat.componentesExcluidos.length > 1 ? "s" : ""})
               </span>
@@ -109,7 +109,7 @@ export function MoatDashboard({
       </div>
 
       {!isInsufficient && (
-        <p className="text-[9px] text-muted-foreground mb-3">
+        <p className="text-[13px] text-muted-foreground mb-3">
           Basado en {moat.aniosAnalizados} años de datos financieros
         </p>
       )}
@@ -126,16 +126,16 @@ export function MoatDashboard({
           return (
             <div key={d.criterio} className={isExcluido ? "opacity-50" : ""}>
               <div className="flex items-center justify-between mb-0.5">
-                <span className="text-[10px] text-muted-foreground truncate pr-2">
+                <span className="text-[13px] text-muted-foreground truncate pr-2">
                   {d.criterio}
                   {isExcluido && (
-                    <span className="text-[8px] text-amber-400 ml-1">
+                    <span className="text-[12px] text-amber-400 ml-1">
                       (excluido por falta de datos)
                     </span>
                   )}
                 </span>
                 <span
-                  className={`text-[10px] font-mono font-semibold ${isExcluido ? "text-muted-foreground" : scoreTextColor((d.puntos / d.maxPuntos) * 100)}`}
+                  className={`text-[13px] font-mono font-semibold ${isExcluido ? "text-muted-foreground" : scoreTextColor((d.puntos / d.maxPuntos) * 100)}`}
                 >
                   {d.puntos}/{d.maxPuntos}
                 </span>
@@ -145,7 +145,7 @@ export function MoatDashboard({
                 maxPuntos={d.maxPuntos}
                 color={isExcluido ? "bg-muted" : barColor}
               />
-              <p className="text-[9px] text-muted-foreground/70 leading-relaxed mt-0.5">
+              <p className="text-[13px] text-muted-foreground/70 leading-relaxed mt-0.5">
                 {d.detalle}
               </p>
             </div>

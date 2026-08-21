@@ -507,7 +507,7 @@ export function xirrConvencion(
     }
   }
 
-  // ── Fallback: bisection method ──────────────────────────────────
+  //  Fallback: bisection method 
   // For complex cash flow structures (step-up, sinkable, etc.),
   // Newton-Raphson may fail. Bisection is slower but more robust.
   const bisection = (lo: number, hi: number, nMax: number): number | null => {
@@ -1100,7 +1100,7 @@ export const calcularRendimientosBono = createServerFn({ method: "POST" })
       flujosFuturos = bono.flujosPorCada100VN.filter((f) => parseISO(f.fecha) > fechaLiq);
     }
 
-    // ── AJUSTE CER: inflar flujos nominales por CER/UVA ───────────
+    //  AJUSTE CER: inflar flujos nominales por CER/UVA 
     // También aplica si ajuste === 'CER' independientemente del tipo (ej. LECAP CER)
     if (bono?.ajuste === "CER" && flujosFuturos.length > 0) {
       try {
@@ -1119,7 +1119,7 @@ export const calcularRendimientosBono = createServerFn({ method: "POST" })
       }
     }
 
-    // ── AJUSTE Dollar-Linked: proyectar flujos por devaluación esperada ──────
+    //  AJUSTE Dollar-Linked: proyectar flujos por devaluación esperada 
     // Usa spread AL30/AL30D (proxy de devaluación implícita), fallback a MEP/Oficial, luego a parámetro
     let metodoDevaluacion: "spread-real" | "mep-fallback" | "parametro" | "ninguno" = "ninguno";
     let tasaDevaluacionUsada = data.tasaDevaluacionAnual;
@@ -1178,7 +1178,7 @@ export const calcularRendimientosBono = createServerFn({ method: "POST" })
       }
     }
 
-    // ── AJUSTE BADLAR / TAMAR: proyectar cupones flotantes ──────────
+    //  AJUSTE BADLAR / TAMAR: proyectar cupones flotantes 
     if ((bono?.ajuste === "BADLAR" || bono?.ajuste === "TAMAR") && flujosFuturos.length > 0) {
       try {
         const tasaReferencia =
@@ -1215,7 +1215,7 @@ export const calcularRendimientosBono = createServerFn({ method: "POST" })
     const fechaLiq = data.fechaLiquidacion ? parseISO(data.fechaLiquidacion) : calcularTplus1();
     const fechaLiqISO = toISO(fechaLiq);
 
-    // ── LECAPs: fórmula directa ──────────────────────────────────
+    //  LECAPs: fórmula directa 
     // Solo para cupón cero puro identificado por tipoBono explícito
     if (bono?.tipoBono === "LECAP_CAPITALIZABLE") {
       // Pago único al vencimiento
@@ -1268,7 +1268,7 @@ export const calcularRendimientosBono = createServerFn({ method: "POST" })
       }
     }
 
-    // ── Bonos con flujos: XIRR con convención ────────────────────
+    //  Bonos con flujos: XIRR con convención 
     if (flujosFuturos.length === 0) {
       return {
         ticker: data.ticker,
@@ -1365,7 +1365,7 @@ export const calcularRendimientosBono = createServerFn({ method: "POST" })
       };
     });
 
-    // ── ALERTA: salto brusco de TIR vs último histórico ────────────
+    //  ALERTA: salto brusco de TIR vs último histórico 
     let alertaSaltoBrusco: string | undefined;
     if (tirCalc !== null && bono && bono.historico && bono.historico.length > 0) {
       const ultimoHist = bono.historico[bono.historico.length - 1];
@@ -1377,7 +1377,7 @@ export const calcularRendimientosBono = createServerFn({ method: "POST" })
       }
     }
 
-    // ── PERSISTIR en histórico automáticamente ─────────────────────
+    //  PERSISTIR en histórico automáticamente 
     if (bono && tirCalc !== null) {
       bono.historico?.push({
         fecha: fechaLiqISO,

@@ -2,7 +2,7 @@
 import { supabase } from "../supabase-stub";
 import type { FuenteAPI } from "./types";
 
-// ── In-memory fallback cache (siempre disponible, sin dependencias externas) ──
+//  In-memory fallback cache (siempre disponible, sin dependencias externas) 
 const memCache = new Map<string, { payload: unknown; expiresAt: number }>();
 const MEM_CLEANUP_INTERVAL = 60_000; // cada 60s limpia entradas vencidas
 

@@ -60,9 +60,9 @@ export function CalculadoraHipoteca() {
   }, [inputs, result]);
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+    <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <div className="glass p-5 space-y-4">
-        <h3 className="mono text-[11px] uppercase tracking-[0.18em] text-foreground">Parámetros</h3>
+        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Parámetros</h3>
         <div>
           <label className="text-xs text-muted-foreground">Monto del préstamo ($)</label>
           <Input
@@ -111,15 +111,15 @@ export function CalculadoraHipoteca() {
       <div className="space-y-4">
         {result && (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Cuota
                 </div>
                 <div className="mono text-lg text-primary">${result.cuota.toLocaleString()}</div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Total intereses
                 </div>
                 <div className="mono text-lg text-warning">
@@ -127,22 +127,22 @@ export function CalculadoraHipoteca() {
                 </div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Total pagado
                 </div>
                 <div className="mono text-lg">${result.totalPagado.toLocaleString()}</div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Cuota máxima
                 </div>
                 <div className="mono text-lg">${result.cuotaMaxima.toLocaleString()}</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2">
               <div className="glass p-5">
-                <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                   Amortización
                 </div>
                 <div className="h-52">
@@ -180,7 +180,7 @@ export function CalculadoraHipoteca() {
                 </div>
               </div>
               <div className="glass p-5">
-                <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                   Capital vs Intereses
                 </div>
                 <div className="h-52">
@@ -213,12 +213,12 @@ export function CalculadoraHipoteca() {
             </div>
 
             <div className="glass overflow-x-auto p-5">
-              <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Tabla de amortización (cada 12 cuotas)
               </div>
-              <table className="mono w-full text-[11px]">
+              <table className="mono w-full text-[14px]">
                 <thead>
-                  <tr className="border-b border-border/60 text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <tr className="border-b border-border/60 text-[13px] uppercase tracking-wider text-muted-foreground">
                     <th className="px-2 py-2 text-left">Cuota</th>
                     <th className="px-2 py-2 text-right">Pago</th>
                     <th className="px-2 py-2 text-right">Capital</th>
@@ -246,7 +246,7 @@ export function CalculadoraHipoteca() {
           </>
         )}
         <div className="flex gap-2">
-          <Button onClick={handleExport} variant="outline" size="sm" className="text-[11px]">
+          <Button onClick={handleExport} variant="outline" size="sm" className="text-[14px]">
             <svg
               className="mr-1.5 h-3.5 w-3.5"
               xmlns="http://www.w3.org/2000/svg"

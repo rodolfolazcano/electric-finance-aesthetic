@@ -36,11 +36,11 @@ export function calcularPoderFijacionPrecios(
     };
   }
 
-  // ── Señal 1: Resiliencia de margen (reusada de costos-de-cambio) ──
+  //  Señal 1: Resiliencia de margen (reusada de costos-de-cambio) 
   const periodos = ordenarPeriodos(historico ?? []);
   const resilienciaMargen = calcularResilienciaMargen(periodos);
 
-  // ── Señal 2: Crecimiento de ingresos vs crecimiento de costo de ventas ──
+  //  Señal 2: Crecimiento de ingresos vs crecimiento de costo de ventas 
   // costOfRevenue se deriva de revenue * (1 - grossMargin)
   let crecimientoIngresosVsCosto: SenalPrecio;
   const periodosConDato = periodos
@@ -99,7 +99,7 @@ export function calcularPoderFijacionPrecios(
     }
   }
 
-  // ── Conclusión ──
+  //  Conclusión 
   const fuerzas: FuerzaSenal[] = [resilienciaMargen.fuerza, crecimientoIngresosVsCosto.fuerza];
   const disponibles = fuerzas.filter((f) => f !== "no_disponible");
   let conclusion: PoderFijacionPreciosResult["conclusion"];

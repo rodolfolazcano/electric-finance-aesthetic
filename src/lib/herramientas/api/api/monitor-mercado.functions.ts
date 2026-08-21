@@ -16,7 +16,7 @@ import {
 import { calcularRendimientosBono, fetchTamarRate } from "@/lib/renta-fija.functions";
 import { BONOS_DB } from "@/lib/bonos-data";
 
-// ─── Ticker lists ──────────────────────────────────────────────────────────
+//  Ticker lists 
 
 const LECAP_TICKERS = [
   "S31L6",
@@ -134,7 +134,7 @@ const FUTUROS_CONTRATOS = [
   "DLR/ABR27",
 ];
 
-// ─── Data types ────────────────────────────────────────────────────────────
+//  Data types 
 
 export interface MonitorMercadoData {
   timestamp: string;
@@ -235,7 +235,7 @@ export interface SenderoRow {
   rem: number | null;
 }
 
-// ─── Server function ───────────────────────────────────────────────────────
+//  Server function 
 
 export const getMonitorMercadoData = createServerFn({ method: "POST" })
   .validator(z.object({ bearerToken: z.string().optional() }))
@@ -249,7 +249,7 @@ export const getMonitorMercadoData = createServerFn({ method: "POST" })
 
     const token = data.bearerToken;
 
-    // ── Panel 1: Dólares & Macro ─────────────────────────────────────
+    //  Panel 1: Dólares & Macro 
     const [dolares, riesgoPais, tamarRate] = await Promise.allSettled([
       fetchDolares(),
       fetchRiesgoPais(),
@@ -278,7 +278,7 @@ export const getMonitorMercadoData = createServerFn({ method: "POST" })
       /* ignore */
     }
 
-    // ── Panel 2: LECAPs ──────────────────────────────────────────────
+    //  Panel 2: LECAPs 
     const letras = await fetchLetras();
     const lecapMap = new Map(
       letras.filter((l) => LECAP_TICKERS.includes(l.ticker)).map((l) => [l.ticker, l]),
@@ -322,7 +322,7 @@ export const getMonitorMercadoData = createServerFn({ method: "POST" })
       };
     });
 
-    // ── Helper: calcular bonos ────────────────────────────────────────
+    //  Helper: calcular bonos 
     async function calcBonos(tickers: string[], tipoLabel: string): Promise<BonoRow[]> {
       const rows: BonoRow[] = [];
       let precios: Record<string, IOLCotizacionSimple> = {};
@@ -385,7 +385,7 @@ export const getMonitorMercadoData = createServerFn({ method: "POST" })
       return rows;
     }
 
-    // ── Panel 6: Futuros ──────────────────────────────────────────────
+    //  Panel 6: Futuros 
     let futuros: FuturoRow[] = [];
     try {
       const futurosRaw = await iolFuturosOperables({ data: { bearerToken: token ?? undefined } });
@@ -407,7 +407,7 @@ export const getMonitorMercadoData = createServerFn({ method: "POST" })
       /* ignore */
     }
 
-    // ── Panel 8: Panel Líder ──────────────────────────────────────────
+    //  Panel 8: Panel Líder 
     let panelLider: AccionRow[] = [];
     try {
       const accPrecios = await iolCotizarMultiples({
@@ -429,7 +429,7 @@ export const getMonitorMercadoData = createServerFn({ method: "POST" })
       /* ignore */
     }
 
-    // ── Panels 3, 4, 5, 7, 9 ──────────────────────────────────────────
+    //  Panels 3, 4, 5, 7, 9 
     const [tamarBonos, bonares, bonosCER, boprealesBonos, dolarLinkedBonos] = await Promise.all([
       calcBonos(TAMAR_TICKERS, "TAMAR"),
       calcBonos(BONARES_GLOBALES_TICKERS, "Bonar/Global"),
@@ -438,10 +438,10 @@ export const getMonitorMercadoData = createServerFn({ method: "POST" })
       calcBonos(DOLAR_LINKED_TICKERS, "Dollar-Linked"),
     ]);
 
-    // ── Panel 10: Pares (derivado) ────────────────────────────────────
+    //  Panel 10: Pares (derivado) 
     const pares: ParRow[] = [];
 
-    // ── Panel 11: Sendero Mensual (derivado) ──────────────────────────
+    //  Panel 11: Sendero Mensual (derivado) 
     const senderoMensual: SenderoRow[] = [];
 
     const tamarTna =

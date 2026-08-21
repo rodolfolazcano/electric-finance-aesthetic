@@ -1,5 +1,5 @@
 // @ts-nocheck
-// Orquestación del estudio. Server-only.
+// OrquestaciÃ³n del estudio. Server-only.
 import "./env.server";
 import { IMAGE_CHAIN_HQ, NARRATIVE_CHAIN, resolveChain, type ModelPrefs } from "./model-catalog";
 import {
@@ -64,7 +64,7 @@ export type TurnInput = {
   selectedElementId?: string | null;
   currentSlide?: SlideSpec | null;
   highQualityImage?: boolean;
-  /** Habilita la habilidad de búsqueda web del agente para este turno. */
+  /** Habilita la habilidad de bÃºsqueda web del agente para este turno. */
   useWeb?: boolean;
   /** Modelo primario elegido por el usuario para cada tarea. */
   modelPrefs?: ModelPrefs | null;
@@ -80,15 +80,15 @@ export type TurnOutput = {
   model: string;
   slide?: SlideSpec | null;
   checks?: MathCheck[];
-  /** Nivel de complejidad detectado; define qué cadena de modelos se usó. */
+  /** Nivel de complejidad detectado; define quÃ© cadena de modelos se usÃ³. */
   complexity?: Complexity;
-  /** Historia de verificación cruzada, si aplicó. */
+  /** Historia de verificaciÃ³n cruzada, si aplicÃ³. */
   verification?: CrossVerification;
   handoffSummary?: string | null;
   attempts: CallAttempt[];
   /** Traza de tool_calls ejecutados por el agente. */
   agentTrace?: ToolCallTrace[];
-  /** Dirección visual elegida por `design_direction` (paso previo a imagen). */
+  /** DirecciÃ³n visual elegida por `design_direction` (paso previo a imagen). */
   design?: DesignDirection | null;
   /** Adjunto exportado (pptx/png/pdf/video/audio). */
   attachment?: TurnAttachment | null;
@@ -97,7 +97,7 @@ export type TurnOutput = {
 const MAX_CHARS_PER_FILE = 14_000;
 
 /** Schema zod estricto del resultado de una pieza. Se usa para validar y
- * reintentar con feedback automático antes de aceptar la respuesta. */
+ * reintentar con feedback automÃ¡tico antes de aceptar la respuesta. */
 const slideResultSchema = z.object({
   narrative: z.string().optional(),
   verification: z.object({ ok: z.boolean().optional(), notes: z.string().optional() }).optional(),
@@ -139,7 +139,7 @@ function trimForContext(text: string): string {
   if (text.length <= MAX_CHARS_PER_FILE) return text;
   const head = text.slice(0, MAX_CHARS_PER_FILE * 0.7);
   const tail = text.slice(-MAX_CHARS_PER_FILE * 0.3);
-  return `${head}\n\n[... sección intermedia omitida por longitud ...]\n\n${tail}`;
+  return `${head}\n\n[... secciÃ³n intermedia omitida por longitud ...]\n\n${tail}`;
 }
 
 export function buildContextBlock(files: ContextFile[]): string {
@@ -147,9 +147,9 @@ export function buildContextBlock(files: ContextFile[]): string {
   const render = (list: ContextFile[]) =>
     list
       .map((file) => {
-        const tag = file.kind === "image" ? "?? IMAGEN (transcripción generada por IA)" : file.kind;
+        const tag = file.kind === "image" ? "?? IMAGEN (transcripciÃ³n generada por IA)" : file.kind;
         const content = file.kind === "image" && !file.text?.trim()
-          ? "(imagen aún no procesada)" : trimForContext(file.text) || "(sin contenido)";
+          ? "(imagen aÃºn no procesada)" : trimForContext(file.text) || "(sin contenido)";
         return `### [${file.name}] (${tag})\n${content}`;
       })
       .join("\n\n");
@@ -160,12 +160,12 @@ export function buildContextBlock(files: ContextFile[]): string {
   const parts: string[] = [];
   if (reference.length) {
     parts.push(
-      `## MATERIAL DE REFERENCIA (formatos, plantillas, estilos e imágenes a replicar; NO son datos para calcular):\n${render(reference)}`,
+      `## MATERIAL DE REFERENCIA (formatos, plantillas, estilos e imÃ¡genes a replicar; NO son datos para calcular):\n${render(reference)}`,
     );
   }
   if (data.length) {
     parts.push(
-      `## DATOS E INFORMACIÓN PARA RAZONAR (única fuente de números y hechos):\n${render(data)}`,
+      `## DATOS E INFORMACIÃ“N PARA RAZONAR (Ãºnica fuente de nÃºmeros y hechos):\n${render(data)}`,
     );
   }
   return parts.join("\n\n");
@@ -173,22 +173,22 @@ export function buildContextBlock(files: ContextFile[]): string {
 
 
 const SLIDE_RE =
-  /\b(slide|placa|pieza|instagram|whatsapp|historia|story|banner|posteo|post|dise(ñ|n)o|fondo( de imagen| foto)?|imagen(es)? de fondo|foto(s)? de fondo|portada|identidad|marca personal|perfil profesional|minimal(ista)?|dark minimal)\b/i;
+  /\b(slide|placa|pieza|instagram|whatsapp|historia|story|banner|posteo|post|dise(Ã±|n)o|fondo( de imagen| foto)?|imagen(es)? de fondo|foto(s)? de fondo|portada|identidad|marca personal|perfil profesional|minimal(ista)?|dark minimal)\b/i;
 const REPORT_RE = /\b(informe|reporte|research|documento|paper|resumen ejecutivo)\b/i;
 const MARKETING_RE = /\b(marketing|linkedin|campa|copy|publicaci|difusi|canal)\b/i;
-const CROSS_RE = /\b(cruz|comparar|compará|combinar|entre archivos|vs\.?)\b/i;
+const CROSS_RE = /\b(cruz|comparar|comparÃ¡|combinar|entre archivos|vs\.?)\b/i;
 const EDIT_RE =
-  /\b(edit(?:a|ar|á|e)?|cambi(?:a|á|ar)?|modific(?:a|á|ar)?|más grande|mas grande|más chico|mas chico|reemplaz(?:a|á|ar)?|correg(?:í|i|í)?|ajust(?:a|á|ar)?)\b/i;
+  /\b(edit(?:a|ar|Ã¡|e)?|cambi(?:a|Ã¡|ar)?|modific(?:a|Ã¡|ar)?|mÃ¡s grande|mas grande|mÃ¡s chico|mas chico|reemplaz(?:a|Ã¡|ar)?|correg(?:Ã­|i|Ã­)?|ajust(?:a|Ã¡|ar)?)\b/i;
 
-/** Router de intención liviano: heurística primero, sin gastar el modelo caro. */
+/** Router de intenciÃ³n liviano: heurÃ­stica primero, sin gastar el modelo caro. */
 export function classifyIntent(
   message: string,
   hasSelection: boolean,
   hasCurrentSlide: boolean,
 ): Intent {
   if (hasSelection && EDIT_RE.test(message)) return "edit";
-  // "edita/rediseñá el slide actual" = edición aunque no haya elemento seleccionado.
-  if (hasCurrentSlide && /\b(edit|cambi|rediseñ|modific)/i.test(message)) return "edit";
+  // "edita/rediseÃ±Ã¡ el slide actual" = ediciÃ³n aunque no haya elemento seleccionado.
+  if (hasCurrentSlide && /\b(edit|cambi|rediseÃ±|modific)/i.test(message)) return "edit";
   if (SLIDE_RE.test(message)) return "slide";
   if (REPORT_RE.test(message)) return "report";
   if (MARKETING_RE.test(message)) return "marketing";
@@ -257,7 +257,7 @@ async function baseMessages(input: TurnInput, extra: string): Promise<ChatMessag
   if (learning) {
     messages.push({
       role: "system",
-      content: `MEMORIA DE APRENDIZAJE (respuestas que el usuario aprobó antes; imitá su criterio, tono y formato):\n${learning}`,
+      content: `MEMORIA DE APRENDIZAJE (respuestas que el usuario aprobÃ³ antes; imitÃ¡ su criterio, tono y formato):\n${learning}`,
     });
   }
   if (input.useWeb) {
@@ -267,17 +267,17 @@ async function baseMessages(input: TurnInput, extra: string): Promise<ChatMessag
       if (results.length) {
         messages.push({
           role: "system",
-          content: `RESULTADOS DE BÚSQUEDA WEB (citá la fuente con su dominio y URL cuando los uses; si contradicen los datos del usuario, avisalo):\n${buildWebBlock(results)}`,
+          content: `RESULTADOS DE BÃšSQUEDA WEB (citÃ¡ la fuente con su dominio y URL cuando los uses; si contradicen los datos del usuario, avisalo):\n${buildWebBlock(results)}`,
         });
       }
     } catch (error) {
-      console.error("[studio] búsqueda web falló", error);
+      console.error("[studio] bÃºsqueda web fallÃ³", error);
     }
   }
   if (library.length) {
     messages.push({
       role: "system",
-      content: `BIBLIOTECA DE REFERENCIA (material propio; citá el título cuando lo uses):\n${library
+      content: `BIBLIOTECA DE REFERENCIA (material propio; citÃ¡ el tÃ­tulo cuando lo uses):\n${library
         .map((doc) => `### ${doc.title}\n${doc.text}`)
         .join("\n\n")}`,
     });
@@ -291,9 +291,9 @@ async function baseMessages(input: TurnInput, extra: string): Promise<ChatMessag
 }
 
 /**
- * Post-proceso determinístico del slide generado por el modelo (sin IA):
+ * Post-proceso determinÃ­stico del slide generado por el modelo (sin IA):
  *   - asigna el templateId de la plantilla elegida
- *   - aplica el slot del logo de la plantilla (posición % y URL del sitio)
+ *   - aplica el slot del logo de la plantilla (posiciÃ³n % y URL del sitio)
  *   - si la plantilla reutiliza fondos cacheados y no hay fondo, no fuerza prompt
  */
 async function enrichSlide(
@@ -323,7 +323,7 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
     Boolean(input.currentSlide),
   );
   // "edita el slide actual" sin slide previo = generar pieza nueva siguiendo la
-  // instrucción, no responder como consulta.
+  // instrucciÃ³n, no responder como consulta.
   const effectiveIntent: Intent = intent === "edit" && !input.currentSlide ? "slide" : intent;
   const wantsPiece =
     effectiveIntent === "slide" || effectiveIntent === "report" || effectiveIntent === "marketing";
@@ -335,11 +335,11 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
       [
         {
           role: "system",
-          content: `${BASE_SYSTEM_PROMPT}\n\nEstás editando UN elemento de una pieza existente. Devolvés JSON: {"narrative":"qué cambiaste","slide": <spec completo con el cambio aplicado>}. No inventes datos nuevos: solo modificá el elemento indicado. Mantené intactos el resto de los elementos.\n\n${SLIDE_JSON_INSTRUCTIONS}`,
+          content: `${BASE_SYSTEM_PROMPT}\n\nEstÃ¡s editando UN elemento de una pieza existente. DevolvÃ©s JSON: {"narrative":"quÃ© cambiaste","slide": <spec completo con el cambio aplicado>}. No inventes datos nuevos: solo modificÃ¡ el elemento indicado. MantenÃ© intactos el resto de los elementos.\n\n${SLIDE_JSON_INSTRUCTIONS}`,
         },
         {
           role: "user",
-          content: `SPEC ACTUAL:\n${JSON.stringify(input.currentSlide)}\n\nELEMENTO SELECCIONADO: ${input.selectedElementId}\n\nINSTRUCCIÓN: ${input.message}`,
+          content: `SPEC ACTUAL:\n${JSON.stringify(input.currentSlide)}\n\nELEMENTO SELECCIONADO: ${input.selectedElementId}\n\nINSTRUCCIÃ“N: ${input.message}`,
         },
       ],
       { maxTokens: 3000 },
@@ -360,18 +360,18 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
   if (wantsPiece) {
     const formatHint =
       effectiveIntent === "report"
-        ? 'Formato "report": resumen ejecutivo, cuerpo, tablas/series, conclusión.'
+        ? 'Formato "report": resumen ejecutivo, cuerpo, tablas/series, conclusiÃ³n.'
         : effectiveIntent === "marketing"
-          ? 'Formato según plataforma: "square" para Instagram/WhatsApp, "story" para historias, "banner" para LinkedIn. Texto corto y con gancho, sin promesas de rendimiento.'
+          ? 'Formato segÃºn plataforma: "square" para Instagram/WhatsApp, "story" para historias, "banner" para LinkedIn. Texto corto y con gancho, sin promesas de rendimiento.'
           : 'Formato "square" (1:1) salvo que el usuario pida otro.';
 
-    // Etapa 1 — Plantilla: tipo de contenido detectado por heurística + plantilla.
+    // Etapa 1 Â— Plantilla: tipo de contenido detectado por heurÃ­stica + plantilla.
     const contentType = classifySlideContentType(input.message, input.files.length);
     const template = pickTemplate(contentType, input.message);
-    // Etapa 2 — design_direction: PASO OBLIGATORIO antes de generar imágenes.
-    // El modelo propone 2-3 direcciones (paleta/tipografía/mood) y se auto-elige
+    // Etapa 2 Â— design_direction: PASO OBLIGATORIO antes de generar imÃ¡genes.
+    // El modelo propone 2-3 direcciones (paleta/tipografÃ­a/mood) y se auto-elige
     // la que matchea la plantilla de la familia correspondiente.
-    const wantsPresentation = /\b(presentaci(ó|o)n|ppt|powerpoint|diapositivas|decks)\b/i.test(
+    const wantsPresentation = /\b(presentaci(Ã³|o)n|ppt|powerpoint|diapositivas|decks)\b/i.test(
       input.message,
     );
     let design: DesignDirection | null = null;
@@ -385,10 +385,10 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
       designAttempts = designResult.attempts;
       design = pickDesignForTemplate(designResult.options, template.palette);
     } catch (error) {
-      console.error("[studio] design_direction falló", error);
+      console.error("[studio] design_direction fallÃ³", error);
     }
 
-    // Etapa 3 — reasoning + generación del spec (con la dirección visual elegida).
+    // Etapa 3 Â— reasoning + generaciÃ³n del spec (con la direcciÃ³n visual elegida).
     const result = await resilientJson<{
       narrative?: string;
       verification?: { ok?: boolean; notes?: string };
@@ -399,7 +399,7 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
         input,
         `${formatHint}\n\n${templateBlock}\n\n${
           design ? designDirectionBlock(design) : ""
-        }\n\nAntes de emitir el JSON, recalculá todos los números y verificá que la suma de las series coincida con los totales que declares. El fondo (background.prompt) debe respetar la dirección visual elegida.\n\n${SLIDE_JSON_INSTRUCTIONS}`,
+        }\n\nAntes de emitir el JSON, recalculÃ¡ todos los nÃºmeros y verificÃ¡ que la suma de las series coincida con los totales que declares. El fondo (background.prompt) debe respetar la direcciÃ³n visual elegida.\n\n${SLIDE_JSON_INSTRUCTIONS}`,
       ),
       { maxTokens: 4000, schema: slideResultSchema },
     );
@@ -414,7 +414,7 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
         text:
           result.value.narrative ??
           result.value.verification?.notes ??
-          "No pude verificar los números necesarios para armar la pieza. Pasame los datos faltantes.",
+          "No pude verificar los nÃºmeros necesarios para armar la pieza. Pasame los datos faltantes.",
         intent: effectiveIntent,
         provider: result.provider,
         model: result.model,
@@ -426,11 +426,11 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
 
     if (failed.length) {
       return {
-        text: `Freno la generación: la verificación matemática no cierra.\n\n${failed
-          .map((c) => `• ${c.label}: ${c.detail}`)
+        text: `Freno la generaciÃ³n: la verificaciÃ³n matemÃ¡tica no cierra.\n\n${failed
+          .map((c) => `Â• ${c.label}: ${c.detail}`)
           .join(
             "\n",
-          )}\n\nRevisá los datos de origen o confirmame el número correcto y la regenero.`,
+          )}\n\nRevisÃ¡ los datos de origen o confirmame el nÃºmero correcto y la regenero.`,
         intent: effectiveIntent,
         provider: result.provider,
         model: result.model,
@@ -440,13 +440,13 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
       };
     }
 
-    // Etapa 4 — Post-proceso determinístico: plantilla + logo + fondo (no IA).
+    // Etapa 4 Â— Post-proceso determinÃ­stico: plantilla + logo + fondo (no IA).
     const enriched = await enrichSlide(slide, template.id, template.reuseBackground);
     if (design && enriched.background.prompt) {
       enriched.background.prompt = buildImagePrompt(enriched.background.prompt, design);
     }
 
-    // Etapa 6 — build_pptx si el usuario pidió "presentación" en vez de placa 1:1.
+    // Etapa 6 Â— build_pptx si el usuario pidiÃ³ "presentaciÃ³n" en vez de placa 1:1.
     let attachment: TurnAttachment | null = null;
     if (wantsPresentation) {
       try {
@@ -455,10 +455,10 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
           kind: "pptx",
           filePath: pptx.filePath,
           url: pptx.url,
-          label: "Presentación .pptx",
+          label: "PresentaciÃ³n .pptx",
         };
       } catch (error) {
-        console.error("[studio] build_pptx falló", error);
+        console.error("[studio] build_pptx fallÃ³", error);
       }
     }
 
@@ -494,8 +494,8 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
   const messages = await baseMessages(
     input,
     effectiveIntent === "crossdata"
-      ? "El usuario pide cruzar datos entre archivos. Dejá explícito de qué archivo sale cada cifra."
-      : "Respondé la consulta con el contexto disponible.",
+      ? "El usuario pide cruzar datos entre archivos. DejÃ¡ explÃ­cito de quÃ© archivo sale cada cifra."
+      : "RespondÃ© la consulta con el contexto disponible.",
   );
 
   let text: string;
@@ -543,7 +543,7 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
         `Tengo ${input.files.length} archivo(s) en contexto. ` +
         (msg.includes("slide") || msg.includes("placa") || msg.includes("informe")
           ? "Para generar un slide necesito que las API keys de IA esten configuradas. Agregalas en el .env y reinicia el servidor."
-          : "Puedo ayudarte con informacion sobre los archivos cargados. ¿Que necesitas saber?");
+          : "Puedo ayudarte con informacion sobre los archivos cargados. Â¿Que necesitas saber?");
     } else if (msg.includes("hola") || msg.length < 5) {
       text =
         "Hola! Carga archivos en el explorador de contexto (Referencias o Datos) y pedime un analisis, un slide o un informe.";
@@ -600,7 +600,7 @@ export async function describeImage(
     VISION_CHAIN,
     base64,
     mime,
-    "Transcribí con precisión todo el texto, tablas y series numéricas visibles en esta imagen financiera. Devolvé las tablas en formato markdown y no inventes ningún número que no esté claramente legible.",
+    "TranscribÃ­ con precisiÃ³n todo el texto, tablas y series numÃ©ricas visibles en esta imagen financiera. DevolvÃ© las tablas en formato markdown y no inventes ningÃºn nÃºmero que no estÃ© claramente legible.",
   );
   await logCalls(conversationId, "vision", result.attempts);
   return { text: result.value, provider: result.provider, model: result.model };
@@ -638,7 +638,7 @@ export async function fetchMarketNews(query: string): Promise<
         }
       }
     } catch (error) {
-      console.error("[studio] tavily falló", error);
+      console.error("[studio] tavily fallÃ³", error);
     }
   }
 
@@ -658,7 +658,7 @@ export async function fetchMarketNews(query: string): Promise<
         }
       }
     } catch (error) {
-      console.error("[studio] rss falló", error);
+      console.error("[studio] rss fallÃ³", error);
     }
   }
 
@@ -666,7 +666,7 @@ export async function fetchMarketNews(query: string): Promise<
 }
 
 // -----------------------------------------------------------------------------
-// AGENTE AUTÓNOMO CON TOOL-CALLING
+// AGENTE AUTÃ“NOMO CON TOOL-CALLING
 // -----------------------------------------------------------------------------
 
 import { buildToolsSchema, executeToolCall } from "./agent-tools.server";
@@ -676,7 +676,7 @@ import { getSessionContext } from "./session-context.server";
 import { MODEL_TIERS } from "./model-catalog";
 import { shouldSkipClassifier, updateConversationState, getConversationState } from "./session-state.server";
 
-// --- Prompts por nivel (completos del markdown de orquestación multi-modelo) ---
+// --- Prompts por nivel (completos del markdown de orquestaciÃ³n multi-modelo) ---
 
 const PROMPTS_POR_NIVEL: Record<string, string> = {
   fast: `AHORA SOS EL ASISTENTE RAPIDO del estudio Coronar Inversiones.
@@ -789,7 +789,7 @@ export async function runAgentTurn(input: TurnInput): Promise<TurnOutput> {
     nivel = estadoAnterior.nivel;
     requiereExploracion = !estadoAnterior.requiereContexto;
   } else {
-    // 1. Clasificar nivel (heurística rápida, sin llamada LLM)
+    // 1. Clasificar nivel (heurÃ­stica rÃ¡pida, sin llamada LLM)
     const clasificacion = heuristicClassify(input.message, !!sessionCtx.getResumen().length);
     nivel = clasificacion.nivel;
     requiereExploracion = clasificacion.requiere_exploracion_nueva;
@@ -798,7 +798,7 @@ export async function runAgentTurn(input: TurnInput): Promise<TurnOutput> {
   // Actualizar estado de sesion para proximos turnos
   updateConversationState(sessionId, input.message, nivel as any);
 
-  // 2. Elegir tools según nivel
+  // 2. Elegir tools segÃºn nivel
   const TOOLS_POR_NIVEL: Record<string, Record<string, any>[]> = {
     fast: toolsSchema.filter((t: any) =>
       ["run_command","read_file","browse_filesystem","search_web","supabase_storage_list","supabase_storage_text","fetch_stock_data","financial_query"].includes(t.function?.name ?? "")
@@ -812,7 +812,7 @@ export async function runAgentTurn(input: TurnInput): Promise<TurnOutput> {
   const systemBase = await buildSystemPrompt(input.conversationId);
   const nivelPrompt = PROMPTS_POR_NIVEL[nivel] ?? PROMPTS_POR_NIVEL.fast;
 
-  // Inyectar SessionContext si no requiere re-exploración
+  // Inyectar SessionContext si no requiere re-exploraciÃ³n
   let contextoBloque = "";
   if (!requiereExploracion) {
     const relevante = sessionCtx.filtrarRelevante(input.message);
@@ -821,10 +821,10 @@ export async function runAgentTurn(input: TurnInput): Promise<TurnOutput> {
     }
   }
 
-  // Inyectar contexto de UI si está disponible
+  // Inyectar contexto de UI si estÃ¡ disponible
   let uiBloque = "";
   if (input.uiContext) {
-    uiBloque = `\n\nCONTEXTO DE LA INTERFAZ ACTUAL:\n${input.uiContext}\n\nINSTRUCCIONES PARA RESPONDER:\n- Identificá en qué página está el usuario y qué herramientas tiene disponibles.\n- Si pregunta "cómo uso esto", explicá las herramientas específicas de esa página.\n- Si ves datos visibles (precios, indicadores, tablas), analizalos.\n- Si ves errores o APIs caídas, reportalos.\n- Si el usuario quiere ejecutar una acción (crear cliente, analizar ticker, etc.), guialo paso a paso.\n- Respondé específico a la página actual, no genérico.`;
+    uiBloque = `\n\nCONTEXTO DE LA INTERFAZ ACTUAL:\n${input.uiContext}\n\nINSTRUCCIONES PARA RESPONDER:\n- IdentificÃ¡ en quÃ© pÃ¡gina estÃ¡ el usuario y quÃ© herramientas tiene disponibles.\n- Si pregunta "cÃ³mo uso esto", explicÃ¡ las herramientas especÃ­ficas de esa pÃ¡gina.\n- Si ves datos visibles (precios, indicadores, tablas), analizalos.\n- Si ves errores o APIs caÃ­das, reportalos.\n- Si el usuario quiere ejecutar una acciÃ³n (crear cliente, analizar ticker, etc.), guialo paso a paso.\n- RespondÃ© especÃ­fico a la pÃ¡gina actual, no genÃ©rico.`;
   }
 
   const messages: ChatMessage[] = [
@@ -876,22 +876,22 @@ ${nivelPrompt}${contextoBloque}${uiBloque}`,
 
       // Detectar intencion del usuario por palabras clave
       if (msg.includes("hola") || msg.includes("buen") || msg.length <= 3) {
-        return { text: `¡Hola! Estas en **${pagina || "Coronar Inversiones"}**. ${herramientas ? "En esta pagina podes: " + herramientas.replace("Herramientas disponibles en esta pagina: ", "").trim() : "Decime que necesitas y te ayudo."}`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
+        return { text: `Â¡Hola! Estas en **${pagina || "Coronar Inversiones"}**. ${herramientas ? "En esta pagina podes: " + herramientas.replace("Herramientas disponibles en esta pagina: ", "").trim() : "Decime que necesitas y te ayudo."}`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
       }
       if (msg.includes("crear") || msg.includes("nuev") || msg.includes("guardar") || msg.includes("registr")) {
-        return { text: `Para crear un nuevo elemento en **${pagina || "Coronar Inversiones"}**, completa el formulario que ves en pantalla y hace clic en "Guardar". Si necesitas ayuda con algún campo en particular, decime cual.`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
+        return { text: `Para crear un nuevo elemento en **${pagina || "Coronar Inversiones"}**, completa el formulario que ves en pantalla y hace clic en "Guardar". Si necesitas ayuda con algÃºn campo en particular, decime cual.`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
       }
       if (msg.includes("como") || msg.includes("que es") || msg.includes("ayuda") || msg.includes("funcion")) {
-        return { text: `En **${pagina || "Coronar Inversiones"}** podes realizar las siguientes acciones:\n${herramientas ? herramientas.replace("Herramientas disponibles en esta pagina: ", "").trim() : "Navega usando el menu lateral para acceder a las diferentes secciones."}\n\n¿Que accion queres realizar?`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
+        return { text: `En **${pagina || "Coronar Inversiones"}** podes realizar las siguientes acciones:\n${herramientas ? herramientas.replace("Herramientas disponibles en esta pagina: ", "").trim() : "Navega usando el menu lateral para acceder a las diferentes secciones."}\n\nÂ¿Que accion queres realizar?`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
       }
       if (msg.includes("gestion") || msg.includes("client") || msg.includes("crm")) {
         return { text: `Para gestionar clientes en CRM:\n1. Completa el formulario "Nuevo Cliente" con nombre, apellido, email, etc.\n2. Selecciona el perfil de inversor (Conservador/Moderado/Agresivo)\n3. Ingresa los activos en cartera separados por coma\n4. Hace clic en "Guardar"\n\nLos clientes guardados apareceran en la lista de abajo. Luego podes hacer backtesting de recomendaciones en las otras pestanas.`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
       }
       if (msg.includes("analiz") || msg.includes("recomend") || msg.includes("invers")) {
-        return { text: `En la pestana "Backtesting Recomendaciones" podes registrar recomendaciones de compra/venta para cada cliente. En "Vender / Mantener / Comprar" podes evaluar decisiones. ¿Que te gustaria hacer?`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
+        return { text: `En la pestana "Backtesting Recomendaciones" podes registrar recomendaciones de compra/venta para cada cliente. En "Vender / Mantener / Comprar" podes evaluar decisiones. Â¿Que te gustaria hacer?`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
       }
       // Respuesta generica contextual
-      return { text: `Estas en **${pagina || "Coronar Inversiones"}**. ${herramientas ? "Acciones disponibles: " + herramientas.replace("Herramientas disponibles en esta pagina: ", "").trim() : "Usa el menu lateral para navegar."}\n\n¿Que queres hacer?`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
+      return { text: `Estas en **${pagina || "Coronar Inversiones"}**. ${herramientas ? "Acciones disponibles: " + herramientas.replace("Herramientas disponibles en esta pagina: ", "").trim() : "Usa el menu lateral para navegar."}\n\nÂ¿Que queres hacer?`, intent: "question", provider: "context", model: "page-aware", agentTrace: trace, attempts: [] };
     }
   }
 
@@ -912,7 +912,7 @@ ${nivelPrompt}${contextoBloque}${uiBloque}`,
       break;
     }
 
-    // Fallback cloud: si la cadena primaria devolvió "API no disponible",
+    // Fallback cloud: si la cadena primaria devolviÃ³ "API no disponible",
     // reintentamos con otra cadena cloud (sin Ollama).
     if (resp.provider === "fallback" || resp.provider === "cache") {
       // Ollama deshabilitado: solo NVIDIA/cloud.
@@ -978,11 +978,11 @@ ${nivelPrompt}${contextoBloque}${uiBloque}`,
   }
 
   if (ultimoError) {
-    return { text: `[${ultimoError}]. Verificá que NVIDIA_API_KEY esté configurada en el .env.`, intent: "question", provider: "fallback", model: "none", agentTrace: trace, attempts: [] };
+    return { text: `[${ultimoError}]. VerificÃ¡ que NVIDIA_API_KEY estÃ© configurada en el .env.`, intent: "question", provider: "fallback", model: "none", agentTrace: trace, attempts: [] };
   }
   const last = [...messages].reverse().find((m) => m.role === "assistant");
   return {
-    text: last?.content ?? "[El agente alcanzó el máximo de iteraciones]",
+    text: last?.content ?? "[El agente alcanzÃ³ el mÃ¡ximo de iteraciones]",
     intent: "question",
     provider: "agent-loop",
     model: `tool-calling/${nivel}`,

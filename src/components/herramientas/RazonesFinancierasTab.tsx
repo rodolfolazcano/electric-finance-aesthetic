@@ -29,8 +29,8 @@ function fMoney(v: number | null): string {
 function MetricRow({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <tr className="border-b border-border/10 last:border-0">
-      <td className="py-1 pr-4 text-[10px] text-muted-foreground whitespace-nowrap">{label}</td>
-      <td className={`py-1 text-[10px] font-mono text-right ${color ?? "text-foreground"}`}>
+      <td className="py-1 pr-4 text-[13px] text-muted-foreground whitespace-nowrap">{label}</td>
+      <td className={`py-1 text-[13px] font-mono text-right ${color ?? "text-foreground"}`}>
         {value}
       </td>
     </tr>
@@ -42,7 +42,7 @@ function SectionHeader({ label }: { label: string }) {
     <tr>
       <td
         colSpan={2}
-        className="pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/60"
+        className="pt-3 pb-1 text-[13px] font-semibold uppercase tracking-widest text-muted-foreground/60"
       >
         {label}
       </td>
@@ -104,7 +104,7 @@ function InterpList({ items }: { items: string[] }) {
   return (
     <ul className="space-y-1.5">
       {items.map((t, i) => (
-        <li key={i} className="text-[9px] leading-relaxed text-muted-foreground flex gap-1.5">
+        <li key={i} className="text-[13px] leading-relaxed text-muted-foreground flex gap-1.5">
           <span className="text-emerald-400/70 shrink-0">•</span>
           <span>{t}</span>
         </li>
@@ -167,7 +167,7 @@ export function RazonesFinancierasTab({
   return (
     <div className="space-y-4">
       <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-        <p className="text-[10px] text-muted-foreground mb-2">
+        <p className="text-[13px] text-muted-foreground mb-2">
           Razones financieras según Weston &amp; Brigham (5 categorías) + descomposición DuPont a
           partir de los estados financieros anuales de Yahoo Finance.
         </p>
@@ -179,12 +179,12 @@ export function RazonesFinancierasTab({
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder="AAPL, MSFT, GGAL.BA"
             maxLength={20}
-            className="flex-1 rounded-md border border-border/40 bg-background/20 px-3 py-2 text-[11px] font-mono text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-emerald-500/50"
+            className="flex-1 rounded-md border border-border/40 bg-background/20 px-3 py-2 text-[14px] font-mono text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-emerald-500/50"
           />
           <button
             onClick={handleSearch}
             disabled={loading || !ticker.trim()}
-            className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[11px] text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[14px] text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? "Consultando..." : "Analizar razones"}
           </button>
@@ -192,13 +192,13 @@ export function RazonesFinancierasTab({
       </div>
 
       {error && (
-        <div className="rounded-md border border-red-500/30 bg-red-500/5 px-4 py-3 text-[10px] text-red-400">
+        <div className="rounded-md border border-red-500/30 bg-red-500/5 px-4 py-3 text-[13px] text-red-400">
           {error}
         </div>
       )}
 
       {loading && (
-        <div className="rounded-md border border-border/40 bg-background/40/60 px-4 py-6 text-center text-[10px] text-muted-foreground">
+        <div className="rounded-md border border-border/40 bg-background/40/60 px-4 py-6 text-center text-[13px] text-muted-foreground">
           Consultando estados financieros y calculando razones...
         </div>
       )}
@@ -207,13 +207,13 @@ export function RazonesFinancierasTab({
         <div className="space-y-4">
           {data.periods.length > 1 && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-3">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Período
               </p>
               <select
                 value={selectedIdx}
                 onChange={(e) => setSelectedIdx(Number(e.target.value))}
-                className="w-full rounded-md border border-border/40 bg-background/20 px-2 py-1.5 text-[11px] font-mono text-foreground outline-none focus:border-emerald-500/50"
+                className="w-full rounded-md border border-border/40 bg-background/20 px-2 py-1.5 text-[14px] font-mono text-foreground outline-none focus:border-emerald-500/50"
               >
                 {data.periods.map((p, i) => (
                   <option key={p.label + i} value={i}>
@@ -226,40 +226,40 @@ export function RazonesFinancierasTab({
 
           {selected && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-3">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-3">
                 Razones del periodo {selected.label} ({selected.endDate})
               </p>
               <RatioTable periodo={selected} />
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-4">
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Liquidez · interpretación
               </p>
               <InterpList items={data.interpretaciones.liquidez} />
             </div>
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Actividad · interpretación
               </p>
               <InterpList items={data.interpretaciones.actividad} />
             </div>
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Endeudamiento · interpretación
               </p>
               <InterpList items={data.interpretaciones.endeudamiento} />
             </div>
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Rentabilidad + DuPont · interpretación
               </p>
               <InterpList items={data.interpretaciones.rentabilidad} />
             </div>
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Valor de mercado · interpretación
               </p>
               <InterpList items={data.interpretaciones.mercado} />

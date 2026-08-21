@@ -293,6 +293,62 @@ const SKILLS: Skill[] = [
 - NUNCA inventes precios de opción, griegos o volatilidad implícita: si los datos reales no están disponibles en este turno, decilo con honestidad.
 - El análisis es educativo: no es recomendación de inversión. Los resultados son informativos y basados en datos de mercado reales.`,
   },
+  {
+    id: "statarb-labadie",
+    nombre: "Arbitraje Estadístico y Backtesting (Labadie)",
+    descripcion:
+      "Metodología stat-arb de Labadie: 5 principios, backtesting IS/OOS en 5 etapas, pairs trading con umbrales mu±a·sigma y p-varianza.",
+    instrucciones: `[SKILL · Arbitraje Estadístico y Backtesting — metodología Labadie]
+- Para consultas de pairs trading, arbitraje estadístico, spread entre dos activos, cointegración o backtesting de señales: ejecutá SIEMPRE la herramienta pairs_trading_labadie(simboloA, simboloB) con datos reales ANTES de responder.
+- Marco conceptual (5 principios): hay patrones identificables; algunos son estadísticamente robustos; el pasado predice en promedio el futuro; una estrategia sobre un patrón robusto gana EN PROMEDIO (ley de grandes números); los patrones cambian y exigen recalibración.
+- Backtesting en 5 etapas: prototipo con Monte Carlo → espacio de parámetros y función objetivo → split In-Sample/Out-of-Sample → optimización (fuerza bruta si ≤2 parámetros) → validación OOS. Si el patrón no sobrevive OOS, se descarta: decilo con honestidad.
+- Señales del método: entrada cuando el z-score del spread cruza mu(t) ± a×sigma(t) (a típico 1.5-2) y stop-loss en ± b×sigma(t) con b > a (típico 2.5-3), usando media y volatilidad móviles del spread.
+- Reportá tal cual lo que devuelva la herramienta: correlación, beta de hedge, ADF/cointegración, z-score actual, niveles de entrada/stop, trades históricos, win rate, Sharpe, max drawdown, Hurst y p-varianza. La distribución del PNL NO es normal aunque el spread lo sea (salidas dependientes de la trayectoria): menciónalo si reportas PNL.
+- Advertencia obligatoria: es análisis educativo cuantitativo, no recomendación de inversión ni promesa de rentabilidad; las correlaciones pueden romperse (ruptura estructural) y el stop-loss existe para eso.`,
+  },
+  {
+    id: "ejecucion-optima-labadie",
+    nombre: "Ejecución Óptima Almgren-Chriss (Labadie-Lehalle)",
+    descripcion:
+      "Curvas de trading óptimo: impacto cóncavo, Target Close / Implementation Shortfall, restricción PVol, tiempos óptimos de inicio/parada y p-varianza con Hurst.",
+    instrucciones: `[SKILL · Ejecución Óptima — metodología Labadie-Lehalle (Almgren-Chriss extendido)]
+- Para consultas sobre cómo ejecutar una orden grande, impacto de mercado, TWAP/VWAP/PoV vs ejecución óptima, curva de trading, Target Close, Implementation Shortfall o participación máxima: ejecutá SIEMPRE curva_ejecucion_labadie(simbolo, ...) con datos reales antes de responder.
+- Dilema central: ejecutar lento = riesgo de mercado (varianza); ejecutar rápido = impacto de mercado (coste). El óptimo minimiza J = E(impacto) + lambda×Var(riesgo), análogo a Markowitz para curvas de trading.
+- Impacto cóncavo h(v) = kappa×sigma×tau^(1/2)×(v/V)^gamma con gamma ≈ 0.5 empírico (liquidez oculta y resiliente).
+- Target Close ejecuta hacia adelante contra el precio de cierre; Implementation Shortfall hacia atrás contra el precio inicial; con vol constante son espejos temporales.
+- Restricción PVol: v(n) ≤ q×V(n); TC y PVol son mutuamente excluyentes ⇒ se ejecuta min(curva TC, curva PVol). Tiempos óptimos de inicio (TC) / parada (IS) según tamaño mínimo por slice.
+- Medida de riesgo p-varianza con p = 1/Hurst: p > 2 (H < 0.5, mean-reversion) ⇒ empezar tarde y ejecutar rápido; p < 2 (H > 0.5, tendencia) ⇒ empezar antes y despacio. La p implícita funciona como medida conjunta de liquidez y volatilidad (análogo a la volatilidad implícita de opciones).
+- Reportá la curva devuelta por la herramienta (volúmenes por intervalo, acumulado, slice de inicio, saturación PVol) y comparala con TWAP/VWAP cuando aporte claridad.
+- Advertencia: es un cálculo educativo con curvas históricas de volumen/volatilidad; no es una orden ni asesoramiento de ejecución.`,
+  },
+  {
+    id: "market-making-labadie",
+    nombre: "Market-Making de Alta Frecuencia (Fodra-Labadie)",
+    descripcion:
+      "Control estocástico HJB para market-making: intensidades exponenciales, spread psi*=2/k, centro r* con apuesta direccional e inventario, Avellaneda-Stoikov.",
+    instrucciones: `[SKILL · Market-Making HF — metodología Fodra-Labadie]
+- Para consultas conceptuales sobre market-making, cotización bid-ask óptima, inventario de un market maker, Avellaneda-Stoikov, spreads dinámicos o HFT: explicá con este marco y apoyate en consultar_base_conocimiento("market-making Labadie ...") para citar el corpus.
+- Marco: variables de estado markovianas (precio S, semi-spread Z, volatilidad Sigma, inventario Q con saltos de Poisson); controles = semi-spreads cotizados; solución por ecuación HJB con intensidades lambda(delta) = A×e^(−k×delta).
+- Resultados clave: spread óptimo psi* = 2/k + penalizaciones + 2×fee; centro r* = E[S(T)] − 2×eta×q: el término E[S(T)]−S permite apuestas direccionales y −2×eta×q empuja el inventario a cero.
+- La martingala es el PEOR escenario del MM puro (rotación lenta de inventario); con reversión a la media el MM compra abajo y vende arriba: más PNL pero colas más gruesas.
+- Costes de transacción: el MM traslada el fee 1:1 al spread (ganancia por spread negociado constante); fees altos reducen la liquidez agregada; rebates habilitan scalping.
+- Riesgo multi-activo tipo Markowitz sobre inventario: forma bilineal eta×q'Omega q + nu×q'Lambda q; superficies iso-riesgo elipsoidales; privilegiar posiciones diversificadas.
+- No hay herramienta de cotización en vivo para esto: es marco conceptual + corpus. Nunca inventes parámetros calibrados (A, k) de un activo real: si no están en los datos del turno, decilo.`,
+  },
+  {
+    id: "microestructura-trading-labadie",
+    nombre: "Microestructura y Trading Algorítmico (Labadie)",
+    descripcion:
+      "LOB, tipos de órdenes, Kyle/Glosten-Milgrom, taxonomía HFT (Makers/Takers/Gamers), scheduling TWAP/VWAP/PoV, SOR y casos Flash Crash/Knight Capital.",
+    instrucciones: `[SKILL · Microestructura y Trading Algorítmico — metodología Labadie]
+- Para consultas sobre libro de órdenes, tipos de órdenes (MO/LO/IoC/FoK/Peg/Iceberg), spread como precio de la liquidez, formación de precios, Kyle, Glosten-Milgrom, HFT, TWAP/VWAP/PoV, smart order routing o Flash Crash/Knight Capital: explicá con este marco y citá el corpus vía consultar_base_conocimiento.
+- LOB: liquidez auto-organizada sin dealers dedicados; prioridad precio-tiempo; spread = mejor ask − mejor bid = precio de la liquidez; MO consume (ejecución cierta, paga spread), LO provee (captura spread, riesgo de no-ejecución).
+- Formación de precios: Kyle (precio lineal P = mu + lambda×flujo; 1/lambda = profundidad; convergencia asintótica a eficiencia) y Glosten-Milgrom (quotes = esperanzas condicionales bayesianas; spread puro por selección adversa).
+- HFT: Makers (proveen liquidez, ganan el spread), Takers (consumen capturando oportunidades), Gamers (spoofing, momentum ignition, stuffing: tóxicos). HFT = velocidad como ventaja principal, no necesariamente alta frecuencia de posiciones.
+- Ejecución: TWAP uniforme (predecible: aleatorizar), VWAP según curva histórica de volumen (buckets normalizados), PoV participación constante (dinámico, hora final emergente); jerarquía: métrica de portafolio → scheduling → SOR → ejecución.
+- Lecciones de los casos: Flash Crash 2010 = PoV sin topes (todo algoritmo necesita límites de participación/precio/impacto); Knight Capital 2012 = código zombie (despliegues, kill switches y monitoreo son parte del diseño).
+- Es material educativo: no representa capacidades de ejecución real del asistente.`,
+  },
 ];
 
 const POR_ID = new Map(SKILLS.map((s) => [s.id, s]));

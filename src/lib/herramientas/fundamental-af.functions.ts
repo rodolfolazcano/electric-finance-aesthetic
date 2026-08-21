@@ -282,7 +282,7 @@ const AF_MODULES = [
   "calendarEvents",
 ];
 
-// ─── Mapas de traducción Yahoo (inglés) → JSON (español) ──────────
+//  Mapas de traducción Yahoo (inglés) → JSON (español) 
 
 const YAHOO_SECTOR_TO_ES: Record<string, string> = {
   Technology: "Tecnología",
@@ -887,7 +887,7 @@ async function computeFundamentalAF(symbol: string): Promise<FundamentalAFResult
     const governanceRiskLabel = or != null ? (or <= 3 ? "Bajo" : or <= 7 ? "Medio" : "Alto") : null;
     const governanceEpochDate = ap?.governanceEpochDate?.fmt ?? null;
 
-    // ── Beta propio contrastado (3-6 meses) ──────────────────────────────
+    //  Beta propio contrastado (3-6 meses) 
     let betaPropio: number | null = null;
     let betaR2: number | null = null;
     let betaBenchmarkUsado: "SPY" | "MERVAL" | null = null;
@@ -921,7 +921,7 @@ async function computeFundamentalAF(symbol: string): Promise<FundamentalAFResult
       // beta propio no disponible — continuar con nulls
     }
 
-    // ── Earnings Trend: momentum de revisiones de analistas ─────────────
+    //  Earnings Trend: momentum de revisiones de analistas 
     let revisionEstimadosPct: number | null = null;
     let revisionEstimadosDetalle: string | null = null;
     const et = qs.earningsTrend as { trend?: Record<string, unknown>[] } | undefined;
@@ -967,7 +967,7 @@ async function computeFundamentalAF(symbol: string): Promise<FundamentalAFResult
       }
     }
 
-    // ── Recommendation Trend (tendencia de recomendaciones de analistas) ──
+    //  Recommendation Trend (tendencia de recomendaciones de analistas) 
     let recommendationTrend: {
       strongBuy: number;
       buy: number;
@@ -993,7 +993,7 @@ async function computeFundamentalAF(symbol: string): Promise<FundamentalAFResult
       }
     }
 
-    // ── Net Share Purchase Activity (insiders) ─────────────────────────
+    //  Net Share Purchase Activity (insiders) 
     let insiderNetActivityPct: number | null = null;
     let insiderNetActivityInterpretacion: string | null = null;
     const nsp = qs.netSharePurchaseActivity as Record<string, unknown> | undefined;
@@ -1013,7 +1013,7 @@ async function computeFundamentalAF(symbol: string): Promise<FundamentalAFResult
       }
     }
 
-    // ── SEC Filings ────────────────────────────────────────────────────
+    //  SEC Filings 
     const sf = qs.secFilings as { filings?: Record<string, unknown>[] } | undefined;
     const secFilings: FilingRow[] = (sf?.filings ?? [])
       .filter((f: Record<string, unknown>) => {
@@ -1126,18 +1126,18 @@ async function computeFundamentalAF(symbol: string): Promise<FundamentalAFResult
             if (!peHistory.find((x) => x.year === endYear)) {
               peHistory.push({ year: endYear, pe: Math.round(pe * 10) / 10, eps });
               matchedCount++;
-              console.log(`[PE-HISTORY] ${symbol} FY${endYear} ➜ PE=${Math.round(pe * 10) / 10} ✓`);
+              console.log(`[PE-HISTORY] ${symbol} FY${endYear}  PE=${Math.round(pe * 10) / 10} `);
             } else {
               skippedDupYear++;
             }
           } else {
             skippedNoPE++;
             console.log(
-              `[PE-HISTORY] ${symbol} FY${endYear} ➜ PE=${pe?.toFixed(1)} fuera de rango (0-500) ✗`,
+              `[PE-HISTORY] ${symbol} FY${endYear}  PE=${pe?.toFixed(1)} fuera de rango (0-500) `,
             );
           }
         } else {
-          console.log(`[PE-HISTORY] ${symbol} FY${endYear} ➜ no matching chart timestamp ✗`);
+          console.log(`[PE-HISTORY] ${symbol} FY${endYear}  no matching chart timestamp `);
         }
       }
       peHistory.sort((a, b) => a.year - b.year);
@@ -1592,7 +1592,7 @@ async function computeFundamentalAF(symbol: string): Promise<FundamentalAFResult
   }
 }
 
-// ─── fetchFundamentalAFBatch (usa fetchYahooQuoteSummaryJson directo — patrón market-insights-hub-main) ─
+//  fetchFundamentalAFBatch (usa fetchYahooQuoteSummaryJson directo — patrón market-insights-hub-main) 
 
 const BATCH_MODULES = [
   "assetProfile",
@@ -1883,7 +1883,7 @@ export const fetchFundamentalAFBatch = createServerFn({ method: "POST" })
     return results;
   });
 
-// ─── findBestBenchmark ─────────────────────────────────────────────
+//  findBestBenchmark 
 
 export interface BenchmarkMatch {
   ticker: string;
@@ -1967,7 +1967,7 @@ export const findBestBenchmark = createServerFn({ method: "GET" })
     return results.slice(0, 10);
   });
 
-// ─── getSectorPeers ────────────────────────────────────────────────
+//  getSectorPeers 
 
 async function fetchYfIndustry(ticker: string): Promise<string | null> {
   try {
@@ -2093,7 +2093,7 @@ export const getSectorPeers = createServerFn({ method: "GET" })
     },
   );
 
-// ─── Periodo historico detallado (anual / trimestral) ──────────
+//  Periodo historico detallado (anual / trimestral) 
 
 export interface PeriodoHistoricoRow {
   label: string;
@@ -2115,7 +2115,7 @@ export interface PeriodoHistoricoRow {
   totalAssets: number | null;
   totalLiabilities: number | null;
   totalEquity: number | null;
-  // ── Detalle de balance (para análisis de razones financieras) ──
+  //  Detalle de balance (para análisis de razones financieras) 
   currentAssets: number | null;
   currentLiabilities: number | null;
   inventory: number | null;
@@ -2129,7 +2129,7 @@ export interface PeriodoHistoricoRow {
   earningsDate: string | null;
 }
 
-// ─── BLOQUE 5 — Leverage operativo, financiero y combinado ───────────
+//  BLOQUE 5 — Leverage operativo, financiero y combinado 
 // Fuente: Pascale, Cap. 18, puntos 18.2, 18.3 y 18.4.
 //   L.O. = %Δ GAII / %Δ Ventas = [Q(p-cv)] / [Q(p-cv) - CF]
 //   L.F. = %Δ UPA   / %Δ GAII  = [Q(p-cv)-CF] / [Q(p-cv)-CF-I]
@@ -2225,7 +2225,7 @@ export function calcularLeverageAproximado(
   };
 }
 
-// ─── BLOQUE 9.1 — Necesidad de Capital de Trabajo Neto (CTN) y ciclo de conversión ──
+//  BLOQUE 9.1 — Necesidad de Capital de Trabajo Neto (CTN) y ciclo de conversión 
 // Fuente: Alonso/Sapetnitzky, "Administración Financiera de las Organizaciones",
 // capítulo sobre PyMEs, secciones 4 y 5. CTN = Σε - Σγ; cada componente en días de
 // venta (Ic = Cc · VC/VT · IMD, Cc = 360/Rotación). Acá se aproxima el ciclo de
@@ -2381,7 +2381,7 @@ async function computeHistoricoDetallado(
       const ta = balRow ? num(balRow.totalAssets) : null;
       const tl = balRow ? num(balRow.totalLiab) : null;
       const te = balRow ? num(balRow.totalStockholderEquity) : null;
-      // ── Detalle de balance para razones de actividad/liquidez ──
+      //  Detalle de balance para razones de actividad/liquidez 
       const curAssets = balRow ? num(balRow.totalCurrentAssets) : null;
       const curLiab = balRow ? num(balRow.totalCurrentLiabilities) : null;
       const inventory = balRow ? num(balRow.inventory) : null;
@@ -2478,7 +2478,7 @@ async function computeHistoricoDetallado(
   }
 }
 
-// ─── Busqueda de noticias por ticker y ventana de fechas ──────
+//  Busqueda de noticias por ticker y ventana de fechas 
 
 export interface NewsItem {
   title: string;
@@ -2573,7 +2573,7 @@ export const fetchNoticiasTicker = createServerFn({ method: "GET" })
     },
   );
 
-// ─── Timeline cronológico de eventos (earnings + noticias) ─────
+//  Timeline cronológico de eventos (earnings + noticias) 
 
 interface TimelineEvent {
   date: string;
@@ -2616,7 +2616,7 @@ function construirLineaTiempoEventos(
   return events;
 }
 
-// ─── Generador de informe narrativo ───────────────────────────
+//  Generador de informe narrativo 
 
 const SECTOR_MARGIN_THRESHOLDS_INTERP: Record<string, number> = {
   Technology: 0.2,
@@ -2653,7 +2653,7 @@ export function generarInformeFundamental(
     (r.longBusinessSummary != null &&
       /^(the fund|this etf|seeks to track|the investment seeks)/i.test(r.longBusinessSummary));
 
-  // ── Contexto top-down ──
+  //  Contexto top-down 
   let contexto = "";
   const isBA = r.symbol.endsWith(".BA");
   if (isBA) {
@@ -2670,7 +2670,7 @@ export function generarInformeFundamental(
     contexto += `Sector ${r.sector}: las empresas con margen neto superior al ${(marginThr * 100).toFixed(0)}% se consideran solidas en este sector. ${r.symbol} presenta un margen TTM de ${r.profitMargin != null ? (r.profitMargin * 100).toFixed(1) : "N/D"}%. `;
   }
 
-  // ── Consistencia de márgenes y ROE en el tiempo ──
+  //  Consistencia de márgenes y ROE en el tiempo 
   if (!isETF && historico.length >= 3) {
     const validMargins = historico
       .filter((p) => p.netMargin != null)
@@ -2696,7 +2696,7 @@ export function generarInformeFundamental(
     }
   }
 
-  // ── Que paso (numeros) ──
+  //  Que paso (numeros) 
   let quePaso = "";
   if (currentPeriod) {
     quePaso = `En ${currentPeriod.label} (cierre: ${currentPeriod.endDate}), `;
@@ -2772,7 +2772,7 @@ export function generarInformeFundamental(
     }
   }
 
-  // ── Por que paso (timeline cronologico: earnings + noticias) ──
+  //  Por que paso (timeline cronologico: earnings + noticias) 
   let porQuePaso = "";
   const timeline = !isETF ? construirLineaTiempoEventos(historico, noticias) : [];
   if (timeline.length > 0) {
@@ -2809,7 +2809,7 @@ export function generarInformeFundamental(
     }
   }
 
-  // ── Que significa (valuacion, margen seguridad, VCS) ──
+  //  Que significa (valuacion, margen seguridad, VCS) 
   let queSignifica = "";
   if (isETF) {
     queSignifica = `Como ETF, su rendimiento sigue la evolucion del indice/subyacente que replica. `;
@@ -2868,7 +2868,7 @@ export function generarInformeFundamental(
     }
   }
 
-  // ── Senal (delegada a resolverSenalCoherente, fuente única de verdad) ──
+  //  Senal (delegada a resolverSenalCoherente, fuente única de verdad) 
   let senalLabel = "";
   let senal = "";
   if (isETF) {

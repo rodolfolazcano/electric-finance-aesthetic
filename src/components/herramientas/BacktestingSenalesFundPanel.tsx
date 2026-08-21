@@ -58,7 +58,7 @@ export default function BacktestingSenalesFundPanel() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end gap-4">
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+          <label className="block text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
             Ticker
           </label>
           <input
@@ -68,7 +68,7 @@ export default function BacktestingSenalesFundPanel() {
           />
         </div>
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+          <label className="block text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
             Período
           </label>
           <select
@@ -82,7 +82,7 @@ export default function BacktestingSenalesFundPanel() {
             <option value="MAX">Máximo</option>
           </select>
         </div>
-        <p className="text-[9px] text-muted-foreground/60 ml-auto">
+        <p className="text-[13px] text-muted-foreground/60 ml-auto">
           Fechas de publicación reales — sin look-ahead bias
         </p>
       </div>
@@ -94,7 +94,7 @@ export default function BacktestingSenalesFundPanel() {
 
       {data && !data.error && (
         <>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {data.porTipo.map((t) => {
               const tone =
                 t.winRate20d > 55 && t.retornoPromedio20d > 0
@@ -106,14 +106,14 @@ export default function BacktestingSenalesFundPanel() {
                 <div key={t.tipo} className="rounded-lg border border-border/60 bg-muted/30 p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span
-                      className="text-[10px] font-semibold uppercase tracking-wider"
+                      className="text-[13px] font-semibold uppercase tracking-wider"
                       style={{ color: TIPO_COLORS[t.tipo] }}
                     >
                       {TIPO_LABELS[t.tipo] ?? t.tipo}
                     </span>
-                    <span className="text-[10px] text-muted-foreground">N={t.ocurrencias}</span>
+                    <span className="text-[13px] text-muted-foreground">N={t.ocurrencias}</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+                  <div className="grid w-full grid-cols-2 gap-1.5 text-[13px]">
                     <MiniMetric
                       label="Win rate 20d"
                       value={`${t.winRate20d.toFixed(0)}%`}
@@ -190,12 +190,12 @@ export default function BacktestingSenalesFundPanel() {
                     .reverse()
                     .map((s, i) => (
                       <tr key={i} className="border-b border-border/10 hover:bg-muted/10">
-                        <td className="py-1.5 pr-2 font-mono text-[10px] text-muted-foreground">
+                        <td className="py-1.5 pr-2 font-mono text-[13px] text-muted-foreground">
                           {s.fechaPublicacion}
                         </td>
                         <td className="p-1.5">
                           <span
-                            className="text-[9px] font-medium"
+                            className="text-[13px] font-medium"
                             style={{ color: TIPO_COLORS[s.tipo] }}
                           >
                             {TIPO_LABELS[s.tipo] ?? s.tipo}
@@ -207,7 +207,7 @@ export default function BacktestingSenalesFundPanel() {
                         {[s.retorno5d, s.retorno20d, s.retorno60d, s.retorno120d].map((r, j) => (
                           <td
                             key={j}
-                            className={`p-1.5 text-right font-mono text-[10px] ${
+                            className={`p-1.5 text-right font-mono text-[13px] ${
                               r == null
                                 ? "text-muted-foreground/40"
                                 : r >= 0
@@ -241,8 +241,8 @@ function MiniMetric({
 }) {
   return (
     <div className="rounded border border-border/30 bg-muted/10 px-2 py-1">
-      <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={`mono text-[11px] ${className ?? ""}`}>{value}</div>
+      <div className="text-[13px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className={`mono text-[14px] ${className ?? ""}`}>{value}</div>
     </div>
   );
 }
@@ -250,7 +250,7 @@ function MiniMetric({
 function ChartTip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-border bg-surface px-3 py-2 text-[10px] font-mono shadow-sm">
+    <div className="rounded-lg border border-border bg-surface px-3 py-2 text-[13px] font-mono shadow-sm">
       {payload.map((p: any) => (
         <div key={p.name} style={{ color: p.color }}>
           {p.name}: {(p.value as number).toFixed(3)}

@@ -42,8 +42,8 @@ function TrendChartCard({
 }) {
   if (data.length === 0) {
     return (
-      <div className="rounded-lg border border-border/40 bg-background/40/40 p-4">
-        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+      <div className="rounded-lg border border-border/40 bg-background/40/40 p-6">
+        <div className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
           {title}
         </div>
         <div className="mt-4 text-xs text-muted-foreground">Sin datos históricos</div>
@@ -57,9 +57,9 @@ function TrendChartCard({
   const isUp = change != null && change > 0;
 
   return (
-    <div className="rounded-lg border border-border/40 bg-background/40/40 p-4">
+    <div className="rounded-lg border border-border/40 bg-background/40/40 p-6">
       <div className="flex items-center justify-between mb-2">
-        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
           {title}
         </div>
         <div className="flex items-center gap-2 font-mono text-xs">
@@ -137,12 +137,12 @@ function IndicatorCard({
   color?: string;
 }) {
   return (
-    <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
-      <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+    <div className="rounded-lg border border-border/40 bg-background/40/40 p-5">
+      <div className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
         {label}
       </div>
       <div className={`mt-1 text-sm font-semibold font-mono ${color}`}>{value}</div>
-      {sub && <div className="mt-0.5 text-[10px] text-muted-foreground">{sub}</div>}
+      {sub && <div className="mt-0.5 text-[13px] text-muted-foreground">{sub}</div>}
     </div>
   );
 }
@@ -159,12 +159,12 @@ export function TendenciasMacroPanel() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
+      <div className="space-y-6">
+        <div className="grid w-full gap-6 sm:grid-cols-2">
           <Skeleton className="h-[220px] w-full rounded-lg" />
           <Skeleton className="h-[220px] w-full rounded-lg" />
         </div>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid w-full grid-cols-4 gap-5">
           <Skeleton className="h-20 w-full rounded-lg" />
           <Skeleton className="h-20 w-full rounded-lg" />
           <Skeleton className="h-20 w-full rounded-lg" />
@@ -176,7 +176,7 @@ export function TendenciasMacroPanel() {
 
   if (isError || !data) {
     return (
-      <div className="rounded-md border border-danger/40 bg-danger/10 p-4 text-sm text-danger">
+      <div className="rounded-md border border-danger/40 bg-danger/10 p-6 text-sm text-danger">
         Error al cargar tendencias macro. Intente nuevamente.
       </div>
     );
@@ -201,23 +201,23 @@ export function TendenciasMacroPanel() {
       : null;
 
   return (
-    <div className="space-y-4">
-      <div className="mono text-[11px] uppercase tracking-[0.22em] text-primary/80">
+    <div className="space-y-6">
+      <div className="mono text-[14px] uppercase tracking-[0.22em] text-primary/80">
         Tendencias Macroeconómicas
       </div>
 
       {/* Trend charts */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid w-full gap-6 sm:grid-cols-2">
         <TrendChartCard title="Riesgo País" data={rpChart} color="#f59e0b" unit="pts" />
         <TrendChartCard title="Reservas BCRA" data={reservasChart} color="#3b82f6" unit="USD B" />
       </div>
 
       {/* Inflation cards */}
       <div>
-        <div className="mb-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="mb-2 text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
           Inflación de Referencia
         </div>
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-3">
+        <div className="grid w-full grid-cols-3 gap-5 sm:grid-cols-3">
           <IndicatorCard
             label="Mensual"
             value={data.inflacion.mensual != null ? fmtPct(data.inflacion.mensual, 2) : "\u2014"}
@@ -254,10 +254,10 @@ export function TendenciasMacroPanel() {
 
       {/* Rates cards */}
       <div>
-        <div className="mb-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="mb-2 text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
           Tasas Comparables
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid w-full grid-cols-2 gap-5 sm:grid-cols-4">
           <IndicatorCard
             label="BADLAR"
             value={data.tasas.badlar != null ? fmtPct(data.tasas.badlar, 2) : "\u2014"}

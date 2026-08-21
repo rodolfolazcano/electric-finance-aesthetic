@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Gauge,
@@ -13,22 +13,23 @@ import {
   Menu,
   X,
   Phone,
-  Sigma,
-  Target,
+  Briefcase,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { IOLLoginButton } from "@/components/shared/IOLLoginButton";
-import { IOLProvider } from "@/lib/herramientas/iol-context";
 import { ContextoTab } from "@/components/herramientas/ContextoTab";
 import { AnalisisTab } from "@/components/herramientas/AnalisisTab";
 import { CuantitativoTab } from "@/components/herramientas/CuantitativoTab";
 import { SectoresTab } from "@/components/herramientas/SectoresTab";
-import { RazonesFinancierasTab } from "@/components/herramientas/RazonesFinancierasTab";
-import { EstimacionesTab } from "@/components/herramientas/EstimacionesTab";
 import { PlanificacionFinancieraTab } from "@/components/herramientas/PlanificacionFinancieraTab";
-import { PlaceholderTab } from "@/components/herramientas/PlaceholderTab";
+import { CriptoTab } from "@/components/herramientas/CriptoTab";
 import { ArbitrajeP2PPanel } from "@/components/herramientas/ArbitrajeP2PPanel";
 import { OptionsPanel } from "@/components/options/OptionsPanel";
+import { PortfolioComposition } from "@/components/optimizer/PortfolioComposition";
+import { RentaFijaPanel } from "@/components/sections/RentaFijaPanel";
+import { SidebarHerramientas } from "@/components/herramientas/SidebarHerramientas";
 import bgImage from "@/assets/bg-skyline.jpg";
 import retratoCintia from "@/assets/cintia-boos.png";
 
@@ -60,34 +61,42 @@ export const Route = createFileRoute("/herramientas")({
 const TABS = [
   { id: "contexto", label: "Contexto", icon: Gauge, tipo: "core" },
   { id: "analisis", label: "Análisis", icon: Activity, tipo: "core" },
-  { id: "razones", label: "Razones + DuPont", icon: Sigma, tipo: "core" },
-  { id: "cuantitativo", label: "Cuantitativo", icon: LineChart, tipo: "core" },
-  { id: "estimaciones", label: "Estimaciones", icon: Target, tipo: "core" },
   { id: "sectores", label: "Sectores", icon: Layers, tipo: "core" },
-  { id: "planificacion", label: "Planificación", icon: Calculator, tipo: "core" },
+  { id: "cuantitativo", label: "Cuantitativo", icon: LineChart, tipo: "core" },
+  { id: "portafolio", label: "Portafolio", icon: Briefcase, tipo: "core" },
+  { id: "renta-fija", label: "Renta Fija", icon: Landmark, tipo: "core" },
   { id: "opciones", label: "Opciones", icon: PieChart, tipo: "core" },
-  { id: "renta-fija", label: "Renta Fija", icon: Landmark, tipo: "proximamente" },
-  { id: "cripto", label: "Cripto", icon: Bitcoin, tipo: "proximamente" },
-  { id: "arbitrador", label: "Arbitrador", icon: ArrowLeftRight, tipo: "proximamente" },
+  { id: "arbitrador", label: "Arbitrador", icon: ArrowLeftRight, tipo: "core" },
+  { id: "cripto", label: "Cripto", icon: Bitcoin, tipo: "core" },
+  { id: "planificacion", label: "Planificación", icon: Calculator, tipo: "core" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
 
 const CONTAINER = "mx-auto w-full max-w-[1240px] px-5 sm:px-8 lg:px-12";
+const HOME_NAV = [
+  { label: "Inicio", href: "/#inicio" },
+  { label: "Perfil", href: "/#test-inversor" },
+  { label: "Herramientas", href: "/#herramientas" },
+  { label: "Instrumentos", href: "/#instrumentos" },
+  { label: "Brokers", href: "/#brokers" },
+  { label: "Preguntas", href: "/#preguntas" },
+];
 
 function HerramientasPage() {
-  return (
-    <IOLProvider>
-      <HerramientasContenido />
-    </IOLProvider>
-  );
+  return <HerramientasContenido />;
 }
 
 function HerramientasContenido() {
-  const { tab } = Route.useSearch();
+  const { tab, subTab } = Route.useSearch();
+  const navigate = useNavigate();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [railState, setRailState] = useState({ isVisible: true, isExpanded: true, isMobile: false });
   const activo = (TABS.some((t) => t.id === tab) ? tab : "contexto") as TabId;
+
+  const setTab = (newTab: string) => navigate({ search: { tab: newTab } as any });
+  const setSubTab = (newSub: string) => navigate({ search: { tab: activo, subTab: newSub } as any });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -98,12 +107,8 @@ function HerramientasContenido() {
 
   return (
     <div className="relative min-h-screen text-foreground">
-      {/* ============ FONDO GLOBAL (idéntico al inicio) ============ */}
       <div aria-hidden className="fixed inset-0 -z-10">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${bgImage})` }} />
         <div
           className="absolute inset-0"
           style={{
@@ -111,16 +116,9 @@ function HerramientasContenido() {
               "radial-gradient(56rem 34rem at 82% 8%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 62%), radial-gradient(46rem 30rem at -5% 92%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%), linear-gradient(180deg, rgba(6,9,18,0.72) 0%, rgba(6,9,18,0.45) 45%, rgba(6,9,18,0.62) 100%)",
           }}
         />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(56rem 34rem at 82% 8%, color-mix(in oklab, var(--primary) 12%, transparent), transparent 62%)",
-          }}
-        />
       </div>
 
-      {/* ============ HEADER (mismo diseño que el inicio) ============ */}
+      {/* HEADER - mantiene menú original electric + back/forward + navegación a Inicio */}
       <header
         className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${
           scrolled || menuAbierto
@@ -128,12 +126,17 @@ function HerramientasContenido() {
             : "border-b border-transparent bg-transparent"
         }`}
       >
-        <div
-          className={`${CONTAINER} flex items-center justify-between gap-4 py-4 transition-all ${
-            scrolled ? "py-3" : ""
-          }`}
-        >
-          <div className="flex min-w-0 items-center gap-4">
+        <div className={`${CONTAINER} flex items-center justify-between gap-3 py-3`}>
+          <div className="flex min-w-0 items-center gap-2">
+            {/* Back / Forward */}
+            <div className="hidden sm:flex items-center gap-1 mr-1">
+              <button onClick={() => window.history.back()} aria-label="Atrás" className="h-8 w-8 inline-flex items-center justify-center rounded-full border border-border/40 hover:bg-muted/30 text-muted-foreground hover:text-foreground transition-colors">
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button onClick={() => window.history.forward()} aria-label="Adelante" className="h-8 w-8 inline-flex items-center justify-center rounded-full border border-border/40 hover:bg-muted/30 text-muted-foreground hover:text-foreground transition-colors">
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
             <Link to="/" className="flex shrink-0 items-center gap-2.5">
               <span className="h-9 w-9 overflow-hidden rounded-full border border-primary/40">
                 <img src={retratoCintia} alt="Cintia Boos" className="h-full w-full object-cover" />
@@ -142,142 +145,88 @@ function HerramientasContenido() {
                 Cintia <em className="italic text-primary">Boos</em>
               </span>
             </Link>
-            <div aria-hidden className="hidden h-5 w-px bg-border/60 sm:block" />
-            <p className="hidden items-center gap-2 eyebrow sm:flex">Herramientas</p>
+            <div aria-hidden className="hidden h-5 w-px bg-border/60 lg:block" />
+            <nav className="hidden lg:flex items-center gap-4 ml-1" aria-label="Navegación Inicio">
+              {HOME_NAV.map((n) => (
+                <a key={n.label} href={n.href} className="text-[14px] uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground transition-colors">
+                  {n.label}
+                </a>
+              ))}
+            </nav>
           </div>
 
           <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2 mr-1">
+              <span className="hidden lg:inline text-[13px] uppercase tracking-wide text-muted-foreground/70">Herramientas</span>
+              <span className="h-4 w-px bg-border/40 hidden lg:block" />
+            </div>
             <IOLLoginButton />
-            <a
-              href={WHATSAPP}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-[12.5px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 md:inline-flex"
-            >
-              Consultar por WhatsApp
+            <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="hidden items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-[12.5px] font-semibold text-primary-foreground hover:bg-primary/90 md:inline-flex">
+              WhatsApp
             </a>
-            <a
-              href={WHATSAPP}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Consultar por WhatsApp"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 md:hidden"
-            >
+            <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground md:hidden">
               <Phone className="h-4 w-4" />
             </a>
-            <button
-              onClick={() => setMenuAbierto((v) => !v)}
-              aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
-              aria-expanded={menuAbierto}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground lg:hidden"
-            >
+            <button onClick={() => setMenuAbierto((v) => !v)} aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"} aria-expanded={menuAbierto} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground lg:hidden">
               {menuAbierto ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
           </div>
         </div>
-
         {menuAbierto && (
           <nav className="border-t border-border/60 bg-background/70 px-5 pb-6 pt-3 backdrop-blur-xl lg:hidden">
+            <div className="flex gap-1 mb-3">
+              <button onClick={() => window.history.back()} className="flex-1 h-9 rounded-full border border-border text-[14px]">← Atrás</button>
+              <button onClick={() => window.history.forward()} className="flex-1 h-9 rounded-full border border-border text-[14px]">Adelante →</button>
+            </div>
+            <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">Inicio</p>
+            <ul className="flex flex-col mb-4">
+              {HOME_NAV.map((n) => (
+                <li key={n.label}><a href={n.href} onClick={() => setMenuAbierto(false)} className="block py-2.5 text-[13px] uppercase tracking-[0.14em] text-muted-foreground">{n.label}</a></li>
+              ))}
+            </ul>
+            <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">Herramientas</p>
             <ul className="flex flex-col">
               {TABS.map((t) => (
-                <li key={t.id}>
-                  <Link
-                    to="/herramientas"
-                    search={{ tab: t.id }}
-                    onClick={() => setMenuAbierto(false)}
-                    className={`flex items-center gap-3 py-3 text-[13px] uppercase tracking-[0.16em] transition-colors ${
-                      t.id === activo ? "text-primary" : "text-muted-foreground"
-                    }`}
-                  >
-                    <t.icon className="h-4 w-4 flex-none" />
-                    {t.label}
-                    {t.tipo === "proximamente" && (
-                      <span className="rounded-full bg-gold/10 px-2 py-0.5 text-[9px] font-semibold tracking-[0.08em] text-gold">
-                        PRONTO
-                      </span>
-                    )}
-                  </Link>
-                </li>
+                <li key={t.id}><Link to="/herramientas" search={{ tab: t.id }} onClick={() => setMenuAbierto(false)} className={`flex items-center gap-3 py-2.5 text-[13px] uppercase tracking-[0.14em] ${t.id === activo ? "text-primary" : "text-muted-foreground"}`}><t.icon className="h-4 w-4" />{t.label}</Link></li>
               ))}
             </ul>
           </nav>
         )}
       </header>
 
-      {/* ============ INTRODUCCIÓN ============ */}
-      <div className={`${CONTAINER} pt-28 pb-8`}>
-        <p className="eyebrow">Panel de análisis financiero</p>
-        <h1 className="mt-4 max-w-3xl font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight chrome-text">
-          Probá el panel de análisis financiero
-        </h1>
-        <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground lg:text-[17px]">
-          Datos en vivo de Yahoo Finance, IOL, BCRA, ArgentinaDatos y CriptoYa. Si opera con
-          InvertirOnline, inicie sesión desde el botón «IOL» para analizar{" "}
-          <em className="text-foreground/90">su</em> portafolio real.
-        </p>
-        <div aria-hidden className="electric-line mt-8 max-w-2xl" />
-      </div>
+      {/* Sidebar auto-hide como Clarity */}
+      <SidebarHerramientas activeTab={activo} activeSubTab={subTab} onTabChange={setTab} onSubTabChange={setSubTab} onRailStateChange={setRailState} />
 
-      <div className="mx-auto flex w-full max-w-[1600px] gap-6 px-5 pb-16 sm:px-8 lg:px-12">
-        {/* Sidebar desktop */}
-        <aside className="hidden w-60 shrink-0 lg:block">
-          <nav className="sticky top-24 space-y-1.5">
-            {TABS.map((t) => {
-              const esActivo = t.id === activo;
-              return (
-                <Link
-                  key={t.id}
-                  to="/herramientas"
-                  search={{ tab: t.id }}
-                  className={cn(
-                    "flex items-center gap-3 rounded-xl border px-4 py-3 text-[13px] transition-colors",
-                    esActivo
-                      ? "border-primary/40 bg-primary/[0.07] font-semibold text-primary"
-                      : "border-border/70 bg-secondary/20 text-muted-foreground hover:border-primary/40 hover:text-foreground",
-                  )}
-                >
-                  <t.icon className="h-4 w-4 flex-none" />
-                  <span className="flex-1">{t.label}</span>
-                  {t.tipo === "proximamente" && (
-                    <span className="rounded-full bg-gold/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-gold ring-1 ring-gold/30">
-                      pronto
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-        </aside>
-
-        {/* Contenido */}
-        <main className="min-w-0 flex-1">
-          {activo === "contexto" && <ContextoTab />}
-          {activo === "analisis" && <AnalisisTab />}
-          {activo === "razones" && <RazonesFinancierasTab />}
-          {activo === "cuantitativo" && <CuantitativoTab />}
-          {activo === "estimaciones" && <EstimacionesTab />}
-          {activo === "sectores" && <SectoresTab />}
-          {activo === "planificacion" && <PlanificacionFinancieraTab />}
-          {activo === "opciones" && <OptionsPanel />}
-          {activo === "renta-fija" && (
-            <PlaceholderTab
-              titulo="Renta Fija"
-              descripcion="Bonos soberanos, ONs, LECAPs y FCIs con TIR, paridad y duración vía IOL."
-            />
-          )}
-          {activo === "cripto" && (
-            <PlaceholderTab
-              titulo="Cripto"
-              descripcion="Panel cripto con precios multi-exchange y métricas de mercado."
-            />
-          )}
-          {activo === "arbitrador" && <ArbitrajeP2PPanel />}
-
-          <p className="mt-8 text-[11px] leading-snug text-muted-foreground">
-            Herramientas informativas con datos de terceros. No constituyen recomendación de
-            inversión.
+      {/* Contenido - ocupa todo el ancho y más arriba */}
+      <div className={cn("transition-all duration-200", !railState.isMobile && railState.isVisible && (railState.isExpanded ? "ml-[252px]" : "ml-[64px]"), railState.isMobile && "ml-0")}>
+        <div className={`${CONTAINER} pt-20 pb-6`}>
+          <p className="eyebrow">Panel de análisis financiero</p>
+          <h1 className="mt-3 max-w-4xl font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight chrome-text">
+            Probá el panel de análisis financiero
+          </h1>
+          <p className="mt-3 max-w-3xl text-[17px] leading-relaxed text-muted-foreground lg:text-[19px]">
+            Datos en vivo de Yahoo Finance, IOL, BCRA, ArgentinaDatos y CriptoYa. Si opera con InvertirOnline, inicie sesión desde el botón <span className="text-foreground font-medium">IOL</span> arriba a la derecha para analizar su portafolio real. Use atrás/adelante del navegador o del header para navegar.
           </p>
-        </main>
+          <div aria-hidden className="electric-line mt-6 max-w-3xl" />
+        </div>
+
+        <div className={`${CONTAINER} pb-16`}>
+          <main className="min-w-0 flex-1 w-full">
+            {activo === "contexto" && <ContextoTab />}
+            {activo === "analisis" && <AnalisisTab />}
+            {activo === "sectores" && <SectoresTab initialTab={subTab} />}
+            {activo === "cuantitativo" && <CuantitativoTab />}
+            {activo === "portafolio" && <PortfolioComposition />}
+            {activo === "renta-fija" && <RentaFijaPanel accessToken={null} refreshToken={null} onTokenRefresh={() => {}} />}
+            {activo === "opciones" && <OptionsPanel />}
+            {activo === "arbitrador" && <ArbitrajeP2PPanel />}
+            {activo === "cripto" && <CriptoTab />}
+            {activo === "planificacion" && <PlanificacionFinancieraTab />}
+            <p className="mt-8 text-[14px] leading-snug text-muted-foreground border-t border-border/20 pt-4">
+              Herramientas informativas con datos de terceros. No constituyen recomendación de inversión. Fuentes: BYMA · IOL · Yahoo Finance · BCRA · Delay 15-20’
+            </p>
+          </main>
+        </div>
       </div>
     </div>
   );

@@ -14,14 +14,14 @@ export function HedgeUniverseTable({ assets, selectedTickers, onToggle }: Props)
     <div className="space-y-2">
       <h3 className="font-mono text-xs font-medium text-foreground">
         Ranking del Universo de Cobertura
-        <span className="ml-2 text-[10px] font-normal text-muted-foreground">
+        <span className="ml-2 text-[13px] font-normal text-muted-foreground">
           ({assets.length} activos)
         </span>
       </h3>
       <div className="max-h-[300px] overflow-y-auto rounded-lg border border-border/40">
-        <table className="w-full text-left font-mono text-[11px]">
+        <table className="w-full text-left font-mono text-[14px]">
           <thead className="sticky top-0 bg-background">
-            <tr className="border-b border-border/40 text-[10px] uppercase tracking-wider text-muted-foreground">
+            <tr className="border-b border-border/40 text-[13px] uppercase tracking-wider text-muted-foreground">
               <th className="w-8 px-3 py-2"></th>
               <th className="px-3 py-2">Ticker</th>
               <th className="px-3 py-2">Nombre</th>
@@ -55,7 +55,7 @@ export function HedgeUniverseTable({ assets, selectedTickers, onToggle }: Props)
                   </td>
                   <td className="px-3 py-1.5">
                     <span
-                      className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                      className={`rounded px-1.5 py-0.5 text-[13px] font-medium ${
                         a.tipo === "ETF"
                           ? "bg-blue-500/10 text-blue-400"
                           : a.tipo === "CEDEAR"

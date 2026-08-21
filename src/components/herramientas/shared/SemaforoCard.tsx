@@ -26,13 +26,13 @@ export function SemaforoCard({
 
   return (
     <div className="rounded-md border border-border/40 bg-background/40 min-w-0 overflow-hidden p-4">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+      <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
         <div className="min-w-0">
           <div className="flex items-center gap-3">
             <h3 className="mono truncate text-xl font-semibold">{data.ticker}</h3>
             {data.clasificacionJerarquica ? (
               <span
-                className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${
+                className={`rounded-full border px-2 py-0.5 text-[13px] font-medium ${
                   data.clasificacionJerarquica === "COMPRA" ||
                   data.clasificacionJerarquica === "COMPRA CON CAUTELA"
                     ? "border-success/40 bg-success/10 text-success"
@@ -45,7 +45,7 @@ export function SemaforoCard({
               </span>
             ) : (
               <span
-                className={`rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${lightColor(data.light)}`}
+                className={`rounded-full border px-2 py-0.5 text-[13px] font-medium uppercase tracking-wider ${lightColor(data.light)}`}
               >
                 {data.recommendation}
               </span>
@@ -70,7 +70,7 @@ export function SemaforoCard({
               </span>
             )}
           </p>
-          <p className="mt-1 text-[10px] text-muted-foreground/60">
+          <p className="mt-1 text-[13px] text-muted-foreground/60">
             {data.dataSource === "yahoo" ? "Yahoo Finance (delay 15-20 min)" : "IOL (tiempo real)"}
             {data.lastUpdated && (
               <> · Actualizado: {new Date(data.lastUpdated).toLocaleString("es-AR")}</>
@@ -160,17 +160,17 @@ export function SemaforoCard({
       {/* Tendencia + Momentum + Soporte/Resistencia labels */}
       {scores && (
         <div className="mt-3 flex flex-wrap gap-1.5">
-          <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-[10px] text-muted-foreground">
+          <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-[13px] text-muted-foreground">
             {scores.tendencia.label}
           </span>
           {data.soportes && data.soportes.length > 0 && (
-            <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-[10px] text-muted-foreground">
+            <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-[13px] text-muted-foreground">
               Soporte ${data.soportes[0].precio.toFixed(2)} ({data.distanciaSoporte?.toFixed(1)}%)
               {data.soportes[0].esEstimado ? " — estimado por mínimo 52 semanas" : ""}
             </span>
           )}
           {data.resistencias && data.resistencias.length > 0 && (
-            <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-[10px] text-muted-foreground">
+            <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-[13px] text-muted-foreground">
               Resistencia ${data.resistencias[0].precio.toFixed(2)} (+
               {data.distanciaResistencia?.toFixed(1)}%)
               {data.resistencias[0].esEstimado ? " — estimado por máximo 52 semanas" : ""}
@@ -184,10 +184,10 @@ export function SemaforoCard({
         <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
           {data.extended.consensoAnalistas && (
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="mb-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              <div className="mb-1.5 text-[13px] uppercase tracking-[0.16em] text-muted-foreground">
                 Consenso de analistas
               </div>
-              <div className="flex gap-2 text-[10px] font-mono">
+              <div className="flex gap-2 text-[13px] font-mono">
                 <span className="text-success">{data.extended.consensoAnalistas.strongBuy} SB</span>
                 <span className="text-success/70">{data.extended.consensoAnalistas.buy} B</span>
                 <span className="text-muted-foreground">
@@ -200,14 +200,14 @@ export function SemaforoCard({
           )}
           {data.extended.ownership && (
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="mb-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              <div className="mb-1.5 text-[13px] uppercase tracking-[0.16em] text-muted-foreground">
                 Quién sostiene esto
               </div>
               {data.extended.ownership.porcentajeInstitucional == null &&
               data.extended.ownership.porcentajeInsiders == null ? (
-                <div className="text-[10px] text-muted-foreground">Dato no disponible</div>
+                <div className="text-[13px] text-muted-foreground">Dato no disponible</div>
               ) : (
-                <div className="flex gap-3 text-[10px] font-mono">
+                <div className="flex gap-3 text-[13px] font-mono">
                   <span className="text-foreground">
                     Inst:{" "}
                     {data.extended.ownership.porcentajeInstitucional != null
@@ -243,7 +243,7 @@ export function SemaforoCard({
       {data.extended?.sorpresaPromedioPct != null && (
         <div className="mt-3">
           <span
-            className={`rounded-md border px-2 py-1 text-[10px] ${
+            className={`rounded-md border px-2 py-1 text-[13px] ${
               data.extended.sorpresaPromedioPct > 0
                 ? "border-success/40 bg-success/10 text-success"
                 : "border-danger/40 bg-danger/10 text-danger"
@@ -260,7 +260,7 @@ export function SemaforoCard({
 
       {/* Interpretaciones expandibles */}
       <div className="mt-5">
-        <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+        <div className="mb-2 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
           Señales
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -268,7 +268,7 @@ export function SemaforoCard({
             <span
               key={i}
               onClick={() => setExpandedSignal(expandedSignal === i ? null : i)}
-              className={`cursor-pointer rounded-md border px-2 py-1 text-[11px] transition-all ${
+              className={`cursor-pointer rounded-md border px-2 py-1 text-[14px] transition-all ${
                 s.tone === "good"
                   ? "border-success/40 bg-success/10 text-success hover:bg-success/20"
                   : s.tone === "bad"
@@ -283,7 +283,7 @@ export function SemaforoCard({
         </div>
         {/* Lecturas expandidas */}
         {expandedSignal != null && data.signals[expandedSignal]?.lectura && (
-          <div className="mt-2 rounded-md border border-border/40 bg-muted/10 p-3 text-[11px] leading-relaxed">
+          <div className="mt-2 rounded-md border border-border/40 bg-muted/10 p-3 text-[14px] leading-relaxed">
             <p className="text-foreground">{data.signals[expandedSignal].lectura}</p>
             {data.signals[expandedSignal].implicancia && (
               <p className="mt-1 text-muted-foreground border-t border-border/20 pt-1">
@@ -297,14 +297,14 @@ export function SemaforoCard({
       {/* Cierre interpretativo */}
       {data.cierreInterpretacion && (
         <div className="mt-4 rounded-md border border-primary/30 bg-primary/5 p-3">
-          <p className="text-[11px] leading-relaxed text-foreground">{data.cierreInterpretacion}</p>
+          <p className="text-[14px] leading-relaxed text-foreground">{data.cierreInterpretacion}</p>
         </div>
       )}
 
       {/* Botón de navegación a análisis fundamental (solo para acciones/CEDEARs/ADRs/ETFs) */}
       {data.infoActivo?.soportaFundamental && onNavigateToFundamental && (
         <div className="mt-4 flex items-center justify-between gap-3">
-          <div className="text-[10px] text-muted-foreground">
+          <div className="text-[13px] text-muted-foreground">
             {data.infoActivo.descripcion} ·{" "}
             {data.infoActivo.soportaFundamental
               ? "Con análisis fundamental disponible"
@@ -312,7 +312,7 @@ export function SemaforoCard({
           </div>
           <button
             onClick={() => onNavigateToFundamental(data.ticker)}
-            className="rounded-md bg-accent/15 border border-accent/30 px-3 py-1.5 text-[11px] text-accent hover:bg-accent/25 transition-colors"
+            className="rounded-md bg-accent/15 border border-accent/30 px-3 py-1.5 text-[14px] text-accent hover:bg-accent/25 transition-colors"
           >
             Ver análisis fundamental
           </button>
@@ -323,7 +323,7 @@ export function SemaforoCard({
       {data.scoreUnificado && (
         <div className="mt-4 rounded-md border border-border/40 bg-muted/20 p-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+            <span className="text-[13px] uppercase tracking-[0.16em] text-muted-foreground">
               Score unificado{" "}
               {data.infoActivo?.soportaFundamental ? "(técnico + fundamental)" : "(técnico)"}
             </span>
@@ -342,7 +342,7 @@ export function SemaforoCard({
           </div>
           {data.scoreUnificado.contradiccion && (
             <div className="mt-2 rounded-md border border-warning/30 bg-warning/10 p-2">
-              <p className="text-[10px] text-warning">
+              <p className="text-[13px] text-warning">
                 {data.scoreUnificado.contradiccion.descripcion}
               </p>
             </div>

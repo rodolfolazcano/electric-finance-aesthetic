@@ -41,15 +41,15 @@ function timeAgo(iso: string): string {
 function NewsCard({ item }: { item: MarketNewsItem }) {
   return (
     <a href={item.url} target="_blank" rel="noopener noreferrer" className="block">
-      <Card className="glass-2 group cursor-pointer border-border/40 p-4 transition-colors hover:border-primary/30">
+      <Card className="glass-2 group cursor-pointer border-border/40 p-6 transition-colors hover:border-primary/30">
         <div className="mb-2 flex items-center gap-2">
           <span
-            className={`rounded border px-1.5 py-0.5 text-[10px] font-mono ${CATEGORY_COLORS[item.category]}`}
+            className={`rounded border px-1.5 py-0.5 text-[13px] font-mono ${CATEGORY_COLORS[item.category]}`}
           >
             {CATEGORY_LABELS[item.category] ?? item.category}
           </span>
-          <span className="text-[10px] text-muted-foreground">{item.source}</span>
-          <span className="ml-auto text-[10px] text-muted-foreground">
+          <span className="text-[13px] text-muted-foreground">{item.source}</span>
+          <span className="ml-auto text-[13px] text-muted-foreground">
             {timeAgo(item.publishedAt)}
           </span>
         </div>
@@ -59,7 +59,7 @@ function NewsCard({ item }: { item: MarketNewsItem }) {
         {item.summary && (
           <p className="text-xs text-muted-foreground leading-relaxed">{item.summary}</p>
         )}
-        <span className="mt-2 inline-block text-[10px] font-mono text-primary/60 group-hover:text-primary transition-colors">
+        <span className="mt-2 inline-block text-[13px] font-mono text-primary/60 group-hover:text-primary transition-colors">
           Leer más →
         </span>
       </Card>
@@ -121,7 +121,7 @@ export function MarketNewsPanel() {
 
   if (isLoading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-5">
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-28 w-full rounded-lg" />
         ))}
@@ -131,22 +131,22 @@ export function MarketNewsPanel() {
 
   if (isError) {
     return (
-      <div className="rounded-md border border-danger/40 bg-danger/10 p-4 text-sm text-danger">
+      <div className="rounded-md border border-danger/40 bg-danger/10 p-6 text-sm text-danger">
         Error al cargar noticias. Intente nuevamente.
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Source badge */}
-      <div className="flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted-foreground">
         <span className="font-mono">Fuentes:</span>
         {["Ámbito", "Cronista", "Infobae", "Investing", "Reuters", "Google News", "BCRA"].map(
           (src) => (
             <span
               key={src}
-              className={`rounded border px-1.5 py-0.5 font-mono text-[9px] ${
+              className={`rounded border px-1.5 py-0.5 font-mono text-[13px] ${
                 (data?.sourcesOk?.includes(src) ?? false)
                   ? "border-emerald-800/40 bg-emerald-950/40 text-emerald-400"
                   : "border-border/40 bg-muted/20 text-muted-foreground line-through"
@@ -164,7 +164,7 @@ export function MarketNewsPanel() {
           <button
             key={key}
             onClick={() => setFilterCategory(key)}
-            className={`rounded border px-2 py-1 text-[11px] font-mono transition-colors ${
+            className={`rounded border px-2 py-1 text-[14px] font-mono transition-colors ${
               filterCategory === key
                 ? "border-primary/60 bg-primary/10 text-foreground"
                 : "border-border/60 text-muted-foreground hover:text-foreground"
@@ -205,7 +205,7 @@ export function MarketNewsPanel() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid w-full gap-5 sm:grid-cols-2">
               {filteredItems.map((item) => (
                 <NewsCard key={item.id} item={item} />
               ))}
@@ -216,13 +216,13 @@ export function MarketNewsPanel() {
 
       {/* Portfolio news */}
       {token && (
-        <div className="space-y-3 pt-4 border-t border-border/40">
+        <div className="space-y-5 pt-4 border-t border-border/40">
           <div className="flex items-center justify-between">
             <h3 className="font-mono text-xs font-medium text-foreground">
               Noticias de mi cartera IOL
             </h3>
             {portfolioNews && (
-              <span className="font-mono text-[10px] text-muted-foreground">
+              <span className="font-mono text-[13px] text-muted-foreground">
                 {portfolioNews.symbols.length} activos — $
                 {portfolioNews.totalValorizado.toLocaleString("es-AR", {
                   minimumFractionDigits: 0,
@@ -232,7 +232,7 @@ export function MarketNewsPanel() {
           </div>
 
           {portfolioLoading && (
-            <div className="space-y-3">
+            <div className="space-y-5">
               {Array.from({ length: 3 }).map((_, i) => (
                 <Skeleton key={i} className="h-24 w-full rounded-lg" />
               ))}
@@ -240,19 +240,19 @@ export function MarketNewsPanel() {
           )}
 
           {portfolioError && (
-            <div className="rounded-md border border-danger/40 bg-danger/10 p-3 text-[11px] font-mono text-danger">
+            <div className="rounded-md border border-danger/40 bg-danger/10 p-5 text-[14px] font-mono text-danger">
               Error al cargar noticias del portafolio.
             </div>
           )}
 
           {portfolioNews && portfolioNews.items.length === 0 && (
-            <div className="rounded-lg border border-border/40 px-4 py-6 text-center font-mono text-[11px] text-muted-foreground">
+            <div className="rounded-lg border border-border/40 px-4 py-6 text-center font-mono text-[14px] text-muted-foreground">
               No hay noticias recientes para los activos de tu cartera.
             </div>
           )}
 
           {portfolioNews && portfolioNews.items.length > 0 && (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid w-full gap-5 sm:grid-cols-2">
               {portfolioNews.items.map((item) => (
                 <a
                   key={item.uuid}
@@ -261,13 +261,13 @@ export function MarketNewsPanel() {
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  <Card className="glass-2 group cursor-pointer border-border/40 p-4 transition-colors hover:border-primary/30">
+                  <Card className="glass-2 group cursor-pointer border-border/40 p-6 transition-colors hover:border-primary/30">
                     <div className="mb-2 flex items-center gap-2">
-                      <span className="rounded border border-purple-800/40 bg-purple-950/40 px-1.5 py-0.5 text-[10px] font-mono text-purple-400">
+                      <span className="rounded border border-purple-800/40 bg-purple-950/40 px-1.5 py-0.5 text-[13px] font-mono text-purple-400">
                         {item.ticker}
                       </span>
-                      <span className="text-[10px] text-muted-foreground">{item.publisher}</span>
-                      <span className="ml-auto text-[10px] text-muted-foreground">
+                      <span className="text-[13px] text-muted-foreground">{item.publisher}</span>
+                      <span className="ml-auto text-[13px] text-muted-foreground">
                         {timeAgo(new Date(item.providerPublishTime * 1000).toISOString())}
                       </span>
                     </div>
@@ -281,7 +281,7 @@ export function MarketNewsPanel() {
                           : item.summary}
                       </p>
                     )}
-                    <span className="mt-2 inline-block text-[10px] font-mono text-primary/60 group-hover:text-primary transition-colors">
+                    <span className="mt-2 inline-block text-[13px] font-mono text-primary/60 group-hover:text-primary transition-colors">
                       Leer más →
                     </span>
                   </Card>

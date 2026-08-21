@@ -14,11 +14,11 @@ function fmtPct(n: number | null | undefined, dp = 1) {
 
 function probLabel(prob: number | null): string {
   if (prob == null) return "S/D";
-  if (prob >= 0.9) return "✅ " + (prob * 100).toFixed(1) + "%";
-  if (prob >= 0.75) return "👍 " + (prob * 100).toFixed(1) + "%";
-  if (prob >= 0.6) return "➖ " + (prob * 100).toFixed(1) + "%";
-  if (prob >= 0.4) return "⚠️ " + (prob * 100).toFixed(1) + "%";
-  return "❌ " + (prob * 100).toFixed(1) + "%";
+  if (prob >= 0.9) return "[OK] " + (prob * 100).toFixed(1) + "%";
+  if (prob >= 0.75) return " " + (prob * 100).toFixed(1) + "%";
+  if (prob >= 0.6) return " " + (prob * 100).toFixed(1) + "%";
+  if (prob >= 0.4) return "[ADVERTENCIA] " + (prob * 100).toFixed(1) + "%";
+  return "[ERROR] " + (prob * 100).toFixed(1) + "%";
 }
 
 export function EstimacionesTab() {
@@ -42,7 +42,7 @@ export function EstimacionesTab() {
 
   return (
     <div className="space-y-4">
-      <div className="mono text-[11px] uppercase tracking-[0.22em] text-primary/80">
+      <div className="mono text-[14px] uppercase tracking-[0.22em] text-primary/80">
         Estimaciones de Earnings
       </div>
       <h2 className="text-2xl font-medium tracking-tight">
@@ -165,7 +165,7 @@ function EarningsCard({ result }: { result: EarningsEstimateResult }) {
           <span className="text-xs font-mono bg-primary/10 px-2 py-1 rounded">
             {result.proximoReporte}{" "}
             {result.diasHastaProximo != null &&
-              (result.diasHastaProximo <= 0 ? "📅 HOY" : `📅 en ${result.diasHastaProximo}d`)}
+              (result.diasHastaProximo <= 0 ? " HOY" : ` en ${result.diasHastaProximo}d`)}
           </span>
         )}
       </div>
@@ -180,7 +180,7 @@ function EarningsCard({ result }: { result: EarningsEstimateResult }) {
               <button
                 key={o.value}
                 onClick={() => setPeriodos(o.value)}
-                className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
+                className={`text-[13px] px-2 py-0.5 rounded border transition-colors ${
                   periodos === o.value
                     ? "border-primary/60 bg-primary/10 text-primary"
                     : "border-border/40 text-muted-foreground hover:text-foreground"
@@ -192,7 +192,7 @@ function EarningsCard({ result }: { result: EarningsEstimateResult }) {
           </div>
 
           {/* Probabilities (recalculated for visible window) */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid w-full grid-cols-2 sm:grid-cols-4 gap-3">
             <MetricBox
               label="P(S>0)"
               value={visibleStats ? probLabel(visibleStats.probS) : probLabel(result.probSPositiva)}
@@ -252,7 +252,7 @@ function EarningsCard({ result }: { result: EarningsEstimateResult }) {
             {showAll ? "Ocultar" : "Mostrar"} historial ({filteredHistory.length} trimestres)
           </button>
           {showAll && (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto w-full">
               <table className="w-full text-xs font-mono">
                 <thead>
                   <tr className="border-b border-border/40 text-muted-foreground">
@@ -294,7 +294,7 @@ function EarningsCard({ result }: { result: EarningsEstimateResult }) {
 function MetricBox({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-border/40 bg-background/40 p-2">
-      <div className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</div>
+      <div className="text-[13px] text-muted-foreground uppercase tracking-wider">{label}</div>
       <div className="text-sm font-mono font-semibold">{value}</div>
     </div>
   );

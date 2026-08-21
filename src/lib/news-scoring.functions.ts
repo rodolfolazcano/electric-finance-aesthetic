@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getCached, setCache } from "./cache";
 import { fetchYahooSearchNews } from "./yahoo-http";
 
-// ─── Tipos ─────────────────────────────────────────────────────
+//  Tipos 
 
 export interface NoticiaAnalizada {
   titulo: string;
@@ -22,7 +22,7 @@ export interface ScoreNoticias {
   totalAnalizadas: number;
 }
 
-// ─── Clasificador por keywords (español/inglés) ────────────────
+//  Clasificador por keywords (español/inglés) 
 
 interface KeywordRule {
   patron: RegExp;
@@ -95,7 +95,7 @@ export function analizarNoticia(titulo: string, fuente: string, url: string, fec
   };
 }
 
-// ─── Provider intercambiable — interfaz para futuro LLM ─────────
+//  Provider intercambiable — interfaz para futuro LLM 
 
 export type SentimentProvider = (noticias: NoticiaAnalizada[]) => ScoreNoticias;
 
@@ -136,7 +136,7 @@ export const keywordSentimentProvider: SentimentProvider = (noticias) => {
   };
 };
 
-// ─── Función principal (usa keyword provider por defecto) ───────
+//  Función principal (usa keyword provider por defecto) 
 
 export async function getNoticiasPorTicker(
   simbolo: string,
@@ -179,7 +179,7 @@ export async function getNoticiasPorTicker(
   }
 }
 
-// ─── Server function con cache ──────────────────────────────────
+//  Server function con cache 
 
 import { z } from "zod";
 

@@ -7,9 +7,9 @@ import { createServerFn } from "@tanstack/react-start";
 import sectoresData from "@/lib/herramientas/sectores.json";
 
 export interface PortfolioHolding {
-  /** Código base detectado (ej: "AMZN", "PAMP") */
+  /** CÃ³digo base detectado (ej: "AMZN", "PAMP") */
   code: string;
-  /** Nombre/descripción, preferentemente el que venía en el texto pegado */
+  /** Nombre/descripciÃ³n, preferentemente el que venÃ­a en el texto pegado */
   nombre: string;
   /** Cantidad detectada en el texto (puede ser null) */
   qty: number | null;
@@ -18,9 +18,9 @@ export interface PortfolioHolding {
   mercado: string;
   /** True si es / tiene CEDEAR en BCBA (existe variante especie D) */
   esCedear: boolean;
-  /** Símbolo en especie D (CEDEAR USD en BCBA), ej: "AMZND" */
+  /** SÃ­mbolo en especie D (CEDEAR USD en BCBA), ej: "AMZND" */
   dTicker: string | null;
-  /** Símbolo en especie ARS en BCBA, ej: "AMZN.BA", "PAMP.BA" */
+  /** SÃ­mbolo en especie ARS en BCBA, ej: "AMZN.BA", "PAMP.BA" */
   baTicker: string | null;
 }
 
@@ -45,7 +45,7 @@ const STOPWORDS = new Set([
   "TENENCIAS",
   "CANTIDAD",
   "VARIACION",
-  "VARIACIÓN",
+  "VARIACIÃ“N",
   "MONTO",
   "RENDIMIENTOS",
   "REPORTES",
@@ -65,7 +65,7 @@ const STOPWORDS = new Set([
   "ACTIVOS",
   "ORDEN",
   "ULTIMA",
-  "ÚLTIMA",
+  "ÃšLTIMA",
   "ALIAS",
   "CUENTAS",
   "CUENTA",
@@ -98,7 +98,7 @@ const STOPWORDS = new Set([
   "TIPO",
   "INTERVALO",
   "PERIODO",
-  "PERÍODO",
+  "PERÃODO",
   "ANALIZAR",
   "MERCADO",
   "SELECCIONAR",
@@ -112,7 +112,7 @@ const STOPWORDS = new Set([
   "RECALCULAR",
   "DETECTAR",
   "SEMAFORO",
-  "SEMÁFORO",
+  "SEMÃFORO",
   "TAB",
   "RESUMEN",
   "TU",
@@ -199,8 +199,8 @@ function buildHolding(code: string, nombre: string | null, qty: number | null): 
       nombre ?? base?.nombre ?? baEntry?.nombre ?? dEntry?.nombre ?? "Sin nombre en diccionario",
     qty,
     tipo: dEntry?.tipo ?? base?.tipo ?? "desconocido",
-    moneda: dEntry?.moneda ?? base?.moneda ?? "—",
-    mercado: base?.mercado ?? "—",
+    moneda: dEntry?.moneda ?? base?.moneda ?? "Â—",
+    mercado: base?.mercado ?? "Â—",
     esCedear,
     dTicker: dEntry ? code + "D" : null,
     baTicker: esAccionBCBA || baEntry ? code + ".BA" : base ? code : null,
@@ -210,7 +210,7 @@ function buildHolding(code: string, nombre: string | null, qty: number | null): 
 export const detectarTickersPortafolio = createServerFn({ method: "POST" })
   .inputValidator((input: unknown): { raw: string } => {
     const raw = String((input as { raw?: unknown })?.raw ?? "");
-    if (!raw.trim()) throw new Error("No se recibió texto para analizar");
+    if (!raw.trim()) throw new Error("No se recibiÃ³ texto para analizar");
     return { raw };
   })
   .handler(async ({ data }): Promise<PortafolioDetectado> => {
@@ -222,7 +222,7 @@ export const detectarTickersPortafolio = createServerFn({ method: "POST" })
     const unknown = new Set<string>();
     const seen = new Set<string>();
 
-    // -- Pase 1: líneas típicas de IOL "TOKEN\n(pct%) | Descripción\nQTY"
+    // -- Pase 1: lÃ­neas tÃ­picas de IOL "TOKEN\n(pct%) | DescripciÃ³n\nQTY"
     const lineRe =
       /\b([A-Z][A-Z0-9]{1,7})\s*\n\s*\([0-9][0-9.,]*%\)\s*\|\s*([^\n]*)\n\s*([0-9][0-9.,]*)/g;
     let m: RegExpExecArray | null;
@@ -242,7 +242,7 @@ export const detectarTickersPortafolio = createServerFn({ method: "POST" })
       }
     }
 
-    // -- Pase 2: líneas del tipo "PAMP 74" / "AMZN 209 1,20%" (ticker + cantidad)
+    // -- Pase 2: lÃ­neas del tipo "PAMP 74" / "AMZN 209 1,20%" (ticker + cantidad)
     const qtyLineRe = /^\s*([A-Z][A-Z0-9]{1,7})(?:\.[A-Z]{2,4})?\s+([0-9][0-9.,]*)\b.*$/gm;
     let q: RegExpExecArray | null;
     while ((q = qtyLineRe.exec(upper)) !== null) {

@@ -192,7 +192,7 @@ export function LecapFciPanel({
           <div className="text-sm font-medium">
             {mode === "lecaps" ? `LECAPs · ${lecaps.length} activas` : `FCIs · ${fcis.length} disponibles`}
           </div>
-          <p className="text-[10px] text-muted-foreground mt-0.5">
+          <p className="text-[13px] text-muted-foreground mt-0.5">
             {mode === "lecaps"
               ? `${lecaps.length} LECAPs · ${posiciones.length} en portafolio`
               : `${fcis.length} FCIs · ${posiciones.length} en portafolio`}
@@ -201,7 +201,7 @@ export function LecapFciPanel({
         <button
           onClick={loadData}
           disabled={loading}
-          className="mono rounded-md border border-border/60 bg-muted/30 px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-50"
+          className="mono rounded-md border border-border/60 bg-muted/30 px-2 py-1 text-[14px] text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           {loading ? "Cargando…" : "Actualizar"}
         </button>
@@ -209,8 +209,8 @@ export function LecapFciPanel({
 
       {data && (
         <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-          <div className="mono mb-2 text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-            Inflaci�n de referencia
+          <div className="mono mb-2 text-[13px] uppercase tracking-[0.15em] text-muted-foreground">
+            Inflacin de referencia
           </div>
           <div className="grid grid-cols-3 gap-2 text-xs">
             <div className="rounded-md border border-border/40 bg-muted/20 px-2 py-1.5">
@@ -222,12 +222,12 @@ export function LecapFciPanel({
               <span className="text-yellow-400 font-mono">{fmtPct(inflacion.anual, 2)}</span>
             </div>
             <div className="rounded-md border border-border/40 bg-muted/20 px-2 py-1.5">
-              <span className="text-muted-foreground">Acum. a�o: </span>
+              <span className="text-muted-foreground">Acum. ao: </span>
               <span className="text-yellow-400 font-mono">{fmtPct(inflacion.acumulada, 2)}</span>
             </div>
           </div>
           <div className="mt-2 pt-2 border-t border-border/30">
-            <div className="mono mb-1 text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+            <div className="mono mb-1 text-[13px] uppercase tracking-[0.15em] text-muted-foreground">
               Tasas comparables
             </div>
             <div className="grid grid-cols-3 gap-2 text-xs">
@@ -244,7 +244,7 @@ export function LecapFciPanel({
                 </span>
               </div>
               <div className="rounded-md border border-border/40 bg-muted/20 px-2 py-1.5">
-                <span className="text-muted-foreground">Riesgo Pa�s: </span>
+                <span className="text-muted-foreground">Riesgo Pas: </span>
                 <span className="text-cyan-400 font-mono">
                   {riesgoPais != null ? fmtNum(riesgoPais, 0) + " pb" : "\u2014"}
                 </span>
@@ -259,12 +259,12 @@ export function LecapFciPanel({
           {/* LECAPs */}
           <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
             <div className="flex items-center justify-between mb-2">
-              <div className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Todas las LECAPs
               </div>
               <div className="flex gap-2 items-center">
                 <div className="space-y-0.5">
-                  <label className="text-[8px] uppercase tracking-wider text-muted-foreground">
+                  <label className="text-[12px] uppercase tracking-wider text-muted-foreground">
                     TEM min
                   </label>
                   <input
@@ -272,17 +272,17 @@ export function LecapFciPanel({
                     value={filtroLecapMinTEM}
                     onChange={(e) => setFiltroLecapMinTEM(e.target.value)}
                     placeholder="0"
-                    className="w-14 rounded border border-border/60 bg-input px-1 py-0.5 text-[10px] font-mono"
+                    className="w-14 rounded border border-border/60 bg-input px-1 py-0.5 text-[13px] font-mono"
                   />
                 </div>
                 <div className="space-y-0.5">
-                  <label className="text-[8px] uppercase tracking-wider text-muted-foreground">
+                  <label className="text-[12px] uppercase tracking-wider text-muted-foreground">
                     TNA Real
                   </label>
                   <select
                     value={filtroLecapTNAreal}
                     onChange={(e) => setFiltroLecapTNAreal(e.target.value)}
-                    className="rounded border border-border/60 bg-input px-1 py-0.5 text-[10px] font-mono"
+                    className="rounded border border-border/60 bg-input px-1 py-0.5 text-[13px] font-mono"
                   >
                     <option value="todos">Todas</option>
                     <option value="positiva">Positiva</option>
@@ -296,7 +296,7 @@ export function LecapFciPanel({
             ) : (
               <div className="overflow-x-auto">
                 <table className="mono w-full text-xs">
-                  <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
                     <tr className="border-b border-border/60">
                       <SortableHeader
                         label="Ticker"
@@ -354,7 +354,7 @@ export function LecapFciPanel({
                         align="right"
                       />
                       <SortableHeader
-                        label="D�as"
+                        label="Das"
                         sortKey="diasAlVencimiento"
                         currentKey={lecapSortKey}
                         currentDir={lecapSortDir}
@@ -369,7 +369,7 @@ export function LecapFciPanel({
                         onSort={toggleLecapSort}
                         align="right"
                       />
-                      <th className="px-2 py-2 text-center">Acci�n</th>
+                      <th className="px-2 py-2 text-center">Accin</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -406,7 +406,7 @@ export function LecapFciPanel({
                                 ? `$ ${fmtNum(l.vpv, 2)} (VPV)`
                                 : "\u2014"}
                             {l.precioFuente === "iol" && (
-                              <span className="ml-1 text-[9px] text-cyan-400">IOL</span>
+                              <span className="ml-1 text-[13px] text-cyan-400">IOL</span>
                             )}
                           </td>
                           <td
@@ -418,14 +418,14 @@ export function LecapFciPanel({
                                 ? "Vence hoy"
                                 : "Vencido"}
                           </td>
-                          <td className="px-2 py-2 text-right text-[10px]">
+                          <td className="px-2 py-2 text-right text-[13px]">
                             {fmtFecha(l.fechaVencimiento)}
                           </td>
                           <td className="px-2 py-2 text-center">
                             {enPort ? (
                               <button
                                 onClick={() => onRemove(l.ticker)}
-                                className="text-[10px] text-danger hover:text-red-300 px-2 py-0.5 rounded border border-danger/40"
+                                className="text-[13px] text-danger hover:text-red-300 px-2 py-0.5 rounded border border-danger/40"
                               >
                                 Quitar
                               </button>
@@ -438,12 +438,12 @@ export function LecapFciPanel({
                                     precio: l.precio!.toString(),
                                   })
                                 }
-                                className="text-[10px] text-primary hover:text-green-300 px-2 py-0.5 rounded border border-primary/40"
+                                className="text-[13px] text-primary hover:text-green-300 px-2 py-0.5 rounded border border-primary/40"
                               >
                                 Agregar
                               </button>
                             ) : (
-                              <span className="text-[9px] text-muted-foreground">—</span>
+                              <span className="text-[13px] text-muted-foreground">—</span>
                             )}
                           </td>
                         </tr>
@@ -460,19 +460,19 @@ export function LecapFciPanel({
         <>
           {/* FCIs */}
           <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-            <div className="mono mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            <div className="mono mb-2 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
               Todos los FCIs
             </div>
 
             <div className="flex gap-2 mb-3">
               <div className="space-y-1">
-                <label className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                <label className="text-[13px] uppercase tracking-wider text-muted-foreground">
                   Tipo
                 </label>
                 <select
                   value={filtroTipo}
                   onChange={(e) => setFiltroTipo(e.target.value)}
-                  className="rounded-md border border-border bg-input px-2 py-1 text-[11px] font-mono"
+                  className="rounded-md border border-border bg-input px-2 py-1 text-[14px] font-mono"
                 >
                   <option value="todas">Todas</option>
                   <option value="mercadoDinero">Mercado Dinero</option>
@@ -482,13 +482,13 @@ export function LecapFciPanel({
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                <label className="text-[13px] uppercase tracking-wider text-muted-foreground">
                   Horizonte
                 </label>
                 <select
                   value={filtroHorizonte}
                   onChange={(e) => setFiltroHorizonte(e.target.value)}
-                  className="rounded-md border border-border bg-input px-2 py-1 text-[11px] font-mono"
+                  className="rounded-md border border-border bg-input px-2 py-1 text-[14px] font-mono"
                 >
                   <option value="todos">Todos</option>
                   <option value="corto">Corto</option>
@@ -503,7 +503,7 @@ export function LecapFciPanel({
             ) : (
               <div className="overflow-x-auto">
                 <table className="mono w-full text-xs">
-                  <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
                     <tr className="border-b border-border/60">
                       <SortableHeader
                         label="Fondo"
@@ -574,7 +574,7 @@ export function LecapFciPanel({
                         currentDir={fciSortDir}
                         onSort={toggleFciSort}
                       />
-                      <th className="px-2 py-2 text-center">Acci�n</th>
+                      <th className="px-2 py-2 text-center">Accin</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -591,7 +591,7 @@ export function LecapFciPanel({
                           </td>
                           <td className="px-2 py-2">
                             <span
-                              className={`inline-block rounded px-1 py-0.5 text-[9px] ${badgeFciTipo(f.tipo)}`}
+                              className={`inline-block rounded px-1 py-0.5 text-[13px] ${badgeFciTipo(f.tipo)}`}
                             >
                               {f.tipo}
                             </span>
@@ -599,17 +599,17 @@ export function LecapFciPanel({
                           <td className="px-2 py-2 text-right">{fmtNum(f.vcp, 4)}</td>
                           <td className="px-2 py-2 text-right">{fmtNum(f.ccp, 4)}</td>
                           <td
-                            className={`px-2 py-2 text-right font-mono text-[10px] ${(f.variacionDiaria ?? 0) >= 0 ? "text-green-400" : "text-red-400"}`}
+                            className={`px-2 py-2 text-right font-mono text-[13px] ${(f.variacionDiaria ?? 0) >= 0 ? "text-green-400" : "text-red-400"}`}
                           >
                             {f.variacionDiaria != null ? fmtPct(f.variacionDiaria, 2) : "\u2014"}
                           </td>
                           <td
-                            className={`px-2 py-2 text-right font-mono text-[10px] ${(f.variacionMensual ?? 0) >= 0 ? "text-green-400" : "text-red-400"}`}
+                            className={`px-2 py-2 text-right font-mono text-[13px] ${(f.variacionMensual ?? 0) >= 0 ? "text-green-400" : "text-red-400"}`}
                           >
                             {f.variacionMensual != null ? fmtPct(f.variacionMensual, 2) : "\u2014"}
                           </td>
                           <td
-                            className={`px-2 py-2 text-right font-mono text-[10px] ${(f.variacionAnual ?? 0) >= 0 ? "text-green-400" : "text-red-400"}`}
+                            className={`px-2 py-2 text-right font-mono text-[13px] ${(f.variacionAnual ?? 0) >= 0 ? "text-green-400" : "text-red-400"}`}
                           >
                             {f.variacionAnual != null ? fmtPct(f.variacionAnual, 2) : "\u2014"}
                           </td>
@@ -618,7 +618,7 @@ export function LecapFciPanel({
                           </td>
                           <td className="px-2 py-2">
                             <span
-                              className={`inline-block rounded px-1 py-0.5 text-[9px] ${badgeHorizonte(f.horizonte)}`}
+                              className={`inline-block rounded px-1 py-0.5 text-[13px] ${badgeHorizonte(f.horizonte)}`}
                             >
                               {f.horizonte}
                             </span>
@@ -627,7 +627,7 @@ export function LecapFciPanel({
                             {enPort ? (
                               <button
                                 onClick={() => onRemove(f.fondo)}
-                                className="text-[10px] text-danger hover:text-red-300 px-2 py-0.5 rounded border border-danger/40"
+                                className="text-[13px] text-danger hover:text-red-300 px-2 py-0.5 rounded border border-danger/40"
                               >
                                 Quitar
                               </button>
@@ -636,7 +636,7 @@ export function LecapFciPanel({
                                 onClick={() =>
                                   onAdd({ ticker: f.fondo, vn: "1", precio: f.vcp.toString() })
                                 }
-                                className="text-[10px] text-primary hover:text-green-300 px-2 py-0.5 rounded border border-primary/40"
+                                className="text-[13px] text-primary hover:text-green-300 px-2 py-0.5 rounded border border-primary/40"
                               >
                                 Agregar
                               </button>

@@ -591,7 +591,7 @@ export function calcularSectorial(input: SectorialInput): SubScore {
     };
   }
 
-  // ─── Graham: Margen de Seguridad (BONUS) ─────────────
+  //  Graham: Margen de Seguridad (BONUS) 
   let grahamBonus = 0;
   const epsGraham =
     input.currentPrice && input.trailingPE && input.trailingPE > 0
@@ -617,7 +617,7 @@ export function calcularSectorial(input: SectorialInput): SubScore {
     detalle.grahamBonus = grahamBonus;
   }
 
-  // ─── Amat: Solvencia Patrimonial (BONUS) ─────────────
+  //  Amat: Solvencia Patrimonial (BONUS) 
   let amatBonus = 0;
   if (input.totalStockholderEquity && input.totalAssets && input.totalAssets > 0) {
     const solvencyRatio = input.totalStockholderEquity / input.totalAssets;

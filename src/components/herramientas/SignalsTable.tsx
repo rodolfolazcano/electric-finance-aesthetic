@@ -27,11 +27,11 @@ export function SignalsTable({ signals, feePct }: { signals: Signal[]; feePct?: 
 
   return (
     <div>
-      <div className="mono mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="mono mb-2 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
         Señales Generadas
       </div>
-      <div className="overflow-x-auto">
-        <table className="mono w-full text-[10px]">
+      <div className="overflow-x-auto w-full">
+        <table className="mono w-full text-[13px]">
           <thead className="uppercase tracking-wider text-muted-foreground">
             <tr className="border-b border-border/60">
               <th className="px-2 py-1 text-left">Hora</th>
@@ -84,7 +84,7 @@ export function SignalsTable({ signals, feePct }: { signals: Signal[]; feePct?: 
                       : s.status === "sl"
                         ? "SL "
                         : s.status === "abierta"
-                          ? "● Abierta"
+                          ? " Abierta"
                           : "Cancelada"}
                   </td>
                 </tr>

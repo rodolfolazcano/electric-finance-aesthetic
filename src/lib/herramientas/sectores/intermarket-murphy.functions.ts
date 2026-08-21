@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getCached, setCache } from "../cache";
 import { computePearsonCorrelation } from "../intermarket-complete";
 
-// ─── Tipos ────────────────────────────────────────────────────────────────
+//  Tipos 
 
 export interface RatioInfo {
   ratio: number | null;
@@ -98,7 +98,7 @@ export interface IntermarketMurphyResult {
   generatedAt: string;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────
+//  Helpers 
 
 const CACHE_TTL = 10 * 60 * 1000;
 const CACHE_KEY = "intermarket-murphy-v2";
@@ -186,7 +186,7 @@ function trendFromChangeStrict(pct: number | null): "up" | "down" | "flat" | nul
   return "flat";
 }
 
-// ─── Cross-correlation with lag ──────────────────────────────────────────
+//  Cross-correlation with lag 
 
 function crossCorrelationLagged(
   rets1: number[],
@@ -306,7 +306,7 @@ function buildRatio(
   };
 }
 
-// ─── TIPS Spread (Breakeven Inflation) ──────────────────────────────────
+//  TIPS Spread (Breakeven Inflation) 
 // BEI = TNX Nominal Yield - TIPS Real Yield (approximated from TIP ETF price)
 // TIP price moves inversely to real yields; we use a calibrated linear model:
 //   TIPS_real_yield ≈ 8.75 - 0.0625 × TIP_close
@@ -410,7 +410,7 @@ function computeTIPSSpread(
   };
 }
 
-// ─── REGLA TRANSPORTES-PETRÓLEO (Cap. 13) ───────────────────────────
+//  REGLA TRANSPORTES-PETRÓLEO (Cap. 13) 
 // Murphy: "Dow Theory... Industrials and Transports must move up together"
 // "rising oil prices... especially damaging to Transportation stocks"
 // Reemplaza reglaGoldOilStocks (DEPRECADA)
@@ -539,7 +539,7 @@ export function reglaTransportesPetroleo(params: {
   };
 }
 
-// ─── TEST SINTÉTICO (validación post-implementación) ─────────────
+//  TEST SINTÉTICO (validación post-implementación) 
 // Test: petróleo subiendo, transportes cayendo → divergenciaPetroleoTransportes negativa
 // Ejemplo de uso:
 // const testPetroleo = Array.from({length: 60}, (_, i) => 100 * (1 + 0.10 * i / 59));
@@ -548,7 +548,7 @@ export function reglaTransportesPetroleo(params: {
 // const result = reglaTransportesPetroleo({ petroleoPrices: testPetroleo, transportesPrices: testTransportes, industrialesPrices: testIndustriales });
 // Resultado esperado: divergenciaPetroleoTransportes < 0 (correlación negativa), interpretacion='presion_alcista_petroleo_negativa_para_ciclo'
 
-// ─── STOVALL SECTOR ROTATION (Cap. 13) ─────────────────────────────
+//  STOVALL SECTOR ROTATION (Cap. 13) 
 // Murphy: Ciclo de Stovall para rotación sectorial
 // Early Expansion = Consumer Discretionary + Technology
 // Full Expansion = Industrials + Materials
@@ -651,14 +651,14 @@ export function clasificarFaseStovall(params: {
   };
 }
 
-// ─── TEST SINTÉTICO (validación post-implementación) ─────────────
+//  TEST SINTÉTICO (validación post-implementación) 
 // Test: ConsDisc+Tech en top-2 → faseActual='EarlyExpansion'
 // Ejemplo de uso:
 // const testRetornos = { XLY: 5.0, XLK: 4.5, XLI: 2.0, XLB: 1.5, XLE: 1.0, XLP: 0.5, XLU: 0.3, XLF: 0.2, XLV: 0.1 };
 // const result = clasificarFaseStovall({ retornosRelativos: testRetornos });
 // Resultado esperado: faseActual='EarlyExpansion', sectoresLiderando=['Consumer Discretionary', 'Technology', ...]
 
-// ─── Determine Pring cycle stage ────────────────────────────────────────
+//  Determine Pring cycle stage 
 
 /** Fuente: Murphy, "Intermarket Analysis", cap. 12-13 (diagnóstico de ciclo según Pring/Murphy) */
 function determineCycleStage(
@@ -745,7 +745,7 @@ const STAGE_LABELS: Record<
   },
 };
 
-// ─── Server function ──────────────────────────────────────────────────────
+//  Server function 
 
 /** EXTENSION PROPIA — no proviene de Murphy, verificar con Cintia si mantener */
 export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).handler(
@@ -753,7 +753,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
     const cached = getCached<IntermarketMurphyResult>(CACHE_KEY, CACHE_TTL);
     if (cached) return cached;
 
-    // ── Fetch ALL tickers in parallel ──
+    //  Fetch ALL tickers in parallel 
     const [
       crbData,
       tltData,
@@ -830,7 +830,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
     const lqdRets = computeReturns(lqdData);
     const tipRets = computeReturns(tipData);
 
-    // ─── 1. RATIO CRB/BONDS ──────────────────────────────────────────
+    //  1. RATIO CRB/BONDS 
     const crbBonds = buildRatio(
       crbData,
       tltData,
@@ -842,7 +842,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Bonos superan a commodities. Señal de desaceleración o búsqueda de refugio. Rotar a defensivos (Murphy Cap. 7).",
     );
 
-    // ─── 2. RATIO COMMODITIES/STOCKS ────────────────────────────────
+    //  2. RATIO COMMODITIES/STOCKS 
     const commoditiesStocks = buildRatio(
       crbData,
       spyData,
@@ -854,7 +854,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Stocks superan a commodities — crecimiento real. Favorecer Technology y Consumer Cyclical. Régimen desinflacionario.",
     );
 
-    // ─── 3. RATIO GOLD/OIL ──────────────────────────────────────────
+    //  3. RATIO GOLD/OIL 
     const goldOil = buildRatio(
       gldData,
       usoData,
@@ -866,7 +866,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Petróleo supera al oro — inflación de demanda (crecimiento real). Favorecer Energy e Industrials.",
     );
 
-    // ─── 4. RATIO COPPER/GOLD (Dr. Copper) ─────────────────────────
+    //  4. RATIO COPPER/GOLD (Dr. Copper) 
     let copperGold: RatioInfo;
     try {
       const hgData = await fetchYahooHistory("HG=F", "max");
@@ -893,7 +893,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       };
     }
 
-    // ─── 5. RATIO DOW/GOLD ─────────────────────────────────────────
+    //  5. RATIO DOW/GOLD 
     const dowGold = buildRatio(
       djiData,
       gldData,
@@ -905,7 +905,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Oro supera a acciones — ciclo de activos duros. Desconfianza en monedas fiduciarias. Risk-off estructural.",
     );
 
-    // ─── 6. RATIO XLY/XLP (Consumer Disc./Staples) ─────────────────
+    //  6. RATIO XLY/XLP (Consumer Disc./Staples) 
     const xlyXlp = buildRatio(
       xlyData,
       xlpData,
@@ -917,7 +917,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Consumidor refugiándose en básico — cautela. Economy preocupada. Señal temprana de desaceleración (Murphy Cap. 6).",
     );
 
-    // ─── 7. RATIO IWM/SPY (Small Caps vs Large Caps) ──────────────
+    //  7. RATIO IWM/SPY (Small Caps vs Large Caps) 
     const iwmSpy = buildRatio(
       iwmData,
       spyData,
@@ -929,7 +929,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Large caps lideran — flight-to-quality dentro de equities. Small caps débiles anticipan desaceleración (Murphy Cap. 5).",
     );
 
-    // ─── 8. RATIO NDX/SPX (Tech vs Market) ────────────────────────
+    //  8. RATIO NDX/SPX (Tech vs Market) 
     const ndxSpx = buildRatio(
       ndxData,
       spyData,
@@ -941,7 +941,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Tech bajoperform — rotación a value. Stage 4-5 típico. Suben Energy, Financials, Materials.",
     );
 
-    // ─── 9. RATIO EFA/EEM (Developed vs Emerging) ─────────────────
+    //  9. RATIO EFA/EEM (Developed vs Emerging) 
     const efaEem = buildRatio(
       efaData,
       eemData,
@@ -953,7 +953,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Emergentes superan a Desarrollados — risk-on global, USD débil. Confianza en crecimiento global (Murphy Cap. 9).",
     );
 
-    // ─── 10. RATIO GROWTH/VALUE ────────────────────────────────────
+    //  10. RATIO GROWTH/VALUE 
     const growthValue = buildRatio(
       ivwData,
       iveData,
@@ -965,7 +965,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Value lidera — subida de tasas, inflación. Stage 4-5. Financials, Energy, Materials toman liderazgo.",
     );
 
-    // ─── 11. RATIO HYG/LQD (Credit Stress) ─────────────────────────
+    //  11. RATIO HYG/LQD (Credit Stress) 
     const hyglqd = buildRatio(
       hygData,
       lqdData,
@@ -977,7 +977,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Investment Grade supera a High Yield — flight-to-quality dentro de crédito. Señal temprana de estrés. (Stage 4-5, Murphy Cap. 12).",
     );
 
-    // ─── 12. RATIO TIPS SPREAD (Inflación implícita) ──────────────
+    //  12. RATIO TIPS SPREAD (Inflación implícita) 
     // BEI = ^TNX yield - TIPS real yield (from TIP price)
     const tipsSpread = computeTIPSSpread(
       tipData,
@@ -990,7 +990,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       "Inflación implícita bajando — desinflación. Favorecer Technology y growth stocks.",
     );
 
-    // ─── 13. YIELD CURVE SPREAD ─────────────────────────────────────
+    //  13. YIELD CURVE SPREAD 
     let yieldCurve: YieldCurveSpread;
     if (tnxData.length > 0 && fvxData.length > 0 && irxData.length > 0) {
       const tnxYield = tnxData[tnxData.length - 1].close;
@@ -1033,7 +1033,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       };
     }
 
-    // ─── 14. BONDS/STOCKS RELATIONSHIP ──────────────────────────────
+    //  14. BONDS/STOCKS RELATIONSHIP 
     const tltReturn1m = computeReturn(tltData, 21);
     const spyReturn1m = computeReturn(spyData, 21);
     // Pearson R returns [-1, 1]; keep as decimal for display
@@ -1111,7 +1111,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
                 : "Relación sin señal clara.",
     };
 
-    // ─── 15. DOW THEORY ─────────────────────────────────────────────
+    //  15. DOW THEORY 
     const djiTrendVal = computeReturn(djiData, 42); // 2-month
     const djtTrendVal = computeReturn(djtData, 42);
     const djiTrend = trendFromChangeStrict(djiTrendVal != null ? djiTrendVal * 100 : null);
@@ -1135,7 +1135,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
             : `Dow Theory sin señal clara. Esperar confirmación direccional.`,
     };
 
-    // ─── 16. CYCLE DIAGNOSIS (Pring 3 Arrows) ──────────────────────
+    //  16. CYCLE DIAGNOSIS (Pring 3 Arrows) 
     // Use TLT price data directly (inverse of yields, but more accurate than TNX inversion)
     // TLT: ETF price of 20+ year US treasuries — direct bond price
     const tltTrendVal =
@@ -1160,7 +1160,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       commoditiesTrend: trendFromChangeStrict(crbTrendVal),
     };
 
-    // ─── 17. CROSS-ASSET CORRELATIONS ──────────────────────────────
+    //  17. CROSS-ASSET CORRELATIONS 
     const crossAssetCorrelations: CrossAssetCorrelation[] = [];
     // Compute returns for sector ETFs we already fetched
     const xlbRets = computeReturns(xlbData);
@@ -1210,7 +1210,7 @@ export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).
       });
     }
 
-    // ─── 18. LEAD-LAG ANALYSIS ─────────────────────────────────────
+    //  18. LEAD-LAG ANALYSIS 
     const leadLag: LeadLagSummary[] = [];
     // Dollar leads commodities
     if (dxyRets.length > 60 && crbRets.length > 60) {

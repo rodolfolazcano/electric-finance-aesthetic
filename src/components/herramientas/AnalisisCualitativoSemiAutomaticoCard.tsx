@@ -10,17 +10,17 @@ interface SenalItem {
 
 function SenalesList({ senales }: { senales: SenalItem[] }) {
   if (senales.length === 0)
-    return <p className="text-[9px] text-muted-foreground">Sin datos disponibles.</p>;
+    return <p className="text-[13px] text-muted-foreground">Sin datos disponibles.</p>;
   return (
     <div className="space-y-1.5">
       {senales.map((s, i) => {
         const icono =
           s.fuerza === "positiva"
-            ? "✓"
+            ? ""
             : s.fuerza === "mixta"
               ? "≈"
               : s.fuerza === "negativa"
-                ? "✗"
+                ? ""
                 : "—";
         const color =
           s.fuerza === "positiva"
@@ -33,15 +33,15 @@ function SenalesList({ senales }: { senales: SenalItem[] }) {
         return (
           <div key={i} className="rounded border border-border/20 bg-muted/10 p-2">
             <div className="flex items-center gap-2">
-              <span className={`text-[11px] font-bold ${color}`}>{icono}</span>
-              <span className="text-[10px] font-semibold text-foreground">{s.nombre}</span>
+              <span className={`text-[14px] font-bold ${color}`}>{icono}</span>
+              <span className="text-[13px] font-semibold text-foreground">{s.nombre}</span>
               {s.comparadoConSector === false && (
                 <span className="text-[7px] text-muted-foreground/60 border border-border/30 rounded px-1 py-0.5">
                   sin benchmark sectorial
                 </span>
               )}
             </div>
-            <p className="mt-0.5 text-[9px] text-muted-foreground leading-relaxed">{s.detalle}</p>
+            <p className="mt-0.5 text-[13px] text-muted-foreground leading-relaxed">{s.detalle}</p>
           </div>
         );
       })}
@@ -72,20 +72,20 @@ export function AnalisisCualitativoSemiAutomaticoCard({
   if (data.esETF) {
     return (
       <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground">
           Análisis Cualitativo
         </p>
-        <p className="mt-1 text-[10px] text-muted-foreground">No aplica para ETFs.</p>
+        <p className="mt-1 text-[13px] text-muted-foreground">No aplica para ETFs.</p>
       </div>
     );
   }
 
   return (
     <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-      <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-3">
+      <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-3">
         Análisis Cualitativo (Señales Cuantitativas)
       </p>
-      <p className="text-[8px] text-muted-foreground/60 leading-relaxed mb-3 border border-border/20 rounded bg-muted/5 p-2">
+      <p className="text-[12px] text-muted-foreground/60 leading-relaxed mb-3 border border-border/20 rounded bg-muted/5 p-2">
         Estas secciones son señales cuantitativas derivadas de datos financieros públicos. No
         reemplazan la lectura de fuentes cualitativas (10-K, noticias, informes de la empresa) para
         entender la causa de estos patrones.
@@ -94,11 +94,11 @@ export function AnalisisCualitativoSemiAutomaticoCard({
       {/* Ventaja Competitiva */}
       {data.ventajaCompetitiva && (
         <details className="mb-2" open>
-          <summary className="text-[10px] font-mono font-semibold text-foreground cursor-pointer hover:text-primary transition-colors select-none flex items-center gap-2">
-            <span className="text-[8px]">▼</span>
+          <summary className="text-[13px] font-mono font-semibold text-foreground cursor-pointer hover:text-primary transition-colors select-none flex items-center gap-2">
+            <span className="text-[12px]"></span>
             Ventaja Competitiva Cuantitativa
             <span
-              className={`text-[8px] font-mono px-1.5 py-0.5 rounded border ${badgeColor(data.ventajaCompetitiva.conclusion)}`}
+              className={`text-[12px] font-mono px-1.5 py-0.5 rounded border ${badgeColor(data.ventajaCompetitiva.conclusion)}`}
             >
               {data.ventajaCompetitiva.conclusion}
             </span>
@@ -112,7 +112,7 @@ export function AnalisisCualitativoSemiAutomaticoCard({
                 comparadoConSector: s.comparadoConSector,
               }))}
             />
-            <div className="flex items-center gap-3 text-[8px] text-muted-foreground/60 border-t border-border/20 pt-1.5 mt-1.5">
+            <div className="flex items-center gap-3 text-[12px] text-muted-foreground/60 border-t border-border/20 pt-1.5 mt-1.5">
               <span>
                 Positivas: {data.ventajaCompetitiva.senalesPositivas}/
                 {data.ventajaCompetitiva.senalesEvaluadas}
@@ -129,11 +129,11 @@ export function AnalisisCualitativoSemiAutomaticoCard({
       {/* Costos de Cambio */}
       {data.costosDeCambio && (
         <details className="mb-2">
-          <summary className="text-[10px] font-mono font-semibold text-foreground cursor-pointer hover:text-primary transition-colors select-none flex items-center gap-2">
-            <span className="text-[8px]">▼</span>
+          <summary className="text-[13px] font-mono font-semibold text-foreground cursor-pointer hover:text-primary transition-colors select-none flex items-center gap-2">
+            <span className="text-[12px]"></span>
             Costos de Cambio (Switching Costs)
             <span
-              className={`text-[8px] font-mono px-1.5 py-0.5 rounded border ${badgeColor(data.costosDeCambio.conclusion)}`}
+              className={`text-[12px] font-mono px-1.5 py-0.5 rounded border ${badgeColor(data.costosDeCambio.conclusion)}`}
             >
               {data.costosDeCambio.conclusion}
             </span>
@@ -148,7 +148,7 @@ export function AnalisisCualitativoSemiAutomaticoCard({
                 },
               ]}
             />
-            <div className="flex items-center gap-3 text-[8px] text-muted-foreground/60 border-t border-border/20 pt-1.5 mt-1.5">
+            <div className="flex items-center gap-3 text-[12px] text-muted-foreground/60 border-t border-border/20 pt-1.5 mt-1.5">
               <span>
                 Clasif. sectorial: {data.costosDeCambio.clasificacionSectorEstatica.nivel}
               </span>
@@ -161,11 +161,11 @@ export function AnalisisCualitativoSemiAutomaticoCard({
       {/* Gobierno Corporativo */}
       {data.gobiernoCorporativo && (
         <details className="mb-2">
-          <summary className="text-[10px] font-mono font-semibold text-foreground cursor-pointer hover:text-primary transition-colors select-none flex items-center gap-2">
-            <span className="text-[8px]">▼</span>
+          <summary className="text-[13px] font-mono font-semibold text-foreground cursor-pointer hover:text-primary transition-colors select-none flex items-center gap-2">
+            <span className="text-[12px]"></span>
             Gobierno Corporativo
             <span
-              className={`text-[8px] font-mono px-1.5 py-0.5 rounded border ${badgeColor(data.gobiernoCorporativo.conclusion)}`}
+              className={`text-[12px] font-mono px-1.5 py-0.5 rounded border ${badgeColor(data.gobiernoCorporativo.conclusion)}`}
             >
               {data.gobiernoCorporativo.conclusion}
             </span>
@@ -197,15 +197,15 @@ export function AnalisisCualitativoSemiAutomaticoCard({
       {/* Predictibilidad de Ingresos */}
       {data.predictibilidadIngresos && (
         <details className="mb-2">
-          <summary className="text-[10px] font-mono font-semibold text-foreground cursor-pointer hover:text-primary transition-colors select-none flex items-center gap-2">
-            <span className="text-[8px]">▼</span>
+          <summary className="text-[13px] font-mono font-semibold text-foreground cursor-pointer hover:text-primary transition-colors select-none flex items-center gap-2">
+            <span className="text-[12px]"></span>
             Predictibilidad de Ingresos
           </summary>
           <div className="mt-2">
             <div className="rounded border border-border/20 bg-muted/10 p-2">
               <div className="flex items-center gap-2">
                 <span
-                  className={`text-[11px] font-bold ${
+                  className={`text-[14px] font-bold ${
                     data.predictibilidadIngresos.fuerza === "positiva"
                       ? "text-emerald-400"
                       : data.predictibilidadIngresos.fuerza === "mixta"
@@ -214,19 +214,19 @@ export function AnalisisCualitativoSemiAutomaticoCard({
                   }`}
                 >
                   {data.predictibilidadIngresos.fuerza === "positiva"
-                    ? "✓"
+                    ? ""
                     : data.predictibilidadIngresos.fuerza === "mixta"
                       ? "≈"
-                      : "✗"}
+                      : ""}
                 </span>
-                <span className="text-[10px] font-semibold text-foreground">
+                <span className="text-[13px] font-semibold text-foreground">
                   Coeficiente de variación de ingresos
                 </span>
               </div>
-              <p className="mt-0.5 text-[9px] text-muted-foreground leading-relaxed">
+              <p className="mt-0.5 text-[13px] text-muted-foreground leading-relaxed">
                 {data.predictibilidadIngresos.detalle}
               </p>
-              <p className="mt-1 text-[9px] text-foreground/80 italic">
+              <p className="mt-1 text-[13px] text-foreground/80 italic">
                 {data.predictibilidadIngresos.interpretacion}
               </p>
             </div>
@@ -237,11 +237,11 @@ export function AnalisisCualitativoSemiAutomaticoCard({
       {/* Poder de Fijación de Precios */}
       {data.poderFijacionPrecios && (
         <details className="mb-2">
-          <summary className="text-[10px] font-mono font-semibold text-foreground cursor-pointer hover:text-primary transition-colors select-none flex items-center gap-2">
-            <span className="text-[8px]">▼</span>
+          <summary className="text-[13px] font-mono font-semibold text-foreground cursor-pointer hover:text-primary transition-colors select-none flex items-center gap-2">
+            <span className="text-[12px]"></span>
             Poder de Fijación de Precios
             <span
-              className={`text-[8px] font-mono px-1.5 py-0.5 rounded border ${badgeColor(data.poderFijacionPrecios.conclusion)}`}
+              className={`text-[12px] font-mono px-1.5 py-0.5 rounded border ${badgeColor(data.poderFijacionPrecios.conclusion)}`}
             >
               {data.poderFijacionPrecios.conclusion}
             </span>

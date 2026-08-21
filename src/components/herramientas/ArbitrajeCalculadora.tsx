@@ -48,25 +48,25 @@ export function ArbitrajeCalculadora({
 
   return (
     <div className="space-y-3">
-      <div className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
         Calculadora de Arbitraje
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-4">
         <div>
-          <Label className="text-[10px] text-muted-foreground">Capital (ARS)</Label>
+          <Label className="text-[13px] text-muted-foreground">Capital (ARS)</Label>
           <Input
             type="number"
             value={capital}
             onChange={(e) => setCapital(parseFloat(e.target.value) || 0)}
-            className="mt-1 h-7 text-[11px] bg-background/40 border-border/60 font-mono"
+            className="mt-1 h-7 text-[14px] bg-background/40 border-border/60 font-mono"
           />
         </div>
         <div>
-          <Label className="text-[10px] text-muted-foreground">Comprar USDT en</Label>
+          <Label className="text-[13px] text-muted-foreground">Comprar USDT en</Label>
           <select
             value={compraEn}
             onChange={(e) => setCompraEn(e.target.value)}
-            className="mt-1 w-full h-7 text-[11px] bg-background/40 border border-border/60 rounded-md text-foreground font-mono px-2"
+            className="mt-1 w-full h-7 text-[14px] bg-background/40 border border-border/60 rounded-md text-foreground font-mono px-2"
           >
             {exchanges
               .sort((a, b) => a.compra - b.compra)
@@ -79,11 +79,11 @@ export function ArbitrajeCalculadora({
           </select>
         </div>
         <div>
-          <Label className="text-[10px] text-muted-foreground">Vender USDT en</Label>
+          <Label className="text-[13px] text-muted-foreground">Vender USDT en</Label>
           <select
             value={ventaEn}
             onChange={(e) => setVentaEn(e.target.value)}
-            className="mt-1 w-full h-7 text-[11px] bg-background/40 border border-border/60 rounded-md text-foreground font-mono px-2"
+            className="mt-1 w-full h-7 text-[14px] bg-background/40 border border-border/60 rounded-md text-foreground font-mono px-2"
           >
             {exchanges
               .sort((a, b) => b.venta - a.venta)
@@ -96,13 +96,13 @@ export function ArbitrajeCalculadora({
           </select>
         </div>
         <div>
-          <Label className="text-[10px] text-muted-foreground">Cotizaciones</Label>
-          <div className="mt-1 h-7 flex items-center text-[11px] font-mono text-muted-foreground bg-background/40 border border-border/60 rounded-md px-2">
+          <Label className="text-[13px] text-muted-foreground">Cotizaciones</Label>
+          <div className="mt-1 h-7 flex items-center text-[14px] font-mono text-muted-foreground bg-background/40 border border-border/60 rounded-md px-2">
             {compra && venta ? `$${fmtNum(compra.compra)} → $${fmtNum(venta.venta)}` : "\u2014"}
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono sm:grid-cols-4">
+      <div className="grid w-full grid-cols-2 gap-2 text-[14px] font-mono sm:grid-cols-4">
         <div className="rounded-md bg-background/40 border border-border/60 p-2">
           <span className="text-muted-foreground">Bruto: </span>
           <span className={gananciaBruta >= 0 ? "text-green-400" : "text-red-400"}>

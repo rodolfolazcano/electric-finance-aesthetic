@@ -69,9 +69,9 @@ export function CalculadoraPasivos() {
   }, [deudas, pagoMensual, estrategia, result]);
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+    <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <div className="glass p-5 space-y-4">
-        <h3 className="mono text-[11px] uppercase tracking-[0.18em] text-foreground">Deudas</h3>
+        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Deudas</h3>
         <div>
           <label className="text-xs text-muted-foreground">Pago mensual disponible ($)</label>
           <Input
@@ -93,10 +93,10 @@ export function CalculadoraPasivos() {
           </select>
         </div>
         <div className="flex items-center justify-between">
-          <h3 className="mono text-[11px] uppercase tracking-[0.18em] text-foreground">Deudas</h3>
+          <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Deudas</h3>
           <button
             onClick={addDeuda}
-            className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
+            className="inline-flex items-center gap-1 text-[13px] text-primary hover:underline"
           >
             <Plus className="h-3 w-3" /> Agregar
           </button>
@@ -109,7 +109,7 @@ export function CalculadoraPasivos() {
                   value={d.nombre}
                   onChange={(e) => updateDeuda(i, "nombre", e.target.value)}
                   placeholder="Nombre"
-                  className="h-7 text-[10px] flex-1"
+                  className="h-7 text-[13px] flex-1"
                 />
                 <button
                   onClick={() => removeDeuda(i)}
@@ -124,21 +124,21 @@ export function CalculadoraPasivos() {
                   value={d.monto}
                   onChange={(e) => updateDeuda(i, "monto", e.target.value)}
                   placeholder="Monto"
-                  className="h-7 text-[10px] w-[32%]"
+                  className="h-7 text-[13px] w-[32%]"
                 />
                 <Input
                   type="number"
                   value={d.tasa}
                   onChange={(e) => updateDeuda(i, "tasa", e.target.value)}
                   placeholder="Tasa %"
-                  className="h-7 text-[10px] w-[32%]"
+                  className="h-7 text-[13px] w-[32%]"
                 />
                 <Input
                   type="number"
                   value={d.cuotaMinima}
                   onChange={(e) => updateDeuda(i, "cuotaMinima", e.target.value)}
                   placeholder="Cuota mín."
-                  className="h-7 text-[10px] w-[32%]"
+                  className="h-7 text-[13px] w-[32%]"
                 />
               </div>
             </div>
@@ -152,21 +152,21 @@ export function CalculadoraPasivos() {
       <div className="space-y-4">
         {result && (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3">
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Estrategia
                 </div>
                 <div className="mono text-xs text-primary mt-1">{result.estrategia}</div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Meses total
                 </div>
                 <div className="mono text-lg">{result.mesesTotal}</div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Interés total
                 </div>
                 <div className="mono text-lg text-warning">
@@ -176,12 +176,12 @@ export function CalculadoraPasivos() {
             </div>
 
             <div className="glass p-5">
-              <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Resumen por deuda
               </div>
-              <table className="mono w-full text-[11px]">
+              <table className="mono w-full text-[14px]">
                 <thead>
-                  <tr className="border-b border-border/60 text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <tr className="border-b border-border/60 text-[13px] uppercase tracking-wider text-muted-foreground">
                     <th className="px-2 py-2 text-left">Deuda</th>
                     <th className="px-2 py-2 text-right">Meses</th>
                     <th className="px-2 py-2 text-right">Interés pagado</th>
@@ -201,7 +201,7 @@ export function CalculadoraPasivos() {
           </>
         )}
         <div className="flex gap-2">
-          <Button onClick={handleExport} variant="outline" size="sm" className="text-[11px]">
+          <Button onClick={handleExport} variant="outline" size="sm" className="text-[14px]">
             <svg
               className="mr-1.5 h-3.5 w-3.5"
               xmlns="http://www.w3.org/2000/svg"

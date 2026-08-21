@@ -202,8 +202,8 @@ function MetricRow({
 }) {
   return (
     <tr className="border-b border-border/20 last:border-0">
-      <td className="py-1.5 pr-4 text-[10px] text-muted-foreground whitespace-nowrap">{label}</td>
-      <td className={`py-1.5 text-[10px] font-mono text-right ${colorClass ?? "text-foreground"}`}>
+      <td className="py-1.5 pr-4 text-[13px] text-muted-foreground whitespace-nowrap">{label}</td>
+      <td className={`py-1.5 text-[13px] font-mono text-right ${colorClass ?? "text-foreground"}`}>
         {value}
       </td>
     </tr>
@@ -215,7 +215,7 @@ function SectionHeader({ label }: { label: string }) {
     <tr>
       <td
         colSpan={2}
-        className="pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/60"
+        className="pt-3 pb-1 text-[13px] font-semibold uppercase tracking-widest text-muted-foreground/60"
       >
         {label}
       </td>
@@ -249,7 +249,7 @@ function PriceBar({
           style={{ left: `${pct}%` }}
         />
       </div>
-      <div className="mt-1 flex justify-between text-[9px] font-mono text-muted-foreground">
+      <div className="mt-1 flex justify-between text-[13px] font-mono text-muted-foreground">
         <span>Min {fPrice(min)}</span>
         {avgPct !== null && <span className="text-amber-400/70">Prom {fPrice(avg)}</span>}
         <span>Max {fPrice(max)}</span>
@@ -269,12 +269,12 @@ function ScoreBar({ score, rawPts, maxPts }: { score: number; rawPts?: number; m
             style={{ width: `${score}%` }}
           />
         </div>
-        <span className={`text-[11px] font-bold font-mono ${color.replace("bg-", "text-")}`}>
+        <span className={`text-[14px] font-bold font-mono ${color.replace("bg-", "text-")}`}>
           {score}
         </span>
       </div>
       {rawPts !== undefined && maxPts !== undefined && maxPts > 0 && (
-        <p className="mt-1 text-[8px] text-muted-foreground">
+        <p className="mt-1 text-[12px] text-muted-foreground">
           {rawPts}/{maxPts} pts disponibles de componentes con dato
         </p>
       )}
@@ -289,9 +289,9 @@ function ScoreDetailTable({ details }: { details: ScoreDetail[] }) {
       <tbody>
         {details.map((d) => (
           <tr key={d.metric} className="border-b border-border/10 last:border-0">
-            <td className="py-1 text-[9px] text-muted-foreground">{d.metric}</td>
-            <td className="py-1 text-[9px] font-mono text-right text-foreground">{d.valor}</td>
-            <td className="py-1 text-[9px] font-mono text-right w-12">
+            <td className="py-1 text-[13px] text-muted-foreground">{d.metric}</td>
+            <td className="py-1 text-[13px] font-mono text-right text-foreground">{d.valor}</td>
+            <td className="py-1 text-[13px] font-mono text-right w-12">
               <span
                 className={
                   d.pts >= d.maxPts * 0.67
@@ -322,7 +322,7 @@ function PeHistoryTable({
 }) {
   if (history.length === 0)
     return (
-      <p className="text-[9px] text-muted-foreground mt-1">
+      <p className="text-[13px] text-muted-foreground mt-1">
         Datos insuficientes para calcular percentil historico de P/E. Se requieren al menos 2
         ejercicios con EPS positivo disponibles en Yahoo Finance.
       </p>
@@ -331,10 +331,10 @@ function PeHistoryTable({
     <table className="w-full mt-2">
       <thead>
         <tr className="border-b border-border/30">
-          <th className="py-1 text-left text-[9px] font-medium text-muted-foreground">
+          <th className="py-1 text-left text-[13px] font-medium text-muted-foreground">
             Año fiscal
           </th>
-          <th className="py-1 text-right text-[9px] font-medium text-muted-foreground">
+          <th className="py-1 text-right text-[13px] font-medium text-muted-foreground">
             P/E calculado
           </th>
         </tr>
@@ -342,20 +342,20 @@ function PeHistoryTable({
       <tbody>
         {history.map((h) => (
           <tr key={h.year} className="border-b border-border/10 last:border-0">
-            <td className="py-1 text-[10px] text-muted-foreground">{h.year}</td>
-            <td className="py-1 text-[10px] font-mono text-right text-foreground">
+            <td className="py-1 text-[13px] text-muted-foreground">{h.year}</td>
+            <td className="py-1 text-[13px] font-mono text-right text-foreground">
               {h.pe.toFixed(1)}x
             </td>
           </tr>
         ))}
         {currentPE !== null && (
           <tr className="border-t border-border/30 bg-border/10">
-            <td className="py-1 text-[10px] font-semibold text-foreground">Actual (trailing)</td>
-            <td className="py-1 text-[10px] font-mono font-semibold text-right text-foreground">
+            <td className="py-1 text-[13px] font-semibold text-foreground">Actual (trailing)</td>
+            <td className="py-1 text-[13px] font-mono font-semibold text-right text-foreground">
               {currentPE.toFixed(1)}x
               {percentile !== null && (
                 <span
-                  className={`ml-2 text-[9px] font-normal ${percentile >= 70 ? "text-red-400" : percentile <= 30 ? "text-emerald-400" : "text-amber-400"}`}
+                  className={`ml-2 text-[13px] font-normal ${percentile >= 70 ? "text-red-400" : percentile <= 30 ? "text-emerald-400" : "text-amber-400"}`}
                 >
                   pct {percentile}
                 </span>
@@ -368,7 +368,7 @@ function PeHistoryTable({
   );
 }
 
-// ─── Health Score Histórico (gráfico de barras año por año) ─────
+//  Health Score Histórico (gráfico de barras año por año) 
 
 function HealthScoreChart({ history }: { history: { year: number; score: number }[] }) {
   if (history.length < 2) return null;
@@ -416,13 +416,13 @@ function HealthScoreChart({ history }: { history: { year: number; score: number 
         </BarChart>
       </ResponsiveContainer>
       <div className="flex items-center justify-end gap-3 mt-1">
-        <span className="flex items-center gap-1 text-[8px] text-muted-foreground">
+        <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#22c55e]" /> Sólido (≥65)
         </span>
-        <span className="flex items-center gap-1 text-[8px] text-muted-foreground">
+        <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#f59e0b]" /> Medio (40-64)
         </span>
-        <span className="flex items-center gap-1 text-[8px] text-muted-foreground">
+        <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#ef4444]" /> Débil (&lt;40)
         </span>
       </div>
@@ -464,7 +464,7 @@ export function AnalisisFundamentalTab({
 
   const [mode, setMode] = useState<DataSourceMode>("manual");
 
-  // 🔹 Historico detallado + noticias + informe narrativo
+  // - Historico detallado + noticias + informe narrativo
   const histFn = useServerFn(fetchHistoricoDetallado);
   const newsFn = useServerFn(fetchNoticiasTicker);
   const [historico, setHistorico] = useState<PeriodoHistoricoRow[]>([]);
@@ -484,7 +484,7 @@ export function AnalisisFundamentalTab({
   const [analisisCualitativoSA, setAnalisisCualitativoSA] =
     useState<AnalisisCualitativoSemiAutomaticoResult | null>(null);
 
-  // ── Contexto macro (Murphy, ciclo económico) ──
+  //  Contexto macro (Murphy, ciclo económico) 
   const [ciclo, setCiclo] = useState<CicloEconomico | null>(null);
   const cicloFn = useServerFn(getCicloEconomico);
   useEffect(() => {
@@ -493,7 +493,7 @@ export function AnalisisFundamentalTab({
       .catch(() => {});
   }, []);
 
-  // ─── Valuación state ──────────────────────────────────────────────
+  //  Valuación state 
   const [valInputRf, setValInputRf] = useState("4.5");
   const [valInputErp, setValInputErp] = useState("5.5");
   const [valInputG, setValInputG] = useState("2.5");
@@ -1019,7 +1019,7 @@ export function AnalisisFundamentalTab({
     }
   };
 
-  // ─── Recalcular valuación cuando cambian inputs o resultado ──────
+  //  Recalcular valuación cuando cambian inputs o resultado 
   useEffect(() => {
     if (!result || result.error) {
       setValWACC(null);
@@ -1107,7 +1107,7 @@ export function AnalisisFundamentalTab({
 
       {/* Banner de navegación cruzada (PASO 8) */}
       {tickerFromSearch && mode === "manual" && (
-        <div className="rounded-md border border-primary/20 bg-primary/5 px-4 py-2 text-[9px] text-primary/80 font-mono">
+        <div className="rounded-md border border-primary/20 bg-primary/5 px-4 py-2 text-[13px] text-primary/80 font-mono">
           Llegaste desde Contexto de Mercado — análisis autocompletado para{" "}
           <strong>{tickerFromSearch}</strong>. Usá el buscador de abajo para consultar otro activo.
         </div>
@@ -1116,7 +1116,7 @@ export function AnalisisFundamentalTab({
       {/* Buscador (solo en modo manual) */}
       {mode === "manual" && (
         <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-          <p className="text-[10px] text-muted-foreground mb-2">
+          <p className="text-[13px] text-muted-foreground mb-2">
             Ingresar el ticker de Yahoo Finance. Para acciones argentinas usar sufijo .BA (ej:
             GGAL.BA). Para CEDEARs ingresar el ticker del subyacente en USA (ej: AAPL, MSFT, GOOGL).
           </p>
@@ -1128,12 +1128,12 @@ export function AnalisisFundamentalTab({
               onKeyDown={handleKey}
               placeholder="AAPL, GGAL.BA, MSFT (separados por coma)"
               maxLength={100}
-              className="flex-1 rounded-md border border-border/40 bg-background/20 px-3 py-2 text-[11px] font-mono text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-emerald-500/50"
+              className="flex-1 rounded-md border border-border/40 bg-background/20 px-3 py-2 text-[14px] font-mono text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-emerald-500/50"
             />
             <button
               onClick={handleSearch}
               disabled={loading || !ticker.trim()}
-              className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[11px] text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[14px] text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? "Consultando..." : "Analizar"}
             </button>
@@ -1146,14 +1146,14 @@ export function AnalisisFundamentalTab({
 
       {/* Error */}
       {fetchError && (
-        <div className="rounded-md border border-red-500/30 bg-red-500/5 px-4 py-3 text-[10px] text-red-400">
+        <div className="rounded-md border border-red-500/30 bg-red-500/5 px-4 py-3 text-[13px] text-red-400">
           {fetchError}
         </div>
       )}
 
       {/* Loading */}
       {loading && (
-        <div className="rounded-md border border-border/40 bg-background/40/60 px-4 py-6 text-center text-[10px] text-muted-foreground">
+        <div className="rounded-md border border-border/40 bg-background/40/60 px-4 py-6 text-center text-[13px] text-muted-foreground">
           Consultando Yahoo Finance y calculando metricas...
         </div>
       )}
@@ -1168,19 +1168,19 @@ export function AnalisisFundamentalTab({
                 <p className="text-[13px] font-semibold text-foreground">
                   {result.companyName ?? result.symbol}
                 </p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">
+                <p className="text-[13px] text-muted-foreground mt-0.5">
                   {[result.sector, result.industry, result.country].filter(Boolean).join(" · ")}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-[11px] font-mono font-semibold text-foreground">
+                <p className="text-[14px] font-mono font-semibold text-foreground">
                   {fPrice(result.currentPrice)}
                 </p>
-                <p className="text-[9px] text-muted-foreground">
+                <p className="text-[13px] text-muted-foreground">
                   {result.esETF ? "AUM" : "Market cap"}: {fMarketCap(result.marketCapM)}
                 </p>
                 {result.beta !== null && (
-                  <p className="text-[9px] text-muted-foreground">
+                  <p className="text-[13px] text-muted-foreground">
                     Beta: {result.beta.toFixed(2)}
                     {result.beta > 1.5 && ciclo?.stage != null && ciclo.stage >= 4 && (
                       <span className="text-amber-400/80 ml-1"></span>
@@ -1197,10 +1197,10 @@ export function AnalisisFundamentalTab({
           {/* Benchmark de referencia — mejor R² de factores disponibles */}
           {result.benchmarkName && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <div className="mono mb-2 text-[9px] uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-2">
+              <div className="mono mb-2 text-[13px] uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-2">
                 Benchmark ·
                 {bestBenchmarksLoading ? (
-                  <span className="text-[8px] font-normal normal-case text-muted-foreground animate-pulse">
+                  <span className="text-[12px] font-normal normal-case text-muted-foreground animate-pulse">
                     buscando mejor R²…
                   </span>
                 ) : bestBenchmarks && bestBenchmarks.length > 0 ? (
@@ -1217,7 +1217,7 @@ export function AnalisisFundamentalTab({
                         return copy;
                       });
                     }}
-                    className="text-[10px] font-mono bg-transparent border border-border/40 rounded px-1 py-0.5 text-foreground cursor-pointer hover:border-primary/50"
+                    className="text-[13px] font-mono bg-transparent border border-border/40 rounded px-1 py-0.5 text-foreground cursor-pointer hover:border-primary/50"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {bestBenchmarks.map((b) => (
@@ -1227,12 +1227,12 @@ export function AnalisisFundamentalTab({
                     ))}
                   </select>
                 ) : (
-                  <span className="text-[10px] font-normal normal-case">
+                  <span className="text-[13px] font-normal normal-case">
                     {result.benchmarkName}
                   </span>
                 )}
               </div>
-              <div className="flex flex-wrap gap-x-6 gap-y-2 text-[11px]">
+              <div className="flex flex-wrap gap-x-6 gap-y-2 text-[14px]">
                 <div>
                   <span className="text-muted-foreground">Precio: </span>
                   <span className="font-mono text-foreground">{fPrice(result.currentPrice)}</span>
@@ -1267,13 +1267,13 @@ export function AnalisisFundamentalTab({
             </div>
           )}
 
-          {/* ── Contexto Macro — Murphy TOP-DOWN ── */}
+          {/*  Contexto Macro — Murphy TOP-DOWN  */}
           {ciclo && !result.esETF && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Contexto Macro · Ciclo Económico
               </p>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px]">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
                 <div>
                   <span className="text-muted-foreground">Etapa: </span>
                   <span className="font-semibold text-foreground">{ciclo.label}</span>
@@ -1304,16 +1304,16 @@ export function AnalisisFundamentalTab({
                   : false;
                 return (
                   <div
-                    className={`mt-2 text-[10px] ${bloqueado ? "text-red-400 border border-red-500/20 bg-red-500/5" : "text-emerald-400 border border-emerald-500/20 bg-emerald-500/5"} rounded p-2`}
+                    className={`mt-2 text-[13px] ${bloqueado ? "text-red-400 border border-red-500/20 bg-red-500/5" : "text-emerald-400 border border-emerald-500/20 bg-emerald-500/5"} rounded p-2`}
                   >
                     {bloqueado
                       ? ` Bloqueado: El sector "${result.sector}" no pertenece a los sectores líderes de la etapa ${ciclo.label}. Según Murphy, este sector no está alineado con el ciclo actual.`
-                      : `✓ Aprobado: El sector "${result.sector}" está alineado con el ciclo económico actual.`}
+                      : ` Aprobado: El sector "${result.sector}" está alineado con el ciclo económico actual.`}
                   </div>
                 );
               })()}
               {result.beta !== null && result.beta > 1.5 && ciclo.stage >= 4 && (
-                <div className="mt-1 text-[9px] text-amber-400/80 border border-amber-500/20 bg-amber-500/5 rounded p-1.5">
+                <div className="mt-1 text-[13px] text-amber-400/80 border border-amber-500/20 bg-amber-500/5 rounded p-1.5">
                   Beta alto ({result.beta.toFixed(2)}): en etapa de {ciclo.label}, una beta &gt;1.5
                   implica que la acción podría caer más del doble que el índice.
                 </div>
@@ -1324,17 +1324,17 @@ export function AnalisisFundamentalTab({
           {/* Señal de inversion — bloque principal */}
           {result.esETF ? (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-3">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-3">
                 Señal de inversion
               </p>
               <div className="flex items-center gap-4 flex-wrap">
                 <div>
-                  <p className="text-[9px] text-muted-foreground">Horizonte</p>
-                  <p className="text-[12px] font-semibold text-muted-foreground">—</p>
+                  <p className="text-[13px] text-muted-foreground">Horizonte</p>
+                  <p className="text-[14px] font-semibold text-muted-foreground">—</p>
                 </div>
                 <div className="h-6 w-px bg-border/30" />
                 <div>
-                  <p className="text-[9px] text-muted-foreground">Acción sugerida</p>
+                  <p className="text-[13px] text-muted-foreground">Acción sugerida</p>
                   <p className="text-[14px] font-bold text-yellow-400">Ver Análisis Técnico</p>
                 </div>
               </div>
@@ -1351,32 +1351,32 @@ export function AnalisisFundamentalTab({
               );
               return (
                 <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-                  <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-3">
+                  <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-3">
                     Señal de inversion
                   </p>
                   <div className="flex items-center gap-4 flex-wrap">
                     <div>
-                      <p className="text-[9px] text-muted-foreground">Horizonte</p>
-                      <p className="text-[12px] font-semibold text-foreground">{senal.plazo}</p>
+                      <p className="text-[13px] text-muted-foreground">Horizonte</p>
+                      <p className="text-[14px] font-semibold text-foreground">{senal.plazo}</p>
                     </div>
                     <div className="h-6 w-px bg-border/30" />
                     <div>
-                      <p className="text-[9px] text-muted-foreground">Accion sugerida</p>
+                      <p className="text-[13px] text-muted-foreground">Accion sugerida</p>
                       <p className={`text-[14px] font-bold ${signalColor(senal.accion)}`}>
                         {senal.accion}
                       </p>
                     </div>
                   </div>
                   {senal.nota && (
-                    <p className="mt-2 text-[9px] text-amber-400/80 leading-relaxed border border-amber-500/20 bg-amber-500/5 rounded p-2">
+                    <p className="mt-2 text-[13px] text-amber-400/80 leading-relaxed border border-amber-500/20 bg-amber-500/5 rounded p-2">
                       {senal.nota}
                     </p>
                   )}
                   <details className="mt-2">
-                    <summary className="text-[9px] text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
+                    <summary className="text-[13px] text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
                       Ver fórmula de la señal
                     </summary>
-                    <div className="mt-1 text-[9px] text-muted-foreground leading-relaxed border border-border/30 rounded p-2 bg-muted/20 space-y-1">
+                    <div className="mt-1 text-[13px] text-muted-foreground leading-relaxed border border-border/30 rounded p-2 bg-muted/20 space-y-1">
                       <p>
                         Esta señal resulta del <strong>score fundamental</strong> (
                         {result.fundScore}/100) combinado con el <strong>crecimiento</strong> de
@@ -1402,13 +1402,13 @@ export function AnalisisFundamentalTab({
                           Resto → <strong>Cautela</strong>
                         </li>
                       </ul>
-                      <p className="text-[8px] text-muted-foreground/60 mt-1">
+                      <p className="text-[12px] text-muted-foreground/60 mt-1">
                         No constituye una recomendacion formal de inversion.
                       </p>
                     </div>
                   </details>
                   {modoGuiado && (
-                    <p className="mt-2 text-[9px] text-muted-foreground/70 leading-relaxed italic border-t border-border/20 pt-2">
+                    <p className="mt-2 text-[13px] text-muted-foreground/70 leading-relaxed italic border-t border-border/20 pt-2">
                       {getExplicacion("senal-inversion")}
                     </p>
                   )}
@@ -1417,7 +1417,7 @@ export function AnalisisFundamentalTab({
             })()
           )}
 
-          {/* 🔹 Subtabs: Resumen Actual / Por Año / Por Trimestre */}
+          {/* - Subtabs: Resumen Actual / Por Año / Por Trimestre */}
           <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
             <div className="flex gap-1.5 border-b border-border/40 pb-2 mb-3">
               {(["actual", "anual", "trimestral"] as const).map((t) => (
@@ -1432,7 +1432,7 @@ export function AnalisisFundamentalTab({
                       setSelectedPeriodIdx(0);
                     }
                   }}
-                  className={`font-mono text-[10px] px-2.5 py-1 rounded border transition-colors ${
+                  className={`font-mono text-[13px] px-2.5 py-1 rounded border transition-colors ${
                     (t === "actual" && selectedPeriodIdx < 0) ||
                     (t === historicoGranularidad && selectedPeriodIdx >= 0)
                       ? "border-emerald-500/60 bg-emerald-500/10 text-emerald-400"
@@ -1447,11 +1447,11 @@ export function AnalisisFundamentalTab({
             {/* Periodo selector (navegacion entre periodos) */}
             {selectedPeriodIdx >= 0 && historico.length > 0 && (
               <div className="flex items-center gap-2 mb-3 flex-wrap">
-                <span className="text-[9px] text-muted-foreground font-mono">Periodo:</span>
+                <span className="text-[13px] text-muted-foreground font-mono">Periodo:</span>
                 <select
                   value={selectedPeriodIdx}
                   onChange={(e) => setSelectedPeriodIdx(Number(e.target.value))}
-                  className="bg-background/40 border border-border/60 text-foreground text-[10px] rounded px-2 py-1 font-mono outline-none focus:border-emerald-500/50"
+                  className="bg-background/40 border border-border/60 text-foreground text-[13px] rounded px-2 py-1 font-mono outline-none focus:border-emerald-500/50"
                 >
                   {historico.map((p, i) => (
                     <option key={p.endDate} value={i}>
@@ -1460,7 +1460,7 @@ export function AnalisisFundamentalTab({
                   ))}
                 </select>
                 {historicoLoading && (
-                  <span className="text-[9px] text-muted-foreground font-mono">Cargando...</span>
+                  <span className="text-[13px] text-muted-foreground font-mono">Cargando...</span>
                 )}
               </div>
             )}
@@ -1468,10 +1468,10 @@ export function AnalisisFundamentalTab({
             {/* Alerta para CEDEARs/ADRs sobre múltiplos de valuación */}
             {result.symbol.endsWith(".BA") && (
               <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 mb-4">
-                <p className="text-[9px] text-amber-400 font-semibold mb-1">
-                  ⚠️ Advertencia: Múltiplos de valuación para CEDEARs
+                <p className="text-[13px] text-amber-400 font-semibold mb-1">
+                  [ADVERTENCIA] Advertencia: Múltiplos de valuación para CEDEARs
                 </p>
-                <p className="text-[8px] text-amber-200/80 leading-relaxed">
+                <p className="text-[12px] text-amber-200/80 leading-relaxed">
                   Los múltiplos (P/E, P/B, EV/EBITDA, etc.) para tickers .BA pueden ser incorrectos
                   porque no incluyen el ratio de conversión del CEDEAR ni el tipo de cambio. Los
                   cálculos actuales usan precio en ARS dividido por métricas financieras en USD sin
@@ -1483,37 +1483,37 @@ export function AnalisisFundamentalTab({
 
             {/* Informe narrativo */}
             {informeNarrativo && (
-              <div className="space-y-2 text-[10px] leading-relaxed">
+              <div className="space-y-2 text-[13px] leading-relaxed">
                 {informeNarrativo.contexto && (
                   <div>
-                    <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <span className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Contexto
                     </span>
                     <p className="text-foreground/80">{informeNarrativo.contexto}</p>
                   </div>
                 )}
                 <div>
-                  <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Qué pasó
                   </span>
                   <p className="text-foreground/80">{informeNarrativo.quePaso}</p>
                 </div>
                 {informeNarrativo.porQuePaso && (
                   <div>
-                    <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <span className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Por qué pasó
                     </span>
                     <p className="text-foreground/80">{informeNarrativo.porQuePaso}</p>
                   </div>
                 )}
                 <div>
-                  <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Qué significa para la inversión
                   </span>
                   <p className="text-foreground/80">{informeNarrativo.queSignifica}</p>
                 </div>
                 <div>
-                  <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Señal
                   </span>
                   <p className={`font-semibold ${signalColor(informeNarrativo.senalLabel)}`}>
@@ -1526,16 +1526,16 @@ export function AnalisisFundamentalTab({
             {/* Period detail table */}
             {selectedPeriodIdx >= 0 && historico[selectedPeriodIdx] && (
               <details className="mt-3" open>
-                <summary className="text-[9px] text-muted-foreground cursor-pointer hover:text-foreground font-mono mb-2">
+                <summary className="text-[13px] text-muted-foreground cursor-pointer hover:text-foreground font-mono mb-2">
                   Datos del período seleccionado
                 </summary>
-                <div className="mb-2 text-[8px] text-muted-foreground italic">
+                <div className="mb-2 text-[12px] text-muted-foreground italic">
                   * Estos datos corresponden al cierre del ejercicio fiscal (FY) seleccionado. Los
                   márgenes en "Métricas Fundamentales" son TTM (Trailing Twelve Months).
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left font-mono text-[10px]">
-                    <thead className="text-[9px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full text-left font-mono text-[13px]">
+                    <thead className="text-[13px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
                       <tr>
                         <th className="px-2 py-1">Métrica</th>
                         <th className="px-2 py-1 text-right">Valor</th>
@@ -1623,12 +1623,12 @@ export function AnalisisFundamentalTab({
                 </div>
                 {noticiasPeriodo.length > 0 && (
                   <div className="mt-2">
-                    <p className="text-[9px] text-muted-foreground font-mono mb-1">
+                    <p className="text-[13px] text-muted-foreground font-mono mb-1">
                       Noticias del período:
                     </p>
                     <div className="space-y-1">
                       {noticiasPeriodo.slice(0, 3).map((n, i) => (
-                        <p key={i} className="text-[9px] text-muted-foreground">
+                        <p key={i} className="text-[13px] text-muted-foreground">
                           <span className="text-foreground">{n.publisher}:</span> {n.title}
                         </p>
                       ))}
@@ -1640,20 +1640,20 @@ export function AnalisisFundamentalTab({
           </div>
 
           {/* Score + posicion en rango */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-4">
             {/* Score fundamental */}
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
               <p
-                className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1"
+                className="text-[13px] uppercase tracking-widest text-muted-foreground mb-1"
                 title="Score actual compuesto por 7 metricas con pesos fijos (100 pts total). Se usa para la señal de inversion. Difiere del Health Score histórico, que usa solo 4 metricas y se calcula para cada año fiscal individual."
               >
                 Score fundamental detallado
               </p>
-              <p className="text-[8px] text-muted-foreground/70 mb-2">
+              <p className="text-[12px] text-muted-foreground/70 mb-2">
                 Valuación y salud financiera actual (7 métricas en tiempo real)
               </p>
               {result.esETF ? (
-                <p className="text-[10px] text-muted-foreground py-2">
+                <p className="text-[13px] text-muted-foreground py-2">
                   Sin score fundamental (ETF)
                 </p>
               ) : (
@@ -1664,7 +1664,7 @@ export function AnalisisFundamentalTab({
                     maxPts={result.maxPts}
                   />
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[9px] uppercase tracking-wider text-muted-foreground/60">
+                    <span className="text-[13px] uppercase tracking-wider text-muted-foreground/60">
                       {result.metricsAvailable}/{result.metricsTotal} métricas
                     </span>
                   </div>
@@ -1672,10 +1672,10 @@ export function AnalisisFundamentalTab({
                 </>
               )}
               <details className="mt-2">
-                <summary className="text-[9px] text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
+                <summary className="text-[13px] text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
                   Ver bandas de puntaje por métrica
                 </summary>
-                <div className="mt-1 text-[8px] text-muted-foreground leading-relaxed border border-border/30 rounded p-2 bg-muted/20 space-y-0.5">
+                <div className="mt-1 text-[12px] text-muted-foreground leading-relaxed border border-border/30 rounded p-2 bg-muted/20 space-y-0.5">
                   <p>
                     <strong>ROE</strong> (15 pts): ≥20%=15 | ≥12%=10 | ≥5%=5 | &lt;5%=0
                   </p>
@@ -1711,18 +1711,18 @@ export function AnalisisFundamentalTab({
 
             {/* Score sectorial (per-sector weighted) */}
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Score sectorial
               </p>
               {scoreSectorial && scoreSectorial.aplica ? (
                 <>
                   <ScoreBar score={Math.round(scoreSectorial.scoreSectorial ?? 0)} />
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[9px] uppercase tracking-wider text-muted-foreground/60">
+                    <span className="text-[13px] uppercase tracking-wider text-muted-foreground/60">
                       {scoreSectorial.coberturaDatos}% cobertura
                     </span>
-                    <span className="text-[9px] text-muted-foreground/40">|</span>
-                    <span className="text-[9px] text-muted-foreground/60">
+                    <span className="text-[13px] text-muted-foreground/40">|</span>
+                    <span className="text-[13px] text-muted-foreground/60">
                       {scoreSectorial.sector}
                     </span>
                   </div>
@@ -1737,7 +1737,7 @@ export function AnalisisFundamentalTab({
                               ? "text-amber-500"
                               : "text-red-500";
                         return (
-                          <div key={m.campo as string} className="flex justify-between text-[9px]">
+                          <div key={m.campo as string} className="flex justify-between text-[13px]">
                             <span className="text-muted-foreground truncate">{m.etiqueta}</span>
                             <span className={`font-mono ${color}`}>
                               {m.valor != null
@@ -1754,7 +1754,7 @@ export function AnalisisFundamentalTab({
                   {scoreSectorial.alertas.length > 0 && (
                     <div className="mt-2 space-y-0.5">
                       {scoreSectorial.alertas.map((a, i) => (
-                        <p key={i} className="text-[8px] leading-tight text-muted-foreground">
+                        <p key={i} className="text-[12px] leading-tight text-muted-foreground">
                           {a}
                         </p>
                       ))}
@@ -1762,31 +1762,31 @@ export function AnalisisFundamentalTab({
                   )}
                 </>
               ) : (
-                <p className="text-[10px] text-muted-foreground py-2">
+                <p className="text-[13px] text-muted-foreground py-2">
                   {result.esETF ? "Sin score sectorial (ETF)" : "No disponible para este sector"}
                 </p>
               )}
             </div>
           </div>
 
-          {/* ─── Beta Propio (calculado vs benchmark) ───────────────── */}
+          {/*  Beta Propio (calculado vs benchmark)  */}
           {(result.betaPropio != null || result.beta != null) && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Beta &mdash; Yahoo vs propio
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
+              <div className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 mb-2">
                 {result.beta != null && (
                   <div className="rounded border border-border/20 bg-muted/10 p-2">
-                    <p className="text-[8px] text-muted-foreground">Beta Yahoo Finance</p>
-                    <p className="text-[11px] font-mono font-semibold text-foreground">
+                    <p className="text-[12px] text-muted-foreground">Beta Yahoo Finance</p>
+                    <p className="text-[14px] font-mono font-semibold text-foreground">
                       {result.beta.toFixed(2)}
                     </p>
                   </div>
                 )}
                 {result.betaPropio != null && (
                   <div className="rounded border border-border/20 bg-muted/10 p-2">
-                    <p className="text-[8px] text-muted-foreground">
+                    <p className="text-[12px] text-muted-foreground">
                       Beta propio
                       {bestBenchmarks && bestBenchmarks.length > 0
                         ? ` (vs ${bestBenchmarks[0].ticker})`
@@ -1794,7 +1794,7 @@ export function AnalisisFundamentalTab({
                           ? " (buscando...)"
                           : " (vs SPY/MERVAL)"}
                     </p>
-                    <p className="text-[11px] font-mono font-semibold text-foreground">
+                    <p className="text-[14px] font-mono font-semibold text-foreground">
                       {bestBenchmarks && bestBenchmarks.length > 0
                         ? bestBenchmarks[0].beta.toFixed(2)
                         : result.betaPropio.toFixed(2)}
@@ -1805,8 +1805,8 @@ export function AnalisisFundamentalTab({
                   ? bestBenchmarks[0].r2 != null
                   : result.betaR2 != null) && (
                   <div className="rounded border border-border/20 bg-muted/10 p-2">
-                    <p className="text-[8px] text-muted-foreground">R&sup2;</p>
-                    <p className="text-[11px] font-mono font-semibold text-foreground">
+                    <p className="text-[12px] text-muted-foreground">R&sup2;</p>
+                    <p className="text-[14px] font-mono font-semibold text-foreground">
                       {bestBenchmarks && bestBenchmarks.length > 0
                         ? bestBenchmarks[0].r2.toFixed(4)
                         : (result.betaR2?.toFixed(3) ?? "—")}
@@ -1815,35 +1815,35 @@ export function AnalisisFundamentalTab({
                 )}
                 {bestBenchmarks && bestBenchmarks.length > 0 ? (
                   <div className="rounded border border-border/20 bg-muted/10 p-2">
-                    <p className="text-[8px] text-muted-foreground">
+                    <p className="text-[12px] text-muted-foreground">
                       Mejor benchmark (103 factores)
                     </p>
-                    <p className="text-[11px] font-mono font-semibold text-foreground">
+                    <p className="text-[14px] font-mono font-semibold text-foreground">
                       {bestBenchmarks[0].ticker} ({bestBenchmarks[0].name})
                     </p>
                   </div>
                 ) : bestBenchmarksLoading ? (
                   <div className="rounded border border-border/20 bg-muted/10 p-2">
-                    <p className="text-[8px] text-muted-foreground">Buscando mejor benchmark</p>
-                    <p className="text-[11px] font-mono text-muted-foreground animate-pulse">
+                    <p className="text-[12px] text-muted-foreground">Buscando mejor benchmark</p>
+                    <p className="text-[14px] font-mono text-muted-foreground animate-pulse">
                       entre 103 factores…
                     </p>
                   </div>
                 ) : result.betaBenchmarkUsado != null ? (
                   <div className="rounded border border-border/20 bg-muted/10 p-2">
-                    <p className="text-[8px] text-muted-foreground">Benchmark elegido</p>
-                    <p className="text-[11px] font-mono font-semibold text-foreground">
+                    <p className="text-[12px] text-muted-foreground">Benchmark elegido</p>
+                    <p className="text-[14px] font-mono font-semibold text-foreground">
                       {result.betaBenchmarkUsado}
                     </p>
                   </div>
                 ) : null}
               </div>
               {result.betaAdvertencia && (
-                <p className="text-[8px] text-amber-400/80 leading-relaxed border border-amber-500/20 bg-amber-500/5 rounded p-2">
+                <p className="text-[12px] text-amber-400/80 leading-relaxed border border-amber-500/20 bg-amber-500/5 rounded p-2">
                   {result.betaAdvertencia}
                 </p>
               )}
-              <p className="mt-1 text-[8px] text-muted-foreground/60">
+              <p className="mt-1 text-[12px] text-muted-foreground/60">
                 {bestBenchmarks && bestBenchmarks.length > 0
                   ? `Beta propio recalculado contra ${bestBenchmarks[0].ticker} (${bestBenchmarks[0].name}, R² ${bestBenchmarks[0].r2.toFixed(4)}), el de mayor correlación entre los 103 factores evaluados.`
                   : bestBenchmarksLoading
@@ -1853,10 +1853,10 @@ export function AnalisisFundamentalTab({
             </div>
           )}
 
-          {/* ─── Revisiones de estimados de analistas ────────────────── */}
+          {/*  Revisiones de estimados de analistas  */}
           {result.revisionEstimadosPct != null && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Momentum de revisiones de analistas
               </p>
               <div className="flex items-center gap-3 flex-wrap">
@@ -1866,7 +1866,7 @@ export function AnalisisFundamentalTab({
                   {result.revisionEstimadosPct >= 0 ? "+" : ""}
                   {result.revisionEstimadosPct}%
                 </p>
-                <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1 text-[13px] text-muted-foreground">
                   <span
                     className={`inline-block h-1.5 w-1.5 rounded-full ${result.revisionEstimadosPct >= 5 ? "bg-emerald-400" : result.revisionEstimadosPct <= -5 ? "bg-red-400" : "bg-amber-400"}`}
                   />
@@ -1878,17 +1878,17 @@ export function AnalisisFundamentalTab({
                 </span>
               </div>
               {result.revisionEstimadosDetalle && (
-                <p className="mt-1 text-[9px] text-muted-foreground leading-relaxed">
+                <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
                   {result.revisionEstimadosDetalle}
                 </p>
               )}
             </div>
           )}
 
-          {/* ─── Actividad de insiders ───────────────────────────────── */}
+          {/*  Actividad de insiders  */}
           {result.insiderNetActivityPct != null && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Actividad de insiders (neto)
               </p>
               <div className="flex items-center gap-3 flex-wrap">
@@ -1898,7 +1898,7 @@ export function AnalisisFundamentalTab({
                   {result.insiderNetActivityPct >= 0 ? "+" : ""}
                   {result.insiderNetActivityPct}%
                 </p>
-                <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1 text-[13px] text-muted-foreground">
                   <span
                     className={`inline-block h-1.5 w-1.5 rounded-full ${result.insiderNetActivityPct >= 30 ? "bg-emerald-400" : result.insiderNetActivityPct <= -30 ? "bg-red-400" : "bg-amber-400"}`}
                   />
@@ -1910,22 +1910,22 @@ export function AnalisisFundamentalTab({
                 </span>
               </div>
               {result.insiderNetActivityInterpretacion && (
-                <p className="mt-1 text-[9px] text-muted-foreground leading-relaxed">
+                <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
                   {result.insiderNetActivityInterpretacion}
                 </p>
               )}
             </div>
           )}
 
-          {/* ─── SEC Filings ─────────────────────────────────────────── */}
+          {/*  SEC Filings  */}
           {result.secFilings && result.secFilings.length > 0 && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Presentaciones SEC (&uacute;ltimas)
               </p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-mono text-[10px]">
-                  <thead className="text-[8px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
+              <div className="overflow-x-auto w-full">
+                <table className="w-full text-left font-mono text-[13px]">
+                  <thead className="text-[12px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
                     <tr>
                       <th className="px-2 py-1">Fecha</th>
                       <th className="px-2 py-1">Tipo</th>
@@ -1947,7 +1947,7 @@ export function AnalisisFundamentalTab({
                               href={f.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2 text-[9px]"
+                              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2 text-[13px]"
                             >
                               Ver
                             </a>
@@ -1960,7 +1960,7 @@ export function AnalisisFundamentalTab({
                   </tbody>
                 </table>
               </div>
-              <p className="mt-1 text-[8px] text-muted-foreground/60">
+              <p className="mt-1 text-[12px] text-muted-foreground/60">
                 S&oacute;lo se muestran los &uacute;ltimos 5 filings 10-K y 10-Q disponibles en
                 Yahoo Finance.
               </p>
@@ -1986,10 +1986,10 @@ export function AnalisisFundamentalTab({
           {/* P/E historico */}
           {!result.esETF && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">
+              <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-1">
                 Historial de P/E por año fiscal
               </p>
-              <p className="text-[9px] text-muted-foreground mb-2">
+              <p className="text-[13px] text-muted-foreground mb-2">
                 P/E calculado usando el precio de cierre de diciembre de cada año fiscal y el EPS
                 derivado de la utilidad neta anual dividida las acciones en circulacion. Yahoo
                 Finance provee hasta 4 años de estados de resultados.
@@ -2013,12 +2013,12 @@ export function AnalisisFundamentalTab({
           {!result.esETF && result.healthScoreHistory && result.healthScoreHistory.length >= 2 && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
               <p
-                className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1"
+                className="text-[13px] uppercase tracking-widest text-muted-foreground mb-1"
                 title="Score HECHO (histórico) — calculado con solo 4 metricas (margen neto, ROE, crec. ingresos, crec. ganancias) disponibles en los estados financieros de cada año. Es distinto del Score fundamental detallado actual (7 metricas) que se muestra arriba y que usa datos en tiempo real del modulo financialData de Yahoo Finance."
               >
                 Evolución del Health Score (histórico anual)
               </p>
-              <p className="text-[9px] text-muted-foreground mb-2">
+              <p className="text-[13px] text-muted-foreground mb-2">
                 Score compuesto calculado a partir de: margen neto (30 pts), ROE (25 pts),
                 crecimiento de ingresos (25 pts) y crecimiento de ganancias (20 pts) disponibles en
                 los estados financieros históricos de Yahoo Finance.
@@ -2035,16 +2035,16 @@ export function AnalisisFundamentalTab({
 
           {/* Checklist cualitativo — preguntas pendientes (solo concentración) */}
           <details className="rounded-md border border-border/40 bg-background/40/60 p-4">
-            <summary className="text-[9px] uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground select-none">
+            <summary className="text-[13px] uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground select-none">
               Preguntas cualitativas pendientes
             </summary>
             <div className="mt-2 space-y-2">
-              <p className="text-[9px] text-muted-foreground leading-relaxed">
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
                 Estas preguntas no se responden con datos de mercado — requieren que investigues el
                 negocio. Las primeras 6 ya tienen señales cuantitativas en la sección "Análisis
                 Cualitativo" de arriba.
               </p>
-              <ul className="space-y-1.5 text-[10px] text-muted-foreground leading-relaxed list-disc list-inside">
+              <ul className="space-y-1.5 text-[13px] text-muted-foreground leading-relaxed list-disc list-inside">
                 <li>
                   ¿La empresa depende de pocos clientes o proveedores concentrados? (riesgo de
                   concentracion) — pendiente de implementación
@@ -2059,14 +2059,14 @@ export function AnalisisFundamentalTab({
       {result && !loading && !multiResults.length && result.sector && result.industry && (
         <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
           {peersInfo && peersInfo.totalEncontrados === 0 ? (
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground">
               No se encontraron pares en el universo cargado para {result.industry}.
             </p>
           ) : (
             <button
               onClick={handleComparePeers}
               disabled={peersLoading}
-              className="w-full rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[11px] text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-mono"
+              className="w-full rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[14px] text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-mono"
             >
               {peersLoading
                 ? "Buscando pares..."
@@ -2085,13 +2085,13 @@ export function AnalisisFundamentalTab({
               const firstErr = multiResults.find((r) => (r as any).error);
               return (
                 <div className="p-4 text-center">
-                  <p className="text-[10px] text-muted-foreground">
+                  <p className="text-[13px] text-muted-foreground">
                     {firstErr
                       ? (firstErr as any).error
                       : "No hay datos disponibles para mostrar la comparación."}
                   </p>
                   {firstErr && (
-                    <p className="mt-1 text-[9px] text-muted-foreground/60">
+                    <p className="mt-1 text-[13px] text-muted-foreground/60">
                       {multiResults.length} ticker(s) consultados, todos fallaron.
                     </p>
                   )}
@@ -2182,8 +2182,8 @@ export function AnalisisFundamentalTab({
             ] as const;
             return (
               <>
-                <table className="w-full text-left font-mono text-[11px]">
-                  <thead className="text-[9px] uppercase tracking-wider text-muted-foreground border-b-2 border-border/60">
+                <table className="w-full text-left font-mono text-[14px]">
+                  <thead className="text-[13px] uppercase tracking-wider text-muted-foreground border-b-2 border-border/60">
                     <tr>
                       <th className="px-2 py-1.5 text-left sticky left-0 bg-surface z-10">
                         Métrica
@@ -2325,7 +2325,7 @@ export function AnalisisFundamentalTab({
                     })}
                   </tbody>
                 </table>
-                <div className="p-2 text-[8px] text-muted-foreground border-t border-border/20">
+                <div className="p-2 text-[12px] text-muted-foreground border-t border-border/20">
                   Datos de Yahoo Finance. Multiples tickers separados por coma o espacio.
                 </div>
               </>
@@ -2358,7 +2358,7 @@ export function AnalisisFundamentalTab({
               return (
                 <div className="px-3 py-2 space-y-1">
                   {notas.map((n, i) => (
-                    <p key={i} className="text-[8px] text-amber-400/80 leading-relaxed">
+                    <p key={i} className="text-[12px] text-amber-400/80 leading-relaxed">
                       {" "}
                       {n}
                     </p>
@@ -2369,12 +2369,12 @@ export function AnalisisFundamentalTab({
         </div>
       )}
 
-      {/* ── Score Fundamental Heatmap ── */}
+      {/*  Score Fundamental Heatmap  */}
       {multiResults.filter((r) => !r.error).length > 0 && (
         <ScoreFundamentalHeatmap results={multiResults.filter((r) => !r.error)} />
       )}
 
-      {/* ── Sector comparison ── */}
+      {/*  Sector comparison  */}
       {sectorComparacion &&
         !sectorComparacion.loading &&
         !sectorComparacion.error &&
@@ -2486,8 +2486,8 @@ export function AnalisisFundamentalTab({
           return (
             <div className="space-y-3 rounded-lg border border-border/40 bg-background/30 p-4">
               <details open>
-                <summary className="cursor-pointer font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors list-none flex items-center gap-1">
-                  <span className="text-[8px]">▼</span>
+                <summary className="cursor-pointer font-mono text-[13px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors list-none flex items-center gap-1">
+                  <span className="text-[12px]"></span>
                   Comparación sectorial:
                   <select
                     value={sc.symbol}
@@ -2504,7 +2504,7 @@ export function AnalisisFundamentalTab({
                       }
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    className="text-[10px] font-mono bg-transparent border border-border/40 rounded px-1 py-0.5 text-foreground cursor-pointer hover:border-primary/50"
+                    className="text-[13px] font-mono bg-transparent border border-border/40 rounded px-1 py-0.5 text-foreground cursor-pointer hover:border-primary/50"
                   >
                     {anchorOptions.map((o) =>
                       o && o.symbol ? (
@@ -2520,7 +2520,7 @@ export function AnalisisFundamentalTab({
                         e.stopPropagation();
                         setAmbitoComparacion("industria");
                       }}
-                      className={`text-[9px] px-1.5 py-0.5 rounded border transition-colors ${
+                      className={`text-[13px] px-1.5 py-0.5 rounded border transition-colors ${
                         ambitoComparacion === "industria"
                           ? "border-primary/60 bg-primary/10 text-primary"
                           : "border-border/30 text-muted-foreground hover:text-foreground"
@@ -2533,7 +2533,7 @@ export function AnalisisFundamentalTab({
                         e.stopPropagation();
                         setAmbitoComparacion("sector");
                       }}
-                      className={`text-[9px] px-1.5 py-0.5 rounded border transition-colors ${
+                      className={`text-[13px] px-1.5 py-0.5 rounded border transition-colors ${
                         ambitoComparacion === "sector"
                           ? "border-primary/60 bg-primary/10 text-primary"
                           : "border-border/30 text-muted-foreground hover:text-foreground"
@@ -2554,7 +2554,7 @@ export function AnalisisFundamentalTab({
                       e.stopPropagation();
                       setComparisonView("tabla");
                     }}
-                    className={`text-[9px] px-2 py-0.5 rounded border transition-colors ${
+                    className={`text-[13px] px-2 py-0.5 rounded border transition-colors ${
                       comparisonView === "tabla"
                         ? "border-primary/60 bg-primary/10 text-primary"
                         : "border-border/30 text-muted-foreground hover:text-foreground"
@@ -2567,7 +2567,7 @@ export function AnalisisFundamentalTab({
                       e.stopPropagation();
                       setComparisonView("matriz");
                     }}
-                    className={`text-[9px] px-2 py-0.5 rounded border transition-colors ${
+                    className={`text-[13px] px-2 py-0.5 rounded border transition-colors ${
                       comparisonView === "matriz"
                         ? "border-primary/60 bg-primary/10 text-primary"
                         : "border-border/30 text-muted-foreground hover:text-foreground"
@@ -2578,13 +2578,13 @@ export function AnalisisFundamentalTab({
                   {/* R² sort controls in Tabla mode */}
                   {comparisonView === "tabla" && matrizData && (
                     <div className="flex items-center gap-1 ml-auto">
-                      <span className="text-[8px] text-muted-foreground">Ordenar por R²:</span>
+                      <span className="text-[12px] text-muted-foreground">Ordenar por R²:</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setSortByR2(sortByR2 === "desc" ? null : "desc");
                         }}
-                        className={`text-[9px] px-1.5 py-0.5 rounded border transition-colors ${
+                        className={`text-[13px] px-1.5 py-0.5 rounded border transition-colors ${
                           sortByR2 === "desc"
                             ? "border-blue-500/60 bg-blue-500/10 text-blue-400"
                             : "border-border/30 text-muted-foreground hover:text-foreground"
@@ -2597,7 +2597,7 @@ export function AnalisisFundamentalTab({
                           e.stopPropagation();
                           setSortByR2(sortByR2 === "asc" ? null : "asc");
                         }}
-                        className={`text-[9px] px-1.5 py-0.5 rounded border transition-colors ${
+                        className={`text-[13px] px-1.5 py-0.5 rounded border transition-colors ${
                           sortByR2 === "asc"
                             ? "border-blue-500/60 bg-blue-500/10 text-blue-400"
                             : "border-border/30 text-muted-foreground hover:text-foreground"
@@ -2609,7 +2609,7 @@ export function AnalisisFundamentalTab({
                   )}
                 </div>
 
-                {/* ── TABLA view: fundamental comparison table ── */}
+                {/*  TABLA view: fundamental comparison table  */}
                 {comparisonView === "tabla" && (
                   <>
                     {/* Build sorted entries by R² if matrix data available */}
@@ -2631,8 +2631,8 @@ export function AnalisisFundamentalTab({
                       }
                       return (
                         <div className="mt-2 overflow-x-auto">
-                          <table className="w-full text-left font-mono text-[11px]">
-                            <thead className="text-[9px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                          <table className="w-full text-left font-mono text-[14px]">
+                            <thead className="text-[13px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
                               <tr>
                                 <th className="px-2 py-1 text-left">Métrica</th>
                                 {displayEntries.map((e) => {
@@ -2644,7 +2644,7 @@ export function AnalisisFundamentalTab({
                                     >
                                       <div className="flex flex-col items-end">
                                         <span className="font-semibold">{e.ticker}</span>
-                                        <span className="text-[8px] text-muted-foreground">
+                                        <span className="text-[12px] text-muted-foreground">
                                           {marketInfo.market} · {marketInfo.currency}
                                         </span>
                                       </div>
@@ -2690,12 +2690,12 @@ export function AnalisisFundamentalTab({
                             e.stopPropagation();
                             setShowAllTickers(!showAllTickers);
                           }}
-                          className="text-[9px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                          className="text-[13px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
                         >
                           <span
-                            className={`text-[8px] transition-transform ${showAllTickers ? "rotate-90" : ""}`}
+                            className={`text-[12px] transition-transform ${showAllTickers ? "rotate-90" : ""}`}
                           >
-                            ▶
+                            
                           </span>
                           Todos los tickers del {ambitoComparacion} ({allSectorTickers.length})
                         </button>
@@ -2706,7 +2706,7 @@ export function AnalisisFundamentalTab({
                               return (
                                 <span
                                   key={t}
-                                  className={`font-mono text-[9px] px-1.5 py-0.5 rounded border ${
+                                  className={`font-mono text-[13px] px-1.5 py-0.5 rounded border ${
                                     hasData
                                       ? "border-primary/30 bg-primary/10 text-foreground"
                                       : "border-border/20 text-muted-foreground/50"
@@ -2723,7 +2723,7 @@ export function AnalisisFundamentalTab({
                   </>
                 )}
 
-                {/* ── MATRIZ view: pairwise R² / corr / alpha / beta ── */}
+                {/*  MATRIZ view: pairwise R² / corr / alpha / beta  */}
                 {comparisonView === "matriz" && (
                   <div className="mt-2 space-y-2">
                     <div className="flex flex-wrap gap-1">
@@ -2734,7 +2734,7 @@ export function AnalisisFundamentalTab({
                             e.stopPropagation();
                             setMatrizMetric(m);
                           }}
-                          className={`text-[9px] px-2 py-0.5 rounded border transition-colors ${
+                          className={`text-[13px] px-2 py-0.5 rounded border transition-colors ${
                             matrizMetric === m
                               ? "border-primary/60 bg-primary/10 text-primary"
                               : "border-border/30 text-muted-foreground hover:text-foreground"
@@ -2744,7 +2744,7 @@ export function AnalisisFundamentalTab({
                         </button>
                       ))}
                       {matrizLoading && (
-                        <span className="text-[9px] text-muted-foreground flex items-center gap-1">
+                        <span className="text-[13px] text-muted-foreground flex items-center gap-1">
                           <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                           Calculando...
                         </span>
@@ -2780,14 +2780,14 @@ export function AnalisisFundamentalTab({
                         };
                         return (
                           <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
-                            <table className="w-full text-left font-mono text-[10px]">
+                            <table className="w-full text-left font-mono text-[13px]">
                               <thead className="sticky top-0 z-10 bg-background/95 backdrop-blur">
                                 <tr>
-                                  <th className="px-1.5 py-1 text-left text-[9px] uppercase text-muted-foreground"></th>
+                                  <th className="px-1.5 py-1 text-left text-[13px] uppercase text-muted-foreground"></th>
                                   {labels.map((l) => (
                                     <th
                                       key={l}
-                                      className={`px-1.5 py-1 text-right text-[9px] uppercase ${l === sc.symbol ? "text-primary" : "text-muted-foreground"}`}
+                                      className={`px-1.5 py-1 text-right text-[13px] uppercase ${l === sc.symbol ? "text-primary" : "text-muted-foreground"}`}
                                     >
                                       {l}
                                     </th>
@@ -2830,7 +2830,7 @@ export function AnalisisFundamentalTab({
                         );
                       })()}
                     {!matrizLoading && (!matrizData || matrizData.tickers.length < 2) && (
-                      <p className="text-[10px] text-muted-foreground">
+                      <p className="text-[13px] text-muted-foreground">
                         No hay suficientes datos para calcular la matriz.
                       </p>
                     )}
@@ -2840,16 +2840,16 @@ export function AnalisisFundamentalTab({
                 {/* Conclusión inteligente */}
                 {sectorConclusion && (
                   <div className="mt-3 border-t border-border/20 pt-3 space-y-2">
-                    <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <p className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Conclusión sectorial
                     </p>
-                    <p className="text-[10px] text-foreground leading-relaxed">
+                    <p className="text-[13px] text-foreground leading-relaxed">
                       {sectorConclusion.resumenEjecutivo}
                     </p>
                     {sectorConclusion.fortalezas.length > 0 && (
                       <div>
-                        <p className="text-[9px] text-emerald-400 font-medium mb-1">Fortalezas</p>
-                        <ul className="list-disc list-inside text-[9px] text-muted-foreground space-y-0.5">
+                        <p className="text-[13px] text-emerald-400 font-medium mb-1">Fortalezas</p>
+                        <ul className="list-disc list-inside text-[13px] text-muted-foreground space-y-0.5">
                           {sectorConclusion.fortalezas.map((f, i) => (
                             <li key={i}>{f}</li>
                           ))}
@@ -2858,8 +2858,8 @@ export function AnalisisFundamentalTab({
                     )}
                     {sectorConclusion.debilidades.length > 0 && (
                       <div>
-                        <p className="text-[9px] text-red-400 font-medium mb-1">Debilidades</p>
-                        <ul className="list-disc list-inside text-[9px] text-muted-foreground space-y-0.5">
+                        <p className="text-[13px] text-red-400 font-medium mb-1">Debilidades</p>
+                        <ul className="list-disc list-inside text-[13px] text-muted-foreground space-y-0.5">
                           {sectorConclusion.debilidades.map((d, i) => (
                             <li key={i}>{d}</li>
                           ))}
@@ -2868,10 +2868,10 @@ export function AnalisisFundamentalTab({
                     )}
                     {sectorConclusion.mejorAlternativaSector && (
                       <div className="rounded border border-emerald-500/20 bg-emerald-500/5 p-2">
-                        <p className="text-[9px] text-emerald-400 font-medium">
+                        <p className="text-[13px] text-emerald-400 font-medium">
                           Mejor alternativa del sector
                         </p>
-                        <p className="text-[10px] text-foreground mt-0.5">
+                        <p className="text-[13px] text-foreground mt-0.5">
                           {sectorConclusion.mejorAlternativaSector}
                         </p>
                       </div>
@@ -2880,7 +2880,7 @@ export function AnalisisFundamentalTab({
                       sectorConclusion.advertencias.map((a, i) => (
                         <p
                           key={i}
-                          className="text-[8px] text-amber-400/80 leading-relaxed border border-amber-500/20 bg-amber-500/5 rounded p-1.5"
+                          className="text-[12px] text-amber-400/80 leading-relaxed border border-amber-500/20 bg-amber-500/5 rounded p-1.5"
                         >
                           {a}
                         </p>

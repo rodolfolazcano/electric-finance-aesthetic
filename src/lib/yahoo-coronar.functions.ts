@@ -289,3 +289,7 @@ export const yahooFundamentalsBatch = createServerFn({ method: "POST" })
       return { results: out };
     },
   );
+
+// Re-export claridad version for compatibilidad
+export * from './herramientas/yahoo-coronar.functions';
+

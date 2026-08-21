@@ -44,7 +44,7 @@ export function calcularGobiernoCorporativoCualitativo(
     };
   }
 
-  // ── Señal 1: Riesgo ISS (trato a minoritarios) ──
+  //  Señal 1: Riesgo ISS (trato a minoritarios) 
   const sr = result.governanceRiskScores?.shareHolderRightsRisk;
   let riesgoISS: SenalGobierno;
   if (sr == null) {
@@ -64,7 +64,7 @@ export function calcularGobiernoCorporativoCualitativo(
     };
   }
 
-  // ── Señal 2: Dilución vs creación de valor ──
+  //  Señal 2: Dilución vs creación de valor 
   let dilucionVsValor: SenalGobierno;
   const dilucion = calcularDilucion(result);
   if (dilucion.variacionPct == null) {
@@ -96,7 +96,7 @@ export function calcularGobiernoCorporativoCualitativo(
     }
   }
 
-  // ── Señal 3: Compensación ejecutiva vs performance ──
+  //  Señal 3: Compensación ejecutiva vs performance 
   let compensacionVsPerformance: SenalGobierno;
   const ceo = obtenerCeo(result);
 
@@ -123,7 +123,7 @@ export function calcularGobiernoCorporativoCualitativo(
     }
   }
 
-  // ── Conclusión ──
+  //  Conclusión 
   const fuerzas = [
     riesgoISS.fuerza,
     dilucionVsValor.fuerza,

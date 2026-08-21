@@ -45,14 +45,14 @@ export function ObiZscoreChart({
 
   if (data.length < 2)
     return (
-      <div className="mono text-[10px] text-muted-foreground">
+      <div className="mono text-[13px] text-muted-foreground">
         OBI + Z-Score: esperando datos...
       </div>
     );
 
   return (
     <div>
-      <div className="mono mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="mono mb-2 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
         OBI + Z-Score
       </div>
       <div className="h-[300px]">

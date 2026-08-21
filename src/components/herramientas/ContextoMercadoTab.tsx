@@ -12,6 +12,7 @@ import {
   type RecomendacionSchvarz,
   type RecomendacionesSchvarzResult,
 } from "@/lib/schvarz-recomendacion.functions";
+import { CierreMercadoPanel } from "./CierreMercadoPanel";
 
 function fmtPct(n: number | null | undefined, dp = 2): string {
   if (n == null || !Number.isFinite(n)) return "--";
@@ -23,12 +24,12 @@ function fmtNum(n: number | null | undefined, dp = 2): string {
   return `${n >= 0 ? "+" : ""}${n.toFixed(dp)}`;
 }
 
-// ─── Nuevo panel: Contexto Macro ──────────────────────────────────────────────
+//  Nuevo panel: Contexto Macro
 
 function MacroContextoPanel() {
   const FLASK_BASE =
     import.meta.env.NEWS_API_URL || import.meta.env.FLASK_API_URL || "http://localhost:5000";
-  const [data, setData] = useState<{
+  type MacroContexto = {
     riesgoPais: number | null;
     inflacion_mensual: number | null;
     dolar_oficial: number | null;
@@ -37,64 +38,61 @@ function MacroContextoPanel() {
     dolar_ccl: number | null;
     badlar: number | null;
     timestamp: string;
-  } | null>(null);
+  };
 
-  const { isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["macro-contexto"],
-    queryFn: async () => {
-      try {
-        const res = await fetch(`${FLASK_BASE}/api/macro-context`, {
-          signal: AbortSignal.timeout(15000),
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = (await res.json()) as Record<string, unknown>;
+    queryFn: async (): Promise<MacroContexto> => {
+      const res = await fetch(`${FLASK_BASE}/api/macro-context`, {
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = (await res.json()) as Record<string, unknown>;
 
-        const num = (v: unknown): number | null =>
-          typeof v === "number" ? v : v != null ? null : null;
+      const num = (v: unknown): number | null =>
+        typeof v === "number" ? v : v != null ? null : null;
 
-        const dolar = (d: unknown): number | null => {
-          if (d == null) return null;
-          if (typeof d === "object" && "compra" in d) return num((d as { compra?: number }).compra);
-          return num(d);
-        };
+      const dolar = (d: unknown): number | null => {
+        if (d == null) return null;
+        if (typeof d === "object" && "compra" in d) return num((d as { compra?: number }).compra);
+        return num(d);
+      };
 
-        const riesgo = json.riesgoPais ?? json.riesgo_pais;
-        const inflacion = (json.inflacion as { mensual?: number } | undefined) ?? null;
-        const dolares =
-          (json.dolares as
-            | {
-                oficial?: unknown;
-                blue?: unknown;
-                mep?: unknown;
-                ccl?: unknown;
-              }
-            | undefined) ?? null;
-        const tasas = (json.tasas as { badlar?: number } | undefined) ?? null;
+      const riesgo = json.riesgoPais ?? json.riesgo_pais;
+      const inflacion = (json.inflacion as { mensual?: number } | undefined) ?? null;
+      const dolares =
+        (json.dolares as
+          | {
+              oficial?: unknown;
+              blue?: unknown;
+              mep?: unknown;
+              ccl?: unknown;
+            }
+          | undefined) ?? null;
+      const tasas = (json.tasas as { badlar?: number } | undefined) ?? null;
 
-        setData({
-          riesgoPais:
-            typeof riesgo === "number" ? riesgo : num((riesgo as { valor?: number })?.valor),
-          inflacion_mensual:
-            typeof json.inflacion_mensual === "number"
-              ? json.inflacion_mensual
-              : num(inflacion?.mensual),
-          dolar_oficial: dolar(dolares?.oficial ?? json.dolar_oficial),
-          dolar_blue: dolar(dolares?.blue ?? json.dolar_blue),
-          dolar_mep: dolar(dolares?.mep ?? json.dolar_mep),
-          dolar_ccl: dolar(dolares?.ccl ?? json.dolar_ccl),
-          badlar:
-            typeof json.tasa_pasiva === "number"
-              ? json.tasa_pasiva
-              : num(tasas?.badlar ?? json.badlar),
-          timestamp: typeof json.timestamp === "string" ? json.timestamp : new Date().toISOString(),
-        });
-      } catch (e) {
-        console.error("[MacroContextoPanel] error fetching data:", e);
-        throw e;
-      }
+      return {
+        riesgoPais:
+          typeof riesgo === "number" ? riesgo : num((riesgo as { valor?: number })?.valor),
+        inflacion_mensual:
+          typeof json.inflacion_mensual === "number"
+            ? json.inflacion_mensual
+            : num(inflacion?.mensual),
+        dolar_oficial: dolar(dolares?.oficial ?? json.dolar_oficial),
+        dolar_blue: dolar(dolares?.blue ?? json.dolar_blue),
+        dolar_mep: dolar(dolares?.mep ?? json.dolar_mep),
+        dolar_ccl: dolar(dolares?.ccl ?? json.dolar_ccl),
+        badlar:
+          typeof json.tasa_pasiva === "number"
+            ? json.tasa_pasiva
+            : num(tasas?.badlar ?? json.badlar),
+        timestamp: typeof json.timestamp === "string" ? json.timestamp : new Date().toISOString(),
+      };
     },
     staleTime: 30 * 60 * 1000,
     refetchInterval: 30 * 60 * 1000,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) {
@@ -109,10 +107,13 @@ function MacroContextoPanel() {
 
   if (isError || data == null) {
     return (
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
-        <div className="p-2 text-[9px] text-warning">
+      <Card className="border border-border/40 bg-card p-4">
+        <p className="text-[14px] font-medium text-amber-400">
           Error al cargar contexto macro. Intente nuevamente.
-        </div>
+        </p>
+        <p className="text-[14px] text-muted-foreground mt-1">
+          Fuente: Flask /api/macro-context — verifique que el servicio esté corriendo.
+        </p>
       </Card>
     );
   }
@@ -128,10 +129,10 @@ function MacroContextoPanel() {
 
   return (
     <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
-      <h3 className="text-[9px] font-mono uppercase tracking-wider text-[2px] font-semibold text-muted-foreground px-3 py-2.5">
-        Contexto Macro
+      <h3 className="text-[14px] font-semibold uppercase tracking-[0.08em] text-muted-foreground px-4 py-3 border-b border-border/20">
+        Contexto Macro — Fuentes: BCRA · IOL · Yahoo Finance
       </h3>
-      <div className="p-3 space-y-2">
+      <div className="p-4 grid grid-cols-2 gap-3">
         <MetricaMini label="Riesgo País" value={riesgoPaisTexto} />
         <MetricaMini label="Inflación Mensual" value={inflacionTexto} />
         <MetricaMini label="Brecha Cambiaria" value={brechaTexto} />
@@ -173,10 +174,10 @@ function RecomendacionesPanel() {
     <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="w-full flex items-center justify-between px-4 py-2.5 text-[10px] font-mono uppercase tracking-wider text-foreground"
+        className="w-full flex items-center justify-between px-4 py-2.5 text-[14px] font-mono uppercase tracking-wider text-foreground"
       >
         <span>Activos Recomendados Hoy</span>
-        <span className="text-muted-foreground">{collapsed ? "▼" : "▲"}</span>
+        <span className="text-muted-foreground">{collapsed ? "" : ""}</span>
       </button>
       {!collapsed && (
         <div className="px-4 pb-4">
@@ -188,12 +189,12 @@ function RecomendacionesPanel() {
             </div>
           )}
           {isError && !isLoading && (
-            <p className="text-[10px] text-warning py-2">
+            <p className="text-[14px] text-warning py-2">
               Error al obtener recomendaciones. Intente nuevamente más tarde.
             </p>
           )}
           {!isLoading && !isError && (!recomendaciones || recomendaciones.length === 0) && (
-            <p className="text-[10px] text-muted-foreground/80 border border-dashed border-border/30 rounded p-3 text-center">
+            <p className="text-[14px] text-muted-foreground/80 border border-dashed border-border/30 rounded p-3 text-center">
               Sin candidatos con alineación suficiente hoy &mdash; las capas disponibles no
               confirman senales.
             </p>
@@ -210,10 +211,10 @@ function RecomendacionesPanel() {
                       <span className="text-xs font-mono font-semibold text-foreground">
                         {r.ticker}
                       </span>
-                      <span className="ml-2 text-[9px] text-muted-foreground">{r.sector}</span>
+                      <span className="ml-2 text-[14px] text-muted-foreground">{r.sector}</span>
                     </div>
                     <span
-                      className={`text-[9px] font-mono ${
+                      className={`text-[14px] font-mono ${
                         r.scoreConfianza >= 3
                           ? "text-emerald-400"
                           : r.scoreConfianza >= 1
@@ -224,7 +225,7 @@ function RecomendacionesPanel() {
                       {r.scoreConfianza}/{r.maxPosible} capas
                     </span>
                   </div>
-                  <p className="text-[9px] text-muted-foreground leading-relaxed mb-1.5">
+                  <p className="text-[14px] text-muted-foreground leading-relaxed mb-1.5">
                     {r.resumenTextual}
                   </p>
                   <div className="flex gap-1.5 flex-wrap">
@@ -233,7 +234,7 @@ function RecomendacionesPanel() {
                       .map((c) => (
                         <span
                           key={c.nombre}
-                          className={`text-[8px] font-mono px-1 py-0.5 rounded ${
+                          className={`text-[14px] font-mono px-1 py-0.5 rounded ${
                             c.valor === 1
                               ? "bg-emerald-950/40 text-emerald-400"
                               : c.valor === -1
@@ -247,13 +248,13 @@ function RecomendacionesPanel() {
                     <div className="flex gap-1 ml-auto">
                       <button
                         onClick={() => irATab("analisis", r.ticker, "fundamental")}
-                        className="text-[8px] font-mono px-1.5 py-0.5 rounded border border-emerald-800/40 text-emerald-400 hover:bg-emerald-950/40 transition-colors"
+                        className="text-[14px] font-mono px-1.5 py-0.5 rounded border border-emerald-800/40 text-emerald-400 hover:bg-emerald-950/40 transition-colors"
                       >
                         Ver AF
                       </button>
                       <button
                         onClick={() => irATab("analisis", r.ticker, "tecnico")}
-                        className="text-[8px] font-mono px-1.5 py-0.5 rounded border border-blue-800/40 text-blue-400 hover:bg-blue-950/40 transition-colors"
+                        className="text-[14px] font-mono px-1.5 py-0.5 rounded border border-blue-800/40 text-blue-400 hover:bg-blue-950/40 transition-colors"
                       >
                         Ver Tecnico
                       </button>
@@ -316,14 +317,14 @@ function RecomendacionesSchvarzPanel() {
     <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="w-full flex items-center justify-between px-4 py-2.5 text-[10px] font-mono uppercase tracking-wider text-foreground"
+        className="w-full flex items-center justify-between px-4 py-2.5 text-[14px] font-mono uppercase tracking-wider text-foreground"
       >
         <span>Activos Recomendados Hoy — Metodología Hernán Schvarz</span>
-        <span className="text-muted-foreground">{collapsed ? "▼" : "▲"}</span>
+        <span className="text-muted-foreground">{collapsed ? "" : ""}</span>
       </button>
       {!collapsed && (
         <div className="px-4 pb-4 space-y-3">
-          <p className="text-[9px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             Combina análisis técnico, valuación por WACC/APV, múltiplos implícitos, valor técnico de
             activos y ventaja competitiva (moat) para seleccionar activos dentro de un marco de
             diversificación por perfil de riesgo.
@@ -334,7 +335,7 @@ function RecomendacionesSchvarzPanel() {
               <button
                 key={p}
                 onClick={() => setPerfilActivo(p)}
-                className={`text-[9px] font-mono px-2 py-1 rounded border transition-colors ${
+                className={`text-[14px] font-mono px-2 py-1 rounded border transition-colors ${
                   perfilActivo === p
                     ? `${perfilColor[p]} bg-background/60`
                     : "border-border/30 text-muted-foreground hover:bg-muted/20"
@@ -347,20 +348,20 @@ function RecomendacionesSchvarzPanel() {
 
           {perfilInfo && (
             <div className="rounded-lg border border-border/30 bg-background/40/40 p-2.5">
-              <p className="text-[9px] font-mono text-foreground mb-1.5">
+              <p className="text-[14px] font-mono text-foreground mb-1.5">
                 Diversificación sugerida — perfil {perfilLabel[perfilActivo].toLowerCase()}
               </p>
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="grid w-full grid-cols-2 gap-1.5">
                 {perfilInfo.allocations.map((a) => (
                   <div
                     key={a.clase}
                     className="rounded border border-border/20 bg-background/40 p-1.5"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[8px] text-muted-foreground">{a.clase}</span>
-                      <span className="text-[8px] font-mono text-foreground">{a.pct}%</span>
+                      <span className="text-[14px] text-muted-foreground">{a.clase}</span>
+                      <span className="text-[14px] font-mono text-foreground">{a.pct}%</span>
                     </div>
-                    <p className="text-[7px] text-muted-foreground/80 mt-0.5">{a.nota}</p>
+                    <p className="text-[14px] text-muted-foreground/80 mt-0.5">{a.nota}</p>
                   </div>
                 ))}
               </div>
@@ -369,14 +370,14 @@ function RecomendacionesSchvarzPanel() {
 
           {result?.universo && (
             <div className="rounded-lg border border-border/30 bg-background/40/40 p-2.5">
-              <p className="text-[9px] font-mono text-foreground mb-1.5">
+              <p className="text-[14px] font-mono text-foreground mb-1.5">
                 Universo analizado · {result.universo.total} tickers
               </p>
               <div className="flex flex-wrap gap-1">
                 {result.universo.porSector.slice(0, 6).map((s) => (
                   <span
                     key={s.sector}
-                    className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-muted/20 text-muted-foreground"
+                    className="text-[14px] font-mono px-1.5 py-0.5 rounded bg-muted/20 text-muted-foreground"
                   >
                     {s.sector} · {s.cantidad}
                   </span>
@@ -393,12 +394,12 @@ function RecomendacionesSchvarzPanel() {
             </div>
           )}
           {isError && !isLoading && (
-            <p className="text-[10px] text-warning py-2">
+            <p className="text-[14px] text-warning py-2">
               Error al obtener recomendaciones Schvarz. Intente nuevamente más tarde.
             </p>
           )}
           {!isLoading && recomendaciones.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/80 border border-dashed border-border/30 rounded p-3 text-center">
+            <p className="text-[14px] text-muted-foreground/80 border border-dashed border-border/30 rounded p-3 text-center">
               Sin candidatos con alineación Schvarz suficiente hoy.
             </p>
           )}
@@ -414,22 +415,22 @@ function RecomendacionesSchvarzPanel() {
                       <span className="text-xs font-mono font-semibold text-foreground">
                         {r.ticker}
                       </span>
-                      <span className="ml-2 text-[9px] text-muted-foreground">
+                      <span className="ml-2 text-[14px] text-muted-foreground">
                         {r.industria || r.sector}
                       </span>
                       {r.tipo && (
-                        <span className="ml-2 text-[8px] font-mono uppercase text-muted-foreground/70">
+                        <span className="ml-2 text-[14px] font-mono uppercase text-muted-foreground/70">
                           {r.tipo}
                         </span>
                       )}
                       {r.mercado && (
-                        <span className="ml-1 text-[8px] font-mono text-muted-foreground/70">
+                        <span className="ml-1 text-[14px] font-mono text-muted-foreground/70">
                           {r.mercado}
                         </span>
                       )}
                     </div>
                     <span
-                      className={`text-[9px] font-mono ${
+                      className={`text-[14px] font-mono ${
                         r.clasificacion === "COMPRA"
                           ? "text-emerald-400"
                           : r.clasificacion === "COMPRA CON CAUTELA"
@@ -440,10 +441,10 @@ function RecomendacionesSchvarzPanel() {
                       {r.clasificacion} · {r.scoreSchvarz.toFixed(2)}
                     </span>
                   </div>
-                  <p className="text-[9px] text-muted-foreground leading-relaxed mb-1.5">
+                  <p className="text-[14px] text-muted-foreground leading-relaxed mb-1.5">
                     {r.reasoning}
                   </p>
-                  <div className="grid grid-cols-2 gap-1.5 mb-2">
+                  <div className="grid w-full grid-cols-2 gap-1.5 mb-2">
                     <MetricaMini
                       label="Margen val."
                       value={fmtPct(r.valuation.margenSeguridadPromedio)}
@@ -458,13 +459,13 @@ function RecomendacionesSchvarzPanel() {
                   <div className="flex gap-1 ml-auto justify-end">
                     <button
                       onClick={() => irATab("analisis", r.ticker, "fundamental")}
-                      className="text-[8px] font-mono px-1.5 py-0.5 rounded border border-emerald-800/40 text-emerald-400 hover:bg-emerald-950/40 transition-colors"
+                      className="text-[14px] font-mono px-1.5 py-0.5 rounded border border-emerald-800/40 text-emerald-400 hover:bg-emerald-950/40 transition-colors"
                     >
                       Ver AF
                     </button>
                     <button
                       onClick={() => irATab("analisis", r.ticker, "tecnico")}
-                      className="text-[8px] font-mono px-1.5 py-0.5 rounded border border-blue-800/40 text-blue-400 hover:bg-blue-950/40 transition-colors"
+                      className="text-[14px] font-mono px-1.5 py-0.5 rounded border border-blue-800/40 text-blue-400 hover:bg-blue-950/40 transition-colors"
                     >
                       Ver Técnico
                     </button>
@@ -481,9 +482,13 @@ function RecomendacionesSchvarzPanel() {
 
 function MetricaMini({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded border border-border/20 bg-background/40 px-1.5 py-1">
-      <span className="text-[7px] text-muted-foreground/80 block">{label}</span>
-      <span className="text-[9px] font-mono text-foreground">{value}</span>
+    <div className="rounded-xl border border-border/30 bg-muted/10 px-3 py-2.5">
+      <span className="text-[14px] font-medium uppercase tracking-wide text-muted-foreground block">
+        {label}
+      </span>
+      <span className="text-[13px] font-mono font-semibold text-foreground mt-1 block">
+        {value}
+      </span>
     </div>
   );
 }
@@ -492,6 +497,7 @@ function MetricaMini({ label, value }: { label: string; value: string }) {
 export function ContextoMercadoTab() {
   return (
     <div className="space-y-4">
+      <CierreMercadoPanel />
       <MacroContextoPanel />
       <RecomendacionesSchvarzPanel />
       <RecomendacionesPanel />

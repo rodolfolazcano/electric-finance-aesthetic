@@ -1,6 +1,6 @@
 import type { OptionType, PricingInput, Greeks, DividendInfo } from "./options.types";
 
-// ─── Dividend adjustment ─────────────────────────────────────────────
+//  Dividend adjustment 
 
 export function ajustarPrecioPorDividendos(
   S: number,
@@ -23,7 +23,7 @@ export function ajustarPrecioPorDividendos(
   return S - ajuste;
 }
 
-// ─── Normal CDF / PDF (Abramowitz & Stegun approximation) ────────────
+//  Normal CDF / PDF (Abramowitz & Stegun approximation) 
 
 function normPdf(x: number): number {
   return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
@@ -43,7 +43,7 @@ function normCdf(x: number): number {
   return 0.5 * (1 + sign * y);
 }
 
-// ─── Black-Scholes ────────────────────────────────────────────────────
+//  Black-Scholes 
 
 export interface BlackScholesResult {
   premium: number;
@@ -100,7 +100,7 @@ export function blackScholes(input: PricingInput): BlackScholesResult | null {
   };
 }
 
-// ─── Binomial (American & European) ────────────────────────────────────
+//  Binomial (American & European) 
 
 export function binomial(
   tipo: OptionType,
@@ -150,7 +150,7 @@ export function binomial(
   return values[0];
 }
 
-// ─── Utils ────────────────────────────────────────────────────────────
+//  Utils 
 
 export function normalCdf(x: number): number {
   return normCdf(x);

@@ -1,4 +1,4 @@
-﻿// Orquestación del estudio. Server-only.
+// Orquestación del estudio. Server-only.
 import "./env.server";
 import { IMAGE_CHAIN_HQ, NARRATIVE_CHAIN, resolveChain, type ModelPrefs } from "./model-catalog";
 import {
@@ -146,7 +146,7 @@ export function buildContextBlock(files: ContextFile[]): string {
   const render = (list: ContextFile[]) =>
     list
       .map((file) => {
-        const tag = file.kind === "image" ? "📷 IMAGEN (transcripción generada por IA)" : file.kind;
+        const tag = file.kind === "image" ? " IMAGEN (transcripción generada por IA)" : file.kind;
         const content = file.kind === "image" && !file.text?.trim()
           ? "(imagen aún no procesada)" : trimForContext(file.text) || "(sin contenido)";
         return `### [${file.name}] (${tag})\n${content}`;
@@ -463,7 +463,7 @@ export async function runStudioTurn(input: TurnInput): Promise<TurnOutput> {
 
     return {
       text: `${result.value.narrative ?? "Pieza generada y verificada."}${
-        attachment ? `\n\n📎 ${attachment.label}: ${attachment.url}` : ""
+        attachment ? `\n\n ${attachment.label}: ${attachment.url}` : ""
       }`,
       intent: effectiveIntent,
       provider: result.provider,
@@ -664,9 +664,9 @@ export async function fetchMarketNews(query: string): Promise<
   return out.slice(0, 8);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 // AGENTE AUTÓNOMO CON TOOL-CALLING
-// ═════════════════════════════════════════════════════════════════════════════
+// 
 
 import { buildToolsSchema, executeToolCall } from "./agent-tools.server";
 import { resilientAgentTurn } from "./providers.server";
@@ -675,7 +675,7 @@ import { getSessionContext } from "./session-context.server";
 import { MODEL_TIERS } from "./model-catalog";
 import { shouldSkipClassifier, updateConversationState, getConversationState } from "./session-state.server";
 
-// ─── Prompts por nivel (completos del markdown de orquestación multi-modelo) ───
+//  Prompts por nivel (completos del markdown de orquestación multi-modelo) 
 
 const PROMPTS_POR_NIVEL: Record<string, string> = {
   fast: `AHORA SOS EL ASISTENTE RAPIDO del estudio Coronar Inversiones.

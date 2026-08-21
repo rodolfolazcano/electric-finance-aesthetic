@@ -1,5 +1,5 @@
 // @ts-nocheck
-// ─── Factor Integration Panel — Todos los factores integrados ──
+//  Factor Integration Panel — Todos los factores integrados 
 // Combina credito, rotacion sectorial, correlaciones y timeline
 // usando solo datos disponibles sin server calls adicionales.
 // Basado en Murphy (Caps. 1-15) + Pring (6 Stages).
@@ -61,17 +61,17 @@ import type {
 import { diagnosePhase, type TrendArrow } from "@/lib/cycle-phase-detector";
 import { MURPHY_STAGE_LABELS } from "@/lib/cycle-phase-detector";
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // TIPOS
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 interface FactorIntegrationProps {
   decouple: DecouplingResult | null;
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // HELPERS VISUALES (mismos patrones que el resto de la app)
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 function fmtNum(n: number | null | undefined, dp = 2): string {
   if (n == null || !Number.isFinite(n)) return "\u2014";
@@ -87,7 +87,7 @@ function Badge({ children, color }: { children: React.ReactNode; color?: string 
   return (
     <span
       className={cn(
-        "text-[8px] px-1.5 py-0.5 rounded font-mono border",
+        "text-[12px] px-1.5 py-0.5 rounded font-mono border",
         color ?? "border-border/30 text-muted-foreground bg-muted/10",
       )}
     >
@@ -97,14 +97,14 @@ function Badge({ children, color }: { children: React.ReactNode; color?: string 
 }
 
 function ArrowIcon({ dir }: { dir: "up" | "down" | "flat" | null }) {
-  if (dir === "up") return <span className="text-green-400 text-[10px]">▲</span>;
-  if (dir === "down") return <span className="text-red-400 text-[10px]">▼</span>;
-  return <span className="text-muted-foreground text-[10px]">▬</span>;
+  if (dir === "up") return <span className="text-green-400 text-[13px]"></span>;
+  if (dir === "down") return <span className="text-red-400 text-[13px]"></span>;
+  return <span className="text-muted-foreground text-[13px]"></span>;
 }
 
 function TrendLabel({ dir, label }: { dir: "up" | "down" | "flat" | null; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1 text-[9px] font-mono">
+    <span className="inline-flex items-center gap-1 text-[13px] font-mono">
       <ArrowIcon dir={dir} />
       <span
         className={cn(
@@ -129,7 +129,7 @@ function ConfidenceBar({ pct }: { pct: number }) {
       <div className="flex-1 h-1.5 bg-muted/30 rounded-full overflow-hidden">
         <div className={cn("h-full rounded-full transition-all", color)} style={barStyle} />
       </div>
-      <span className="text-[9px] font-mono text-muted-foreground w-10 text-right">{pct}%</span>
+      <span className="text-[13px] font-mono text-muted-foreground w-10 text-right">{pct}%</span>
     </div>
   );
 }
@@ -163,9 +163,9 @@ function percentileLabel(p: number | null | undefined): string {
   return "Extremo alto";
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // SECCION B — Senales de Rotacion
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 function RotationSignalsSection({ decouple }: { decouple: DecouplingResult | null }) {
   const signals = decouple?.rotationSignals ?? [];
@@ -176,7 +176,7 @@ function RotationSignalsSection({ decouple }: { decouple: DecouplingResult | nul
   return (
     <div className="space-y-3">
       {signals.length > 0 && (
-        <div className="grid gap-1.5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid w-full gap-1.5 md:grid-cols-2 lg:grid-cols-3">
           {signals.map((s, i) => (
             <div
               key={s.key ?? i}
@@ -185,7 +185,7 @@ function RotationSignalsSection({ decouple }: { decouple: DecouplingResult | nul
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <SignalDot trend={s.trend} />
-                  <span className="font-mono text-[9px] font-semibold text-foreground truncate">
+                  <span className="font-mono text-[13px] font-semibold text-foreground truncate">
                     {s.label}
                   </span>
                   {MURPHY_GLOSSARY[s.label] && (
@@ -213,7 +213,7 @@ function RotationSignalsSection({ decouple }: { decouple: DecouplingResult | nul
               <div className="flex items-center gap-2">
                 <span
                   className={cn(
-                    "font-mono text-[10px]",
+                    "font-mono text-[13px]",
                     s.trend === "up"
                       ? "text-green-400"
                       : s.trend === "down"
@@ -221,10 +221,10 @@ function RotationSignalsSection({ decouple }: { decouple: DecouplingResult | nul
                         : "text-muted-foreground",
                   )}
                 >
-                  {s.trend === "up" ? "▲" : s.trend === "down" ? "▼" : "▬"} {fmtNum(s.valor, 4)}
+                  {s.trend === "up" ? "" : s.trend === "down" ? "" : ""} {fmtNum(s.valor, 4)}
                 </span>
               </div>
-              <p className="text-[8px] text-muted-foreground/70 leading-relaxed">
+              <p className="text-[12px] text-muted-foreground/70 leading-relaxed">
                 {s.interpretacion}
               </p>
             </div>
@@ -234,7 +234,7 @@ function RotationSignalsSection({ decouple }: { decouple: DecouplingResult | nul
 
       {momentum.length > 0 && (
         <div className="border-t border-border/10 pt-2">
-          <div className="text-[9px] font-mono text-muted-foreground mb-1.5">
+          <div className="text-[13px] font-mono text-muted-foreground mb-1.5">
             Momentum sectorial (6m) — {momentum.length} sectores
           </div>
           <div className="flex flex-wrap gap-1">
@@ -242,7 +242,7 @@ function RotationSignalsSection({ decouple }: { decouple: DecouplingResult | nul
               <span
                 key={s.ticker ?? i}
                 className={cn(
-                  "inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-mono border",
+                  "inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[12px] font-mono border",
                   (s.retorno6m ?? 0) > 5
                     ? "text-green-400 border-green-500/30 bg-green-500/10"
                     : (s.retorno6m ?? 0) < -5
@@ -261,9 +261,9 @@ function RotationSignalsSection({ decouple }: { decouple: DecouplingResult | nul
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // SECCION C — Credit Historical Compare
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 function CreditHistoricalCompare({ creditCycle }: { creditCycle: CreditSpreadData | null }) {
   if (!creditCycle) return null;
@@ -293,18 +293,18 @@ function CreditHistoricalCompare({ creditCycle }: { creditCycle: CreditSpreadDat
   ];
 
   return (
-    <div className="grid gap-2 md:grid-cols-3">
+    <div className="grid w-full gap-2 md:grid-cols-3">
       {metrics.map((m) => (
         <div
           key={m.label}
           className="rounded-lg border border-border/40 bg-muted/5 p-3 space-y-1.5"
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] font-semibold text-foreground">{m.label}</span>
+            <span className="font-mono text-[13px] font-semibold text-foreground">{m.label}</span>
             {m.pct != null && (
               <span
                 className={cn(
-                  "text-[8px] px-1.5 py-0.5 rounded font-mono border",
+                  "text-[12px] px-1.5 py-0.5 rounded font-mono border",
                   percentileColor(m.pct),
                 )}
               >
@@ -319,7 +319,7 @@ function CreditHistoricalCompare({ creditCycle }: { creditCycle: CreditSpreadDat
               {m.covid != null && <> | COVID 2020: {fmtNum(m.covid, 4)}</>}
             </div>
           )}
-          <div className="flex items-center gap-2 text-[8px]">
+          <div className="flex items-center gap-2 text-[12px]">
             <div className="flex-1 h-1 bg-muted/30 rounded-full overflow-hidden">
               <div
                 className={cn(
@@ -341,9 +341,9 @@ function CreditHistoricalCompare({ creditCycle }: { creditCycle: CreditSpreadDat
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // SECCION A — Diagnostico del Ciclo (desde decouple data, siempre disponible)
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 function inferTrendFromSignals(
   signals: RotationSignal[],
@@ -419,12 +419,12 @@ function CycleDiagnosisBanner({ decouple }: { decouple: DecouplingResult | null 
                   {phase.label}
                 </span>
                 <span
-                  className={cn("text-[8px] px-1.5 py-0.5 rounded font-mono border", alertColor)}
+                  className={cn("text-[12px] px-1.5 py-0.5 rounded font-mono border", alertColor)}
                 >
                   {alertLevel}
                 </span>
               </div>
-              <p className="text-[8px] text-muted-foreground/60 mt-0.5 leading-relaxed max-w-xl">
+              <p className="text-[12px] text-muted-foreground/60 mt-0.5 leading-relaxed max-w-xl">
                 {phase.description}
               </p>
             </div>
@@ -432,7 +432,7 @@ function CycleDiagnosisBanner({ decouple }: { decouple: DecouplingResult | null 
           <div className="flex items-center gap-1.5 shrink-0">
             <span
               className={cn(
-                "text-[9px] px-1.5 py-0.5 rounded font-mono border",
+                "text-[13px] px-1.5 py-0.5 rounded font-mono border",
                 confidence === "alta"
                   ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                   : confidence === "media"
@@ -444,7 +444,7 @@ function CycleDiagnosisBanner({ decouple }: { decouple: DecouplingResult | null 
             </span>
             <span
               className={cn(
-                "text-[9px] px-1.5 py-0.5 rounded font-mono border",
+                "text-[13px] px-1.5 py-0.5 rounded font-mono border",
                 confidence === "alta"
                   ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                   : confidence === "media"
@@ -459,9 +459,9 @@ function CycleDiagnosisBanner({ decouple }: { decouple: DecouplingResult | null 
       </div>
 
       <div className="border-t border-border/20 px-4 py-3">
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid w-full gap-3 md:grid-cols-2">
           <div>
-            <div className="text-[9px] font-mono font-semibold uppercase tracking-wider text-emerald-400 mb-1.5 flex items-center gap-1">
+            <div className="text-[13px] font-mono font-semibold uppercase tracking-wider text-emerald-400 mb-1.5 flex items-center gap-1">
               <span>COMPRAR / SOBREPONDER</span>
               <span className="text-[7px] text-muted-foreground/50 font-normal">
                 ({rotation.style})
@@ -471,7 +471,7 @@ function CycleDiagnosisBanner({ decouple }: { decouple: DecouplingResult | null 
               {rotation.buy.map((s) => (
                 <span
                   key={s}
-                  className="inline-block px-1.5 py-0.5 rounded text-[8px] font-mono leading-tight border bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                  className="inline-block px-1.5 py-0.5 rounded text-[12px] font-mono leading-tight border bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                 >
                   {s}
                 </span>
@@ -479,14 +479,14 @@ function CycleDiagnosisBanner({ decouple }: { decouple: DecouplingResult | null 
             </div>
           </div>
           <div>
-            <div className="text-[9px] font-mono font-semibold uppercase tracking-wider text-red-400 mb-1.5">
+            <div className="text-[13px] font-mono font-semibold uppercase tracking-wider text-red-400 mb-1.5">
               <span>VENDER / INFRAPONDERAR</span>
             </div>
             <div className="flex flex-wrap gap-1">
               {rotation.sell.map((s) => (
                 <span
                   key={s}
-                  className="inline-block px-1.5 py-0.5 rounded text-[8px] font-mono leading-tight border bg-red-500/10 border-red-500/30 text-red-400"
+                  className="inline-block px-1.5 py-0.5 rounded text-[12px] font-mono leading-tight border bg-red-500/10 border-red-500/30 text-red-400"
                 >
                   {s}
                 </span>
@@ -499,9 +499,9 @@ function CycleDiagnosisBanner({ decouple }: { decouple: DecouplingResult | null 
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // SECCION D — Timeline Predictivo (datos locales, sin server)
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 function PredictiveTimeline({ decouple }: { decouple: DecouplingResult | null }) {
   const timeline = useMemo(() => {
@@ -512,7 +512,7 @@ function PredictiveTimeline({ decouple }: { decouple: DecouplingResult | null })
 
     const events: { time: string; event: string; prob: number; trigger: string }[] = [];
 
-    // ── Las 4 patas de Murphy: DXY, CRB/Copper/Oil, Curva, Sectores ──
+    //  Las 4 patas de Murphy: DXY, CRB/Copper/Oil, Curva, Sectores 
     const dxyTrend = inferTrendFromSignals(signals, "DXY");
     const copperTrend = inferTrendFromSignals(signals, "Cobre/Oro");
     const corrSignal = decouple?.correlacionTLTSPY;
@@ -521,7 +521,7 @@ function PredictiveTimeline({ decouple }: { decouple: DecouplingResult | null })
     const eemTrend = inferTrendFromSignals(signals, "EEM");
     const rspTrend = inferTrendFromSignals(signals, "Equal/Cap");
 
-    // ── 1A. LEADING INDICATOR COMPUESTO (Murphy pp. 37-39, 186) ────
+    //  1A. LEADING INDICATOR COMPUESTO (Murphy pp. 37-39, 186) 
     // JOC-ECRI Industrial Price Index es la senal mas temprana del ciclo.
     // Proxy via DBC (CRB generico) + Copper + Oil.
     const commLeading =
@@ -539,14 +539,14 @@ function PredictiveTimeline({ decouple }: { decouple: DecouplingResult | null })
       });
     }
 
-    // ── 1. REGIMEN MACRO (Murphy pp. 52-53, 120) ────────────────────
+    //  1. REGIMEN MACRO (Murphy pp. 52-53, 120) 
     // Comentado: filtRO macro desactivado
     const regimen = "NO CLASIFICADO";
     const regimenDesc = "";
     const regimenRef = "";
     // events.push({ time: `REGIMEN: ${regimen}`, event: regimenDesc, prob: dxyTrend !== null ? 80 : 50, trigger: `DXY=${dxyTrend ?? "?"} Cobre=${copperTrend ?? "?"} (${regimenRef})` });
 
-    // ── 2. SENALES PRIMARIAS MURPHY (Caps. 1-7) ─────────────────────
+    //  2. SENALES PRIMARIAS MURPHY (Caps. 1-7) 
     // 2a. Yield curve — senal mas temprana (Cap. 7)
     events.push({
       time: "0-6 meses",
@@ -650,7 +650,7 @@ function PredictiveTimeline({ decouple }: { decouple: DecouplingResult | null })
       });
     }
 
-    // ── 3. SENALES SECUNDARIAS: credito (confirmacion, no Murphy) ─────
+    //  3. SENALES SECUNDARIAS: credito (confirmacion, no Murphy) 
     if (raPct != null && raPct >= 95) {
       events.push({
         time: "0-4 semanas",
@@ -677,7 +677,7 @@ function PredictiveTimeline({ decouple }: { decouple: DecouplingResult | null })
       });
     }
 
-    // ── 4. REACCION FED + FLIGHT-TO-QUALITY (Caps. 13-14) ──────────
+    //  4. REACCION FED + FLIGHT-TO-QUALITY (Caps. 13-14) 
     events.push({
       time: "4-10 meses",
       event: "Fed recorta tasas — reaccion a debilidad manifiesta",
@@ -721,7 +721,7 @@ function PredictiveTimeline({ decouple }: { decouple: DecouplingResult | null })
 
   return (
     <div className="space-y-2">
-      <div className="text-[8px] font-mono text-muted-foreground">
+      <div className="text-[12px] font-mono text-muted-foreground">
         {timeline.length} eventos proyectados segun senales actuales
       </div>
       <div className="relative">
@@ -739,15 +739,15 @@ function PredictiveTimeline({ decouple }: { decouple: DecouplingResult | null })
                       : "bg-muted-foreground border-muted-foreground",
                 )}
               />
-              <div className="rounded-lg border border-border/40 bg-muted/5 p-2 text-[9px] space-y-1">
+              <div className="rounded-lg border border-border/40 bg-muted/5 p-2 text-[13px] space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold font-mono text-[10px] text-foreground">
+                  <span className="font-semibold font-mono text-[13px] text-foreground">
                     {e.time}
                   </span>
                   <span className="flex items-center gap-1">
                     <span
                       className={cn(
-                        "text-[8px] px-1.5 py-0.5 rounded font-mono border",
+                        "text-[12px] px-1.5 py-0.5 rounded font-mono border",
                         e.prob >= 80
                           ? "text-red-400 border-red-500/30 bg-red-500/10"
                           : e.prob >= 65
@@ -775,9 +775,9 @@ function PredictiveTimeline({ decouple }: { decouple: DecouplingResult | null })
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // COMPONENTE PRINCIPAL
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 export function FactorIntegrationPanel({ decouple }: FactorIntegrationProps) {
   const creditCycle = decouple?.creditCycle;
@@ -793,14 +793,14 @@ export function FactorIntegrationPanel({ decouple }: FactorIntegrationProps) {
           <div className="text-xs font-semibold font-mono uppercase tracking-wider text-foreground">
             Diagnostico Integrado — Todos los Factores
           </div>
-          <p className="text-[8px] text-muted-foreground/70 mt-0.5">
+          <p className="text-[12px] text-muted-foreground/70 mt-0.5">
             {signals.length} senales de rotacion, {momentum.length} sectores, 3 proxies de credito
           </p>
         </div>
         {creditCycle?.alertLevel && (
           <span
             className={cn(
-              "text-[8px] px-2 py-1 rounded font-mono border",
+              "text-[12px] px-2 py-1 rounded font-mono border",
               creditCycle.alertLevel === "CRITICAL"
                 ? "text-red-400 border-red-500/30 bg-red-500/10"
                 : creditCycle.alertLevel === "WARNING"
@@ -843,7 +843,7 @@ export function FactorIntegrationPanel({ decouple }: FactorIntegrationProps) {
         <div className="text-xs font-semibold font-mono uppercase tracking-wider text-foreground mb-2">
           Ciclo Largo — Dow/Gold (Kondratieff)
         </div>
-        <div className="text-[8px] text-muted-foreground/70 leading-relaxed space-y-1">
+        <div className="text-[12px] text-muted-foreground/70 leading-relaxed space-y-1">
           <p>
             Murphy (Cap. 15): El ratio Dow/Gold mide el ciclo de 50-60 a&ntilde;os entre activos
             financieros y activos duros.
@@ -870,7 +870,7 @@ export function FactorIntegrationPanel({ decouple }: FactorIntegrationProps) {
 
       {/* Score compuesto del decoupling */}
       {compuesto && (
-        <div className="text-[8px] text-muted-foreground/50 font-mono text-right space-y-0.5">
+        <div className="text-[12px] text-muted-foreground/50 font-mono text-right space-y-0.5">
           <div>
             Score decoupling: {compuesto.score}% ({compuesto.nivel}) — {compuesto.senalesActivas}/
             {compuesto.totalSenales} senales activas

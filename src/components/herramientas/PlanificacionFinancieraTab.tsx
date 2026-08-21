@@ -23,13 +23,13 @@ function Num({
 }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-[9px] text-muted-foreground">{label}</span>
+      <span className="text-[13px] text-muted-foreground">{label}</span>
       <input
         type="number"
         step={step ?? 1}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-        className="rounded-md border border-border/40 bg-background/20 px-2 py-1 text-[10px] font-mono text-foreground outline-none focus:border-emerald-500/50"
+        className="rounded-md border border-border/40 bg-background/20 px-2 py-1 text-[13px] font-mono text-foreground outline-none focus:border-emerald-500/50"
       />
     </label>
   );
@@ -38,9 +38,9 @@ function Num({
 function State({ label, val1, val2 }: { label: string; val1: string; val2: string }) {
   return (
     <tr className="border-b border-border/10 last:border-0">
-      <td className="py-1 pr-3 text-[9px] text-muted-foreground">{label}</td>
-      <td className="py-1 text-[9px] font-mono text-right text-foreground">{val1}</td>
-      <td className="py-1 text-[9px] font-mono text-right text-foreground">{val2}</td>
+      <td className="py-1 pr-3 text-[13px] text-muted-foreground">{label}</td>
+      <td className="py-1 text-[13px] font-mono text-right text-foreground">{val1}</td>
+      <td className="py-1 text-[13px] font-mono text-right text-foreground">{val2}</td>
     </tr>
   );
 }
@@ -50,7 +50,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
     <tr>
       <td
         colSpan={3}
-        className="pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/60"
+        className="pt-3 pb-1 text-[13px] font-semibold uppercase tracking-widest text-muted-foreground/60"
       >
         {children}
       </td>
@@ -114,19 +114,19 @@ export function PlanificacionFinancieraTab() {
   return (
     <div className="space-y-4">
       <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           Planificación financiera de corto plazo · caso Pascale (Cap. 37)
         </p>
-        <p className="text-[9px] text-muted-foreground leading-relaxed mb-3">
+        <p className="text-[13px] text-muted-foreground leading-relaxed mb-3">
           Configure los presupuestos de ventas, producción, inversiones y el plan financiero para
           generar el Presupuesto del fluir de caja (PFC), de resultados (PER) y de situación (PES)
           proyectados, más las razones forward y el informe profesional (Biondi, Cap. 7).
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Ventas */}
           <div className="rounded border border-border/20 bg-muted/10 p-3 space-y-2">
-            <p className="text-[9px] font-semibold text-foreground">Presupuesto de ventas</p>
+            <p className="text-[13px] font-semibold text-foreground">Presupuesto de ventas</p>
             <Num
               label="UD/mes S1"
               value={v.unidadesMes1}
@@ -163,7 +163,7 @@ export function PlanificacionFinancieraTab() {
           </div>
           {/* Producción */}
           <div className="rounded border border-border/20 bg-muted/10 p-3 space-y-2">
-            <p className="text-[9px] font-semibold text-foreground">Producción</p>
+            <p className="text-[13px] font-semibold text-foreground">Producción</p>
             <Num
               label="Costo var unit S1"
               value={p.costoVariableUnit1}
@@ -213,7 +213,7 @@ export function PlanificacionFinancieraTab() {
           </div>
           {/* Inversiones */}
           <div className="rounded-2xl border border-border/20 bg-muted/10 p-3 space-y-2">
-            <p className="text-[9px] font-semibold text-foreground">Inversiones</p>
+            <p className="text-[13px] font-semibold text-foreground">Inversiones</p>
             <Num
               label="Compra activo fijo"
               value={inv.compraActivoFijo}
@@ -248,7 +248,7 @@ export function PlanificacionFinancieraTab() {
           </div>
           {/* Financiamiento + caja */}
           <div className="rounded-md border border-border/20 bg-muted/10 p-3 space-y-2">
-            <p className="text-[9px] font-semibold text-foreground">Financiamiento · Caja</p>
+            <p className="text-[13px] font-semibold text-foreground">Financiamiento · Caja</p>
             <Num
               label="Préstamo bancario inicial"
               value={fin.prestamoBancarioInicial}
@@ -309,7 +309,7 @@ export function PlanificacionFinancieraTab() {
 
       {/* PER */}
       <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           PER · Presupuesto del estado de resultados
         </p>
         <table className="w-full">
@@ -338,7 +338,7 @@ export function PlanificacionFinancieraTab() {
 
       {/* PES */}
       <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           PES · Presupuesto del estado de situación
         </p>
         <table className="w-full">
@@ -390,7 +390,7 @@ export function PlanificacionFinancieraTab() {
 
       {/* PFC */}
       <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           PFC · Presupuesto del fluir de caja
         </p>
         <table className="w-full">
@@ -422,7 +422,7 @@ export function PlanificacionFinancieraTab() {
 
       {/* Ratios forward */}
       <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           Razones forward (estados proyectados)
         </p>
         <table className="w-full">
@@ -475,12 +475,12 @@ export function PlanificacionFinancieraTab() {
       {/* Observaciones */}
       {resultado.observaciones.length > 0 && (
         <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-          <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+          <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
             Observaciones del plan
           </p>
           <ul className="space-y-1">
             {resultado.observaciones.map((o, i) => (
-              <li key={i} className="text-[9px] leading-relaxed text-muted-foreground flex gap-1.5">
+              <li key={i} className="text-[13px] leading-relaxed text-muted-foreground flex gap-1.5">
                 <span className="text-emerald-400/70 shrink-0">•</span>
                 <span>{o}</span>
               </li>
@@ -491,29 +491,29 @@ export function PlanificacionFinancieraTab() {
 
       {/* Informe (Biondi Cap. 7) */}
       <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-2">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           Informe profesional ({informe.empresa})
         </p>
-        <p className="text-[10px] font-semibold text-foreground mb-1">{informe.denominacion}</p>
+        <p className="text-[13px] font-semibold text-foreground mb-1">{informe.denominacion}</p>
 
-        <div className="text-[9px] text-muted-foreground leading-relaxed mb-3 space-y-1">
+        <div className="text-[13px] text-muted-foreground leading-relaxed mb-3 space-y-1">
           <p>
             Fui requerido por {informe.empresa} para emitir opinión sobre la situación económica y
             financiera.
           </p>
-          <p className="text-[8px]">
+          <p className="text-[12px]">
             1. Estados contables objeto del análisis: PER, PES y PFC proyectados (
             {informe.alcance.join(" ")})
           </p>
-          <p className="text-[8px]">2. Alcance: {informe.aclaraciones[0]}</p>
-          <p className="text-[8px]">{informe.aclaraciones[2]}</p>
+          <p className="text-[12px]">2. Alcance: {informe.aclaraciones[0]}</p>
+          <p className="text-[12px]">{informe.aclaraciones[2]}</p>
         </div>
 
         <div className="mb-2">
-          <p className="text-[9px] font-semibold text-foreground mb-1">Situación económica</p>
+          <p className="text-[13px] font-semibold text-foreground mb-1">Situación económica</p>
           <ul className="space-y-0.5">
             {informe.situacionEconomica.map((s, i) => (
-              <li key={i} className="text-[9px] text-muted-foreground flex gap-1.5">
+              <li key={i} className="text-[13px] text-muted-foreground flex gap-1.5">
                 <span className="text-emerald-400/70 shrink-0">•</span>
                 <span>{s}</span>
               </li>
@@ -522,10 +522,10 @@ export function PlanificacionFinancieraTab() {
         </div>
 
         <div className="mb-3">
-          <p className="text-[9px] font-semibold text-foreground mb-1">Situación financiera</p>
+          <p className="text-[13px] font-semibold text-foreground mb-1">Situación financiera</p>
           <ul className="space-y-0.5">
             {informe.situacionFinanciera.map((s, i) => (
-              <li key={i} className="text-[9px] text-muted-foreground flex gap-1.5">
+              <li key={i} className="text-[13px] text-muted-foreground flex gap-1.5">
                 <span className="text-emerald-400/70 shrink-0">•</span>
                 <span>{s}</span>
               </li>
@@ -534,38 +534,38 @@ export function PlanificacionFinancieraTab() {
         </div>
 
         {/* Tabla comparativa real vs preestablecido */}
-        <p className="text-[9px] font-semibold text-foreground mb-1">
+        <p className="text-[13px] font-semibold text-foreground mb-1">
           Comparación real vs. preestablecida (variación %)
         </p>
         <div className="overflow-x-auto mb-3">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border/20">
-                <th className="text-left text-[8px] text-muted-foreground py-1 pr-2">Concepto</th>
-                <th className="text-right text-[8px] text-muted-foreground py-1 pr-2">Real</th>
-                <th className="text-right text-[8px] text-muted-foreground py-1 pr-2">Preest.</th>
-                <th className="text-right text-[8px] text-muted-foreground py-1 pr-2">Var %</th>
-                <th className="text-left text-[8px] text-muted-foreground py-1">Recomendación</th>
+                <th className="text-left text-[12px] text-muted-foreground py-1 pr-2">Concepto</th>
+                <th className="text-right text-[12px] text-muted-foreground py-1 pr-2">Real</th>
+                <th className="text-right text-[12px] text-muted-foreground py-1 pr-2">Preest.</th>
+                <th className="text-right text-[12px] text-muted-foreground py-1 pr-2">Var %</th>
+                <th className="text-left text-[12px] text-muted-foreground py-1">Recomendación</th>
               </tr>
             </thead>
             <tbody>
               {informe.tablaComparativa.map((it, i) => (
                 <tr key={i} className="border-b border-border/10 last:border-0">
-                  <td className="py-1 pr-2 text-[9px] text-muted-foreground">{it.concepto}</td>
-                  <td className="py-1 pr-2 text-[9px] font-mono text-right text-foreground">
+                  <td className="py-1 pr-2 text-[13px] text-muted-foreground">{it.concepto}</td>
+                  <td className="py-1 pr-2 text-[13px] font-mono text-right text-foreground">
                     {it.real != null ? fmt2(it.real) : "--"}
                   </td>
-                  <td className="py-1 pr-2 text-[9px] font-mono text-right text-foreground">
+                  <td className="py-1 pr-2 text-[13px] font-mono text-right text-foreground">
                     {it.preestablecido != null ? fmt2(it.preestablecido) : "--"}
                   </td>
                   <td
-                    className={`py-1 pr-2 text-[9px] font-mono text-right ${it.variacionPct != null && (it.variacionPct > 20 || it.variacionPct < -20) ? "text-amber-400" : "text-foreground"}`}
+                    className={`py-1 pr-2 text-[13px] font-mono text-right ${it.variacionPct != null && (it.variacionPct > 20 || it.variacionPct < -20) ? "text-amber-400" : "text-foreground"}`}
                   >
                     {it.variacionPct != null
                       ? `${it.variacionPct >= 0 ? "+" : ""}${it.variacionPct.toFixed(1)}%`
                       : "--"}
                   </td>
-                  <td className="py-1 text-[8px] text-muted-foreground">{it.recomendacion}</td>
+                  <td className="py-1 text-[12px] text-muted-foreground">{it.recomendacion}</td>
                 </tr>
               ))}
             </tbody>
@@ -573,18 +573,18 @@ export function PlanificacionFinancieraTab() {
         </div>
 
         <div className="mb-2">
-          <p className="text-[9px] font-semibold text-foreground mb-1">
+          <p className="text-[13px] font-semibold text-foreground mb-1">
             Conclusiones y recomendaciones
           </p>
           <ul className="space-y-1">
             {informe.conclusiones.map((c, i) => (
-              <li key={`c${i}`} className="text-[9px] text-muted-foreground flex gap-1.5">
+              <li key={`c${i}`} className="text-[13px] text-muted-foreground flex gap-1.5">
                 <span className="text-emerald-400/70 shrink-0">•</span>
                 <span>{c}</span>
               </li>
             ))}
             {informe.recomendaciones.map((r, i) => (
-              <li key={`r${i}`} className="text-[9px] text-amber-300/90 flex gap-1.5">
+              <li key={`r${i}`} className="text-[13px] text-amber-300/90 flex gap-1.5">
                 <span className="text-amber-400/70 shrink-0">→</span>
                 <span>{r}</span>
               </li>
@@ -592,7 +592,7 @@ export function PlanificacionFinancieraTab() {
           </ul>
         </div>
 
-        <p className="text-[8px] text-muted-foreground/60 mt-2 text-right">{informe.fecha}</p>
+        <p className="text-[12px] text-muted-foreground/60 mt-2 text-right">{informe.fecha}</p>
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ import {
   type CicloEconomico,
 } from "./intermarket-engine";
 
-// ─── Tipos existentes ──────────────────────────────────────────
+//  Tipos existentes 
 
 export interface RollingCorrelation {
   asset1: string;
@@ -29,7 +29,7 @@ export interface ArgentinaCorrelation {
   interpretation: string;
 }
 
-// ─── PASO 13 — Relative Strength Ratios ────────────────────────
+//  PASO 13 — Relative Strength Ratios 
 
 export interface RelativeStrengthRatio {
   label: string;
@@ -78,7 +78,7 @@ export interface IntermarketResult {
   timestamp: string;
 }
 
-// ─── Helpers estadísticos ──────────────────────────────────────
+//  Helpers estadísticos 
 // pearsonR y rollingCorrelation unificados via computePearsonCorrelation (intermarket-complete)
 
 function rollingCorrelation(prices1: number[], prices2: number[], window = 60): number[] {
@@ -114,7 +114,7 @@ function interpretCorrelation(value: number | null, relation: string): string {
   return `${relation}: correlación de ${value.toFixed(2)}. Relación débil o neutral entre activos.`;
 }
 
-// ─── LEAD-LAG ANALYSIS (nuevo) ─────────────────────────────────
+//  LEAD-LAG ANALYSIS (nuevo) 
 
 interface CrossCorrelationResult {
   bestLag: number | null;
@@ -171,7 +171,7 @@ function crossCorrelationLagged(
   return { bestLag, bestCorrelation: bestCorr, text };
 }
 
-// ─── PARTE 4: EVALUAR LAG LARGO DEL DÓLAR (3 ventanas) ────────
+//  PARTE 4: EVALUAR LAG LARGO DEL DÓLAR (3 ventanas) 
 
 function evaluarLagDolar(dxyPrices: number[], dbcPrices: number[]): EvaluacionLagDolar {
   if (dxyPrices.length < 60 || dbcPrices.length < 60) {
@@ -218,7 +218,7 @@ function evaluarLagDolar(dxyPrices: number[], dbcPrices: number[]): EvaluacionLa
   return { correlacion60d: c60, correlacion250d: c250, correlacion500d: c500, interpretacion };
 }
 
-// ─── PARTE 1 (Cap. 3): ÍNDICE INDUSTRIAL (proxy JOC-ECRI) ─────
+//  PARTE 1 (Cap. 3): ÍNDICE INDUSTRIAL (proxy JOC-ECRI) 
 
 function calcularIndiceIndustrial(
   copperCloses: number[],
@@ -289,7 +289,7 @@ function calcularRatioCommoditiesBonos(
   };
 }
 
-// ─── Server function ───────────────────────────────────────────
+//  Server function 
 
 export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
   async (): Promise<IntermarketResult> => {
@@ -297,7 +297,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
     const cached = getCached<IntermarketResult>(CACHE_KEY, 15 * 60 * 1000);
     if (cached) return cached;
 
-    // ── Parte 1: Correlaciones de Pearson (existente) ──
+    //  Parte 1: Correlaciones de Pearson (existente) 
     const pairs = [
       { symbol1: "^TNX", symbol2: "^GSPC", label: "Bonos (UST 10Y) vs Acciones (S&P500)" },
       { symbol1: "DX-Y.NYB", symbol2: "DBC", label: "Dólar (DXY) vs Commodities (DBC)" },
@@ -311,7 +311,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
       ),
     );
 
-    // ── Fetch adicional: HG=F y DBB (metales industriales, Cap. 3) ──
+    //  Fetch adicional: HG=F y DBB (metales industriales, Cap. 3) 
     const [hgData, dbbData] = await Promise.allSettled([
       yahooChartCloses("HG=F", "6mo"),
       yahooChartCloses("DBB", "6mo"),
@@ -321,7 +321,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
     const leadLag: LeadLagInfo[] = [];
     let correlacionEstructural: number | null = null;
 
-    // ── 5to gauge: Metales Industriales vs Bonos (Cap. 3) ──
+    //  5to gauge: Metales Industriales vs Bonos (Cap. 3) 
     let indiceIndustrialTrend: number | null = null;
     if (hgData.status === "fulfilled" || dbbData.status === "fulfilled") {
       const copper = hgData.status === "fulfilled" ? hgData.value.map((c) => c.close) : [];
@@ -397,7 +397,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
       });
     }
 
-    // ── Argentina (existente) ──
+    //  Argentina (existente) 
     let argentinaCorr: ArgentinaCorrelation[] = [];
     try {
       const [mervalData, rpData, cclData] = await Promise.allSettled([
@@ -469,7 +469,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
       ];
     }
 
-    // ── Lead-Lag: extraer TNX y GSPC del par 0 ──
+    //  Lead-Lag: extraer TNX y GSPC del par 0 
     if (results[0].status === "fulfilled") {
       const tnxPrices = results[0].value[0].map((c) => c.close);
       const spxPrices = results[0].value[1].map((c) => c.close);
@@ -519,7 +519,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
       }
     }
 
-    // ── Datos largos para correlación estructural y evaluación de lag ──
+    //  Datos largos para correlación estructural y evaluación de lag 
     const [dxy1y, dbc1y, dxy2y, dbc2y] = await Promise.allSettled([
       yahooChartCloses("DX-Y.NYB", "1y"),
       yahooChartCloses("DBC", "1y"),
@@ -574,7 +574,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
           : [],
     );
 
-    // ── Alerta 1987 ──
+    //  Alerta 1987 
     let alerta1987: Alerta1987 = { activa: false, mensaje: null };
     if (results[1].status === "fulfilled" && results[0].status === "fulfilled") {
       const dbcPrices = results[1].value[1].map((c) => c.close);
@@ -582,7 +582,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
       alerta1987 = detectarSetupInflacionarioAgresivo(dbcPrices, tnxPrices);
     }
 
-    // ── Datos para Lectura Intermarket (gold, oil, XLE, Dow) ──
+    //  Datos para Lectura Intermarket (gold, oil, XLE, Dow) 
     const [goldLongData, oilLongData, xleData, dowLongData] = await Promise.allSettled([
       yahooChartCloses("GC=F", "1y"),
       yahooChartCloses("CL=F", "1y"),
@@ -590,7 +590,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
       yahooChartCloses("^DJI", "2y"),
     ]);
 
-    // ── Dow/Gold ratio ──
+    //  Dow/Gold ratio 
     let dowGoldRatio: number | null = null;
     if (dowLongData.status === "fulfilled" && goldLongData.status === "fulfilled") {
       const dow = dowLongData.value;
@@ -601,7 +601,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
       }
     }
 
-    // ── Divergencia Commodity-Sector: Oil vs XLE ──
+    //  Divergencia Commodity-Sector: Oil vs XLE 
     let divergenciaOilXLE: DivergenciaCommoditySector = { detectada: false, mensaje: null };
     if (results[3].status === "fulfilled" && xleData.status === "fulfilled") {
       const oilCloses = results[3].value[0].map((c) => c.close);
@@ -629,7 +629,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
       }
     }
 
-    // ── Generar Lectura Intermarket ──
+    //  Generar Lectura Intermarket 
     let dxyTrend: number | null = null;
     let dbcTrend: number | null = null;
     let bondPriceTrend: number | null = null;
@@ -694,7 +694,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
     const dxyClosesFull =
       results[1].status === "fulfilled" ? results[1].value[0].map((c) => c.close) : undefined;
 
-    // ── Ratio Commodities/Bonos (Cap. 3) ──
+    //  Ratio Commodities/Bonos (Cap. 3) 
     const ratioCommoditiesBonos = calcularRatioCommoditiesBonos(dbcClosesFull, bondPriceCloses);
 
     const lecturaIntermarket = generarLecturaIntermarket({
@@ -715,7 +715,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
       dowGoldRatio,
     });
 
-    // ── PASO 13: Relative Strength Ratios ──
+    //  PASO 13: Relative Strength Ratios 
     const [xlyData, xlpData, spyRatioData, dowData, goldData] = await Promise.allSettled([
       yahooChartCloses("XLY", "2y"), // Consumer Discretionary
       yahooChartCloses("XLP", "2y"), // Consumer Staples
@@ -824,7 +824,7 @@ export const getIntermarketAnalysis = createServerFn({ method: "GET" }).handler(
   },
 );
 
-// ─── Server fn ligera: devuelve etapa del ciclo + sectores líderes ──
+//  Server fn ligera: devuelve etapa del ciclo + sectores líderes 
 export const getCicloEconomico = createServerFn({ method: "GET" }).handler(
   async (): Promise<{
     ciclo: CicloEconomico;

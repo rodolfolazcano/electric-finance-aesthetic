@@ -1,4 +1,4 @@
-// ─── Types ─────────────────────────────────────────────────────────
+//  Types 
 
 export interface Interpretacion {
   resumen: string;
@@ -7,7 +7,7 @@ export interface Interpretacion {
   confiabilidad: "alta" | "media" | "baja";
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────
+//  Helpers 
 
 function zonaDesdePercentil(pct: number | null): {
   zona: string;
@@ -21,7 +21,7 @@ function zonaDesdePercentil(pct: number | null): {
   return { zona: "en un nivel intermedio dentro de su propio rango histórico", tono: "neutral" };
 }
 
-// ─── Interpretación de P/E ─────────────────────────────────────────
+//  Interpretación de P/E 
 
 export function interpretarPE(
   peActual: number | null,
@@ -55,7 +55,7 @@ export function interpretarPE(
   };
 }
 
-// ─── Interpretación de P/B (Price to Book) ──────────────────────────
+//  Interpretación de P/B (Price to Book) 
 
 export function interpretarPB(
   pbActual: number | null,
@@ -87,7 +87,7 @@ export function interpretarPB(
   };
 }
 
-// ─── Interpretación de ROE ──────────────────────────────────────────
+//  Interpretación de ROE 
 
 export function interpretarROE(
   roe: number | null,
@@ -123,7 +123,7 @@ export function interpretarROE(
   return { resumen, contexto, tono: roe > 0.12 ? "positivo" : roe > 0.05 ? "neutral" : roe > 0 ? "negativo" : "negativo", confiabilidad: "alta" };
 }
 
-// ─── Interpretación de FCF Yield ────────────────────────────────────
+//  Interpretación de FCF Yield 
 
 export function interpretarFCFYield(
   fcfYield: number | null,
@@ -156,7 +156,7 @@ export function interpretarFCFYield(
   };
 }
 
-// ─── Interpretación de Deuda / Patrimonio ───────────────────────────
+//  Interpretación de Deuda / Patrimonio 
 
 export function interpretarDE(
   deudaEquity: number | null,
@@ -194,7 +194,7 @@ export function interpretarDE(
   };
 }
 
-// ─── Interpretación de Upside de analistas ─────────────────────────
+//  Interpretación de Upside de analistas 
 
 export function interpretarUpside(
   upsidePct: number | null,
@@ -218,7 +218,7 @@ export function interpretarUpside(
   };
 }
 
-// ─── Interpretación de Beta ─────────────────────────────────────────
+//  Interpretación de Beta 
 
 export function interpretarBeta(
   beta: number | null,
@@ -250,7 +250,7 @@ export function interpretarBeta(
   };
 }
 
-// ─── Interpretación del Score Fundamental ─────────────────────────--
+//  Interpretación del Score Fundamental --
 
 export function interpretarScore(
   score: number | null,
@@ -286,7 +286,7 @@ export function interpretarScore(
   };
 }
 
-// ─── Texto de disclaimer obligatorio ────────────────────────────────
+//  Texto de disclaimer obligatorio 
 
 export const DISCLAIMER_INTERPRETACION =
   "Interpretación automática basada en datos históricos del propio activo. No constituye recomendación de inversión ni sugerencia de compra o venta.";

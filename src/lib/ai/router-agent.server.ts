@@ -64,7 +64,7 @@ export type RouterDecision = {
   rationale: string;
 };
 
-// ─── Detección por patrones (0ms, sin modelo) ────────────────────────────────
+//  Detección por patrones (0ms, sin modelo) 
 
 const T2I_RE =
   /\b(gener(á|a|ar)?|cre(á|a|ar)?|dibuj(á|a|ar)?|imagen|ilustraci|ilustr(á|a)|imagen(es)?|fondo|arte|arte de|banner|thumb|miniatur|portada|wallpaper)\b/i;
@@ -143,7 +143,7 @@ export function detectComplejidad(message: string, contextChars = 0): "simple" |
   return "media";
 }
 
-// ─── Mapeo intención → tarea del catálogo ────────────────────────────────────
+//  Mapeo intención → tarea del catálogo 
 
 const INTENT_TO_TASK: Record<RouterIntent, RouterDecision["task"]> = {
   generate_image: "image",

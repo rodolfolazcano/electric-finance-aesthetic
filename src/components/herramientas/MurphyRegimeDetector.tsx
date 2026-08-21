@@ -118,7 +118,7 @@ function detectRegime(data: IntermarketMurphyResult): { regime: Regime; confianz
   return { regime: "mixto", confianza: 40 };
 }
 
-// ─── Las 4 relaciones Murphy como cards individuales ──────────────────────
+//  Las 4 relaciones Murphy como cards individuales 
 
 function RelationshipCard({
   title,
@@ -142,20 +142,20 @@ function RelationshipCard({
   return (
     <Card className="border-border/40 bg-background/40/40 p-4">
       <div className="mb-1 flex items-center justify-between">
-        <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+        <span className="text-[13px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
           {title}
         </span>
-        <span className={cn("rounded px-1.5 py-0.5 text-[8px] font-mono border", statusColor)}>
+        <span className={cn("rounded px-1.5 py-0.5 text-[12px] font-mono border", statusColor)}>
           {direction}
         </span>
       </div>
-      <p className="text-[10px] text-foreground font-medium mb-1">{summary}</p>
-      <p className="text-[9px] text-muted-foreground/70 leading-relaxed">{detail}</p>
+      <p className="text-[13px] text-foreground font-medium mb-1">{summary}</p>
+      <p className="text-[13px] text-muted-foreground/70 leading-relaxed">{detail}</p>
     </Card>
   );
 }
 
-// ─── Componente principal ─────────────────────────────────────────────────
+//  Componente principal 
 
 export function MurphyRegimeDetector() {
   const fn = useServerFn(getIntermarketMurphyIndicators);
@@ -170,7 +170,7 @@ export function MurphyRegimeDetector() {
     return (
       <div className="space-y-3">
         <Skeleton className="h-16 w-full rounded-lg" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-28 w-full rounded-lg" />
           ))}
@@ -181,7 +181,7 @@ export function MurphyRegimeDetector() {
 
   if (isError || !data) {
     return (
-      <div className="rounded-md border border-danger/40 bg-danger/10 p-3 text-[10px] text-danger">
+      <div className="rounded-md border border-danger/40 bg-danger/10 p-3 text-[13px] text-danger">
         Error al cargar indicadores intermarket.
       </div>
     );
@@ -224,16 +224,16 @@ export function MurphyRegimeDetector() {
                       style={{ width: `${confianza}%` }}
                     />
                   </div>
-                  <span className="text-[9px] font-mono text-muted-foreground">{confianza}%</span>
+                  <span className="text-[13px] font-mono text-muted-foreground">{confianza}%</span>
                 </div>
               </div>
-              <p className="text-[10px] text-muted-foreground/80 leading-relaxed mt-0.5">
+              <p className="text-[13px] text-muted-foreground/80 leading-relaxed mt-0.5">
                 {cfg.desc}
               </p>
             </div>
           </div>
           <div className="hidden sm:block text-right">
-            <span className="text-[8px] font-mono text-muted-foreground/50">
+            <span className="text-[12px] font-mono text-muted-foreground/50">
               {new Date(data.generatedAt).toLocaleString("es-AR")}
             </span>
           </div>
@@ -241,7 +241,7 @@ export function MurphyRegimeDetector() {
       </Card>
 
       {/* Las 4 relaciones Murphy */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <RelationshipCard
           title="1. Dólar vs Commodities"
           direction="Opuesta"

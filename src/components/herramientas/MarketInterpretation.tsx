@@ -286,7 +286,7 @@ export function MarketInterpretation({
 
   return (
     <div className="space-y-3">
-      <div className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
         Interpretación de Mercado
       </div>
 
@@ -299,10 +299,10 @@ export function MarketInterpretation({
             {interpretacion.senal.replace("_", " ")}
           </span>
           <div className="flex items-center gap-2">
-            <span className={`text-[10px] font-mono ${colorRiesgo[interpretacion.riesgo]}`}>
+            <span className={`text-[13px] font-mono ${colorRiesgo[interpretacion.riesgo]}`}>
               Riesgo: {interpretacion.riesgo.toUpperCase()}
             </span>
-            <span className="text-[10px] font-mono text-muted-foreground">
+            <span className="text-[13px] font-mono text-muted-foreground">
               Confianza: {interpretacion.confianza}%
             </span>
           </div>
@@ -312,7 +312,7 @@ export function MarketInterpretation({
 
       {/* Acción sugerida */}
       <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
-        <div className="mono text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+        <div className="mono text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
           Acción sugerida
         </div>
         <p className="font-mono text-sm font-medium text-foreground">{interpretacion.accion}</p>
@@ -320,14 +320,14 @@ export function MarketInterpretation({
 
       {/* Detalles del análisis */}
       <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
-        <div className="mono text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+        <div className="mono text-[13px] uppercase tracking-wider text-muted-foreground mb-2">
           Factores considerados
         </div>
         <ul className="space-y-1.5">
           {interpretacion.detalles.map((d, i) => (
             <li
               key={i}
-              className="text-[11px] font-mono text-muted-foreground leading-relaxed flex items-start gap-2"
+              className="text-[14px] font-mono text-muted-foreground leading-relaxed flex items-start gap-2"
             >
               <span className="mt-0.5 h-1 w-1 shrink-0 rounded-full bg-current opacity-50" />
               {d}
@@ -337,9 +337,9 @@ export function MarketInterpretation({
       </div>
 
       {/* Métricas clave */}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-md border border-border/30 bg-muted/5 p-2 text-center">
-          <div className="text-[9px] text-muted-foreground uppercase tracking-wider">OBI</div>
+          <div className="text-[13px] text-muted-foreground uppercase tracking-wider">OBI</div>
           <div
             className={`font-mono text-sm ${obiCalc ? (obiCalc.obi > 0 ? "text-green-400" : "text-red-400") : "text-muted-foreground"}`}
           >
@@ -347,7 +347,7 @@ export function MarketInterpretation({
           </div>
         </div>
         <div className="rounded-md border border-border/30 bg-muted/5 p-2 text-center">
-          <div className="text-[9px] text-muted-foreground uppercase tracking-wider">Z-Score</div>
+          <div className="text-[13px] text-muted-foreground uppercase tracking-wider">Z-Score</div>
           <div
             className={`font-mono text-sm ${obiCalc ? (Math.abs(obiCalc.zScore) >= umbral ? "text-yellow-400" : "") : "text-muted-foreground"}`}
           >
@@ -355,11 +355,11 @@ export function MarketInterpretation({
           </div>
         </div>
         <div className="rounded-md border border-border/30 bg-muted/5 p-2 text-center">
-          <div className="text-[9px] text-muted-foreground uppercase tracking-wider">ATR</div>
+          <div className="text-[13px] text-muted-foreground uppercase tracking-wider">ATR</div>
           <div className="font-mono text-sm">{atr ? fmtPct(atr.atrPct) : "\u2014"}</div>
         </div>
         <div className="rounded-md border border-border/30 bg-muted/5 p-2 text-center">
-          <div className="text-[9px] text-muted-foreground uppercase tracking-wider">Spread</div>
+          <div className="text-[13px] text-muted-foreground uppercase tracking-wider">Spread</div>
           <div className="font-mono text-sm text-cyan-400">
             {orderBook ? fmtPct(orderBook.spreadPct, 3) : "\u2014"}
           </div>

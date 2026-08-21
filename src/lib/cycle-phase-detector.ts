@@ -1,19 +1,19 @@
 // @ts-nocheck
-// ─── Cycle Phase Detector — Murphy (6 Stages) + Sector Rotation ──
+//  Cycle Phase Detector — Murphy (6 Stages) + Sector Rotation 
 // Lógica PURA: detecta la fase económica según las 3 flechas de Pring
 // y devuelve la rotación sectorial correspondiente (Murphy + Stovall).
 // Sin dependencias de UI, sin side effects.
 
-// ─── TIPOS ────────────────────────────────────────────────────────
+//  TIPOS 
 
 export type TrendArrow = "up" | "down" | "flat" | null;
 
-// ─── Murphy Stage 1-6 labels (desde el Cap. 12) ──────────────────
+//  Murphy Stage 1-6 labels (desde el Cap. 12) 
 // Mismas reglas que detectCyclePhase(0-5), re-enumeradas 1-6.
 // MURPHY_STAGE_LABELS usa numeración 1-6 (igual que StageCiclo en intermarket-engine.ts).
 // CYCLE_PHASES usa 0-5 (índice de array). Para una fase 0-5, sumar 1 → 1-6.
 
-// ─── FUENTE DE VERDAD CANÓNICA: Rueda de Stovall (Murphy, Cap. 13, Fig. 13.1, pág. 200) ─────────────────────
+//  FUENTE DE VERDAD CANÓNICA: Rueda de Stovall (Murphy, Cap. 13, Fig. 13.1, pág. 200) 
 // Mapeo de 6 stages de Pring (0-5) a los 6 sectores líderes de Stovall.
 // Correspondencia Pring-stage ↔ Stovall-etapa:
 //   Stage 0 (B↑S↓C↓) → Late Contraction → Financials
@@ -54,7 +54,7 @@ export const CANONICAL_SECTOR_ROTATION: Record<
   },
 };
 
-// ─── Tablas legacy (derivadas de CANONICAL_SECTOR_ROTATION) ─────────────────────────────────────────────────────────────
+//  Tablas legacy (derivadas de CANONICAL_SECTOR_ROTATION) 
 // @deprecated: Usar CANONICAL_SECTOR_ROTATION directamente. Estas tablas se mantienen por compatibilidad.
 
 export const MURPHY_STAGE_LABELS: Record<number, { label: string; sectoresLideres: string[] }> = {
@@ -126,7 +126,7 @@ export interface PhaseDiagnosis {
   totalSignals: number;
 }
 
-// ─── LAS 6 FASES DEL CICLO (Murphy + Pring) ──────────────────────
+//  LAS 6 FASES DEL CICLO (Murphy + Pring) 
 
 export const CYCLE_PHASES: CyclePhase[] = [
   {
@@ -135,7 +135,7 @@ export const CYCLE_PHASES: CyclePhase[] = [
     shortLabel: "Recesión",
     description:
       "Bonos suben (flight-to-quality). Acciones caen buscando piso. Commodities caen por demanda destruida. El peor momento del ciclo, pero el mejor para comprar bonos largos.",
-    icon: "🔴",
+    icon: "[ROJO]",
     color: "text-red-400",
     bgColor: "bg-red-500/10",
     borderColor: "border-red-500/30",
@@ -146,7 +146,7 @@ export const CYCLE_PHASES: CyclePhase[] = [
     shortLabel: "Recuperación",
     description:
       "Bonos y acciones suben. Commodities aún débiles. Pequeñas empresas lideran. Es el MEJOR momento para comprar acciones. Tech, Discrecional, Small Caps.",
-    icon: "🟢",
+    icon: "[VERDE]",
     color: "text-green-400",
     bgColor: "bg-green-500/10",
     borderColor: "border-green-500/30",
@@ -157,7 +157,7 @@ export const CYCLE_PHASES: CyclePhase[] = [
     shortLabel: "Expansión",
     description:
       "Los 3 activos suben sincronizados. Liquidez abundante. Industriales y Materiales toman liderazgo. La economía está en su punto más saludable.",
-    icon: "🟢",
+    icon: "[VERDE]",
     color: "text-emerald-400",
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/30",
@@ -168,7 +168,7 @@ export const CYCLE_PHASES: CyclePhase[] = [
     shortLabel: "Tardía",
     description:
       "Bonos caen (yields suben por inflación). Acciones aún suben pero sólo las mega-caps. Commodities fuertes. Energy lidera. Mercado angosto. INFLACIÓN es el riesgo dominante.",
-    icon: "🟡",
+    icon: "[AMARILLO]",
     color: "text-amber-400",
     bgColor: "bg-amber-500/10",
     borderColor: "border-amber-500/30",
@@ -190,7 +190,7 @@ export const CYCLE_PHASES: CyclePhase[] = [
     shortLabel: "Recesión",
     description:
       "Los 3 activos caen. Cash es king. Bonos largos empiezan a subir anticipando recortes. Preparar el suelo del ciclo (Stage 0).",
-    icon: "🔴🔴",
+    icon: "[ROJO][ROJO]",
     color: "text-rose-400",
     bgColor: "bg-rose-500/10",
     borderColor: "border-rose-500/30",
@@ -201,7 +201,7 @@ export const PHASE_MAP: Record<number, CyclePhase> = Object.fromEntries(
   CYCLE_PHASES.map((p) => [p.stage, p]),
 );
 
-// ─── ROTACIÓN SECTORIAL POR FASE (Murphy + Stovall + Pring) ─────
+//  ROTACIÓN SECTORIAL POR FASE (Murphy + Stovall + Pring) 
 
 export const SECTOR_ROTATION_MAP: SectorRotation[] = [
   {
@@ -310,7 +310,7 @@ export const ROTATION_BY_STAGE: Record<number, SectorRotation> = Object.fromEntr
   SECTOR_ROTATION_MAP.map((r) => [r.stage, r]),
 );
 
-// ─── DETECTOR DE FASE: REGLAS EXPLÍCITAS (no difusas) ───────────
+//  DETECTOR DE FASE: REGLAS EXPLÍCITAS (no difusas) 
 
 /**
  * Detecta la fase del ciclo económico según las 3 flechas de Pring.
@@ -322,25 +322,25 @@ export const ROTATION_BY_STAGE: Record<number, SectorRotation> = Object.fromEntr
 export function detectCyclePhase(input: PhaseInput): number {
   const { bondsTrend: b, stocksTrend: s, commoditiesTrend: c } = input;
 
-  // ─── Stage 0: B↑ S↓ C↓ (Recesión / Suelo) ───────────────────────
+  //  Stage 0: B↑ S↓ C↓ (Recesión / Suelo) 
   if (b === "up" && s === "down" && c === "down") return 0;
 
-  // ─── Stage 1: B↑ S↑ C↓ (Recuperación Temprana) ──────────────────
+  //  Stage 1: B↑ S↑ C↓ (Recuperación Temprana) 
   if (b === "up" && s === "up" && c === "down") return 1;
 
-  // ─── Stage 2: B↑ S↑ C↑ (Expansión Plena) ────────────────────────
+  //  Stage 2: B↑ S↑ C↑ (Expansión Plena) 
   if (b === "up" && s === "up" && c === "up") return 2;
 
-  // ─── Stage 3: B↓ S↑ C↑ (Expansión Tardía) ───────────────────────
+  //  Stage 3: B↓ S↑ C↑ (Expansión Tardía) 
   if (b === "down" && s === "up" && c === "up") return 3;
 
-  // ─── Stage 4: B↓ S↓ C↑ (Contracción Temprana) ───────────────────
+  //  Stage 4: B↓ S↓ C↑ (Contracción Temprana) 
   if (b === "down" && s === "down" && c === "up") return 4;
 
-  // ─── Stage 5: B↓ S↓ C↓ (Contracción Total) ──────────────────────
+  //  Stage 5: B↓ S↓ C↓ (Contracción Total) 
   if (b === "down" && s === "down" && c === "down") return 5;
 
-  // ─── Casos parciales / fronterizos ───────────────────────────────
+  //  Casos parciales / fronterizos 
   // Si bonos suben y acciones suben → probablemente Stage 1-2
   if (b === "up" && s === "up") {
     // Si commodities también suben → Stage 2, si no → Stage 1
@@ -362,7 +362,7 @@ export function detectCyclePhase(input: PhaseInput): number {
   return 2;
 }
 
-// ─── DIAGNÓSTICO COMPLETO ────────────────────────────────────────
+//  DIAGNÓSTICO COMPLETO 
 
 /**
  * Diagnóstico completo: fase + rotación + señales de confirmación.
@@ -442,7 +442,7 @@ export function diagnosePhase(
   };
 }
 
-// ─── HELPERS ──────────────────────────────────────────────────────
+//  HELPERS 
 
 /** Convierte un changePct (%) a TrendArrow */
 export function pctToTrend(pct: number | null, threshold = 2): TrendArrow {
@@ -460,9 +460,9 @@ export function trendDirectionToArrow(dir: "rising" | "falling" | "flat" | null)
   return null;
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // PASO 2 — CHECKLIST DE RECESIÓN (Metodología propia — no cita textual de Murphy)
-// ═══════════════════════════════════════════════════════════════════
+// 
 // Esta metodología define 6 condiciones que juntas señalan recesión inminente.
 // Cada condición vale 1 punto. Score ≥ 4 = alta probabilidad de recesión.
 
@@ -545,9 +545,9 @@ export function checkRecessionChecklist(params: {
     met: dxyRising,
     value:
       params.dxyDirection === "up"
-        ? "▲ Subiendo"
+        ? " Subiendo"
         : params.dxyDirection === "down"
-          ? "▼ Bajando"
+          ? " Bajando"
           : "→ Lateral",
     chapterRef: "Metodología propia — no cita textual de Murphy",
   });
@@ -595,10 +595,10 @@ export function checkRecessionChecklist(params: {
     met: dowBearish,
     value:
       params.dowTheoryDivergence === "bearish"
-        ? "🔴 Divergencia bajista"
+        ? "[ROJO] Divergencia bajista"
         : params.dowTheoryConfirmed === true
-          ? "🟢 Confirmada"
-          : "⚪ Sin confirmación",
+          ? "[VERDE] Confirmada"
+          : " Sin confirmación",
     chapterRef: "Murphy Cap. 4, 5",
   });
 
@@ -611,16 +611,16 @@ export function checkRecessionChecklist(params: {
 
   if (metCount >= 5) {
     probability = "inminente";
-    interpretation = `⚠️⚠️ ${metCount}/6 condiciones activas — RECESIÓN INMINENTE. Murphy: cuando 5+ condiciones se alinean, la recesión es cuestión de meses. Reducir drásticamente exposición a riesgo.`;
+    interpretation = `[ADVERTENCIA][ADVERTENCIA] ${metCount}/6 condiciones activas — RECESIÓN INMINENTE. Murphy: cuando 5+ condiciones se alinean, la recesión es cuestión de meses. Reducir drásticamente exposición a riesgo.`;
   } else if (metCount >= 4) {
     probability = "alta";
-    interpretation = `🔴 ${metCount}/6 condiciones activas — ALTA probabilidad de recesión en 6-12 meses. Postura defensiva: aumentar duration, reducir crédito y cíclicos.`;
+    interpretation = `[ROJO] ${metCount}/6 condiciones activas — ALTA probabilidad de recesión en 6-12 meses. Postura defensiva: aumentar duration, reducir crédito y cíclicos.`;
   } else if (metCount >= 2) {
     probability = "moderada";
-    interpretation = `🟡 ${metCount}/6 condiciones activas — RIESGO MODERADO de recesión. Monitorear condiciones que faltan. Postura neutral con sesgo defensivo.`;
+    interpretation = `[AMARILLO] ${metCount}/6 condiciones activas — RIESGO MODERADO de recesión. Monitorear condiciones que faltan. Postura neutral con sesgo defensivo.`;
   } else {
     probability = "baja";
-    interpretation = `🟢 ${metCount}/6 condiciones activas — BAJA probabilidad de recesión inmediata. Condiciones mayormente saludables. Continuar con asignación por fase de ciclo.`;
+    interpretation = `[VERDE] ${metCount}/6 condiciones activas — BAJA probabilidad de recesión inmediata. Condiciones mayormente saludables. Continuar con asignación por fase de ciclo.`;
   }
 
   return {
@@ -633,9 +633,9 @@ export function checkRecessionChecklist(params: {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // PASO 3 — DIAGNÓSTICO DE INFLACIÓN: DEMANDA vs OFERTA (Murphy Cap. 3, 8, 10)
-// ═══════════════════════════════════════════════════════════════════
+// 
 // Murphy distingue DOS tipos de inflación con implicaciones OPUESTAS:
 //
 //   DEMANDA (Monetaria/Buena):  Cobre↑ Oro→ Petróleo→ DXY↓ HY↑  → Comprar Tech, Cíclicos
@@ -687,7 +687,7 @@ export function diagnoseInflationType(params: {
     return {
       type: "no_inflacionario",
       label: "Sin presión inflacionaria",
-      icon: "⚪",
+      icon: "",
       color: "text-muted-foreground",
       confidence: "alta",
       description:
@@ -760,12 +760,12 @@ export function diagnoseInflationType(params: {
   let sellSectors: string[];
 
   if (type === "demanda") {
-    label = `Inflación de DEMANDA ${confidence === "alta" ? "✅" : "⚠️"}`;
-    icon = "🟢";
+    label = `Inflación de DEMANDA ${confidence === "alta" ? "[OK]" : "[ADVERTENCIA]"}`;
+    icon = "[VERDE]";
     color = "text-green-400";
     description =
       confidence === "alta"
-        ? `Copper/Gold ↑ (${copperGoldTrend === "up" ? "✅" : "❌"}) — DXY ↓ (${dxyTrend === "down" ? "✅" : "❌"}) — HYG/LQD ↑ (${hyLqdTrend === "up" ? "✅" : "❌"}). La inflación es por CRECIMIENTO real. El cobre sube porque la industria demanda. Es el mejor escenario: expande márgenes corporativos.`
+        ? `Copper/Gold ↑ (${copperGoldTrend === "up" ? "[OK]" : "[ERROR]"}) — DXY ↓ (${dxyTrend === "down" ? "[OK]" : "[ERROR]"}) — HYG/LQD ↑ (${hyLqdTrend === "up" ? "[OK]" : "[ERROR]"}). La inflación es por CRECIMIENTO real. El cobre sube porque la industria demanda. Es el mejor escenario: expande márgenes corporativos.`
         : `Señales mayormente de demanda pero con algunas contradicciones. ${demandaScore}/${totalSignals} señales a favor de demanda. Monitorear evolución.`;
     buySectors = [
       "XLK (Tecnología) — innovación y crecimiento",
@@ -782,12 +782,12 @@ export function diagnoseInflationType(params: {
       "GLD (Oro) — no hay incertidumbre",
     ];
   } else if (type === "oferta") {
-    label = `Inflación de OFERTA ${confidence === "alta" ? "⚠️" : "⚠️"}`;
-    icon = "🔴";
+    label = `Inflación de OFERTA ${confidence === "alta" ? "[ADVERTENCIA]" : "[ADVERTENCIA]"}`;
+    icon = "[ROJO]";
     color = "text-red-400";
     description =
       confidence === "alta"
-        ? `Gold/Oil ↑ (${goldOilTrend === "up" ? "✅" : "❌"}) — DXY ↑ (${dxyTrend === "up" ? "✅" : "❌"}) — HYG/LQD ↓ (${hyLqdTrend === "down" ? "✅" : "❌"}). La inflación es por RESTRICCIÓN de oferta o incertidumbre geopolítica. El oro sube por miedo, no por demanda industrial. ES MALO para equities.`
+        ? `Gold/Oil ↑ (${goldOilTrend === "up" ? "[OK]" : "[ERROR]"}) — DXY ↑ (${dxyTrend === "up" ? "[OK]" : "[ERROR]"}) — HYG/LQD ↓ (${hyLqdTrend === "down" ? "[OK]" : "[ERROR]"}). La inflación es por RESTRICCIÓN de oferta o incertidumbre geopolítica. El oro sube por miedo, no por demanda industrial. ES MALO para equities.`
         : `Señales mayormente de oferta pero con algunas contradicciones. ${ofertaScore}/${totalSignals} señales a favor de oferta. Monitorear evolución.`;
     buySectors = [
       "XLE (Energía) — petróleo, gas, combustibles",
@@ -806,7 +806,7 @@ export function diagnoseInflationType(params: {
     ];
   } else if (type === "mixta") {
     label = "Inflación MIXTA — señales contradictorias";
-    icon = "🟡";
+    icon = "[AMARILLO]";
     color = "text-amber-400";
     description = `Demanda: ${demandaScore}/${totalSignals} | Oferta: ${ofertaScore}/${totalSignals}. Las señales están divididas. Reducir tamaño de posiciones y esperar confirmación direccional.`;
     buySectors = [
@@ -820,7 +820,7 @@ export function diagnoseInflationType(params: {
     ];
   } else {
     label = "Sin presión inflacionaria";
-    icon = "⚪";
+    icon = "";
     color = "text-muted-foreground";
     description = "No hay régimen inflacionario activo.";
     buySectors = [];
@@ -841,9 +841,9 @@ export function diagnoseInflationType(params: {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // PASO 4 — CASCADA INTERMARKET (DXY → CRB → TLT → SPY)
-// ═══════════════════════════════════════════════════════════════════
+// 
 // Murphy (Cap. 6): El orden de líderes DEBE ser:
 //   DXY (dólar) → CRB (commodities) → TLT (bonos) → SPY (acciones)
 // Si el orden se rompe, el régimen es anómalo y el modelo no aplica.
@@ -895,7 +895,7 @@ export function validateMurphyCascade(params: {
   let intactCount = 0;
   let totalWithData = 0;
 
-  // ─── Link 1: DXY → DBC ─────────────────────────────────────
+  //  Link 1: DXY → DBC 
   const l1Leader = params.dxyDbc?.leader ?? null;
   const l1Intact =
     l1Leader === "DXY" ||
@@ -914,7 +914,7 @@ export function validateMurphyCascade(params: {
       "Dólar lidera Commodities: el dólar fuerte ABARATA las materias primas (cotizadas en USD). Relación INVERSA clásica. Murphy: 'El dólar es el líder más temprano del ciclo.'",
   });
 
-  // ─── Link 2: DBC → TLT ─────────────────────────────────────
+  //  Link 2: DBC → TLT 
   // El lead-lag de DBC→TLT no está precomputado en context.leadLag.
   // Inferimos: si DBC sube → inflación → TLT baja (yields suben).
   // Relación esperada: DBC lidera TLT con lag de 1-3 meses.
@@ -941,7 +941,7 @@ export function validateMurphyCascade(params: {
       "Commodities lideran Bonos: cuando DBC sube, la inflación esperada sube → TLT baja (yields suben). Murphy: 'El índice CRB es líder de tasas por 1-3 meses.'",
   });
 
-  // ─── Link 3: TLT → SPY ─────────────────────────────────────
+  //  Link 3: TLT → SPY 
   const l3Leader = params.tltSpy?.leader ?? null;
   const l3Intact =
     l3Leader === "TLT" ||
@@ -971,7 +971,7 @@ export function validateMurphyCascade(params: {
       "Bonos lideran Acciones: TLT baja (yields suben) → SPY eventualmente corrige. Murphy: 'Los bonos anticipan a las acciones por 1-6 meses.'",
   });
 
-  // ─── Determinar salud de la cascada ────────────────────────
+  //  Determinar salud de la cascada 
   const healthScore = totalWithData > 0 ? intactCount / totalWithData : 0;
   const breakPointIndex = links.findIndex((l) => !l.intact);
 
@@ -984,17 +984,17 @@ export function validateMurphyCascade(params: {
       "No hay datos suficientes de lead-lag para validar la cascada. Usar direcciones como aproximación.";
   } else if (healthScore === 1) {
     cascadeHealth = "intacta";
-    interpretation = `✅ Cascada MURPHY INTACTA (${intactCount}/${totalWithData} links). DXY → DBC → TLT → SPY funcionando en orden. El modelo intermarket es válido.`;
+    interpretation = `[OK] Cascada MURPHY INTACTA (${intactCount}/${totalWithData} links). DXY → DBC → TLT → SPY funcionando en orden. El modelo intermarket es válido.`;
   } else if (healthScore >= 0.5) {
     cascadeHealth = "parcial";
     const broken = links
       .filter((l) => !l.intact)
       .map((l) => `${l.from}→${l.to}`)
       .join(", ");
-    interpretation = `🟡 Cascada PARCIALMENTE ROTA en: ${broken}. El régimen tiene componentes anómalos. Algunas relaciones Murphy no se cumplen.`;
+    interpretation = `[AMARILLO] Cascada PARCIALMENTE ROTA en: ${broken}. El régimen tiene componentes anómalos. Algunas relaciones Murphy no se cumplen.`;
   } else {
     cascadeHealth = "rota";
-    interpretation = `🔴 Cascada MURPHY ROTA (${intactCount}/${totalWithData} intactas). El orden líder tradicional no se cumple. Régimen ANÓMALO — las reglas normales de intermarket pueden no aplicar.`;
+    interpretation = `[ROJO] Cascada MURPHY ROTA (${intactCount}/${totalWithData} intactas). El orden líder tradicional no se cumple. Régimen ANÓMALO — las reglas normales de intermarket pueden no aplicar.`;
   }
 
   return {

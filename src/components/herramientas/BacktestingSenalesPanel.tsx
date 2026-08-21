@@ -36,7 +36,7 @@ export default function BacktestingSenalesPanel() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end gap-4">
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+          <label className="block text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
             Ticker
           </label>
           <input
@@ -46,7 +46,7 @@ export default function BacktestingSenalesPanel() {
           />
         </div>
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+          <label className="block text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
             Período
           </label>
           <select
@@ -60,7 +60,7 @@ export default function BacktestingSenalesPanel() {
             <option value="MAX">Máximo</option>
           </select>
         </div>
-        <p className="text-[9px] text-muted-foreground/60 ml-auto">
+        <p className="text-[13px] text-muted-foreground/60 ml-auto">
           Señales por cambio de clasificación del semáforo (score combinado)
         </p>
       </div>
@@ -73,7 +73,7 @@ export default function BacktestingSenalesPanel() {
       {data && !data.error && (
         <>
           {/* Tarjetas resumen */}
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid w-full gap-3 sm:grid-cols-3">
             {resumenMejora && (
               <ResumenCard
                 titulo="Mejora de clasificación"
@@ -171,24 +171,24 @@ export default function BacktestingSenalesPanel() {
                     .reverse()
                     .map((s, i) => (
                       <tr key={i} className="border-b border-border/10 hover:bg-muted/10">
-                        <td className="py-1.5 pr-2 font-mono text-[10px] text-muted-foreground">
+                        <td className="py-1.5 pr-2 font-mono text-[13px] text-muted-foreground">
                           {s.fecha}
                         </td>
                         <td className="p-1.5">
                           <span
-                            className={`text-[9px] font-medium ${s.tipo === "mejora" ? "text-success" : "text-danger"}`}
+                            className={`text-[13px] font-medium ${s.tipo === "mejora" ? "text-success" : "text-danger"}`}
                           >
-                            {s.tipo === "mejora" ? "▲ Mejora" : "▼ Empeora"}
+                            {s.tipo === "mejora" ? " Mejora" : " Empeora"}
                           </span>
                         </td>
-                        <td className="p-1.5 text-[10px]">
+                        <td className="p-1.5 text-[13px]">
                           <span className="text-muted-foreground">{s.clasificacionAnterior}</span>
                           <span className="mx-1 text-muted-foreground/40">→</span>
                           <span className={s.tipo === "mejora" ? "text-success" : "text-danger"}>
                             {s.clasificacionActual}
                           </span>
                         </td>
-                        <td className="p-1.5 text-right font-mono text-[10px]">
+                        <td className="p-1.5 text-right font-mono text-[13px]">
                           <span className="text-muted-foreground">
                             {s.scoreAnterior.toFixed(2)}
                           </span>
@@ -203,7 +203,7 @@ export default function BacktestingSenalesPanel() {
                         {[s.retorno5d, s.retorno20d, s.retorno60d].map((r, j) => (
                           <td
                             key={j}
-                            className={`p-1.5 text-right font-mono text-[10px] ${
+                            className={`p-1.5 text-right font-mono text-[13px] ${
                               r == null
                                 ? "text-muted-foreground/40"
                                 : r >= 0
@@ -230,10 +230,10 @@ function ResumenCard({ titulo, data, color }: { titulo: string; data: any; color
   if (data.ocurrencias === 0) return null;
   return (
     <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
-      <h4 className="text-[11px] font-semibold mb-3" style={{ color }}>
+      <h4 className="text-[14px] font-semibold mb-3" style={{ color }}>
         {titulo}
       </h4>
-      <div className="grid grid-cols-2 gap-2 text-[10px]">
+      <div className="grid w-full grid-cols-2 gap-2 text-[13px]">
         <MiniMetric label="Señales" value={String(data.ocurrencias)} />
         <MiniMetric
           label="Win rate 20d"
@@ -278,8 +278,8 @@ function MiniMetric({
 }) {
   return (
     <div className="rounded border border-border/30 bg-muted/10 px-2 py-1">
-      <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={`mono text-[11px] ${className ?? ""}`}>{value}</div>
+      <div className="text-[13px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className={`mono text-[14px] ${className ?? ""}`}>{value}</div>
     </div>
   );
 }
@@ -287,7 +287,7 @@ function MiniMetric({
 function ChartTip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-border bg-surface px-3 py-2 text-[10px] font-mono shadow-sm">
+    <div className="rounded-lg border border-border bg-surface px-3 py-2 text-[13px] font-mono shadow-sm">
       {payload.map((p: any) => (
         <div key={p.name} style={{ color: p.color }}>
           {p.name}: {(p.value as number).toFixed(3)}

@@ -290,7 +290,7 @@ function dot(a: number[], b: number[]): number {
   return s;
 }
 
-// ── Ejecución diaria para los 7 perfiles ─────────────
+//  Ejecución diaria para los 7 perfiles 
 export async function construirPortafoliosDiarios(
   scores: ScoreActivo[],
   humorMercado: "risk-on" | "risk-off" | "mixto" | null,

@@ -66,7 +66,7 @@ function SortableHeader<T>({
     <th className={`px-2 py-1.5 ${alignClass}`}>
       <button
         onClick={() => onSort(sortKey)}
-        className="font-medium hover:text-foreground text-[9px] uppercase tracking-wider text-muted-foreground"
+        className="font-medium hover:text-foreground text-[13px] uppercase tracking-wider text-muted-foreground"
       >
         {label} {isActive && (currentDir === "asc" ? "\u2191" : "\u2193")}
       </button>
@@ -145,14 +145,14 @@ export function ScoreFundamentalHeatmap({ results }: { results: FundamentalAFRes
     if (etfs.length === 0) return null;
     return (
       <div className="space-y-3 rounded-lg border border-border/40 bg-background/30 p-4">
-        <p className="text-[9px] uppercase tracking-widest text-muted-foreground">
+        <p className="text-[13px] uppercase tracking-widest text-muted-foreground">
           Score Fundamental por Dimensión
         </p>
-        <p className="text-[9px] text-muted-foreground/60 leading-relaxed">
+        <p className="text-[13px] text-muted-foreground/60 leading-relaxed">
           {etfs.map((e) => e.symbol).join(", ")} {etfs.length === 1 ? "es un ETF" : "son ETFs"} — no
           aplica score fundamental.
         </p>
-        <p className="text-[8px] text-muted-foreground/40">
+        <p className="text-[12px] text-muted-foreground/40">
           Cintia Boos, Agente Productora CNV N° 2192
         </p>
       </div>
@@ -161,17 +161,17 @@ export function ScoreFundamentalHeatmap({ results }: { results: FundamentalAFRes
 
   return (
     <div className="space-y-3 rounded-lg border border-border/40 bg-background/30 p-4">
-      <p className="text-[9px] uppercase tracking-widest text-muted-foreground">
+      <p className="text-[13px] uppercase tracking-widest text-muted-foreground">
         Score Fundamental por Dimensión
       </p>
       {etfs.length > 0 && (
-        <p className="text-[9px] text-muted-foreground/60 leading-relaxed">
+        <p className="text-[13px] text-muted-foreground/60 leading-relaxed">
           {etfs.map((e) => e.symbol).join(", ")} {etfs.length === 1 ? "es un ETF" : "son ETFs"} — no
           aplica score fundamental.
         </p>
       )}
       <div className="overflow-x-auto rounded-lg border border-border/40">
-        <table className="w-full text-left font-mono text-[11px]">
+        <table className="w-full text-left font-mono text-[14px]">
           <thead className="border-b border-border/40">
             <tr>
               <SortableHeader
@@ -233,7 +233,7 @@ export function ScoreFundamentalHeatmap({ results }: { results: FundamentalAFRes
                 >
                   {row.fundScoreAbsolute}
                 </td>
-                <td className="px-2 py-1 text-right font-mono text-muted-foreground text-[10px]">
+                <td className="px-2 py-1 text-right font-mono text-muted-foreground text-[13px]">
                   {row.metricsAvailable < 6 ? (
                     <span
                       title={`Score calculado con cobertura de datos parcial: ${row.metricsAvailable} de ${row.metricsTotal} metricas disponibles. Comparar con precaucion.`}
@@ -252,12 +252,12 @@ export function ScoreFundamentalHeatmap({ results }: { results: FundamentalAFRes
           </tbody>
         </table>
       </div>
-      <p className="text-[8px] text-muted-foreground/60 leading-relaxed">
+      <p className="text-[12px] text-muted-foreground/60 leading-relaxed">
         Cada celda muestra puntos obtenidos / puntos máximos de esa dimensión. Verde ≥66% del máximo
         · Ámbar 33-65% · Rojo &lt;33% · — sin dato disponible. Score total calculado sobre base fija
         de 100 puntos (métricas sin dato cuentan como 0).
       </p>
-      <p className="text-[8px] text-muted-foreground/40">
+      <p className="text-[12px] text-muted-foreground/40">
         Cintia Boos, Agente Productora CNV N° 2192
       </p>
     </div>

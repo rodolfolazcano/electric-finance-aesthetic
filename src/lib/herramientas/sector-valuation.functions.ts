@@ -5,7 +5,7 @@ import { fetchYahooQuoteSummaryJson, fetchYahooChart } from "./yahoo-http";
 import { getCached, setCache } from "./cache";
 import sectoresData from "./sectores.json";
 
-// ─── Exported types ───────────────────────────────────────────────────
+//  Exported types 
 export interface SectorValuationRow {
   sector: string;
   forwardPE: number | null;
@@ -28,7 +28,7 @@ export interface SectorValuationPercentilesResult {
   generatedAt: string;
 }
 
-// ─── Constants ───────────────────────────────────────────────────────
+//  Constants 
 const SNAPSHOT_CACHE_TTL = 15 * 60 * 1000;
 const HISTORY_CACHE_TTL = 24 * 60 * 60 * 1000;
 const BATCH = 4;
@@ -38,7 +38,7 @@ const PE_CAP = 150;
 type SectorsDict = Record<string, Record<string, { ticker: string; nombre: string }[]>>;
 const DICT = sectoresData as SectorsDict;
 
-// ─── Helpers ─────────────────────────────────────────────────────────
+//  Helpers 
 
 function raw(obj: any, ...keys: string[]): number | null {
   let cur = obj;
@@ -128,7 +128,7 @@ function alignPER(
   return { dates, per };
 }
 
-// ─── Sector data helpers ────────────────────────────────────────────
+//  Sector data helpers 
 
 function getTickers(sector: string): { ticker: string; nombre: string }[] {
   const data = DICT[sector];
@@ -150,7 +150,7 @@ function sectorNames(): string[] {
     .sort();
 }
 
-// ─── Snapshot: fetch ticker fundamentals ───────────────────────────
+//  Snapshot: fetch ticker fundamentals 
 
 async function snapOne(
   ticker: string,
@@ -204,7 +204,7 @@ async function batchSnap(
   return out;
 }
 
-// ─── SERVER FN: getSectorValuationSnapshot ────────────────────────
+//  SERVER FN: getSectorValuationSnapshot 
 
 export const getSectorValuationSnapshot = createServerFn({ method: "POST" }).handler(
   async (): Promise<SectorValuationSnapshotResult> => {
@@ -246,7 +246,7 @@ export const getSectorValuationSnapshot = createServerFn({ method: "POST" }).han
   },
 );
 
-// ─── History: fetch PER series for one ticker ──────────────────────
+//  History: fetch PER series for one ticker 
 
 async function fetchPERHistory(ticker: string): Promise<{ dates: number[]; per: number[] } | null> {
   try {
@@ -329,7 +329,7 @@ async function sectorHistory(
   return { percentile: Math.round(pc * 10) / 10, yearsHistory: years };
 }
 
-// ─── SERVER FN: getSectorValuationPercentiles ─────────────────────
+//  SERVER FN: getSectorValuationPercentiles 
 
 export const getSectorValuationPercentiles = createServerFn({ method: "POST" }).handler(
   async (): Promise<SectorValuationPercentilesResult> => {
@@ -357,7 +357,7 @@ export const getSectorValuationPercentiles = createServerFn({ method: "POST" }).
   },
 );
 
-// ─── Per-ticker valuation data (reusing fundamental analysis method) ──
+//  Per-ticker valuation data (reusing fundamental analysis method) 
 
 let _yf: any = null;
 async function getYF(): Promise<any> {

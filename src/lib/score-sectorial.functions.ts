@@ -544,7 +544,7 @@ function extraerValor(
   return null;
 }
 
-// ─── Filtro macro top-down: el ciclo bloquea sectores enteros ───
+//  Filtro macro top-down: el ciclo bloquea sectores enteros 
 // El motor intermercado no evalúa a la empresa, evalúa el entorno.
 // Su resultado se unifica bloqueando o habilitando el análisis
 // fundamental posterior según la etapa del ciclo vigente.
@@ -671,7 +671,7 @@ export function calcularScoreSectorial(
   const pesoBaseSectorial = pesoDisponible;
   const sumaBaseSectorial = sumaPonderada;
 
-  // ─── Graham: Margen de Seguridad (BONUS adicional) ─────────────
+  //  Graham: Margen de Seguridad (BONUS adicional) 
   const epsGraham =
     result.currentPrice && result.trailingPE && result.trailingPE > 0
       ? result.currentPrice / result.trailingPE
@@ -715,7 +715,7 @@ export function calcularScoreSectorial(
       );
   }
 
-  // ─── Amat: Solvencia Patrimonial (BONUS adicional) ───────────────
+  //  Amat: Solvencia Patrimonial (BONUS adicional) 
   let amatBonus = 0;
   if (result.totalStockholderEquity && result.totalAssets && result.totalAssets > 0) {
     const solvencyRatio = result.totalStockholderEquity / result.totalAssets;

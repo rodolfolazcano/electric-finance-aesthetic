@@ -1,5 +1,5 @@
 // @ts-nocheck
-// ─── Inflation Diagnosis — Demanda vs Oferta (Murphy Cap. 3, 8, 10) ──
+//  Inflation Diagnosis — Demanda vs Oferta (Murphy Cap. 3, 8, 10) 
 // Muestra si la inflación es por demanda (buena) o por oferta (mala).
 
 import { useMemo } from "react";
@@ -12,13 +12,13 @@ import {
 } from "@/lib/cycle-phase-detector";
 import type { CompleteIntermarketResult } from "@/lib/intermarket-complete";
 
-// ─── Props ───────────────────────────────────────────────────────
+//  Props 
 
 interface InflationDiagnosisProps {
   data: CompleteIntermarketResult;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────
+//  Helpers 
 
 function SignalRow({
   label,
@@ -32,11 +32,11 @@ function SignalRow({
   const isUp = trend === "up";
   const isDown = trend === "down";
   const isGood = expected === "up" ? isUp : isDown;
-  const icon = isGood ? "✅" : trend === null ? "⚪" : isUp || isDown ? "❌" : "➖";
-  const arrow = isUp ? "▲" : isDown ? "▼" : "—";
+  const icon = isGood ? "[OK]" : trend === null ? "" : isUp || isDown ? "[ERROR]" : "";
+  const arrow = isUp ? "" : isDown ? "" : "—";
 
   return (
-    <div className="flex items-center gap-2 text-[9px] font-mono">
+    <div className="flex items-center gap-2 text-[13px] font-mono">
       <span>{icon}</span>
       <span
         className={cn(
@@ -48,21 +48,21 @@ function SignalRow({
       </span>
       <span className="text-muted-foreground/60">{arrow}</span>
       <span className="text-muted-foreground/40 text-[7px]">
-        (esperado {expected === "up" ? "▲" : "▼"})
+        (esperado {expected === "up" ? "" : ""})
       </span>
     </div>
   );
 }
 
 function SectorTags({ sectors, type }: { sectors: string[]; type: "buy" | "sell" }) {
-  if (sectors.length === 0) return <span className="text-[8px] text-muted-foreground/50">—</span>;
+  if (sectors.length === 0) return <span className="text-[12px] text-muted-foreground/50">—</span>;
   return (
     <div className="flex flex-wrap gap-1">
       {sectors.map((s) => (
         <span
           key={s}
           className={cn(
-            "px-1.5 py-0.5 rounded text-[8px] font-mono border leading-tight",
+            "px-1.5 py-0.5 rounded text-[12px] font-mono border leading-tight",
             type === "buy"
               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
               : "bg-red-500/10 border-red-500/30 text-red-400",
@@ -75,7 +75,7 @@ function SectorTags({ sectors, type }: { sectors: string[]; type: "buy" | "sell"
   );
 }
 
-// ─── Componente principal ────────────────────────────────────────
+//  Componente principal 
 
 export function InflationDiagnosis({ data }: InflationDiagnosisProps) {
   const diagnosis: InflationDiagnosisResult | null = useMemo(() => {
@@ -123,7 +123,7 @@ export function InflationDiagnosis({ data }: InflationDiagnosisProps) {
 
   return (
     <Card className={cn("p-4", borderColor, bgColor)}>
-      {/* ── Header ──────────────────────────────────────────── */}
+      {/*  Header  */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-sm">{icon}</span>
@@ -132,16 +132,16 @@ export function InflationDiagnosis({ data }: InflationDiagnosisProps) {
               Paso 3 — Tipo de Inflación:{" "}
               {type === "demanda" ? "Demanda" : type === "oferta" ? "Oferta" : "Mixta"}
             </div>
-            <p className="text-[9px] text-muted-foreground/70 mt-0.5">{chapterRef}</p>
+            <p className="text-[13px] text-muted-foreground/70 mt-0.5">{chapterRef}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className={cn("text-[9px] px-1.5 py-0.5 rounded font-mono border", color)}>
+          <span className={cn("text-[13px] px-1.5 py-0.5 rounded font-mono border", color)}>
             {label}
           </span>
           <span
             className={cn(
-              "text-[8px] px-1.5 py-0.5 rounded font-mono border",
+              "text-[12px] px-1.5 py-0.5 rounded font-mono border",
               confidence === "alta"
                 ? "bg-green-500/10 border-green-500/30 text-green-400"
                 : "bg-amber-500/10 border-amber-500/30 text-amber-400",
@@ -152,9 +152,9 @@ export function InflationDiagnosis({ data }: InflationDiagnosisProps) {
         </div>
       </div>
 
-      {/* ── Señales ─────────────────────────────────────────── */}
+      {/*  Señales  */}
       <div className="mb-3 space-y-1 px-1">
-        <div className="text-[8px] font-mono text-muted-foreground/50 uppercase tracking-wider mb-1">
+        <div className="text-[12px] font-mono text-muted-foreground/50 uppercase tracking-wider mb-1">
           Señales de diagnóstico:
         </div>
         <SignalRow label="Copper/Gold (Dr. Copper)" trend={signals.copperGoldTrend} expected="up" />
@@ -164,10 +164,10 @@ export function InflationDiagnosis({ data }: InflationDiagnosisProps) {
         <SignalRow label="XLY/XLP (Consumidor)" trend={signals.xlyXlpTrend} expected="up" />
       </div>
 
-      {/* ── Descripción ─────────────────────────────────────── */}
+      {/*  Descripción  */}
       <div
         className={cn(
-          "mb-3 px-3 py-2 rounded-lg text-[9px] font-mono leading-relaxed border",
+          "mb-3 px-3 py-2 rounded-lg text-[13px] font-mono leading-relaxed border",
           type === "demanda"
             ? "bg-green-500/10 border-green-500/20 text-green-300"
             : type === "oferta"
@@ -178,17 +178,17 @@ export function InflationDiagnosis({ data }: InflationDiagnosisProps) {
         {description}
       </div>
 
-      {/* ── Sectores ────────────────────────────────────────── */}
-      <div className="grid gap-2 md:grid-cols-2">
+      {/*  Sectores  */}
+      <div className="grid w-full gap-2 md:grid-cols-2">
         <div>
-          <div className="text-[9px] font-mono font-semibold uppercase tracking-wider text-emerald-400 mb-1.5">
-            ✅ Comprar en este escenario
+          <div className="text-[13px] font-mono font-semibold uppercase tracking-wider text-emerald-400 mb-1.5">
+            [OK] Comprar en este escenario
           </div>
           <SectorTags sectors={buySectors} type="buy" />
         </div>
         <div>
-          <div className="text-[9px] font-mono font-semibold uppercase tracking-wider text-red-400 mb-1.5">
-            ❌ Vender / Evitar en este escenario
+          <div className="text-[13px] font-mono font-semibold uppercase tracking-wider text-red-400 mb-1.5">
+            [ERROR] Vender / Evitar en este escenario
           </div>
           <SectorTags sectors={sellSectors} type="sell" />
         </div>

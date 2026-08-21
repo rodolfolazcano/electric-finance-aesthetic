@@ -1,11 +1,11 @@
-// ─── Murphy Validator — 25+ validaciones contra los 15 capítulos de John Murphy ───
+//  Murphy Validator — 25+ validaciones contra los 15 capítulos de John Murphy 
 // Módulo puro: sin fetching, sin side effects. Recibe datos estructurados y produce
 // un reporte capítulo-por-capítulo con scoring, señales e interpretaciones.
-// ─────────────────────────────────────────────────────────────────────────────────
+// 
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // TIPOS DE ENTRADA — datos puros que necesita el validador
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 export interface RatioData {
   value: number | null;
@@ -150,9 +150,9 @@ export interface MurphyValidationData {
   vixLevel: number | null;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // TIPOS DE RESULTADO
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 export type ValidationSignal = "bullish" | "bearish" | "neutral" | "warning";
 export type ConfidenceLevel = "alta" | "media" | "baja";
@@ -196,9 +196,9 @@ export interface MurphyReport {
   detectedStage: number | null; // etapa del ciclo detectada (1-6)
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // UTILIDADES INTERNAS
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 function trendToSignal(
   trend: "rising" | "falling" | "flat" | null,
@@ -239,10 +239,10 @@ function isStrongTrend(changePct: number | null, minAbs: number = 2): boolean {
   return changePct != null && Math.abs(changePct) >= minAbs;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 1 — Commodities → Bonos (CRB/Bonds Ratio)
 // Regla: CRB sube → Bonos caen (inflación/growth). CRB cae → Bonos suben (desinflación/fear).
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP1_TITLE = "Cap. 1 — Commodities Lideran Bonos";
 
@@ -291,11 +291,11 @@ function validateCap1Rule2(crbBonds: RatioData): ValidationResult {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 2 — Commodities → Stocks (CRB/SPY Ratio)
 // Regla: CRB supera a SPY = régimen inflacionario (malo para stocks growth).
 //        SPY supera a CRB = régimen de crecimiento real (bueno para stocks).
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP2_TITLE = "Cap. 2 — Commodities y Stocks";
 
@@ -343,10 +343,10 @@ function validateCap2Rule2(commoditiesStocks: RatioData): ValidationResult {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 3 — Bonos → Stocks (Bonds/Stocks Relationship)
 // Regla: Normalmente relación inversa. Cuando se mueven juntos = régimen monetario.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP3_TITLE = "Cap. 3 — Bonos y Stocks";
 
@@ -407,7 +407,7 @@ function validateCap3Rule2(bondsStocks: BondStockRelationData): ValidationResult
     score: bondsTurnedFirst ? -0.3 : 0.2,
     confianza: "media",
     detalle: bondsTurnedFirst
-      ? "⚠️ Bonos y stocks divergen en tendencia a 3m. Posible giro importante. Bonos suelen adelantarse 2-6 meses a las acciones en puntos de inflexión."
+      ? "[ADVERTENCIA] Bonos y stocks divergen en tendencia a 3m. Posible giro importante. Bonos suelen adelantarse 2-6 meses a las acciones en puntos de inflexión."
       : "Bonos y stocks alineados direccionalmente. Sin divergencia en puntos de giro.",
     evidencia: `TLT 3m: ${(tltLead6m * 100).toFixed(2)}%, SPY 3m: ${(spyLead6m * 100).toFixed(2)}%. Divergencia: ${bondsTurnedFirst}`,
     murphyReference:
@@ -415,10 +415,10 @@ function validateCap3Rule2(bondsStocks: BondStockRelationData): ValidationResult
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 4 — Dólar → Commodities (Inverse Relationship)
 // Regla: USD fuerte → Commodities débiles. USD débil → Commodities fuertes.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP4_TITLE = "Cap. 4 — El Dólar y las Commodities";
 
@@ -445,7 +445,7 @@ function validateCap4Rule1(
     signal = "warning";
     score = -0.5;
     detalle =
-      "⚠️ Dólar y commodities moviéndose en la MISMA dirección. Anomalía intermarket. Posible intervención, crisis o régimen atípico.";
+      "[ADVERTENCIA] Dólar y commodities moviéndose en la MISMA dirección. Anomalía intermarket. Posible intervención, crisis o régimen atípico.";
   } else {
     signal = "neutral";
     score = 0;
@@ -514,7 +514,7 @@ function validateCap4Rule2(
       signal = "bearish";
       score -= 0.5;
       detalle +=
-        " | ⚠️ DIVERGENCIA OIL vs OIL SHARES: petróleo sube (" +
+        " | [ADVERTENCIA] DIVERGENCIA OIL vs OIL SHARES: petróleo sube (" +
         o.toFixed(1) +
         "%) pero XLE no confirma (" +
         s.toFixed(1) +
@@ -540,10 +540,10 @@ function validateCap4Rule2(
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 5 — Dow Theory (Industriales y Transportes)
 // Regla: Ambos deben moverse en la misma dirección para confirmar tendencia.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP5_TITLE = "Cap. 5 — Dow Theory";
 
@@ -564,9 +564,9 @@ function validateCap5Rule1(dowTheory: DowTheoryData): ValidationResult {
     detalle: confirmed
       ? `Dow Theory CONFIRMADA — ambos índices en tendencia ${dowTheory.industrialsTrend}. La tendencia actual está validada.`
       : dowTheory.divergence === "bearish"
-        ? `⚠️ Dow Theory con DIVERGENCIA BAJISTA. Industriales (^DJI) en ${dowTheory.industrialsTrend} pero Transportes (^DJT) no confirman. Señal clásica de debilidad inminente.`
+        ? `[ADVERTENCIA] Dow Theory con DIVERGENCIA BAJISTA. Industriales (^DJI) en ${dowTheory.industrialsTrend} pero Transportes (^DJT) no confirman. Señal clásica de debilidad inminente.`
         : dowTheory.divergence === "bullish"
-          ? `⚠️ Dow Theory con DIVERGENCIA ALCISTA. Industriales (^DJI) en ${dowTheory.industrialsTrend} pero Transportes (^DJT) no confirman. Posible fondo.`
+          ? `[ADVERTENCIA] Dow Theory con DIVERGENCIA ALCISTA. Industriales (^DJI) en ${dowTheory.industrialsTrend} pero Transportes (^DJT) no confirman. Posible fondo.`
           : "Dow Theory sin señal clara.",
     evidencia: `^DJI trend: ${dowTheory.industrialsTrend ?? "N/A"}, ^DJT trend: ${dowTheory.transportsTrend ?? "N/A"}. Confirmed: ${confirmed}. Divergence: ${dowTheory.divergence ?? "N/A"}`,
     murphyReference:
@@ -603,10 +603,10 @@ function validateCap5Rule2(dowTheory: DowTheoryData): ValidationResult {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 6 — Consumer Cyclical vs Consumer Staples (XLY/XLP)
 // Regla: XLY/XLP sube = consumidor confiado (alcista). XLY/XLP baja = consumidor cauteloso (bajista).
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP6_TITLE = "Cap. 6 — Consumo Discrecional vs Básico";
 
@@ -650,17 +650,17 @@ function validateCap6Rule2(
     confianza: "media",
     detalle: confirmacion
       ? "XLY/XLP y Technology alineados: consumidor confiado + liderazgo tecnológico confirman ciclo expansivo."
-      : "⚠️ XLY/XLP y Technology divergen: consumidor confiado pero Technology no lidera (o viceversa). Señal mixta.",
+      : "[ADVERTENCIA] XLY/XLP y Technology divergen: consumidor confiado pero Technology no lidera (o viceversa). Señal mixta.",
     evidencia: `XLY/XLP trend: ${xlyXlp.trend ?? "N/A"}. XLK 3m: ${(sectorRotation.technologyReturn3m ?? 0).toFixed(2)}%. Confirmación: ${confirmacion}.`,
     murphyReference:
       "Murphy Cap. 6-10: 'Consumer confidence should align with Technology sector leadership in expansionary phases.'",
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 7 — Bonos Lideran Acciones (Bonds Lead Stocks)
 // Regla: Bonos se giran antes que acciones en los puntos de inflexión del ciclo.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP7_TITLE = "Cap. 7 — Bonos Lideran Acciones";
 
@@ -683,7 +683,7 @@ function validateCap7Rule1(
     detalle: bondsLead
       ? "Bonos (TLT) lideran a Acciones (SPY) — patrón Murphy clásico. Los mercados de bonos se adelantan en detectar cambios de régimen."
       : stocksLead
-        ? "⚠️ Acciones (SPY) lideran a Bonos (TLT) — anomalía respecto a lo esperado por Murphy. Mercado de acciones descontando cambios que bonos aún no reflejan."
+        ? "[ADVERTENCIA] Acciones (SPY) lideran a Bonos (TLT) — anomalía respecto a lo esperado por Murphy. Mercado de acciones descontando cambios que bonos aún no reflejan."
         : synchronous
           ? "Bonos y Acciones moviéndose sincrónicamente. Sin relación líder-seguidor clara."
           : "Lead-lag no disponible.",
@@ -707,7 +707,7 @@ function validateCap7Rule2(bondsStocks: BondStockRelationData): ValidationResult
     score: divergencia ? -0.7 : 0,
     confianza: divergencia ? "alta" : "baja",
     detalle: divergencia
-      ? "⚠️ ALTAMENTE SIGNIFICATIVO: Bonos cayendo fuerte (yields subiendo) mientras acciones aún suben. Divergencia clásica de techo de mercado según Murphy. Bonos advirtiendo antes que acciones."
+      ? "[ADVERTENCIA] ALTAMENTE SIGNIFICATIVO: Bonos cayendo fuerte (yields subiendo) mientras acciones aún suben. Divergencia clásica de techo de mercado según Murphy. Bonos advirtiendo antes que acciones."
       : "Sin divergencia bonos/acciones. Ciclo normal.",
     evidencia: `TLT 3m: ${(bondsStocks.tltReturn3m ?? 0).toFixed(2)}%, SPY 3m: ${(bondsStocks.spyReturn3m ?? 0).toFixed(2)}%. Divergencia: ${divergencia}.`,
     murphyReference:
@@ -715,10 +715,10 @@ function validateCap7Rule2(bondsStocks: BondStockRelationData): ValidationResult
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 8 — La Curva de Rendimientos como Predictor
 // Regla: Curva invertida = recesión en 6-18 meses. Steepening post-inversión = recuperación.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP8_TITLE = "Cap. 8 — La Curva de Rendimientos";
 
@@ -743,7 +743,7 @@ function validateCap8Rule1(yieldCurve: YieldCurveData): ValidationResult {
           : 0,
     confianza: inverted ? "alta" : yieldCurve.steepness != null ? "alta" : "baja",
     detalle: yieldCurve.inverted
-      ? `❗CURVA INVERTIDA (${yieldCurve.spread10y2y?.toFixed(2) ?? "N/A"}% 10Y-2Y). LA SEÑAL MÁS TEMPRANA Y CONFIABLE DE RECESIÓN SEGÚN MURPHY. Históricamente precede recesión por 6-18 meses. Probabilidad de recesión elevada.`
+      ? `CURVA INVERTIDA (${yieldCurve.spread10y2y?.toFixed(2) ?? "N/A"}% 10Y-2Y). LA SEÑAL MÁS TEMPRANA Y CONFIABLE DE RECESIÓN SEGÚN MURPHY. Históricamente precede recesión por 6-18 meses. Probabilidad de recesión elevada.`
       : yieldCurve.steepness === "steepening"
         ? `Curva steepening (${yieldCurve.spread10y2y?.toFixed(2) ?? "N/A"}%). Normalización post-inversión o expansión temprana. Stage 1-2 del ciclo.`
         : yieldCurve.steepness === "flattening"
@@ -790,10 +790,10 @@ function validateCap8Rule2(yieldCurve: YieldCurveData): ValidationResult {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 9 — Mercados Internacionales (Developed vs Emerging)
 // Regla: EFA/EEM ratio sube = USD fuerte, risk-off global. Baja = risk-on global, USD débil.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP9_TITLE = "Cap. 9 — Mercados Internacionales";
 
@@ -836,17 +836,17 @@ function validateCap9Rule2(international: InternationalData, dollar: DollarData)
     confianza: confirmsUSD ? "alta" : "media",
     detalle: confirmsUSD
       ? "Relación internacional consistente con el dólar: USD y flujos globales alineados. Mercado racional."
-      : "⚠️ Anomalía: desarrollados vs emergentes NO consistentes con el movimiento del USD. Posible intervención o factores idiosincráticos.",
+      : "[ADVERTENCIA] Anomalía: desarrollados vs emergentes NO consistentes con el movimiento del USD. Posible intervención o factores idiosincráticos.",
     evidencia: `DXY 3m: ${(dollar.dxyReturn3m ?? 0).toFixed(2)}%. ${devOutperformEM ? "EFA > EEM" : "EEM > EFA"}. Consistente: ${confirmsUSD}.`,
     murphyReference:
       "Murphy Cap. 9: 'The direction of the dollar determines relative performance between developed and emerging markets.'",
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 10 — Rotación Sectorial (Sector Rotation)
 // Regla: Technology → Industrials → Energy/Materials → Defensivos en ciclo completo.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP10_TITLE = "Cap. 10 — Rotación Sectorial";
 
@@ -930,7 +930,7 @@ function validateCap10Rule2(
     detalle: earlyCycleSignals
       ? "Small caps liderando + Consumer Cyclical fuerte + Financials sólidos = Expansión temprana confirmada (Stage 2)."
       : lateCycleSignals
-        ? "⚠️ Small caps débiles + Energy liderando = Expansión tardía (Stage 4-5). Cautela con cíclicos."
+        ? "[ADVERTENCIA] Small caps débiles + Energy liderando = Expansión tardía (Stage 4-5). Cautela con cíclicos."
         : "Señales de rotación mixtas o poco definidas.",
     evidencia: `IWM/SPY trend: ${iwmSpy.trend ?? "N/A"}. XLY: ${(sectorRotation.consumerCyclical3m ?? 0).toFixed(2)}%. XLF: ${(sectorRotation.financialsReturn3m ?? 0).toFixed(2)}%`,
     murphyReference:
@@ -959,7 +959,7 @@ function validateCap10Rule3(
       techOutperform && !energyDominant
         ? "Technology (NDX) outperforming S&P 500: confirma liderazgo tecnológico típico de Stage 2-3."
         : energyDominant
-          ? "⚠️ Energy superando a Technology: rotación desde crecimiento hacia valor. Stage 4-5. Cautela."
+          ? "[ADVERTENCIA] Energy superando a Technology: rotación desde crecimiento hacia valor. Stage 4-5. Cautela."
           : "Tech vs Energy sin tendencia dominante clara.",
     evidencia: `NDX/SPX trend: ${ndxSpx.trend ?? "N/A"}. Tech 3m: ${(sectorRotation.technologyReturn3m ?? 0).toFixed(2)}%, Energy 3m: ${(sectorRotation.energyReturn3m ?? 0).toFixed(2)}%`,
     murphyReference:
@@ -985,7 +985,7 @@ function validateCap10Rule4(
     signal = "bearish";
     score = -0.5;
     detalle =
-      "⚠️ REITs (XLRE) superando a Technology — rotación hacia yield en late stage. Murphy: REITs suelen tener su peor momento cerca del final de la contracción.";
+      "[ADVERTENCIA] REITs (XLRE) superando a Technology — rotación hacia yield en late stage. Murphy: REITs suelen tener su peor momento cerca del final de la contracción.";
   } else if (reitOutperforming && stage != null && stage <= 2) {
     signal = "bullish";
     score = 0.3;
@@ -1014,9 +1014,9 @@ function validateCap10Rule4(
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 9b — Japón Lidera USA (EWJ/SPY) — Murphy p.84-87
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP9B_TITLE = "Cap. 9b — Japón Lidera USA";
 
@@ -1030,7 +1030,7 @@ function validateCap9bRule1(ewjSpy: RatioData): ValidationResult {
     signal = "warning";
     score = -0.5;
     detalle =
-      "⚠️ EWJ/SPY cayendo: Japón (EWJ) rinde menos que USA (SPY). Murphy: 'Japan effect overrides Federal Reserve.' Señal de debilidad global adelantada.";
+      "[ADVERTENCIA] EWJ/SPY cayendo: Japón (EWJ) rinde menos que USA (SPY). Murphy: 'Japan effect overrides Federal Reserve.' Señal de debilidad global adelantada.";
   } else if (japanStrong) {
     signal = "bullish";
     score = 0.3;
@@ -1053,9 +1053,9 @@ function validateCap9bRule1(ewjSpy: RatioData): ValidationResult {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 10b — Gold Stocks Confirmation (GDX/GLD) — Murphy p.125-127
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP10B_TITLE = "Cap. 10b — Gold Stocks vs Gold";
 
@@ -1074,7 +1074,7 @@ function validateCap10bRule1(gdxGld: RatioData): ValidationResult {
     signal = "bearish";
     score = -0.5;
     detalle =
-      "⚠️ GDX/GLD cayendo: oro sube pero mineros no confirman. Posible trampa alcista según Murphy.";
+      "[ADVERTENCIA] GDX/GLD cayendo: oro sube pero mineros no confirman. Posible trampa alcista según Murphy.";
   } else {
     detalle = "GDX/GLD estable: sin divergencia.";
   }
@@ -1092,10 +1092,10 @@ function validateCap10bRule1(gdxGld: RatioData): ValidationResult {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 11 — Growth vs Value
 // Regla: Growth (IVW) vs Value (IVE): Growth lidera en bajas tasas. Value lidera en subida de tasas.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP11_TITLE = "Cap. 11 — Growth vs Value";
 
@@ -1145,12 +1145,12 @@ function validateCap11Rule2(growthValue: RatioData): ValidationResult {
     signal = "warning";
     score = -0.3;
     detalle =
-      "⚠️ Growth extremo: crecimiento superando a value por más de 5% en 3m. Posible agotamiento de momentum. Murphy advierte que los extremos de Growth suelen preceder correcciones.";
+      "[ADVERTENCIA] Growth extremo: crecimiento superando a value por más de 5% en 3m. Posible agotamiento de momentum. Murphy advierte que los extremos de Growth suelen preceder correcciones.";
   } else if (valueExtreme) {
     signal = "warning";
     score = -0.3;
     detalle =
-      "⚠️ Value extremo: value superando a growth por más de 5% en 3m. Puede indicar pánico o giro brusco de régimen.";
+      "[ADVERTENCIA] Value extremo: value superando a growth por más de 5% en 3m. Puede indicar pánico o giro brusco de régimen.";
   }
   return {
     ruleId: "C11-R2",
@@ -1166,10 +1166,10 @@ function validateCap11Rule2(growthValue: RatioData): ValidationResult {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 12 — Mercados de Crédito (HYG/LQD)
 // Regla: HYG/LQD sube = apetito por riesgo crediticio. Baja = flight-to-quality crediticio.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP12_TITLE = "Cap. 12 — Mercados de Crédito";
 
@@ -1212,7 +1212,7 @@ function validateCap12Rule2(
     score: divergence ? -0.6 : 0.2,
     confianza: divergence ? "alta" : "baja",
     detalle: divergence
-      ? "⚠️ HYG/LQD cayendo pero SPY aún subiendo: DIVERGENCIA CREDITICIA. Murphy señala que los mercados de crédito se adelantan a las acciones. Señal de techo inminente."
+      ? "[ADVERTENCIA] HYG/LQD cayendo pero SPY aún subiendo: DIVERGENCIA CREDITICIA. Murphy señala que los mercados de crédito se adelantan a las acciones. Señal de techo inminente."
       : creditMarket.hygLqdTrend === "rising" && (bondsStocks.spyReturn1m ?? 0) > 0
         ? "Crédito y acciones alineados: HYG/LQD subiendo con SPY. Expansión crediticia saludable."
         : "Sin divergencia crédito-acciones significativa.",
@@ -1222,10 +1222,10 @@ function validateCap12Rule2(
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 13 — Política Monetaria y la Fed
 // Regla: Fed tightening → bearish. Fed cutting → bullish. Fed vs yield curve = señal compuesta.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP13_TITLE = "Cap. 13 — Política Monetaria";
 
@@ -1258,7 +1258,7 @@ function validateCap13Rule1(
   if (tightening && inverted) {
     signal = "bearish";
     score = -0.8;
-    detalle = `❗ Fed en ciclo de tightening (${fedMonetary.currentRate.toFixed(2)}%) Y curva invertida. Combinación más bajista según Murphy. Históricamente precede recesión en 6-12 meses.`;
+    detalle = ` Fed en ciclo de tightening (${fedMonetary.currentRate.toFixed(2)}%) Y curva invertida. Combinación más bajista según Murphy. Históricamente precede recesión en 6-12 meses.`;
   } else if (cutting) {
     signal = "bullish";
     score = 0.6;
@@ -1270,7 +1270,7 @@ function validateCap13Rule1(
   } else if (fedAboveSpread) {
     signal = "bearish";
     score = -0.4;
-    detalle = `⚠️ Tasa Fed (${fedMonetary.currentRate.toFixed(2)}%) por encima del spread 10Y-3M. Condición restrictiva. Señal de desaceleración.`;
+    detalle = `[ADVERTENCIA] Tasa Fed (${fedMonetary.currentRate.toFixed(2)}%) por encima del spread 10Y-3M. Condición restrictiva. Señal de desaceleración.`;
   } else {
     signal = "neutral";
     score = 0;
@@ -1322,10 +1322,10 @@ function validateCap13Rule2(fedMonetary: FedMonetaryData): ValidationResult {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 14 — Curva Invertida y Predicción de Recesión
 // Regla: 10Y-3M invertido + persistencia = alta probabilidad de recesión.
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP14_TITLE = "Cap. 14 — Curva Invertida y Recesión";
 
@@ -1347,7 +1347,7 @@ function validateCap14Rule1(
     confianza: recessionProbability > 0.5 ? "alta" : "baja",
     detalle:
       inverted && creditWorsening
-        ? `❗ CURVA INVERTIDA (${yieldCurve.spread10y2y?.toFixed(2) ?? "N/A"}%) + CRÉDITO DETERIORÁNDOSE hacia Investment Grade. Alta probabilidad de recesión (${(recessionProbability * 100).toFixed(0)}%). Murphy Cap. 14: combinación más letal.`
+        ? ` CURVA INVERTIDA (${yieldCurve.spread10y2y?.toFixed(2) ?? "N/A"}%) + CRÉDITO DETERIORÁNDOSE hacia Investment Grade. Alta probabilidad de recesión (${(recessionProbability * 100).toFixed(0)}%). Murphy Cap. 14: combinación más letal.`
         : inverted
           ? `Curva invertida (${yieldCurve.spread10y2y?.toFixed(2) ?? "N/A"}%). Probabilidad de recesión: ~65% en 12 meses. Sin confirmación crediticia aún.`
           : `Curva no invertida. Probabilidad de recesión baja en horizonte 12 meses.`,
@@ -1374,7 +1374,7 @@ function validateCap14Rule2(
     score: lateCycle ? -0.7 : 0,
     confianza: lateCycle ? "alta" : "baja",
     detalle: lateCycle
-      ? "❗ Escenario late-cycle clásico: curva invertida PERO S&P 500 aún positivo a 1 año. Murphy advierte que este es el momento más peligroso: las acciones aún no han descontado la recesión."
+      ? " Escenario late-cycle clásico: curva invertida PERO S&P 500 aún positivo a 1 año. Murphy advierte que este es el momento más peligroso: las acciones aún no han descontado la recesión."
       : inverted
         ? "Curva invertida y S&P 500 correctivo. Mercado ya descontando recesión parcialmente."
         : "Sin señal late-cycle.",
@@ -1384,10 +1384,10 @@ function validateCap14Rule2(
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // CAPÍTULO 15 — El Ciclo Completo de 6 Etapas (Six-Stage Cycle)
 // Regla: Bond↑ Stock↓ Comm↓ (1) → B↑ S↑ C↓ (2) → B↑ S↑ C↑ (3) → B↓ S↑ C↑ (4) → B↓ S↓ C↑ (5) → B↓ S↓ C↓ (6)
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CAP15_TITLE = "Cap. 15 — El Ciclo de 6 Etapas";
 
@@ -1481,16 +1481,16 @@ function validateCap15Rule2(
     confianza: stage != null ? "media" : "baja",
     detalle: aligned
       ? `Rotación sectorial alineada con Stage ${stage}. Diagnóstico de ciclo coherente.`
-      : `⚠️ Rotación sectorial NO alineada con Stage ${stage}. Posible transición o divergencia táctica.`,
+      : `[ADVERTENCIA] Rotación sectorial NO alineada con Stage ${stage}. Posible transición o divergencia táctica.`,
     evidencia: `Stage: ${stage ?? "N/A"}. Tech: ${(sectorRotation.technologyReturn3m ?? 0).toFixed(2)}%, Energy: ${(sectorRotation.energyReturn3m ?? 0).toFixed(2)}%, Utilities: ${(sectorRotation.utilitiesReturn3m ?? 0).toFixed(2)}%. Alineado: ${aligned}.`,
     murphyReference:
       "Murphy Cap. 15: 'Each stage of the cycle has a characteristic sector leadership pattern. The cycle diagnosis should be confirmed by actual sector rotation data.'",
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 // ORQUESTADOR — ejecuta todas las validaciones (25+) y genera el reporte
-// ═══════════════════════════════════════════════════════════════════════════════
+// 
 
 const CHAPTER_TITLES: Record<number, string> = {
   1: CAP1_TITLE,
@@ -1675,7 +1675,7 @@ function detectDivergencias(rules: ValidationResult[], chapters: ChapterSummary[
   const cap12 = chapters.find((c) => c.chapter === 12);
   if (cap6 && cap12 && cap6.compositeScore > 0.3 && cap12.compositeScore < -0.3) {
     divergencias.push(
-      `⚠️ Divergencia CONSUMIDOR vs CRÉDITO: XLY/XLP (Cap.6) alcista pero HYG/LQD (Cap.12) bajista. ` +
+      `[ADVERTENCIA] Divergencia CONSUMIDOR vs CRÉDITO: XLY/XLP (Cap.6) alcista pero HYG/LQD (Cap.12) bajista. ` +
         `Consumidor confiado mientras crédito se deteriora — señal mixta que suele resolverse con el crédito liderando.`,
     );
   }
@@ -1685,7 +1685,7 @@ function detectDivergencias(rules: ValidationResult[], chapters: ChapterSummary[
   const cap2 = chapters.find((c) => c.chapter === 2);
   if (cap5 && cap2 && cap5.compositeScore < -0.3 && cap2.compositeScore > 0.3) {
     divergencias.push(
-      `⚠️ Dow Theory bajista mientras régimen commodities/acciones es alcista. Posible giro táctico vs estructural.`,
+      `[ADVERTENCIA] Dow Theory bajista mientras régimen commodities/acciones es alcista. Posible giro táctico vs estructural.`,
     );
   }
 
@@ -1701,7 +1701,7 @@ function detectDivergencias(rules: ValidationResult[], chapters: ChapterSummary[
   // Buscar reglas warning
   const warningRules = rules.filter((r) => r.signal === "warning");
   for (const wr of warningRules) {
-    divergencias.push(`⚠️ [${wr.ruleId}] ${wr.detalle}`);
+    divergencias.push(`[ADVERTENCIA] [${wr.ruleId}] ${wr.detalle}`);
   }
 
   return divergencias;
@@ -1733,7 +1733,7 @@ function generateResumenEjecutivo(report: MurphyReport): string {
   if (highConf >= 5) summary += `${highConf} capítulos con alta confianza. `;
 
   if (report.divergencias.length > 0) {
-    summary += `⚠️ ${report.divergencias.length} divergencia(s) detectada(s). Señales mixtas — cautela. `;
+    summary += `[ADVERTENCIA] ${report.divergencias.length} divergencia(s) detectada(s). Señales mixtas — cautela. `;
   }
 
   return summary;
@@ -1848,7 +1848,7 @@ function determinarSectores(report: MurphyReport): { favorecidos: string[]; evit
     }
   }
 
-  // ─── Cross-check contra la etapa del ciclo ──────────────────────
+  //  Cross-check contra la etapa del ciclo 
   // Si la etapa detectada dice que cierto sector DEBERÍA liderar,
   // no lo recomendamos como "evitar" (sería contradictorio).
   const stage = report.detectedStage;

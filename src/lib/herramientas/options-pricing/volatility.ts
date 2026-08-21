@@ -2,7 +2,7 @@
 import { blackScholes } from "./pricing.models";
 import type { OptionType, PricingInput, VolatilityResult } from "./options.types";
 
-// ─── Histórica ────────────────────────────────────────────────────────
+//  Histórica 
 
 export function calcularVolatilidadHistorica(
   closes: number[],
@@ -30,7 +30,7 @@ export function calcularVolatilidadHistorica(
   return volSerie;
 }
 
-// ─── EWMA (RiskMetrics) ───────────────────────────────────────────────
+//  EWMA (RiskMetrics) 
 
 export function calcularVolatilidadEWMA(
   closes: number[],
@@ -63,7 +63,7 @@ export function calcularVolatilidadEWMA(
   return volSerie;
 }
 
-// ─── Volatilidad Implícita (Brent + Newton fallback) ───────────────────
+//  Volatilidad Implícita (Brent + Newton fallback) 
 
 export function calcularVolatilidadImplicita(
   tipo: OptionType,
@@ -187,9 +187,9 @@ export function calcularVolatilidadImplicita(
   return b;
 }
 
-// ─── Calcular ambas series y retornar VolatilityResult ────────────────
+//  Calcular ambas series y retornar VolatilityResult 
 
-// ─── Sanity checks (equivalente a verificación en obtener_datos_subyacente) ───
+//  Sanity checks (equivalente a verificación en obtener_datos_subyacente) 
 
 export interface VolatilidadSaneada {
   historica: number;

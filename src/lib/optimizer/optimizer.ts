@@ -2,7 +2,7 @@
 // Portfolio math + simplex-constrained optimizer (pure TS, no deps).
 // Long-only (w_i >= 0, sum w = 1) using projected gradient descent.
 //
-// ─── BLOQUE 6 — Riesgo y teoría de portafolios (confirmación conceptual, sin código nuevo) ───
+//  BLOQUE 6 — Riesgo y teoría de portafolios (confirmación conceptual, sin código nuevo) 
 // Fuente: Pascale, Cap. 9 (varianza/σ como subrogante del riesgo; riesgo sistemático vs
 // no sistemático) y Cap. 10 (frontera de eficiencia de Markowitz).
 //
@@ -88,7 +88,7 @@ export function portfolioVariance(w: number[], cov: Matrix): number {
   return dot(w, matVec(cov, w));
 }
 
-// ─── Labadie §3.2: p-variance del portafolio ───
+//  Labadie §3.2: p-variance del portafolio 
 export function portfolioPVariance(w: number[], returns: number[][], p: number = 2): number {
   // Calcula la p-variance del portafolio: E[|w·r - μ_port|^p]^(1/p)
   const T = returns.length;
@@ -210,10 +210,10 @@ export interface OptimizationResult {
   expectedReturn: number; // annualized
   volatility: number; // annualized
   sharpe: number;
-  // ─── Labadie §3.2: p-variance ───
+  //  Labadie §3.2: p-variance 
   pSharpe?: number;
   pVariance?: number;
-  // ─── TAO-*: Anomaly detection ───
+  //  TAO-*: Anomaly detection 
   anomalyReport?: AnomalyReport;
   correctedP?: number;
 }
@@ -235,7 +235,7 @@ export interface Inputs {
   volDaily: number[]; // daily stdev
   cov: Matrix; // daily covariance
   targetReturn?: number; // daily target for markowitz
-  // ─── Labadie §3.2: p-variance ───
+  //  Labadie §3.2: p-variance 
   pValue?: number; // p para p-variance (default 2=std)
   returnsRows?: number[][]; // daily returns row-wise [T][N] para p-variance directa
 }
@@ -270,7 +270,7 @@ export function optimize(strategy: Strategy, inp: Inputs): OptimizationResult {
       { iters: 1200, lr: 0.05 },
     );
   } else if (strategy === "min-pvar") {
-    // ─── Labadie §3.2: Mínima p-variance ───
+    //  Labadie §3.2: Mínima p-variance 
     // Minimizar p-variance(w·r) en vez de w^T·Σ·w
     const p = inp.pValue ?? 2;
     const rets = inp.returnsRows;
@@ -307,7 +307,7 @@ export function optimize(strategy: Strategy, inp: Inputs): OptimizationResult {
       );
     }
   } else if (strategy === "max-psharpe") {
-    // ─── Labadie §3.2: Máximo p-Sharpe ───
+    //  Labadie §3.2: Máximo p-Sharpe 
     // Maximizar (mu·w) / p-variance(w·r)^(1/p)
     const p = inp.pValue ?? 2;
     const rets = inp.returnsRows;
@@ -382,7 +382,7 @@ export function optimize(strategy: Strategy, inp: Inputs): OptimizationResult {
   const rfCont = Math.log(1 + rfAnual);
   const sharpe = annVol > 0 ? (annRet - rfCont) / annVol : 0;
 
-  // ─── Labadie §3.2: p-variance del portafolio ───
+  //  Labadie §3.2: p-variance del portafolio 
   let pSharpe: number | undefined;
   let pVariance: number | undefined;
   let anomalyReport: AnomalyReport | undefined;
@@ -392,7 +392,7 @@ export function optimize(strategy: Strategy, inp: Inputs): OptimizationResult {
     pVariance = portfolioPVariance(w, inp.returnsRows, pUsed);
     const pStd = pVariance > 0 ? Math.pow(pVariance, 1 / pUsed) : 0;
     pSharpe = pStd > 0 ? (dailyRet * FACTOR - rfCont) / (pStd * Math.pow(FACTOR, 1 / pUsed)) : 0;
-    // ─── TAO-*: Anomaly detection en el motor de cálculo ───
+    //  TAO-*: Anomaly detection en el motor de cálculo 
     const portfolioReturns = inp.returnsRows.map((r) => dot(w, r));
     anomalyReport = detectCalculationAnomalies({
       returns: portfolioReturns,

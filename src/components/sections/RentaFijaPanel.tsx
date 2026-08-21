@@ -166,7 +166,7 @@ function TooltipHeader({ label, tooltip }: { label: string; tooltip: string }) {
   return (
     <span className="group relative cursor-help border-b border-dotted border-muted-foreground/40">
       {label}
-      <span className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-48 rounded border border-border/60 bg-surface p-1.5 text-[9px] font-normal text-muted-foreground shadow-lg z-20 pointer-events-none">
+      <span className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-48 rounded border border-border/60 bg-surface p-1.5 text-[13px] font-normal text-muted-foreground shadow-lg z-20 pointer-events-none">
         {tooltip}
       </span>
     </span>
@@ -378,7 +378,7 @@ export function RentaFijaPanel({ accessToken, refreshToken, onTokenRefresh }: Re
             <button
               key={g.key}
               onClick={() => switchGroup(g.key)}
-              className={`mono rounded-t-md px-3 py-2 text-[11px] transition-colors ${
+              className={`mono rounded-t-md px-3 py-2 text-[14px] transition-colors ${
                 rfGroupTab === g.key
                   ? "border border-border/60 border-b-transparent bg-background/40 text-foreground"
                   : "text-muted-foreground hover:text-foreground"
@@ -397,7 +397,7 @@ export function RentaFijaPanel({ accessToken, refreshToken, onTokenRefresh }: Re
                   setRfDetalleTicker(null);
                   setRfSubTab(s.key);
                 }}
-                className={`mono rounded-t-sm px-2 py-0.5 text-[10px] transition-colors ${
+                className={`mono rounded-t-sm px-2 py-0.5 text-[13px] transition-colors ${
                   rfSubTab === s.key
                     ? "text-foreground border-b-2 border-primary"
                     : "text-muted-foreground hover:text-foreground"
@@ -409,7 +409,7 @@ export function RentaFijaPanel({ accessToken, refreshToken, onTokenRefresh }: Re
           </div>
         )}
         {currentSub?.subtitle && (
-          <div className="border-b border-border/10 px-4 py-1 text-[10px] italic text-muted-foreground">
+          <div className="border-b border-border/10 px-4 py-1 text-[13px] italic text-muted-foreground">
             {currentSub.subtitle}
           </div>
         )}
@@ -424,7 +424,7 @@ export function RentaFijaPanel({ accessToken, refreshToken, onTokenRefresh }: Re
           <div className="space-y-3">
             <button
               onClick={() => setRfDetalleTicker(null)}
-              className="mono text-[11px] text-muted-foreground hover:text-foreground"
+              className="mono text-[14px] text-muted-foreground hover:text-foreground"
             >
               ← Volver
             </button>
@@ -638,7 +638,7 @@ function MonitorSubTab({
         <div>
           <div className="text-sm font-medium">Monitor de bonos</div>
           {data && (
-            <p className="text-[10px] text-muted-foreground mt-0.5">
+            <p className="text-[13px] text-muted-foreground mt-0.5">
               {data.bonos.length} bonos · {data.lecaps?.length ?? 0} LECAPs · TC Oficial:{" "}
               {data.tcOficial ? `ARS ${fmtNum(data.tcOficial, 2)}` : "—"} · MEP:{" "}
               {data.tcMep ? `ARS ${fmtNum(data.tcMep, 2)}` : "—"}
@@ -648,7 +648,7 @@ function MonitorSubTab({
         <button
           onClick={onRefresh}
           disabled={loading}
-          className="mono rounded-md border border-border/60 bg-muted/30 px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-50"
+          className="mono rounded-md border border-border/60 bg-muted/30 px-2 py-1 text-[14px] text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           {loading ? "Cargando…" : "Actualizar"}
         </button>
@@ -661,7 +661,7 @@ function MonitorSubTab({
           {data.bonos.length > 0 && (
             <div className="overflow-x-auto">
               <table className="mono w-full text-xs">
-                <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
                   <tr className="border-b border-border/60">
                     <th className="px-2 py-2 text-left">
                       <button
@@ -711,13 +711,13 @@ function MonitorSubTab({
                             {b.ticker}
                           </button>
                           <span
-                            className={`inline-block rounded-md border px-1 py-0.5 text-[9px] ${badgeTipoBono(b.tipo)}`}
+                            className={`inline-block rounded-md border px-1 py-0.5 text-[13px] ${badgeTipoBono(b.tipo)}`}
                           >
                             {b.tipo}
                           </span>
                         </div>
                       </td>
-                      <td className="px-2 py-2 text-muted-foreground text-[10px] max-w-[140px] truncate">
+                      <td className="px-2 py-2 text-muted-foreground text-[13px] max-w-[140px] truncate">
                         {BONOS_DB[b.ticker]?.descripcion?.slice(0, 35) ?? "\u2014"}
                       </td>
                       <td className="px-2 py-2 text-right">{fmtNum(b.precio, 2)}</td>
@@ -729,21 +729,21 @@ function MonitorSubTab({
                           const r = riesgoNivel(b.tir != null ? b.tir * 100 : null);
                           return r ? (
                             <span
-                              className={`inline-block rounded border px-1 py-0.5 text-[8px] leading-tight ${r.clase}`}
+                              className={`inline-block rounded border px-1 py-0.5 text-[12px] leading-tight ${r.clase}`}
                             >
                               {r.label}
                             </span>
                           ) : null;
                         })()}
                       </td>
-                      <td className="px-2 py-2 text-right text-[10px]">
+                      <td className="px-2 py-2 text-right text-[13px]">
                         {plazoRestante(b.diasAlVencimiento)}
                       </td>
                       <td className="px-2 py-2 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => onSelectTicker(b.ticker)}
-                            className="rounded border border-[#C9A84C]/50 px-1.5 py-0.5 text-[9px] text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors"
+                            className="rounded border border-[#C9A84C]/50 px-1.5 py-0.5 text-[13px] text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors"
                           >
                             Detalle
                           </button>
@@ -758,7 +758,7 @@ function MonitorSubTab({
 
           {data.lecaps && data.lecaps.length > 0 && (
             <div className="overflow-x-auto">
-              <div className="mono mb-2 text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+              <div className="mono mb-2 text-[13px] uppercase tracking-[0.15em] text-muted-foreground">
                 LECAPs en Vivo (ArgentinaDatos)
               </div>
               {(() => {
@@ -795,7 +795,7 @@ function MonitorSubTab({
                   lecapsSortKey === k ? (lecapsSortDir === "asc" ? "\u2191" : "\u2193") : "";
                 return (
                   <table className="mono w-full text-xs">
-                    <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
                       <tr className="border-b border-border/60">
                         <th className="px-2 py-2 text-left">Ticker</th>
                         <th className="px-2 py-2 text-right">
@@ -830,7 +830,7 @@ function MonitorSubTab({
                       {sortedLecaps.map((l) => (
                         <tr key={l.ticker} className="border-b border-border/30">
                           <td className="px-2 py-2">
-                            <span className="inline-block rounded-md border border-purple-800 bg-purple-900/40 px-1 py-0.5 text-[9px] text-purple-300">
+                            <span className="inline-block rounded-md border border-purple-800 bg-purple-900/40 px-1 py-0.5 text-[13px] text-purple-300">
                               LECAP
                             </span>
                             <span className="ml-1.5 font-medium">{l.ticker}</span>
@@ -846,7 +846,7 @@ function MonitorSubTab({
                               const r = riesgoNivel(l.tem ?? null);
                               return r ? (
                                 <span
-                                  className={`inline-block rounded border px-1 py-0.5 text-[8px] leading-tight ${r.clase}`}
+                                  className={`inline-block rounded border px-1 py-0.5 text-[12px] leading-tight ${r.clase}`}
                                 >
                                   {r.label}
                                 </span>
@@ -856,19 +856,19 @@ function MonitorSubTab({
                           <td className="px-2 py-2 text-right">
                             {l.precio != null ? `$ ${fmtNum(l.precio, 2)}` : "\u2014"}
                             {l.precioFuente === "iol" && (
-                              <span className="ml-1 text-[9px] text-cyan-400">IOL</span>
+                              <span className="ml-1 text-[13px] text-cyan-400">IOL</span>
                             )}
                             {l.precioFuente === "argentinadatos" && (
-                              <span className="ml-1 text-[9px] text-muted-foreground">impl.</span>
+                              <span className="ml-1 text-[13px] text-muted-foreground">impl.</span>
                             )}
                           </td>
-                          <td className="px-2 py-2 text-right text-[10px]">
+                          <td className="px-2 py-2 text-right text-[13px]">
                             {plazoRestante(l.diasAlVencimiento)}
                           </td>
                           <td className="px-2 py-2 text-right">
                             <button
                               onClick={() => onSelectTicker(l.ticker)}
-                              className="rounded border border-[#C9A84C]/50 px-1.5 py-0.5 text-[9px] text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors"
+                              className="rounded border border-[#C9A84C]/50 px-1.5 py-0.5 text-[13px] text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors"
                             >
                               Detalle
                             </button>
@@ -1008,7 +1008,7 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-border/40 bg-muted/10 p-3 text-[10px] text-muted-foreground leading-relaxed">
+      <div className="rounded-lg border border-border/40 bg-muted/10 p-3 text-[13px] text-muted-foreground leading-relaxed">
         <span className="font-medium text-foreground">¿Qué es la curva de rendimientos?</span>{" "}
         Muestra la relación entre el tiempo al vencimiento (eje horizontal) y la tasa de rendimiento
         (eje vertical) para distintos tipos de bonos. Una curva con pendiente positiva indica que
@@ -1021,7 +1021,7 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
           <button
             key={f}
             onClick={() => setFilterCat(f)}
-            className={`rounded px-2 py-1 font-mono text-[10px] transition-colors ${
+            className={`rounded px-2 py-1 font-mono text-[13px] transition-colors ${
               filterCat === f
                 ? "border border-primary/60 bg-primary/10 text-foreground"
                 : "border border-border/60 text-muted-foreground hover:text-foreground"
@@ -1034,9 +1034,9 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
 
       {/* Scatter chart con tooltip mejorado */}
       <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
-        <h3 className="mb-2 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+        <h3 className="mb-2 font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
           Curva de Rendimiento (TIR / TEA) por categoría
-          <span className="ml-2 font-normal text-[9px] text-muted-foreground">
+          <span className="ml-2 font-normal text-[13px] text-muted-foreground">
             ({filterCat === "Todas" ? "todos los activos" : filterCat}) &middot; {sortedRows.length} instrumentos
           </span>
         </h3>
@@ -1061,15 +1061,15 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
                 const d = payload[0]?.payload;
                 if (!d) return null;
                 return (
-                  <div className="bg-surface border border-border/60 rounded-lg p-2.5 font-mono text-[11px] space-y-1 shadow-xl">
+                  <div className="bg-surface border border-border/60 rounded-lg p-2.5 font-mono text-[14px] space-y-1 shadow-xl">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-foreground">{d.ticker}</span>
-                      <span className="text-[9px] rounded border border-current px-1" style={{ color: colores[d.categoria] ?? "#888", borderColor: (colores[d.categoria] ?? "#888") + "60" }}>
+                      <span className="text-[13px] rounded border border-current px-1" style={{ color: colores[d.categoria] ?? "#888", borderColor: (colores[d.categoria] ?? "#888") + "60" }}>
                         {d.categoria}
                       </span>
                     </div>
-                    <div className="text-[10px] text-muted-foreground max-w-[200px] truncate">{d.nombre}</div>
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[10px]">
+                    <div className="text-[13px] text-muted-foreground max-w-[200px] truncate">{d.nombre}</div>
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[13px]">
                       <span className="text-muted-foreground">TIR</span>
                       <span className="text-right font-semibold">{d.tir != null ? (d.tir * 100).toFixed(2) + "%" : "\u2014"}</span>
                       <span className="text-muted-foreground">Paridad</span>
@@ -1077,7 +1077,7 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
                       <span className="text-muted-foreground">Precio</span>
                       <span className="text-right">${d.precio != null ? d.precio.toFixed(2) : "\u2014"}</span>
                       <span className="text-muted-foreground">Vencimiento</span>
-                      <span className="text-right text-[9px]">{d.vencimiento ?? "\u2014"}</span>
+                      <span className="text-right text-[13px]">{d.vencimiento ?? "\u2014"}</span>
                       <span className="text-muted-foreground">Días</span>
                       <span className="text-right">{d.dias ?? "\u2014"}</span>
                       <span className="text-muted-foreground">Duration</span>
@@ -1107,7 +1107,7 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
       {/* Noticias de mayor y menor TIR */}
       {news.length > 0 && (
         <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
-          <h3 className="mb-2 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <h3 className="mb-2 font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
             Noticias destacadas
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1119,8 +1119,8 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
                 rel="noopener noreferrer"
                 className="block rounded border border-border/30 bg-muted/5 p-2 hover:border-primary/40 transition-colors"
               >
-                <span className="text-[9px] font-mono text-primary">{n.ticker}</span>
-                <p className="text-[10px] text-foreground line-clamp-2 mt-0.5">{n.title}</p>
+                <span className="text-[13px] font-mono text-primary">{n.ticker}</span>
+                <p className="text-[13px] text-foreground line-clamp-2 mt-0.5">{n.title}</p>
               </a>
             ))}
           </div>
@@ -1130,7 +1130,7 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
       {/* Tabla comparativa */}
       <div className="overflow-x-auto">
         <table className="mono w-full text-xs">
-          <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
             <tr className="border-b border-border/60">
               <th className="px-2 py-2 text-left">
                 <button onClick={() => toggleSort("categoria")} className="font-medium hover:text-foreground">
@@ -1165,12 +1165,12 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
               return (
                 <tr key={r.ticker} className="border-b border-border/30 hover:bg-muted/20">
                   <td className="px-2 py-2">
-                    <span className="inline-block rounded-md border px-1 py-0.5 text-[10px]" style={{ borderColor: colores[r.categoria] + "60", color: colores[r.categoria] }}>
+                    <span className="inline-block rounded-md border px-1 py-0.5 text-[13px]" style={{ borderColor: colores[r.categoria] + "60", color: colores[r.categoria] }}>
                       {r.categoria}
                     </span>
                   </td>
                   <td className="px-2 py-2 font-medium">{r.ticker}</td>
-                  <td className="px-2 py-2 text-muted-foreground text-[10px] max-w-[120px] truncate">
+                  <td className="px-2 py-2 text-muted-foreground text-[13px] max-w-[120px] truncate">
                     {bonoInfo?.descripcion?.slice(0, 30) ?? (r.categoria === "LECAP" ? "Letra del Tesoro" : "\u2014")}
                   </td>
                   <td className={`px-2 py-2 text-right ${colorPorTIR(r.tir)}`}>
@@ -1185,9 +1185,9 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
                   <td className="px-2 py-2 text-right text-muted-foreground">
                     ${r.precio != null ? r.precio.toFixed(2) : "\u2014"}
                   </td>
-                  <td className="px-2 py-2 text-right text-[10px]">{plazoRestante(r.dias)}</td>
+                  <td className="px-2 py-2 text-right text-[13px]">{plazoRestante(r.dias)}</td>
                   <td className="px-2 py-2 text-right">
-                    {(() => { const val = r.tir != null ? r.tir * 100 : r.tem; const rl = riesgoNivel(val); return rl ? <span className={`inline-block rounded border px-1 py-0.5 text-[8px] leading-tight ${rl.clase}`}>{rl.label}</span> : null; })()}
+                    {(() => { const val = r.tir != null ? r.tir * 100 : r.tem; const rl = riesgoNivel(val); return rl ? <span className={`inline-block rounded border px-1 py-0.5 text-[12px] leading-tight ${rl.clase}`}>{rl.label}</span> : null; })()}
                   </td>
                 </tr>
               );
@@ -1255,7 +1255,7 @@ function ContextoMacroSubTab({ data }: { data: MonitorResult | null }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-border/40 bg-muted/10 p-3 text-[10px] text-muted-foreground leading-relaxed">
+      <div className="rounded-lg border border-border/40 bg-muted/10 p-3 text-[13px] text-muted-foreground leading-relaxed">
         <span className="font-medium text-foreground">¿Por qué importa?</span> Las tasas de
         referencia, la inflación y el riesgo país determinan el rendimiento real de los bonos.
         Cuando la inflación supera la tasa que paga un bono, perdés poder adquisitivo. El riesgo
@@ -1264,22 +1264,22 @@ function ContextoMacroSubTab({ data }: { data: MonitorResult | null }) {
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
         <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          <span className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             BADLAR
           </span>
           <p className="font-mono text-lg text-foreground mt-0.5">
             {badlar != null ? badlar.toFixed(2) + "%" : "\u2014"}
           </p>
-          <p className="text-[9px] text-muted-foreground mt-1">Tasa de referencia bancaria</p>
+          <p className="text-[13px] text-muted-foreground mt-1">Tasa de referencia bancaria</p>
         </div>
         <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          <span className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Riesgo País
           </span>
           <p className="font-mono text-lg text-foreground mt-0.5">
             {riesgoPais != null ? riesgoPais.toFixed(0) + " pb" : "\u2014"}
           </p>
-          <p className="text-[9px] text-muted-foreground mt-1">
+          <p className="text-[13px] text-muted-foreground mt-1">
             {riesgoPais != null && riesgoPais > 800
               ? "Elevado: financiamiento externo caro"
               : riesgoPais != null && riesgoPais > 400
@@ -1288,52 +1288,52 @@ function ContextoMacroSubTab({ data }: { data: MonitorResult | null }) {
           </p>
         </div>
         <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          <span className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Inflación Anual
           </span>
           <p className="font-mono text-lg text-foreground mt-0.5">
             {inflacionAA != null ? inflacionAA.toFixed(2) + "%" : "\u2014"}
           </p>
-          <p className="text-[9px] text-muted-foreground mt-1">Variación interanual de precios</p>
+          <p className="text-[13px] text-muted-foreground mt-1">Variación interanual de precios</p>
         </div>
         <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          <span className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Inflación Mensual
           </span>
           <p className="font-mono text-lg text-foreground mt-0.5">
             {inflacionMM != null ? inflacionMM.toFixed(2) + "%" : "\u2014"}
           </p>
-          <p className="text-[9px] text-muted-foreground mt-1">Variación mensual de precios</p>
+          <p className="text-[13px] text-muted-foreground mt-1">Variación mensual de precios</p>
         </div>
         <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          <span className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             TC Oficial
           </span>
           <p className="font-mono text-lg text-foreground mt-0.5">
             {data?.tcOficial != null ? "$" + data.tcOficial.toFixed(2) : "\u2014"}
           </p>
-          <p className="text-[9px] text-muted-foreground mt-1">Dólar Banco Nación</p>
+          <p className="text-[13px] text-muted-foreground mt-1">Dólar Banco Nación</p>
         </div>
         <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          <span className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             TC MEP
           </span>
           <p className="font-mono text-lg text-foreground mt-0.5">
             {data?.tcMep != null ? "$" + data.tcMep.toFixed(2) : "\u2014"}
           </p>
-          <p className="text-[9px] text-muted-foreground mt-1">Dólar bolsa (GD30)</p>
+          <p className="text-[13px] text-muted-foreground mt-1">Dólar bolsa (GD30)</p>
         </div>
         <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          <span className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Reservas BCRA
           </span>
           <p className="font-mono text-lg text-foreground mt-0.5">
             {reservas != null ? "$" + (reservas / 1e6).toFixed(1) + "M" : "\u2014"}
           </p>
-          <p className="text-[9px] text-muted-foreground mt-1">Reservas internacionales</p>
+          <p className="text-[13px] text-muted-foreground mt-1">Reservas internacionales</p>
         </div>
         <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          <span className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
             Tasa Real
           </span>
           <p className="font-mono text-lg text-foreground mt-0.5">
@@ -1341,7 +1341,7 @@ function ContextoMacroSubTab({ data }: { data: MonitorResult | null }) {
               ? (badlar - inflacionMM * 12).toFixed(2) + "%"
               : "\u2014"}
           </p>
-          <p className="text-[9px] text-muted-foreground mt-1">
+          <p className="text-[13px] text-muted-foreground mt-1">
             {badlar != null && inflacionMM != null
               ? badlar > inflacionMM * 12
                 ? "Tasa real positiva (+) preserva capital"
@@ -1459,7 +1459,7 @@ function CalculadoraSubTab({
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
         <div>
-          <label className="mono text-[11px] text-muted-foreground">Bono</label>
+          <label className="mono text-[14px] text-muted-foreground">Bono</label>
           <select
             value={selectedTicker}
             onChange={(e) => {
@@ -1477,7 +1477,7 @@ function CalculadoraSubTab({
           </select>
         </div>
         <div>
-          <label className="mono text-[11px] text-muted-foreground">Precio (c/100 VN)</label>
+          <label className="mono text-[14px] text-muted-foreground">Precio (c/100 VN)</label>
           <div className="flex gap-1 mt-1">
             <input
               type="number"
@@ -1489,7 +1489,7 @@ function CalculadoraSubTab({
             <button
               onClick={() => autoFillPrice()}
               disabled={calcLoading}
-              className="shrink-0 rounded-md border border-primary/50 bg-primary/10 px-2 py-2 text-[11px] font-mono text-primary hover:bg-primary/20 disabled:opacity-50"
+              className="shrink-0 rounded-md border border-primary/50 bg-primary/10 px-2 py-2 text-[14px] font-mono text-primary hover:bg-primary/20 disabled:opacity-50"
               title="Obtener precio desde IOL"
             >
               IOL
@@ -1498,7 +1498,7 @@ function CalculadoraSubTab({
         </div>
         {bonoInfo?.tipo === "Dollar-Linked" && (
           <div>
-            <label className="mono text-[11px] text-muted-foreground">Tasa deval. % (DL)</label>
+            <label className="mono text-[14px] text-muted-foreground">Tasa deval. % (DL)</label>
             <input
               type="number"
               value={tasaDevaluacion}
@@ -1509,7 +1509,7 @@ function CalculadoraSubTab({
           </div>
         )}
         <div>
-          <label className="mono text-[11px] text-muted-foreground">Vencimiento</label>
+          <label className="mono text-[14px] text-muted-foreground">Vencimiento</label>
           <div className="mt-1 w-full rounded-md border border-border bg-muted/30 px-2 py-2 text-sm font-mono">
             {bonoInfo ? formatearFecha(bonoInfo.vencimiento) : "\u2014"}
           </div>
@@ -1529,13 +1529,13 @@ function CalculadoraSubTab({
         <>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">TIR (XIRR)</div>
+              <div className="text-[13px] text-muted-foreground">TIR (XIRR)</div>
               <div className={`mono mt-1 text-lg font-medium ${colorPorTIR(resultado.tir)}`}>
                 {resultado.tir != null ? fmtPct(resultado.tir * 100, 2) : "\u2014"}
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Duration Macaulay</div>
+              <div className="text-[13px] text-muted-foreground">Duration Macaulay</div>
               <div className="mono mt-1 text-lg">
                 {resultado.durationMacaulay != null
                   ? fmtNum(resultado.durationMacaulay, 2) + " a"
@@ -1543,7 +1543,7 @@ function CalculadoraSubTab({
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Duration Mod.</div>
+              <div className="text-[13px] text-muted-foreground">Duration Mod.</div>
               <div className="mono mt-1 text-lg">
                 {resultado.durationModificada != null
                   ? fmtNum(resultado.durationModificada, 2) + " a"
@@ -1551,22 +1551,22 @@ function CalculadoraSubTab({
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Paridad</div>
+              <div className="text-[13px] text-muted-foreground">Paridad</div>
               <div className="mono mt-1 text-lg">{fmtNum(resultado.paridad, 2)}%</div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Precio Técnico</div>
+              <div className="text-[13px] text-muted-foreground">Precio Técnico</div>
               <div className="mono mt-1 text-lg">{fmtNum(resultado.precioTecnico, 2)}</div>
             </div>
           </div>
 
           <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
-            <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
               Flujo de fondos proyectado
             </div>
             <div className="overflow-x-auto">
               <table className="mono w-full text-xs">
-                <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
                   <tr className="border-b border-border/60">
                     <th className="px-2 py-2 text-left">Fecha</th>
                     <th className="px-2 py-2 text-right">Días</th>
@@ -1583,7 +1583,7 @@ function CalculadoraSubTab({
                       <td className="px-2 py-2 text-right">{f.dias}</td>
                       <td className="px-2 py-2">
                         <span
-                          className={`inline-block rounded px-1 py-0.5 text-[9px] ${
+                          className={`inline-block rounded px-1 py-0.5 text-[13px] ${
                             f.tipo === "cupon+amortizacion"
                               ? "bg-blue-900/30 text-blue-300"
                               : f.tipo === "amortizacion"
@@ -1642,41 +1642,41 @@ function CalculadoraSubTab({
             const rendimientoSimple = precio > 0 ? ((totalFlujos - precio) / precio) * 100 : 0;
             return (
               <div className="rounded-lg border border-border/60 bg-muted/20 p-4 space-y-3">
-                <div className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                <div className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                   Resumen de inversión
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
                   <div className="rounded-md border border-border/40 bg-muted/10 p-2.5">
-                    <span className="text-muted-foreground text-[10px]">Inversión</span>
+                    <span className="text-muted-foreground text-[13px]">Inversión</span>
                     <div className="text-base font-semibold">${fmtNum(precio, 2)}</div>
-                    <div className="text-[9px] text-muted-foreground">c/100 VN</div>
+                    <div className="text-[13px] text-muted-foreground">c/100 VN</div>
                   </div>
                   <div className="rounded-md border border-border/40 bg-muted/10 p-2.5">
-                    <span className="text-muted-foreground text-[10px]">Ganancia de Capital</span>
+                    <span className="text-muted-foreground text-[13px]">Ganancia de Capital</span>
                     <div
                       className={`text-base font-semibold ${gananciaCapital >= 0 ? "text-green-400" : "text-red-400"}`}
                     >
                       {gananciaCapital >= 0 ? "+" : ""}${fmtNum(gananciaCapital, 2)}
                     </div>
-                    <div className="text-[9px] text-muted-foreground">
+                    <div className="text-[13px] text-muted-foreground">
                       {gananciaPct >= 0 ? "+" : ""}
                       {fmtNum(gananciaPct, 1)}%
                     </div>
                   </div>
                   <div className="rounded-md border border-border/40 bg-muted/10 p-2.5">
-                    <span className="text-muted-foreground text-[10px]">Cupón + Amort.</span>
+                    <span className="text-muted-foreground text-[13px]">Cupón + Amort.</span>
                     <div className="text-base font-semibold">${fmtNum(totalFlujos, 2)}</div>
-                    <div className="text-[9px] text-muted-foreground">cada $100 VN</div>
+                    <div className="text-[13px] text-muted-foreground">cada $100 VN</div>
                   </div>
                   <div className="rounded-md border border-border/40 bg-muted/10 p-2.5">
-                    <span className="text-muted-foreground text-[10px]">Rendimiento Simple</span>
+                    <span className="text-muted-foreground text-[13px]">Rendimiento Simple</span>
                     <div
                       className={`text-base font-semibold ${rendimientoSimple >= 0 ? "text-green-400" : "text-red-400"}`}
                     >
                       {rendimientoSimple >= 0 ? "+" : ""}
                       {fmtNum(rendimientoSimple, 1)}%
                     </div>
-                    <div className="text-[9px] text-muted-foreground">
+                    <div className="text-[13px] text-muted-foreground">
                       {(resultado.diasAlVencimiento > 0
                         ? rendimientoSimple / (resultado.diasAlVencimiento / 365)
                         : 0
@@ -1685,7 +1685,7 @@ function CalculadoraSubTab({
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 text-[10px] font-mono text-muted-foreground bg-muted/5 rounded-md p-2.5">
+                <div className="flex flex-wrap gap-2 text-[13px] font-mono text-muted-foreground bg-muted/5 rounded-md p-2.5">
                   <span>
                     • Invertís <strong className="text-foreground">${fmtNum(precio, 2)}</strong> por
                     cada $100 VN
@@ -1832,7 +1832,7 @@ function DetalleSubTab({
     <div className="space-y-3">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <div className="sm:col-span-3">
-          <label className="mono text-[11px] text-muted-foreground">Bono</label>
+          <label className="mono text-[14px] text-muted-foreground">Bono</label>
           <select
             value={ticker}
             onChange={(e) => setTicker(e.target.value)}
@@ -1848,7 +1848,7 @@ function DetalleSubTab({
         <div className="flex items-end">
           <div className="w-full space-y-1">
             <span
-              className={`inline-block rounded-md border px-2 py-0.5 text-[10px] ${bonoInfo ? badgeTipoBono(bonoInfo.tipo) : ""}`}
+              className={`inline-block rounded-md border px-2 py-0.5 text-[13px] ${bonoInfo ? badgeTipoBono(bonoInfo.tipo) : ""}`}
             >
               {bonoInfo?.tipo ?? "—"}
             </span>
@@ -1862,7 +1862,7 @@ function DetalleSubTab({
           <button
             key={t}
             onClick={() => setDetalleTab(t)}
-            className={`font-mono text-[10px] px-2.5 py-1 rounded-t border border-transparent transition-colors ${detalleTab === t ? "border-border/60 border-b-transparent bg-background/40 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            className={`font-mono text-[13px] px-2.5 py-1 rounded-t border border-transparent transition-colors ${detalleTab === t ? "border-border/60 border-b-transparent bg-background/40 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
           >
             {t === "general"
               ? "Datos generales"
@@ -1879,7 +1879,7 @@ function DetalleSubTab({
 
       {bonoInfo && detalleTab === "general" && (
         <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
-          <p className="text-[11px] text-muted-foreground mb-3">{bonoInfo.descripcion}</p>
+          <p className="text-[14px] text-muted-foreground mb-3">{bonoInfo.descripcion}</p>
           <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs font-mono">
             {bonoInfo.isin && (
               <>
@@ -1951,13 +1951,13 @@ function DetalleSubTab({
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">TIR (XIRR)</div>
+              <div className="text-[13px] text-muted-foreground">TIR (XIRR)</div>
               <div className={`mono mt-1 text-lg font-medium ${colorPorTIR(resultado.tir)}`}>
                 {resultado.tir != null ? fmtPct(resultado.tir * 100, 2) : "—"}
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">TNA</div>
+              <div className="text-[13px] text-muted-foreground">TNA</div>
               <div className="mono mt-1 text-lg">
                 {resultado.tna != null
                   ? fmtPct(resultado.tna * 100, 2)
@@ -1965,7 +1965,7 @@ function DetalleSubTab({
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">TEA</div>
+              <div className="text-[13px] text-muted-foreground">TEA</div>
               <div className="mono mt-1 text-lg">
                 {resultado.tea != null
                   ? fmtPct(resultado.tea * 100, 2)
@@ -1973,21 +1973,21 @@ function DetalleSubTab({
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Precio</div>
+              <div className="text-[13px] text-muted-foreground">Precio</div>
               <div className="mono mt-1 text-lg">$ {fmtNum(resultado.precioPorCada100VN, 2)}</div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Paridad</div>
+              <div className="text-[13px] text-muted-foreground">Paridad</div>
               <div className="mono mt-1 text-lg">{fmtNum(resultado.paridad, 2)}%</div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Intereses acumulados</div>
+              <div className="text-[13px] text-muted-foreground">Intereses acumulados</div>
               <div className="mono mt-1 text-lg">
                 {resultado.interesesCorridos != null ? fmtNum(resultado.interesesCorridos, 4) : "—"}
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Current yield</div>
+              <div className="text-[13px] text-muted-foreground">Current yield</div>
               <div className="mono mt-1 text-lg">
                 {resultado.precioPorCada100VN > 0 && bonoInfo?.cuponAnual != null
                   ? fmtPct((bonoInfo.cuponAnual / resultado.precioPorCada100VN) * 100, 2)
@@ -1995,7 +1995,7 @@ function DetalleSubTab({
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Precio dirty</div>
+              <div className="text-[13px] text-muted-foreground">Precio dirty</div>
               <div className="mono mt-1 text-lg">
                 {resultado.precioDirty != null ? "$ " + fmtNum(resultado.precioDirty, 4) : "—"}
               </div>
@@ -2008,19 +2008,19 @@ function DetalleSubTab({
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Duration (nominal)</div>
+              <div className="text-[13px] text-muted-foreground">Duration (nominal)</div>
               <div className="mono mt-1 text-lg">
                 {resultado.durationMacaulay != null ? fmtNum(resultado.durationMacaulay, 3) : "—"}
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Macaulay duration</div>
+              <div className="text-[13px] text-muted-foreground">Macaulay duration</div>
               <div className="mono mt-1 text-lg">
                 {resultado.durationMacaulay != null ? fmtNum(resultado.durationMacaulay, 3) : "—"}
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Duration Mod.</div>
+              <div className="text-[13px] text-muted-foreground">Duration Mod.</div>
               <div className="mono mt-1 text-lg">
                 {resultado.durationModificada != null
                   ? fmtNum(resultado.durationModificada, 3) + " a"
@@ -2028,29 +2028,29 @@ function DetalleSubTab({
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Convexidad</div>
+              <div className="text-[13px] text-muted-foreground">Convexidad</div>
               <div className="mono mt-1 text-lg">
                 {resultado.convexity != null ? fmtNum(resultado.convexity, 3) : "—"}
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Precio Técnico</div>
+              <div className="text-[13px] text-muted-foreground">Precio Técnico</div>
               <div className="mono mt-1">{fmtNum(resultado.precioTecnico, 4)}</div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Valor técnico</div>
+              <div className="text-[13px] text-muted-foreground">Valor técnico</div>
               <div className="mono mt-1">{fmtNum(resultado.precioTecnico, 4)}</div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Intereses acumulados</div>
+              <div className="text-[13px] text-muted-foreground">Intereses acumulados</div>
               <div className="mono mt-1">{resultado.interesesCorridos != null ? fmtNum(resultado.interesesCorridos, 4) : "—"}</div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Días al Vto.</div>
+              <div className="text-[13px] text-muted-foreground">Días al Vto.</div>
               <div className="mono mt-1">{fmtNum(resultado.diasAlVencimiento, 0)} d</div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="text-[10px] text-muted-foreground">Vencimiento</div>
+              <div className="text-[13px] text-muted-foreground">Vencimiento</div>
               <div className="mono mt-1">{formatearFecha(resultado.vencimiento)}</div>
             </div>
           </div>
@@ -2065,7 +2065,7 @@ function DetalleSubTab({
               <button
                 key={r}
                 onClick={() => setHistoricoRange(r)}
-                className={`mono rounded-md px-2 py-1 text-[10px] transition-colors ${
+                className={`mono rounded-md px-2 py-1 text-[13px] transition-colors ${
                   historicoRange === r
                     ? "bg-primary/20 text-primary border border-primary/40"
                     : "text-muted-foreground border border-border/40 hover:text-foreground"
@@ -2177,7 +2177,7 @@ function DetalleSubTab({
               interpretacion = "La TIR se mantiene en rangos normales para el período analizado.";
             }
             return (
-              <div className="rounded-lg border border-border/40 bg-muted/10 p-3 text-[11px] text-muted-foreground leading-relaxed">
+              <div className="rounded-lg border border-border/40 bg-muted/10 p-3 text-[14px] text-muted-foreground leading-relaxed">
                 <span className="font-medium text-foreground">Interpretación: </span>
                 {interpretacion}
               </div>
@@ -2261,7 +2261,7 @@ function PortafolioSubTab({
     <div className="space-y-4">
       <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
         <div className="text-sm font-medium">Cartera de bonos</div>
-        <p className="mt-1 text-[11px] text-muted-foreground">
+        <p className="mt-1 text-[14px] text-muted-foreground">
           Agregá posiciones, buscá instrumentos en IOL y calculá métricas del portafolio.
         </p>
 
@@ -2290,7 +2290,7 @@ function PortafolioSubTab({
 
         {/* Quick-add suggested bonds */}
         <div className="mt-3">
-          <div className="mono mb-2 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          <div className="mono mb-2 text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
             Bonos disponibles
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -2312,7 +2312,7 @@ function PortafolioSubTab({
                     ]);
                   }
                 }}
-                className="font-mono text-[10px] px-2 py-1 rounded border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+                className="font-mono text-[13px] px-2 py-1 rounded border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
               >
                 {b.ticker}
               </button>
@@ -2333,7 +2333,7 @@ function PortafolioSubTab({
                   >
                     <div>
                       <div className="font-medium">{inst.ticker}</div>
-                      <div className="text-[10px] text-muted-foreground">{inst.descripcion}</div>
+                      <div className="text-[13px] text-muted-foreground">{inst.descripcion}</div>
                     </div>
                     <button
                       onClick={() =>
@@ -2343,7 +2343,7 @@ function PortafolioSubTab({
                           precio: inst.ultimoPrecio?.toString() || "",
                         })
                       }
-                      className="rounded-md bg-muted/40 px-2 py-1 text-[11px] hover:bg-muted/60"
+                      className="rounded-md bg-muted/40 px-2 py-1 text-[14px] hover:bg-muted/60"
                     >
                       Agregar
                     </button>
@@ -2362,7 +2362,7 @@ function PortafolioSubTab({
         ) : (
           <div className="mt-3 overflow-x-auto">
             <table className="mono w-full text-xs">
-              <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
                 <tr className="border-b border-border/60">
                   <th className="px-2 py-2 text-left">Ticker</th>
                   <th className="px-2 py-2 text-right">Cantidad</th>
@@ -2377,7 +2377,7 @@ function PortafolioSubTab({
                   <tr key={p.ticker} className="border-b border-border/30">
                     <td className="px-2 py-2 font-medium group relative">
                       {p.ticker}
-                      <span className="invisible group-hover:visible absolute left-0 top-full z-10 mt-1 w-64 rounded border border-border/60 bg-surface p-2 text-[10px] text-muted-foreground shadow-lg">
+                      <span className="invisible group-hover:visible absolute left-0 top-full z-10 mt-1 w-64 rounded border border-border/60 bg-surface p-2 text-[13px] text-muted-foreground shadow-lg">
                         {BONOS_DB[p.ticker]?.descripcion ?? "Sin descripción"}
                       </span>
                     </td>
@@ -2397,7 +2397,7 @@ function PortafolioSubTab({
                             ),
                           );
                         }}
-                        className="w-14 rounded border border-border/40 bg-input px-1 py-0.5 text-right text-[11px] font-mono"
+                        className="w-14 rounded border border-border/40 bg-input px-1 py-0.5 text-right text-[14px] font-mono"
                       />
                     </td>
                     <td className="px-2 py-2 text-right">
@@ -2416,7 +2416,7 @@ function PortafolioSubTab({
                             ),
                           );
                         }}
-                        className="w-16 rounded border border-border/40 bg-input px-1 py-0.5 text-right text-[11px] font-mono"
+                        className="w-16 rounded border border-border/40 bg-input px-1 py-0.5 text-right text-[14px] font-mono"
                       />
                     </td>
                     <td className="px-2 py-2 text-right">
@@ -2435,7 +2435,7 @@ function PortafolioSubTab({
                             ),
                           );
                         }}
-                        className="w-16 rounded border border-border/40 bg-input px-1 py-0.5 text-right text-[11px] font-mono"
+                        className="w-16 rounded border border-border/40 bg-input px-1 py-0.5 text-right text-[14px] font-mono"
                       />
                     </td>
                     <td className="px-2 py-2 text-right font-semibold">{fmtNum(p.total, 2)}</td>
@@ -2475,7 +2475,7 @@ function PortafolioSubTab({
           <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <div>
-                <div className="text-[10px] text-muted-foreground">TIR Ponderada</div>
+                <div className="text-[13px] text-muted-foreground">TIR Ponderada</div>
                 <div
                   className={`mono mt-1 text-lg font-medium ${colorPorTIR(resultado.metricas.tirPonderadaUSD)}`}
                 >
@@ -2485,7 +2485,7 @@ function PortafolioSubTab({
                 </div>
               </div>
               <div>
-                <div className="text-[10px] text-muted-foreground">Total USD</div>
+                <div className="text-[13px] text-muted-foreground">Total USD</div>
                 <div className="mono mt-1 text-lg">
                   USD{" "}
                   {resultado.metricas.totalUSD != null
@@ -2494,7 +2494,7 @@ function PortafolioSubTab({
                 </div>
               </div>
               <div>
-                <div className="text-[10px] text-muted-foreground">Duration Ponderada</div>
+                <div className="text-[13px] text-muted-foreground">Duration Ponderada</div>
                 <div className="mono mt-1 text-lg">
                   {resultado.metricas.durationPonderada != null
                     ? fmtNum(resultado.metricas.durationPonderada, 2) + " a"
@@ -2502,7 +2502,7 @@ function PortafolioSubTab({
                 </div>
               </div>
               <div>
-                <div className="text-[10px] text-muted-foreground">Con TIR</div>
+                <div className="text-[13px] text-muted-foreground">Con TIR</div>
                 <div className="mono mt-1 text-lg">
                   {(resultado.metricas.pctConTir * 100).toFixed(0)}%
                 </div>
@@ -2510,14 +2510,14 @@ function PortafolioSubTab({
             </div>
             {resultado.composicion.porTipo.length > 0 && (
               <div className="mt-3">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+                <div className="text-[13px] uppercase tracking-wider text-muted-foreground mb-2">
                   Composición por tipo
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {resultado.composicion.porTipo.map((c) => (
                     <span
                       key={c.nombre}
-                      className={`inline-block rounded-md border px-2 py-1 text-[10px] ${badgeTipoBono(c.nombre as TipoBono)}`}
+                      className={`inline-block rounded-md border px-2 py-1 text-[13px] ${badgeTipoBono(c.nombre as TipoBono)}`}
                     >
                       {c.nombre}: {c.pct.toFixed(1)}%
                     </span>
@@ -2527,14 +2527,14 @@ function PortafolioSubTab({
             )}
             {resultado.composicion.porMoneda.length > 0 && (
               <div className="mt-2">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                <div className="text-[13px] uppercase tracking-wider text-muted-foreground mb-1">
                   Por moneda
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {resultado.composicion.porMoneda.map((c) => (
                     <span
                       key={c.moneda}
-                      className="inline-block rounded-md border border-border/40 bg-muted/20 px-2 py-0.5 text-[10px]"
+                      className="inline-block rounded-md border border-border/40 bg-muted/20 px-2 py-0.5 text-[13px]"
                     >
                       {c.moneda}: {c.pct.toFixed(1)}%
                     </span>
@@ -2549,12 +2549,12 @@ function PortafolioSubTab({
 
           {/* Enhanced metrics */}
           <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-            <div className="mono mb-2 text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+            <div className="mono mb-2 text-[13px] uppercase tracking-[0.15em] text-muted-foreground">
               Métricas de cartera de bonos
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div className="rounded-md border border-border/40 bg-muted/20 p-2.5">
-                <div className="text-[9px] text-muted-foreground">TIR Cartera</div>
+                <div className="text-[13px] text-muted-foreground">TIR Cartera</div>
                 <div
                   className={`mono mt-0.5 text-base font-medium ${colorPorTIR(resultado.metricas.tirPonderadaUSD)}`}
                 >
@@ -2564,7 +2564,7 @@ function PortafolioSubTab({
                 </div>
               </div>
               <div className="rounded-md border border-border/40 bg-muted/20 p-2.5">
-                <div className="text-[9px] text-muted-foreground">MOD Duration</div>
+                <div className="text-[13px] text-muted-foreground">MOD Duration</div>
                 <div className="mono mt-0.5 text-base font-medium">
                   {resultado.metricas.durationPonderada != null
                     ? fmtNum(
@@ -2576,7 +2576,7 @@ function PortafolioSubTab({
                 </div>
               </div>
               <div className="rounded-md border border-border/40 bg-muted/20 p-2.5">
-                <div className="text-[9px] text-muted-foreground">Convexity</div>
+                <div className="text-[13px] text-muted-foreground">Convexity</div>
                 <div className="mono mt-0.5 text-base font-medium">
                   {resultado.metricas.durationPonderada != null
                     ? fmtNum(Math.pow(resultado.metricas.durationPonderada, 2) * 1.5, 2)
@@ -2584,7 +2584,7 @@ function PortafolioSubTab({
                 </div>
               </div>
               <div className="rounded-md border border-border/40 bg-muted/20 p-2.5">
-                <div className="text-[9px] text-muted-foreground">DV01</div>
+                <div className="text-[13px] text-muted-foreground">DV01</div>
                 <div className="mono mt-0.5 text-base font-medium">
                   USD{" "}
                   {resultado.metricas.durationPonderada != null &&
@@ -2638,7 +2638,7 @@ function FlujoPorMes({
 
   return (
     <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-      <div className="mono mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="mono mb-2 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
         Flujo de fondos proyectado por mes
       </div>
       <div className="h-48">
@@ -2717,7 +2717,7 @@ function CalendarioPagos({
   return (
     <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
       <div className="flex items-center justify-between mb-3">
-        <div className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+        <div className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
           Calendario de pagos de rentas y amortizaciones
         </div>
         <button
@@ -2738,14 +2738,14 @@ function CalendarioPagos({
             a.click();
             URL.revokeObjectURL(url);
           }}
-          className="mono rounded-md border border-border/60 bg-muted/30 px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground"
+          className="mono rounded-md border border-border/60 bg-muted/30 px-2 py-1 text-[13px] text-muted-foreground hover:text-foreground"
         >
           Descargar
         </button>
       </div>
       <div className="overflow-x-auto max-h-80 overflow-y-auto">
         <table className="mono w-full text-xs">
-          <thead className="text-[10px] uppercase tracking-wider text-muted-foreground sticky top-0 bg-background/40">
+          <thead className="text-[13px] uppercase tracking-wider text-muted-foreground sticky top-0 bg-background/40">
             <tr className="border-b border-border/60">
               <th className="px-2 py-2 text-left">Instrumento</th>
               <th className="px-2 py-2 text-left">Tipo de pago</th>
@@ -2760,7 +2760,7 @@ function CalendarioPagos({
                 <td className="px-2 py-2 font-medium">{r.ticker}</td>
                 <td className="px-2 py-2">
                   <span
-                    className={`inline-block rounded px-1 py-0.5 text-[9px] ${r.esAmort ? "bg-yellow-900/30 text-yellow-300" : "bg-green-900/30 text-green-300"}`}
+                    className={`inline-block rounded px-1 py-0.5 text-[13px] ${r.esAmort ? "bg-yellow-900/30 text-yellow-300" : "bg-green-900/30 text-green-300"}`}
                   >
                     {r.esAmort ? "Amortización" : "Renta"}
                   </span>
@@ -2770,7 +2770,7 @@ function CalendarioPagos({
                   {r.moneda === "USD" ? "USD " : "$ "}
                   {fmtNum(r.monto, 2)}
                 </td>
-                <td className="px-2 py-2 text-right text-[10px]">{formatearFecha(r.fecha)}</td>
+                <td className="px-2 py-2 text-right text-[13px]">{formatearFecha(r.fecha)}</td>
               </tr>
             ))}
             <tr className="border-t border-border/60 font-medium bg-muted/10">
@@ -2816,8 +2816,8 @@ const COMPARE_COLORS = [
 function ChartTooltipContent({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-border/60 bg-surface px-3 py-2 text-[11px] shadow-lg">
-      <div className="mb-1 text-[10px] text-muted-foreground">{label}</div>
+    <div className="rounded-lg border border-border/60 bg-surface px-3 py-2 text-[14px] shadow-lg">
+      <div className="mb-1 text-[13px] text-muted-foreground">{label}</div>
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: p.color }} />
@@ -2912,7 +2912,7 @@ function HistoricoSubTab({
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-5">
         <div>
-          <label className="mono text-[11px] text-muted-foreground">Bono</label>
+          <label className="mono text-[14px] text-muted-foreground">Bono</label>
           <select
             value={ticker}
             onChange={(e) => {
@@ -2930,7 +2930,7 @@ function HistoricoSubTab({
           </select>
         </div>
         <div>
-          <label className="mono text-[11px] text-muted-foreground">Comparar con</label>
+          <label className="mono text-[14px] text-muted-foreground">Comparar con</label>
           <select
             value=""
             onChange={(e) => {
@@ -2950,7 +2950,7 @@ function HistoricoSubTab({
               {compareTickers.map((t, i) => (
                 <span
                   key={t}
-                  className="inline-flex items-center gap-1 font-mono text-[10px] px-1.5 py-0.5 rounded border"
+                  className="inline-flex items-center gap-1 font-mono text-[13px] px-1.5 py-0.5 rounded border"
                   style={{ borderColor: COMPARE_COLORS[i % COMPARE_COLORS.length] }}
                 >
                   <span
@@ -2970,7 +2970,7 @@ function HistoricoSubTab({
           )}
         </div>
         <div>
-          <label className="mono text-[11px] text-muted-foreground">Desde</label>
+          <label className="mono text-[14px] text-muted-foreground">Desde</label>
           <input
             type="date"
             value={desde}
@@ -2979,7 +2979,7 @@ function HistoricoSubTab({
           />
         </div>
         <div>
-          <label className="mono text-[11px] text-muted-foreground">Hasta</label>
+          <label className="mono text-[14px] text-muted-foreground">Hasta</label>
           <input
             type="date"
             value={hasta}
@@ -3019,7 +3019,7 @@ function HistoricoSubTab({
               {/* TIR Chart */}
               <div className="glass p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <div className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                     Evolución TIR
                   </div>
                 </div>
@@ -3083,7 +3083,7 @@ function HistoricoSubTab({
                     </ComposedChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[9px] text-muted-foreground">
+                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
                   <span>
                     <span className="inline-block h-2 w-2 rounded-sm bg-[#10b981] mr-1" />
                     {ticker}
@@ -3107,7 +3107,7 @@ function HistoricoSubTab({
               {/* Paridad Chart */}
               <div className="glass p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <div className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                     Evolución Paridad
                   </div>
                 </div>
@@ -3171,7 +3171,7 @@ function HistoricoSubTab({
                     </ComposedChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[9px] text-muted-foreground">
+                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
                   <span>
                     <span className="inline-block h-2 w-2 rounded-sm bg-[#a855f7] mr-1" />
                     {ticker}
@@ -3193,11 +3193,11 @@ function HistoricoSubTab({
               </div>
 
               <div className="glass overflow-x-auto p-4">
-                <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                   Estadísticas del período
                 </div>
                 <table className="mono w-full text-xs">
-                  <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
                     <tr className="border-b border-border/60">
                       <th className="px-2 py-2 text-left">Métrica</th>
                       <th className="px-2 py-2 text-right">{ticker}</th>
@@ -3267,7 +3267,7 @@ function HistoricoSubTab({
   );
 }
 
-// ─── Títulos Públicos ──────────────────────────────────────────────────
+//  Títulos Públicos 
 
 interface TitulosPublicosSubTabProps {
   data: IOLCotizacion[];
@@ -3294,7 +3294,7 @@ function TitulosPublicosSubTab({
         <div>
           <div className="text-sm font-medium">Títulos Públicos</div>
           {data.length > 0 && (
-            <p className="text-[10px] text-muted-foreground mt-0.5">
+            <p className="text-[13px] text-muted-foreground mt-0.5">
               {data.length} títulos públicos cotizados en IOL
             </p>
           )}
@@ -3302,7 +3302,7 @@ function TitulosPublicosSubTab({
         <button
           onClick={onRefresh}
           disabled={loading}
-          className="mono rounded-md border border-border/60 bg-muted/30 px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-50"
+          className="mono rounded-md border border-border/60 bg-muted/30 px-2 py-1 text-[14px] text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           {loading ? "Cargando…" : "Actualizar"}
         </button>
@@ -3315,7 +3315,7 @@ function TitulosPublicosSubTab({
       ) : (
         <div className="overflow-x-auto">
           <table className="mono w-full text-xs">
-            <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
               <tr className="border-b border-border/60">
                 <th className="px-2 py-2 text-left">Símbolo</th>
                 <th className="px-2 py-2 text-left">Nombre</th>
@@ -3374,7 +3374,7 @@ function TitulosPublicosSubTab({
   );
 }
 
-// ─── Dashboard Diario ─────────────────────────────────────────────────────
+//  Dashboard Diario 
 
 interface DashboardDiarioSubTabProps {
   data: DashboardRow[];
@@ -3425,7 +3425,7 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
         onClick={() => toggleSort(sk)}
       >
         {label}
-        {active && <span className="ml-0.5">{sortDir === "asc" ? "▲" : "▼"}</span>}
+        {active && <span className="ml-0.5">{sortDir === "asc" ? "" : ""}</span>}
       </th>
     );
   }
@@ -3437,11 +3437,11 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
         <div className="flex items-center gap-2 text-sm font-medium">
           <span>{icon}</span>
           <span>{title}</span>
-          <span className="text-[10px] text-muted-foreground font-normal">{rows.length} instrumentos</span>
+          <span className="text-[13px] text-muted-foreground font-normal">{rows.length} instrumentos</span>
         </div>
         <div className="overflow-x-auto">
-          <table className="mono w-full text-[11px]">
-            <thead className="text-[9px] uppercase tracking-wider text-muted-foreground">
+          <table className="mono w-full text-[14px]">
+            <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
               <tr className="border-b border-border/60">
                 <SortableHeader label="Ticker" sortKey="ticker" className="text-left" />
                 <SortableHeader label="Vencimiento" sortKey="vencimiento" className="text-left" />
@@ -3472,7 +3472,7 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
                     <td className="px-2 py-2 font-semibold text-foreground">{row.ticker}</td>
                     <td className="px-2 py-2 text-muted-foreground">{row.vencimiento}</td>
                     <td className="px-2 py-2">
-                      <span className={`rounded px-1 py-0.5 text-[9px] font-medium ${
+                      <span className={`rounded px-1 py-0.5 text-[13px] font-medium ${
                         row.emisor === "BCRA" ? "bg-blue-900/30 text-blue-300" : "bg-amber-900/30 text-amber-300"
                       }`}>
                         {row.emisor}
@@ -3500,12 +3500,12 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
                       {row.variacion != null ? `${row.variacion >= 0 ? "+" : ""}${row.variacion.toFixed(2)}%` : "\u2014"}
                     </td>
                     <td className="px-2 py-2 text-right">
-                      <span className="text-[10px]">{row.moneda}</span> {row.outstanding != null ? fmtNum(row.outstanding, 2) : "\u2014"}
+                      <span className="text-[13px]">{row.moneda}</span> {row.outstanding != null ? fmtNum(row.outstanding, 2) : "\u2014"}
                     </td>
                     <td className={`px-2 py-2 text-right ${currYield != null ? colorPorTIR(currYield / 100) : "text-muted-foreground"}`}>
                       {currYield != null ? fmtPct(currYield, 2) : "\u2014"}
                     </td>
-                    <td className="px-2 py-2 text-[10px] text-muted-foreground max-w-[120px] truncate" title={row.isin}>
+                    <td className="px-2 py-2 text-[13px] text-muted-foreground max-w-[120px] truncate" title={row.isin}>
                       {row.isin || "\u2014"}
                     </td>
                     <td className="px-2 py-2 text-center">
@@ -3530,7 +3530,7 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
       <div className="flex items-center justify-between">
         <div>
           <div className="text-sm font-medium">Dashboard Diario — Renta Fija</div>
-          <p className="text-[10px] text-muted-foreground mt-0.5">
+          <p className="text-[13px] text-muted-foreground mt-0.5">
             Soberanos y Bopreales en Moneda Extranjera · Fuente: Refinitiv Eikon
             {data.length > 0 && (
               <span className="ml-2">{iolCount > 0 ? `· ${iolCount} cotizaciones IOL` : "· cotizaciones de referencia"}</span>
@@ -3540,7 +3540,7 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
         <button
           onClick={onRefresh}
           disabled={loading}
-          className="mono rounded-md border border-border/60 bg-muted/30 px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-50"
+          className="mono rounded-md border border-border/60 bg-muted/30 px-2 py-1 text-[14px] text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           {loading ? "Cargando…" : "Actualizar"}
         </button>

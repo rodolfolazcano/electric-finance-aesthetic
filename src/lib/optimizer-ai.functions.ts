@@ -222,7 +222,7 @@ export const detectarTickersPortafolio = createServerFn({ method: "POST" })
     const unknown = new Set<string>();
     const seen = new Set<string>();
 
-    // ── Pase 1: líneas típicas de IOL "TOKEN\n(pct%) | Descripción\nQTY"
+    //  Pase 1: líneas típicas de IOL "TOKEN\n(pct%) | Descripción\nQTY"
     const lineRe =
       /\b([A-Z][A-Z0-9]{1,7})\s*\n\s*\([0-9][0-9.,]*%\)\s*\|\s*([^\n]*)\n\s*([0-9][0-9.,]*)/g;
     let m: RegExpExecArray | null;
@@ -242,7 +242,7 @@ export const detectarTickersPortafolio = createServerFn({ method: "POST" })
       }
     }
 
-    // ── Pase 2: líneas del tipo "PAMP 74" / "AMZN 209 1,20%" (ticker + cantidad)
+    //  Pase 2: líneas del tipo "PAMP 74" / "AMZN 209 1,20%" (ticker + cantidad)
     const qtyLineRe = /^\s*([A-Z][A-Z0-9]{1,7})(?:\.[A-Z]{2,4})?\s+([0-9][0-9.,]*)\b.*$/gm;
     let q: RegExpExecArray | null;
     while ((q = qtyLineRe.exec(upper)) !== null) {
@@ -257,7 +257,7 @@ export const detectarTickersPortafolio = createServerFn({ method: "POST" })
       }
     }
 
-    // ── Pase 3: tokens sueltos (listas separadas por coma/espacio)
+    //  Pase 3: tokens sueltos (listas separadas por coma/espacio)
     const tokenRe = /(?<![A-Z0-9.])([A-Z][A-Z0-9]{1,7})(?:\.[A-Z]{2,4})?(?![A-Z0-9.])/g;
     let t: RegExpExecArray | null;
     while ((t = tokenRe.exec(upper)) !== null) {

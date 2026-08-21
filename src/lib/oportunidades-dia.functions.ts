@@ -15,7 +15,7 @@ import { getNoticiasPorTicker } from "./news-scoring.functions";
 import type { IntermarketResult } from "./intermarket-analysis.functions";
 
 
-// ─── Yahoo Finance 2 — mismo método que tab Análisis Fundamental y tab Sectores ───
+//  Yahoo Finance 2 — mismo método que tab Análisis Fundamental y tab Sectores 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _yf: any = null;
@@ -46,7 +46,7 @@ function num(v: unknown): number | null {
   return null;
 }
 
-// ─── Resolver símbolo IOL → Yahoo Finance ──────────────────────
+//  Resolver símbolo IOL → Yahoo Finance 
 
 async function yahooResolve(query: string): Promise<string | null> {
   try {
@@ -87,7 +87,7 @@ function resolverSimboloYahoo(item: PanelItem): string {
   }
 }
 
-// ─── Tipos de salida extendidos ────────────────────────────────
+//  Tipos de salida extendidos 
 
 export interface OportunidadItem {
   ticker: string;
@@ -152,7 +152,7 @@ export interface OportunidadesResult {
 
 const BATCH_SIZE = 5;
 
-// ─── Fetch fundamental con yahoo-finance2 ──────────────────────
+//  Fetch fundamental con yahoo-finance2 
 
 interface FundData {
   pe: number | null;
@@ -213,7 +213,7 @@ async function yahooFundamentals(ticker: string): Promise<FundData | null> {
   }
 }
 
-// ─── Fetch chart con unified history cache ────────────────────
+//  Fetch chart con unified history cache 
 
 import { getHistory } from "./history-cache.server";
 
@@ -226,7 +226,7 @@ async function fetchHistory(ticker: string, days: number): Promise<ChartPoint[]>
   }
 }
 
-// ─── Estadísticos ─────────────────────────────────────────────
+//  Estadísticos 
 
 async function computeZScore(closes: number[], window = 20): Promise<number> {
   if (closes.length < window) return 0;
@@ -265,7 +265,7 @@ function computeBeta(
   return { beta: Math.round(beta * 10000) / 10000, r2: Math.round(r2 * 10000) / 10000 };
 }
 
-// ─── CAPA A: Score técnico/estadístico ─────────────────────────
+//  CAPA A: Score técnico/estadístico 
 
 function scoreTecnico(zscore: number, volRel: number): { score: number; detalle: string } {
   let score = 0;
@@ -288,7 +288,7 @@ function scoreTecnico(zscore: number, volRel: number): { score: number; detalle:
   };
 }
 
-// ─── CAPA B: Score sectorial/Intermarket ───────────────────────
+//  CAPA B: Score sectorial/Intermarket 
 
 function scoreSectorial(
   sector: string | null,
@@ -325,7 +325,7 @@ function scoreSectorial(
   }
 }
 
-// ─── CAPA C: Score fundamental ─────────────────────────────────
+//  CAPA C: Score fundamental 
 
 function scoreFundamental(fund: FundData | null): { score: number; detalle: string; esEspeculativo: boolean; requiereRevision: boolean } {
   if (!fund) return { score: 0, detalle: "Sin datos fundamentales", esEspeculativo: false, requiereRevision: false };
@@ -406,7 +406,7 @@ function scoreFundamental(fund: FundData | null): { score: number; detalle: stri
   };
 }
 
-// ─── CAPA D: Score de noticias ─────────────────────────────────
+//  CAPA D: Score de noticias 
 
 function scoreNoticiasLayer(sn: ScoreNoticias | null): { score: number; detalle: string } {
   if (!sn) return { score: 0, detalle: "Sin evaluación de noticias" };
@@ -416,7 +416,7 @@ function scoreNoticiasLayer(sn: ScoreNoticias | null): { score: number; detalle:
   };
 }
 
-// ─── Computar retornos diarios ─────────────────────────────────
+//  Computar retornos diarios 
 
 function dailyReturns(prices: number[]): number[] {
   const rets: number[] = [];
@@ -426,7 +426,7 @@ function dailyReturns(prices: number[]): number[] {
   return rets;
 }
 
-// ─── Evaluar fork renta fija ───────────────────────────────────
+//  Evaluar fork renta fija 
 
 function evaluarForkRentaFija(intermarket: IntermarketResult | null): {
   activo: boolean;
@@ -472,7 +472,7 @@ function evaluarForkRentaFija(intermarket: IntermarketResult | null): {
   };
 }
 
-// ─── ProcessTicker extendido ───────────────────────────────────
+//  ProcessTicker extendido 
 
 async function processTicker(
   item: PanelItem,
@@ -515,19 +515,19 @@ async function processTicker(
     const signal = Math.abs(zscore) > 1.5 || Math.abs(variacion) > 2 * volRel;
     if (!signal && Math.abs(variacion) < 0.3) return null;
 
-    // ─── CAPA A: Técnico ───
+    //  CAPA A: Técnico 
     const capaA = scoreTecnico(zscore, volRel);
 
-    // ─── CAPA B: Sectorial ───
+    //  CAPA B: Sectorial 
     const capaB = scoreSectorial(fund?.sector ?? null, sectoresFav, regimenActual);
 
-    // ─── CAPA C: Fundamental ───
+    //  CAPA C: Fundamental 
     const capaC = scoreFundamental(fund);
 
-    // ─── CAPA D: Noticias (simplificado, sin fetch adicional por rendimiento en batch) ───
+    //  CAPA D: Noticias (simplificado, sin fetch adicional por rendimiento en batch) 
     const capaD = { score: 0, detalle: "Score de noticias disponible al expandir" };
 
-    // ─── CAPA E: Beta ───
+    //  CAPA E: Beta 
     let beta: number | null = null;
     let benchmarkUsado: string | null = null;
     if (sp500Returns && histData.length > 20) {
@@ -537,14 +537,14 @@ async function processTicker(
       if (beta != null) benchmarkUsado = "SPY";
     }
 
-    // ─── Score final ───
+    //  Score final 
     const scoreA = capaA.score;
     const scoreB = capaB.favorabilidad ? (capaB.score * (intermarket?.lecturaIntermarket.confianza ?? 50) / 100) : 0;
     const scoreC = capaC.score;
     const scoreD = capaD.score;
     const scoreFinal = Math.round((scoreA + scoreB + scoreC + scoreD) * 10) / 10;
 
-    // ─── Justificación compuesta ───
+    //  Justificación compuesta 
     const partes: string[] = [
       `${item.simbolo}: ${variacion >= 0 ? "+" : ""}${variacion.toFixed(2)}% ${periodo === "mes" ? "en el mes" : "en la rueda"}`,
       `vol ${volRel.toFixed(1)}x, Z ${zscore.toFixed(2)}`,
@@ -606,7 +606,7 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
   return chunks;
 }
 
-// ─── Server function principal ─────────────────────────────────
+//  Server function principal 
 
 export const getOportunidadesDelDia = createServerFn({ method: "GET" })
   .validator(

@@ -185,6 +185,46 @@ export async function fetchYahooSearch(query: string): Promise<YahooSearchResult
   }
 }
 
+export interface YahooNewsItem {
+  uuid: string;
+  title: string;
+  publisher: string;
+  link: string;
+  summary: string;
+  relatedTickers: string[];
+  providerPublishTime: number;
+  type: string;
+}
+
+export async function fetchYahooSearchNews(query: string, newsCount = 5): Promise<YahooNewsItem[]> {
+  try {
+    const session = await getYahooSession();
+    const params = new URLSearchParams({
+      q: query,
+      newsCount: String(newsCount),
+      crumb: session.crumb,
+      corsDomain: "finance.yahoo.com",
+    });
+    const url = `https://query1.finance.yahoo.com/v1/finance/search?${params}`;
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": YAHOO_UA,
+        Accept: "application/json",
+        ...(session.cookie ? { Cookie: session.cookie } : {}),
+      },
+    });
+    if (res.status === 401) {
+      sessionCache = null;
+      return fetchYahooSearchNews(query, newsCount);
+    }
+    if (!res.ok) return [];
+    const json = await res.json();
+    return (json.news ?? []) as YahooNewsItem[];
+  } catch {
+    return [];
+  }
+}
+
 export function yahooHeaders(): HeadersInit {
   return { "User-Agent": YAHOO_UA, Accept: "application/json" };
 }

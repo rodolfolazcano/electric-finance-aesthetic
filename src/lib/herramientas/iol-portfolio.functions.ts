@@ -95,7 +95,7 @@ export const getIOLPortafolio = createServerFn({ method: "POST" })
     return iolFetch<IOLPortfolioItem[]>(url, data.token, data.refreshToken);
   });
 
-// ─── IOL Portfolio real API shape ────────────────────────────────────
+//  IOL Portfolio real API shape 
 
 export interface IOLTitulo {
   simbolo: string;
@@ -126,7 +126,7 @@ export interface IOLPortfolioRaw {
   activos: IOLActivo[];
 }
 
-// ─── IOL CAPM Result types ───────────────────────────────────────────
+//  IOL CAPM Result types 
 
 export interface IOLCapmAssetRow {
   simbolo: string;
@@ -180,7 +180,7 @@ export interface IOLCapmResult {
   warning?: string;
 }
 
-// ─── IOL CAPM Analysis ───────────────────────────────────────────────
+//  IOL CAPM Analysis 
 
 export const getIOLCapm = createServerFn({ method: "POST" })
   .inputValidator(
@@ -745,7 +745,7 @@ export const getIOLCapm = createServerFn({ method: "POST" })
     };
   });
 
-// ─── Yahoo Finance helper (same pattern as capm.functions) ────────────
+//  Yahoo Finance helper (same pattern as capm.functions) 
 
 let _yf: any = null;
 async function getYF(): Promise<any> {
@@ -791,7 +791,7 @@ export const getIOLEstadoCuenta = createServerFn({ method: "POST" })
     return iolFetch<EstadoCuenta>(url, data.token, data.refreshToken);
   });
 
-// ─── Operaciones (Asesor) ─────────────────────────────────────────────────
+//  Operaciones (Asesor) 
 
 export interface IOLOperacion {
   numero: number;

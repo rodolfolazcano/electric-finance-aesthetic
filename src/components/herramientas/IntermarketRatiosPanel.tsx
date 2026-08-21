@@ -1,15 +1,10 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import {
-  getIntermarketRatios,
-  type RatioSignal,
-  type ArrowsPhase,
-} from "@/lib/sectores/internarket-ratios.functions";
+import { getIntermarketRatios, type RatioSignal, type ArrowsPhase } from "@/lib/sectores/internarket-ratios.functions";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -38,21 +33,16 @@ const SIGNAL_COLORS: Record<string, string> = {
 };
 
 const STAGE_CONFIG: Record<number, { color: string; bg: string; border: string }> = {
-  0: { color: "text-rose-400", bg: "bg-rose-500/10", border: "border-rose-500/30" },
-  1: { color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/30" },
+  0: { color: "text-rose-400",  bg: "bg-rose-500/10",    border: "border-rose-500/30" },
+  1: { color: "text-green-400", bg: "bg-green-500/10",   border: "border-green-500/30" },
   2: { color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30" },
-  3: { color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/30" },
-  4: { color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/30" },
-  5: { color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/30" },
+  3: { color: "text-amber-400", bg: "bg-amber-500/10",   border: "border-amber-500/30" },
+  4: { color: "text-orange-400", bg: "bg-orange-500/10",  border: "border-orange-500/30" },
+  5: { color: "text-red-400",   bg: "bg-red-500/10",     border: "border-red-500/30" },
 };
 
 const STAGE_ICONS: Record<number, string> = {
-  0: "🔴",
-  1: "🟢",
-  2: "🟢",
-  3: "🟡",
-  4: "🟠",
-  5: "🔴🔴",
+  0: "🔴", 1: "🟢", 2: "🟢", 3: "🟡", 4: "🟠", 5: "🔴🔴",
 };
 
 function TrendArrow({ trend }: { trend: string | null | undefined }) {
@@ -72,15 +62,11 @@ function fmtPctStr(n: number | null | undefined, dp = 1): string {
 }
 
 function ConfianzaBar({ nivel }: { nivel: number }) {
-  const color =
-    nivel >= 70 ? "bg-green-500" : nivel >= 40 ? "bg-yellow-500" : "bg-muted-foreground/30";
+  const color = nivel >= 70 ? "bg-green-500" : nivel >= 40 ? "bg-yellow-500" : "bg-muted-foreground/30";
   return (
     <div className="flex items-center gap-1.5">
       <div className="relative h-1.5 w-full max-w-[60px] rounded-full bg-border/30">
-        <div
-          className={cn("absolute left-0 top-0 h-full rounded-full", color)}
-          style={{ width: nivel + "%" }}
-        />
+        <div className={cn("absolute left-0 top-0 h-full rounded-full", color)} style={{ width: nivel + "%" }} />
       </div>
       <span className="text-[9px] font-mono text-muted-foreground">{nivel}%</span>
     </div>
@@ -96,83 +82,45 @@ function RatioCard({ ratio }: { ratio: RatioSignal }) {
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <TrendArrow trend={ratio.trend} />
-          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-foreground">
-            {ratio.label}
-          </span>
+          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-foreground">{ratio.label}</span>
         </div>
         <span className={cn("rounded px-1.5 py-0.5 text-[8px] font-mono border", signalColor)}>
           {SIGNAL_LABELS[ratio.signal] ?? ratio.signal}
         </span>
       </div>
 
-      <div className="grid grid-cols-4 gap-2 mb-2">
+      <div className="grid w-full grid-cols-4 gap-2 mb-2">
         <div>
           <span className="text-[8px] font-mono text-muted-foreground block">Ratio</span>
           <span className="text-[11px] font-mono text-foreground">{fmtNum(ratio.ratioActual)}</span>
         </div>
         <div>
           <span className="text-[8px] font-mono text-muted-foreground block">1m</span>
-          <span
-            className={cn(
-              "text-[11px] font-mono",
-              (ratio.changePct1m ?? 0) > 0
-                ? "text-green-400"
-                : ratio.changePct1m != null && ratio.changePct1m < 0
-                  ? "text-red-400"
-                  : "text-muted-foreground",
-            )}
-          >
+          <span className={cn("text-[11px] font-mono", (ratio.changePct1m ?? 0) > 0 ? "text-green-400" : ratio.changePct1m != null && ratio.changePct1m < 0 ? "text-red-400" : "text-muted-foreground")}>
             {fmtPctStr(ratio.changePct1m)}
           </span>
         </div>
         <div>
           <span className="text-[8px] font-mono text-muted-foreground block">3m</span>
-          <span
-            className={cn(
-              "text-[11px] font-mono",
-              (ratio.changePct3m ?? 0) > 0
-                ? "text-green-400"
-                : ratio.changePct3m != null && ratio.changePct3m < 0
-                  ? "text-red-400"
-                  : "text-muted-foreground",
-            )}
-          >
+          <span className={cn("text-[11px] font-mono", (ratio.changePct3m ?? 0) > 0 ? "text-green-400" : ratio.changePct3m != null && ratio.changePct3m < 0 ? "text-red-400" : "text-muted-foreground")}>
             {fmtPctStr(ratio.changePct3m)}
           </span>
         </div>
         <div>
           <span className="text-[8px] font-mono text-muted-foreground block">Percentil</span>
-          <span
-            className={cn(
-              "text-[11px] font-mono",
-              ratio.percentil != null
-                ? ratio.percentil >= 90
-                  ? "text-red-400"
-                  : ratio.percentil >= 70
-                    ? "text-orange-400"
-                    : ratio.percentil <= 10
-                      ? "text-green-400"
-                      : "text-muted-foreground"
-                : "",
-            )}
-          >
+          <span className={cn("text-[11px] font-mono", ratio.percentil != null ? (ratio.percentil >= 90 ? "text-red-400" : ratio.percentil >= 70 ? "text-orange-400" : ratio.percentil <= 10 ? "text-green-400" : "text-muted-foreground") : "")}>
             {ratio.percentil != null ? `${ratio.percentil}%` : "\u2014"}
           </span>
         </div>
       </div>
 
-      <p className="text-[9px] text-muted-foreground/70 leading-relaxed mb-2">
-        {ratio.interpretacion}
-      </p>
+      <p className="text-[9px] text-muted-foreground/70 leading-relaxed mb-2">{ratio.interpretacion}</p>
 
       {ratio.sectoresFavorecidos.length > 0 && (
         <div className="flex flex-wrap gap-1">
           <span className="text-[8px] font-mono text-muted-foreground/50 mr-0.5">→</span>
           {ratio.sectoresFavorecidos.map((s) => (
-            <span
-              key={s}
-              className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20"
-            >
+            <span key={s} className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
               {s}
             </span>
           ))}
@@ -197,12 +145,8 @@ function ArrowsCard({ arrows }: { arrows: ArrowsPhase }) {
           <div className="flex items-center gap-2">
             <span className="text-2xl">{STAGE_ICONS[arrows.stage] ?? "◆"}</span>
             <div>
-              <span className={cn("text-sm font-bold font-mono tracking-wide", cfg.color)}>
-                {arrows.shortLabel}
-              </span>
-              <p className="text-[9px] text-muted-foreground/80 mt-0.5">
-                Pring 3-Arrows · Confianza {arrows.confianza}
-              </p>
+              <span className={cn("text-sm font-bold font-mono tracking-wide", cfg.color)}>{arrows.shortLabel}</span>
+              <p className="text-[9px] text-muted-foreground/80 mt-0.5">Pring 3-Arrows · Confianza {arrows.confianza}</p>
             </div>
           </div>
         </div>
@@ -219,36 +163,26 @@ function ArrowsCard({ arrows }: { arrows: ArrowsPhase }) {
             <div key={a.label} className="flex flex-col items-center gap-1">
               <TrendArrow trend={a.arrow} />
               <span className="text-[9px] font-mono text-muted-foreground">{a.label}</span>
-              <span className="text-[8px] font-mono text-muted-foreground/60">
-                {a.arrow ?? "—"}
-              </span>
+              <span className="text-[8px] font-mono text-muted-foreground/60">{a.arrow ?? "—"}</span>
             </div>
           ))}
         </div>
 
         {/* Buy / Sell */}
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid w-full gap-3 sm:grid-cols-2">
           <div>
-            <span className="text-[8px] font-mono uppercase tracking-wider text-green-400 block mb-1">
-              Comprar
-            </span>
+            <span className="text-[8px] font-mono uppercase tracking-wider text-green-400 block mb-1">Comprar</span>
             <ul className="space-y-0.5">
               {arrows.buy.map((item) => (
-                <li key={item} className="text-[9px] text-foreground/70 font-mono">
-                  {item}
-                </li>
+                <li key={item} className="text-[9px] text-foreground/70 font-mono">{item}</li>
               ))}
             </ul>
           </div>
           <div>
-            <span className="text-[8px] font-mono uppercase tracking-wider text-red-400 block mb-1">
-              Vender
-            </span>
+            <span className="text-[8px] font-mono uppercase tracking-wider text-red-400 block mb-1">Vender</span>
             <ul className="space-y-0.5">
               {arrows.sell.map((item) => (
-                <li key={item} className="text-[9px] text-foreground/70 font-mono">
-                  {item}
-                </li>
+                <li key={item} className="text-[9px] text-foreground/70 font-mono">{item}</li>
               ))}
             </ul>
           </div>
@@ -271,27 +205,17 @@ function PricingPowerSection() {
         Pricing Power & Backlogs (2026)
       </span>
       <p className="text-[9px] text-muted-foreground/70 leading-relaxed mb-3">
-        Empresas con backlogs plurianuales (contratos cerrados a 2–3 años) anulan el riesgo de
-        demanda. Sectores con pricing power — capacidad de trasladar inflación de costos sin perder
-        volumen — son claves en contextos inflacionarios. Buscar en infraestructura física (PAVE),
-        ingeniería nuclear (RARE), redes eléctricas, semiconductores y defensa (XAR).
+        Empresas con backlogs plurianuales (contratos cerrados a 2–3 años) anulan el riesgo de demanda.
+        Sectores con pricing power — capacidad de trasladar inflación de costos sin perder volumen —
+        son claves en contextos inflacionarios. Buscar en infraestructura física (PAVE), ingeniería nuclear (RARE),
+        redes eléctricas, semiconductores y defensa (XAR).
       </p>
       <div className="flex flex-wrap gap-2">
-        <span className="text-[8px] font-mono px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-          PAVE — Infraestructura
-        </span>
-        <span className="text-[8px] font-mono px-2 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
-          RARE — Uranio/Nuclear
-        </span>
-        <span className="text-[8px] font-mono px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-          XAR — Defensa
-        </span>
-        <span className="text-[8px] font-mono px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          SOXX — Semiconductores
-        </span>
-        <span className="text-[8px] font-mono px-2 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
-          XLU — Utilities (Redes)
-        </span>
+        <span className="text-[8px] font-mono px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">PAVE — Infraestructura</span>
+        <span className="text-[8px] font-mono px-2 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">RARE — Uranio/Nuclear</span>
+        <span className="text-[8px] font-mono px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">XAR — Defensa</span>
+        <span className="text-[8px] font-mono px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">SOXX — Semiconductores</span>
+        <span className="text-[8px] font-mono px-2 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">XLU — Utilities (Redes)</span>
       </div>
     </Card>
   );
@@ -314,10 +238,8 @@ export function IntermarketRatiosPanel() {
     return (
       <div className="space-y-3">
         <Skeleton className="h-8 w-48 rounded" />
-        <div className="grid gap-3 sm:grid-cols-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-40 w-full rounded-lg" />
-          ))}
+        <div className="grid w-full gap-3 sm:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-lg" />)}
         </div>
       </div>
     );
@@ -356,10 +278,8 @@ export function IntermarketRatiosPanel() {
 
       {solapa === "ratios" && (
         <>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {data.ratios.map((r) => (
-              <RatioCard key={r.ratioKey} ratio={r} />
-            ))}
+          <div className="grid w-full gap-3 sm:grid-cols-2">
+            {data.ratios.map((r) => <RatioCard key={r.ratioKey} ratio={r} />)}
           </div>
           <PricingPowerSection />
         </>

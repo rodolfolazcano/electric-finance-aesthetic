@@ -7,20 +7,20 @@ export interface BenchmarkEntry {
 }
 
 const ENTRIES: BenchmarkEntry[] = [
-  // ── Macro ────────────────────────────────────────────────────────
+  //  Macro 
   { ticker: "DX-Y.NYB", name: "Dólar Index (DXY)", cat: "Macro", sub: "Currency" },
   { ticker: "EURUSD=X", name: "Euro/Dólar", cat: "Macro", sub: "Currency" },
   { ticker: "^TNX", name: "Yield 10Y Tesoro", cat: "Macro", sub: "Rates" },
   { ticker: "^VIX", name: "Índice de Volatilidad (Miedo)", cat: "Macro", sub: "Risk" },
   { ticker: "TIP", name: "TIPS (Inflación)", cat: "Macro", sub: "Inflation" },
-  // ── Bonds ────────────────────────────────────────────────────────
+  //  Bonds 
   { ticker: "SHY", name: "Bonos 1-3Y (Corto)", cat: "Bonds", sub: "Yield" },
   { ticker: "IEF", name: "Bonos 7-10Y (Medio)", cat: "Bonds", sub: "Yield" },
   { ticker: "TLT", name: "Bonos 20+Y (Largo)", cat: "Bonds", sub: "Yield" },
   { ticker: "HYG", name: "High Yield (Corporativo)", cat: "Bonds", sub: "Risk" },
   { ticker: "LQD", name: "Corp. Investment Grade", cat: "Bonds", sub: "Risk" },
   { ticker: "BNDX", name: "Bonos Int. Total", cat: "Bonds", sub: "Global" },
-  // ── Commodities ──────────────────────────────────────────────────
+  //  Commodities 
   { ticker: "USO", name: "Petróleo WTI", cat: "Commodities", sub: "Energy" },
   { ticker: "UNG", name: "Gas Natural", cat: "Commodities", sub: "Energy" },
   { ticker: "GLD", name: "Oro", cat: "Commodities", sub: "Precious" },
@@ -30,7 +30,7 @@ const ENTRIES: BenchmarkEntry[] = [
   { ticker: "SOYB", name: "Soja", cat: "Commodities", sub: "Agri" },
   { ticker: "CORN", name: "Maíz", cat: "Commodities", sub: "Agri" },
   { ticker: "LIT", name: "Litio", cat: "Commodities", sub: "Strategic" },
-  // ── US Sectors ───────────────────────────────────────────────────
+  //  US Sectors 
   { ticker: "XLK", name: "Tecnología", cat: "Sectors", sub: "US" },
   { ticker: "XLF", name: "Finanzas", cat: "Sectors", sub: "US" },
   { ticker: "XLV", name: "Salud", cat: "Sectors", sub: "US" },
@@ -52,7 +52,7 @@ const ENTRIES: BenchmarkEntry[] = [
   { ticker: "XLB", name: "Materiales", cat: "Sectors", sub: "US" },
   { ticker: "XLRE", name: "Inmobiliario", cat: "Sectors", sub: "US" },
   { ticker: "XLU", name: "Utilities", cat: "Sectors", sub: "US" },
-  // ── Factors / Smart Beta ────────────────────────────────────────
+  //  Factors / Smart Beta 
   { ticker: "MTUM", name: "Momentum", cat: "Factors", sub: "Alpha" },
   { ticker: "QUAL", name: "Calidad", cat: "Factors", sub: "Alpha" },
   { ticker: "SIZE", name: "Small Caps", cat: "Factors", sub: "Style" },
@@ -79,7 +79,7 @@ const ENTRIES: BenchmarkEntry[] = [
   { ticker: "SPXL", name: "S&P 500 3x Long", cat: "Factors", sub: "Leveraged" },
   { ticker: "TQQQ", name: "Nasdaq 3x Long", cat: "Factors", sub: "Leveraged" },
   { ticker: "VXX", name: "VIX Short-Term", cat: "Factors", sub: "Risk" },
-  // ── Countries / Regions ──────────────────────────────────────────
+  //  Countries / Regions 
   { ticker: "ARGT", name: "MSCI Argentina", cat: "Countries", sub: "Latam" },
   { ticker: "EWZ", name: "MSCI Brasil", cat: "Countries", sub: "Latam" },
   { ticker: "EWW", name: "MSCI México", cat: "Countries", sub: "Latam" },
@@ -93,7 +93,7 @@ const ENTRIES: BenchmarkEntry[] = [
   { ticker: "EWJ", name: "MSCI Japón", cat: "Countries", sub: "Asia" },
   { ticker: "^GDAXI", name: "DAX Alemania", cat: "Countries", sub: "Europe" },
   { ticker: "^N225", name: "Nikkei 225", cat: "Countries", sub: "Asia" },
-  // ── Market Indices ───────────────────────────────────────────────
+  //  Market Indices 
   { ticker: "^SPX", name: "S&P 500", cat: "Market", sub: "US" },
   { ticker: "^GSPC", name: "S&P 500 (alt)", cat: "Market", sub: "US" },
   { ticker: "^IXIC", name: "NASDAQ", cat: "Market", sub: "US" },
@@ -105,15 +105,15 @@ const ENTRIES: BenchmarkEntry[] = [
   { ticker: "^MXX", name: "IPC México", cat: "Market", sub: "Latam" },
   { ticker: "^STOXX", name: "STOXX Europa 600", cat: "Market", sub: "Europe" },
   { ticker: "^FCHI", name: "CAC 40", cat: "Market", sub: "Europe" },
-  // ── ARCA / BCBA ETFs ────────────────────────────────────────────
+  //  ARCA / BCBA ETFs 
   { ticker: "SPY", name: "S&P 500 (cotización CCL)", cat: "Argentina", sub: "BCBA" },
-  // ── Crypto ───────────────────────────────────────────────────────
+  //  Crypto 
   { ticker: "BTC-USD", name: "Bitcoin USD", cat: "Crypto", sub: "Crypto" },
   { ticker: "ETHA", name: "Ethereum Trust", cat: "Crypto", sub: "Crypto" },
-  // ── Real Estate ──────────────────────────────────────────────────
+  //  Real Estate 
   { ticker: "REET", name: "Real Estate Total", cat: "RealEstate", sub: "Global" },
   { ticker: "ICF", name: "Real Estate US", cat: "RealEstate", sub: "US" },
-  // ── Thematic ─────────────────────────────────────────────────────
+  //  Thematic 
   { ticker: "ROKT", name: "Robótica e IA", cat: "Thematic", sub: "Innovation" },
   { ticker: "BOTZ", name: "Robótica Global", cat: "Thematic", sub: "Innovation" },
   { ticker: "AIQ", name: "IA Global", cat: "Thematic", sub: "Innovation" },
@@ -127,7 +127,7 @@ const ENTRIES: BenchmarkEntry[] = [
   { ticker: "PICK", name: "Minería Global", cat: "Thematic", sub: "Materials" },
   { ticker: "WOOD", name: "Forestal", cat: "Thematic", sub: "Materials" },
   { ticker: "CUT", name: "Maderas", cat: "Thematic", sub: "Materials" },
-  // ── Fixed Income Argentina ──────────────────────────────────────
+  //  Fixed Income Argentina 
   { ticker: "GD30D.BA", name: "Bonos Argentina USD", cat: "Argentina", sub: "Sovereign" },
   { ticker: "AL30D.BA", name: "Bonos Argentina USD (AL)", cat: "Argentina", sub: "Sovereign" },
 ];

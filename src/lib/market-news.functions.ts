@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { createServerFn } from "@tanstack/react-start";
 
-// ── Original Dashboard Interfaces ──────────────────────────────────────
+//  Original Dashboard Interfaces 
 
 export type NewsCategory =
   "acciones" | "bonos" | "cedears" | "cripto" | "fx" | "macro" | "commodities";
@@ -25,7 +25,7 @@ export interface MarketNewsResult {
   timestamp: string;
 }
 
-// ── Compass-style RSS Feed Types ───────────────────────────────────────
+//  Compass-style RSS Feed Types 
 
 export interface NewsItem {
   title: string;
@@ -35,7 +35,7 @@ export interface NewsItem {
   description: string;
 }
 
-// ── RSS Feed Parsers (compass) ─────────────────────────────────────────
+//  RSS Feed Parsers (compass) 
 
 const FEEDS: { name: string; url: string }[] = [
   { name: "Ámbito Financiero", url: "https://www.ambito.com/rss/pages/finanzas.xml" },
@@ -78,7 +78,7 @@ function parseFeed(xml: string, source: string): NewsItem[] {
   return items;
 }
 
-// ── Server Functions ───────────────────────────────────────────────────
+//  Server Functions 
 
 export const getMarketNews = createServerFn({ method: "GET" }).handler(
   async (): Promise<MarketNewsResult> => {

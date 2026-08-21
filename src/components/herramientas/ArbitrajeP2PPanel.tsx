@@ -192,7 +192,7 @@ export function ArbitrajeP2PPanel() {
             <CardTitle className="mono text-sm font-medium">
               USDT/ARS — Mejores cotizaciones
             </CardTitle>
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[13px] text-muted-foreground">
               {lastUpdate ? lastUpdateStr : ""}
             </span>
           </div>
@@ -201,10 +201,10 @@ export function ArbitrajeP2PPanel() {
           {loading ? (
             <p className="text-sm text-muted-foreground">Cargando cotizaciones...</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="mono w-full text-[11px]">
+            <div className="overflow-x-auto w-full">
+              <table className="mono w-full text-[14px]">
                 <thead>
-                  <tr className="border-b border-border/40 text-[10px] text-muted-foreground uppercase tracking-wider">
+                  <tr className="border-b border-border/40 text-[13px] text-muted-foreground uppercase tracking-wider">
                     <th className="px-3 py-1.5 text-left">Indicador</th>
                     <th className="px-3 py-1.5 text-right">Valor</th>
                     <th className="px-3 py-1.5 text-right">Detalle</th>
@@ -261,18 +261,18 @@ export function ArbitrajeP2PPanel() {
       {oportunidades.length > 0 && (
         <Card className="bg-surface border-border/60">
           <CardHeader className="pb-2">
-            <CardTitle className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            <CardTitle className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
               Oportunidades de Arbitraje
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {oportunidades.map((o) => (
                 <div
                   key={o.tipo}
-                  className={`rounded-md border p-2 text-[11px] font-mono ${o.viable ? "border-green-500/30 bg-green-500/10" : "border-border/30 bg-background/40"}`}
+                  className={`rounded-md border p-2 text-[14px] font-mono ${o.viable ? "border-green-500/30 bg-green-500/10" : "border-border/30 bg-background/40"}`}
                 >
-                  <div className="text-[10px] text-muted-foreground mb-1">{o.descripcion}</div>
+                  <div className="text-[13px] text-muted-foreground mb-1">{o.descripcion}</div>
                   <div className="flex justify-between">
                     <span>Bruto:</span>
                     <span className={o.spreadBruto > 0 ? "text-green-400" : "text-red-400"}>
@@ -290,7 +290,7 @@ export function ArbitrajeP2PPanel() {
                     </span>
                   </div>
                   {o.precioCompra && o.precioVenta && (
-                    <div className="flex justify-between text-[9px] text-muted-foreground mt-1">
+                    <div className="flex justify-between text-[13px] text-muted-foreground mt-1">
                       <span>
                         ${fmtNum(o.precioCompra)} → ${fmtNum(o.precioVenta)}
                       </span>
@@ -328,34 +328,34 @@ export function ArbitrajeP2PPanel() {
       {dolar && (
         <Card className="bg-surface border-border/60">
           <CardHeader className="pb-2">
-            <CardTitle className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            <CardTitle className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
               Comparación Tipos de Cambio
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 text-[11px] font-mono">
+            <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4 text-[14px] font-mono">
               <div className="rounded-md bg-background/40 border border-border/60 p-2">
-                <div className="text-[10px] text-muted-foreground">Blue</div>
+                <div className="text-[13px] text-muted-foreground">Blue</div>
                 <div>
                   ${fmtNum(dolar.blue.compra)} / ${fmtNum(dolar.blue.venta)}
                 </div>
               </div>
               <div className="rounded-md bg-background/40 border border-border/60 p-2">
-                <div className="text-[10px] text-muted-foreground">MEP</div>
+                <div className="text-[13px] text-muted-foreground">MEP</div>
                 <div>${fmtNum(dolar.mep)}</div>
               </div>
               <div className="rounded-md bg-background/40 border border-border/60 p-2">
-                <div className="text-[10px] text-muted-foreground">CCL</div>
+                <div className="text-[13px] text-muted-foreground">CCL</div>
                 <div>${fmtNum(dolar.ccl)}</div>
               </div>
               <div className="rounded-md bg-background/40 border border-border/60 p-2">
-                <div className="text-[10px] text-muted-foreground">Oficial</div>
+                <div className="text-[13px] text-muted-foreground">Oficial</div>
                 <div>
                   ${fmtNum(dolar.oficial.compra)} / ${fmtNum(dolar.oficial.venta)}
                 </div>
               </div>
             </div>
-            <div className="mt-2 space-y-1 text-[11px] font-mono">
+            <div className="mt-2 space-y-1 text-[14px] font-mono">
               {oportunidades
                 .filter((o) => o.tipo.startsWith("usdt-vs-"))
                 .map((o) => (

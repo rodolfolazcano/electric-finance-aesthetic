@@ -35,9 +35,9 @@ export function CalculadoraPatrimonioNeto() {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+    <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <div className="glass p-5 space-y-4">
-        <h3 className="mono text-[11px] uppercase tracking-[0.18em] text-foreground">Activos</h3>
+        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Activos</h3>
         <div>
           <label className="text-xs text-muted-foreground">Líquidos (efectivo, cuentas)</label>
           <Input
@@ -74,7 +74,7 @@ export function CalculadoraPatrimonioNeto() {
             className="h-8 text-xs mt-1"
           />
         </div>
-        <h3 className="mono text-[11px] uppercase tracking-[0.18em] text-foreground mt-4">
+        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground mt-4">
           Pasivos
         </h3>
         <div>
@@ -94,9 +94,9 @@ export function CalculadoraPatrimonioNeto() {
       <div className="space-y-4">
         {result && (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Total activos
                 </div>
                 <div className="mono text-lg text-success">
@@ -104,7 +104,7 @@ export function CalculadoraPatrimonioNeto() {
                 </div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Total pasivos
                 </div>
                 <div className="mono text-lg text-danger">
@@ -112,7 +112,7 @@ export function CalculadoraPatrimonioNeto() {
                 </div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Patrimonio neto
                 </div>
                 <div
@@ -122,7 +122,7 @@ export function CalculadoraPatrimonioNeto() {
                 </div>
               </div>
               <div className="glass p-4 text-center">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
                   Salud
                 </div>
                 <div className={`mono text-lg ${result.saludFinanciera.color}`}>
@@ -132,7 +132,7 @@ export function CalculadoraPatrimonioNeto() {
             </div>
 
             <div className="glass p-5">
-              <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Distribución de activos
               </div>
               <div className="h-64">

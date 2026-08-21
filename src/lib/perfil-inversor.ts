@@ -5,7 +5,7 @@
 
 import perfilesData from "@/data/perfiles_inversor_unificado.json";
 
-// ─── Tipos principales ──────────────────────────────────────────────
+//  Tipos principales 
 export interface PerfilAsignacion {
   categoria_id: string;
   porcentaje: number;
@@ -58,7 +58,7 @@ interface PerfilesDataJson {
 
 const DATA = perfilesData as unknown as PerfilesDataJson;
 
-// ─── Preguntas del test (mismas 7 de IOL) ──────────────────────────
+//  Preguntas del test (mismas 7 de IOL) 
 export interface Pregunta {
   id: string;
   seccion: "horizonte" | "tolerancia";
@@ -146,7 +146,7 @@ export const PREGUNTAS: Pregunta[] = [
   },
 ];
 
-// ─── Cálculo de perfil ─────────────────────────────────────────────
+//  Cálculo de perfil 
 export function calcularPerfil(scoreH: number, scoreT: number): PerfilInversor {
   const perfiles = DATA.perfiles_inversor;
 
@@ -180,7 +180,7 @@ export function calcularPerfil(scoreH: number, scoreT: number): PerfilInversor {
   return perfiles.find((p) => p.id === "agresivo") ?? perfiles[6];
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────
+//  Helpers 
 export function getPanelesPorPerfil(perfilId: string): PanelMercado[] {
   const perfil = DATA.perfiles_inversor.find((p) => p.id === perfilId);
   if (!perfil) return [];
@@ -212,7 +212,7 @@ export function getAsignacionCompleta(perfil: PerfilInversor) {
     });
 }
 
-// ─── Mercados ───────────────────────────────────────────────────────
+//  Mercados 
 export interface MercadoInfo {
   exchange: string;
   moneda: string;

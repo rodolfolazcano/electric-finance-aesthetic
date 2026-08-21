@@ -40,11 +40,11 @@ export function CycleContextBanner() {
   const dollarCommCorr = correlations[1]?.current ?? null;
 
   return (
-    <div className="rounded-md border border-border/40 bg-background/40 px-3 py-2 text-[10px] leading-relaxed">
+    <div className="rounded-md border border-border/40 bg-background/40 px-3 py-2 text-[13px] leading-relaxed">
       <div className="flex items-center gap-x-3 gap-y-1 flex-wrap">
         {ciclo && (
           <>
-            <span className="font-semibold text-primary uppercase tracking-wider text-[10px]">
+            <span className="font-semibold text-primary uppercase tracking-wider text-[13px]">
               Fase {ciclo.stage} · {ciclo.description ?? ""}
             </span>
             <span className="text-muted-foreground">|</span>

@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabase";
 import type { SemaforoResult } from "./finance.functions";
 import type { FundamentalAFResult } from "./fundamental-af.functions";
 
-// ── TTL por fuente ─────────────────────────────────────────────────────
+//  TTL por fuente 
 
 export const SCHVARZ_TTL = {
   semaforoMs: 15 * 60 * 1000, // 15 min (acorde al refetch del tab)
@@ -40,7 +40,7 @@ interface CacheEntrada {
   fetchedAt: number; // ms epoch
 }
 
-// ── Capa 1: memoria ────────────────────────────────────────────────────
+//  Capa 1: memoria 
 
 const memCache = new Map<string, CacheEntrada>();
 const MEM_TTL_MS = 60 * 1000; // 1 min antes de re-verificar Supabase
@@ -55,7 +55,7 @@ function keyHistorico(t: string): string {
   return `schvarz:historico:${t.toUpperCase()}`;
 }
 
-// ── Capa 2: Supabase (api_cache) ───────────────────────────────────────
+//  Capa 2: Supabase (api_cache) 
 
 interface SupabaseRow {
   cache_key: string;
@@ -104,7 +104,7 @@ async function supabaseWrite(
   }
 }
 
-// ── Helpers de lectura/escritura por capa ──────────────────────────────
+//  Helpers de lectura/escritura por capa 
 
 function memGet<T>(key: string): T | null {
   const e = memCache.get(key);
@@ -120,7 +120,7 @@ function isFreshFromRow(row: SupabaseRow, ttlMs: number): boolean {
   return Date.now() - new Date(row.fetched_at).getTime() < ttlMs;
 }
 
-// ── Lectura consolidada por ticker ─────────────────────────────────────
+//  Lectura consolidada por ticker 
 
 interface EstadoTicker {
   ticker: string;
@@ -228,7 +228,7 @@ export async function leerCacheSchvarz(tickers: string[]): Promise<LecturaSchvar
   };
 }
 
-// ── Guardado (memoria + Supabase) ──────────────────────────────────────
+//  Guardado (memoria + Supabase) 
 
 export async function guardarSemaforo(ticker: string, sem: SemaforoResult): Promise<void> {
   const tk = ticker.toUpperCase();

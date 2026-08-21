@@ -16,7 +16,7 @@ import { calcularVariaciones } from "./macro-trends.functions";
 import { getSemaforoBatch, type SemaforoResult } from "./finance.functions";
 import { RUEDA_STOVALL, inferirEtapaCiclo } from "./intermarket-engine";
 
-// ─── Tipos ─────────────────────────────────────────────────────
+//  Tipos 
 
 export interface EvaluacionCapa {
   nombre: string;
@@ -38,7 +38,7 @@ export interface RecomendacionActivo {
   resumenTextual: string;
 }
 
-// ─── PARTE 1: 4 REGLAS NÚCLEO MURPHY (Cap. 1) ──────────────────
+//  PARTE 1: 4 REGLAS NÚCLEO MURPHY (Cap. 1) 
 // Cada regla devuelve score -1 a +1
 
 export function reglaDolarCommodities(dxyTrend: number | null, dbcTrend: number | null): number {
@@ -103,7 +103,7 @@ export function indicePresionInflacionaria(params: {
   return scores.reduce((a, b) => a + b, 0) / scores.length;
 }
 
-// ─── PARTE 2: DETECTOR DE PATRONES HISTÓRICOS (Cap. 1-2) ──────
+//  PARTE 2: DETECTOR DE PATRONES HISTÓRICOS (Cap. 1-2) 
 
 export interface PatronHistorico {
   id: "1987" | "1990" | "geopolitico";
@@ -125,7 +125,7 @@ export function detectarPatronHistorico(params: {
 }): PatronHistorico[] {
   const resultados: PatronHistorico[] = [];
 
-  // ── Arquetipo A: Setup 1987 ──
+  //  Arquetipo A: Setup 1987 
   let match1987 = 0;
   const ctx1987: string[] = [];
   if (params.dbcCloses.length >= 90 && params.tnxCloses.length >= 60) {
@@ -152,7 +152,7 @@ export function detectarPatronHistorico(params: {
     activo: match1987 >= 60,
   });
 
-  // ── Arquetipo B: Setup 1990 ──
+  //  Arquetipo B: Setup 1990 
   let match1990 = 0;
   const ctx1990: string[] = [];
   if (params.bondPriceCloses.length >= 63) {
@@ -180,7 +180,7 @@ export function detectarPatronHistorico(params: {
     activo: match1990 >= 55,
   });
 
-  // ── Arquetipo C: Shock geopolítico / energía ──
+  //  Arquetipo C: Shock geopolítico / energía 
   let matchGeo = 0;
   const ctxGeo: string[] = [];
   if (params.oilCloses && params.oilCloses.length >= 20) {
@@ -214,7 +214,7 @@ export function detectarPatronHistorico(params: {
   return resultados;
 }
 
-// ─── PARTE 3: LEAD-LAG Y MEMORIA DE SECUENCIA ──────────────────
+//  PARTE 3: LEAD-LAG Y MEMORIA DE SECUENCIA 
 
 export interface SecuenciaGiros {
   ordenCorrecto: boolean;
@@ -272,7 +272,7 @@ export function registrarSecuenciaDeGiros(params: {
   return { ordenCorrecto: false, detalle: `Giros detectados (${giros.map((g) => g.nombre).join(", ")}), pero no forman una secuencia clara.` };
 }
 
-// ─── PARTE 6: SÍNTESIS — LECTURA INTERMARKET ───────────────────
+//  PARTE 6: SÍNTESIS — LECTURA INTERMARKET 
 
 export interface LecturaIntermarket {
   regimen: string;
@@ -307,7 +307,7 @@ export interface LecturaIntermarket {
   };
 }
 
-// ─── PARTE 3: VALIDAR SECUENCIA DE ROTACIÓN (3 etapas) ────────
+//  PARTE 3: VALIDAR SECUENCIA DE ROTACIÓN (3 etapas) 
 
 export function validarSecuenciaRotacionCompleta(params: {
   girosCommodities: { idx: number; tipo: "max" | "min" | null };
@@ -357,7 +357,7 @@ export function validarSecuenciaRotacionCompleta(params: {
   };
 }
 
-// ─── PARTE 4: DETECTOR DE BEAR MARKET SILENCIOSO (1994) ───────
+//  PARTE 4: DETECTOR DE BEAR MARKET SILENCIOSO (1994) 
 
 export function detectarBearMarketSilencioso(params: {
   indicePrincipalVariacion: number | null | undefined;
@@ -397,7 +397,7 @@ export function detectarBearMarketSilencioso(params: {
   return { detectado: confianzaFinal >= 50, confianza: confianzaFinal, contextoHistorico: contexto };
 }
 
-// ─── PARTE 5: EVALUAR CONVERGENCIA DE COMMODITIES ─────────────
+//  PARTE 5: EVALUAR CONVERGENCIA DE COMMODITIES 
 
 export function evaluarConvergenciaCommodities(params: {
   dbcTrend: number | null | undefined;
@@ -510,7 +510,7 @@ export function generarLecturaIntermarket(params: {
     ? contextos.join(" ")
     : "Sin patrones históricos análogos detectados en este momento. Las relaciones intermarket siguen su curso normal.";
 
-  // ── Cap. 3: Ratio Commodities/Bonos ──
+  //  Cap. 3: Ratio Commodities/Bonos 
   const ratioCommBonds = params.bondPriceCloses.length > 0 && params.dbcCloses.length > 0
     ? params.dbcCloses[params.dbcCloses.length - 1] / Math.abs(params.bondPriceCloses[params.bondPriceCloses.length - 1] || 1)
     : null;
@@ -525,20 +525,20 @@ export function generarLecturaIntermarket(params: {
       ? "Favorecer sectores sensibles a tasas (utilities, financieras, real estate)"
       : "Sin sesgo sectorial claro por ratio commodities/bonos";
 
-  // ── Cap. 3: Secuencia de rotación completa ──
+  //  Cap. 3: Secuencia de rotación completa 
   const secuenciaRot = validarSecuenciaRotacionCompleta({
     girosCommodities: secuencia.ordenCorrecto ? { idx: 1, tipo: "max" } : { idx: -1, tipo: null },
     girosBonos: secuencia.ordenCorrecto ? { idx: 0, tipo: "max" } : { idx: -1, tipo: null },
     girosAcciones: secuencia.ordenCorrecto ? { idx: -1, tipo: null } : { idx: -1, tipo: null },
   });
 
-  // ── Cap. 3: Bear market silencioso ──
+  //  Cap. 3: Bear market silencioso 
   const bearMarket = detectarBearMarketSilencioso({
     indicePrincipalVariacion: params.sp500Var30d ?? params.mervalVar30d,
     ratioCommBondsAlcista: tendenciaRatio === "alcista",
   });
 
-  // ── Cap. 3: Convergencia de commodities ──
+  //  Cap. 3: Convergencia de commodities 
   const convergencia = evaluarConvergenciaCommodities({
     dbcTrend: params.dbcTrend,
     industrialTrend: params.industrialTrend,
@@ -562,7 +562,7 @@ export function generarLecturaIntermarket(params: {
   };
 }
 
-// ─── ALERTA SETUP TIPO 1987 (original, se mantiene) ────────────
+//  ALERTA SETUP TIPO 1987 (original, se mantiene) 
 
 export function detectarSetupInflacionarioAgresivo(
   dbcCloses: number[],
@@ -590,7 +590,7 @@ export function detectarSetupInflacionarioAgresivo(
   return { activa: false, mensaje: null };
 }
 
-// ─── CLASIFICAR REGIMEN INTERMARKET (PASO 10 — Murphy) ────────
+//  CLASIFICAR REGIMEN INTERMARKET (PASO 10 — Murphy) 
 
 export function clasificarRegimenIntermarket(input: {
   dxyVar30d: number | null;
@@ -677,7 +677,7 @@ export function clasificarRegimenIntermarket(input: {
   };
 }
 
-// ─── RATIO CRB/BONDS (PASO 11) ─────────────────────────────────
+//  RATIO CRB/BONDS (PASO 11) 
 
 export function evaluarRatioCRBBonds(crbRatio30dChange: number | null, sector: string): { confirmacion: number; detalle: string } {
   if (crbRatio30dChange == null) return { confirmacion: 0, detalle: "N/D — sin datos del ratio CRB/Bonos" };
@@ -694,7 +694,7 @@ export function evaluarRatioCRBBonds(crbRatio30dChange: number | null, sector: s
   return { confirmacion: 0, detalle: "Ratio CRB/Bonos no confirma sesgo sectorial específico" };
 }
 
-// ─── CAPA 1: REGIMEN INTERMARKET (reemplaza la vieja evaluarIntermarket) ──
+//  CAPA 1: REGIMEN INTERMARKET (reemplaza la vieja evaluarIntermarket) 
 
 // FASE 4: exportado para src/lib/scoring/macro-contexto.ts
 export function evaluarIntermarketMurphy(
@@ -715,7 +715,7 @@ export function evaluarIntermarketMurphy(
   return { valor: Math.max(-1, Math.min(1, valor)), detalle, confianza: regimen.confianza };
 }
 
-// ─── CAPA 3: STOVALL (reemplaza la vieja evaluarMacroArgentina) ───
+//  CAPA 3: STOVALL (reemplaza la vieja evaluarMacroArgentina) 
 
 // FASE 4: exportado para src/lib/scoring/macro-contexto.ts
 export function evaluarStovall(
@@ -741,7 +741,7 @@ export function evaluarStovall(
   return { valor: Math.max(-1, Math.min(1, score)), detalle: `Ranking sectorial: posición #${idx + 1}${idx < 3 ? " (top 3)" : idx >= sectorRanking.length - 3 ? " (bottom 3)" : ""}` };
 }
 
-// ─── CAPA 2: MACRO GLOBAL (sin cambios) ────────────────────────
+//  CAPA 2: MACRO GLOBAL (sin cambios) 
 
 // FASE 4: exportado para src/lib/scoring/macro-contexto.ts
 export function evaluarMacroGlobal(semaforoGlobal: { scoreGlobal: number }): number {
@@ -750,7 +750,7 @@ export function evaluarMacroGlobal(semaforoGlobal: { scoreGlobal: number }): num
   return 0;
 }
 
-// ─── CAPA 4: FUNDAMENTAL (Value Investing — margen de seguridad) ──
+//  CAPA 4: FUNDAMENTAL (Value Investing — margen de seguridad) 
 
 function evaluarFundamental(
   fundamentalScore: number | null,
@@ -795,7 +795,7 @@ function evaluarFundamentalUnificado(
   return { valor: 0, detalle: `Score fundamental intermedio (${f.toFixed(1)}) — sin señal clara` };
 }
 
-// ─── CAPA 5: TÉCNICO (score unificado -10 a +10) ────────────────
+//  CAPA 5: TÉCNICO (score unificado -10 a +10) 
 // # REVISAR (FASE 6): consume scoreTecnicoDetalle.scoreFinal legacy;
 // alternativa unificada = subScores.tecnico.raw de motor-unificado.
 
@@ -815,7 +815,7 @@ function evaluarTecnicoUnificado(
   return { valor: 0, detalle: `Score técnico neutral (${scoreFinal.toFixed(2)}) — ${clasificacion ?? "MANTENER"}` };
 }
 
-// ─── ETIQUETA DE CONFIANZA ─────────────────────────────────────
+//  ETIQUETA DE CONFIANZA 
 
 function etiquetaConfianza(score: number, maxPosible: number): string {
   if (maxPosible === 0) return "Sin datos disponibles";
@@ -824,7 +824,7 @@ function etiquetaConfianza(score: number, maxPosible: number): string {
   return "Sin alineación — no se recomienda destacar este activo";
 }
 
-// ─── GENERAR RECOMENDACIONES ────────────────────────────────────
+//  GENERAR RECOMENDACIONES 
 
 interface InputRecomendacion {
   sectorRanking: Array<{ sector: string; variacionPromedioSemanal: number }>;
@@ -962,7 +962,7 @@ export async function generarRecomendaciones(
   return filtradas;
 }
 
-// ─── SERVER FUNCTION PRINCIPAL ──────────────────────────────────
+//  SERVER FUNCTION PRINCIPAL 
 
 const CACHE_KEY = "motor-recomendacion-v2";
 

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { yahooHeaders } from "./yahoo-http";
 import { yahooChartCloses } from "./yahoo-chart";
 
-// ─── Helpers estadísticos ───────────────────────────────────────────
+//  Helpers estadísticos 
 
 function returns(prices: number[]): number[] {
   const r: number[] = [];
@@ -43,7 +43,7 @@ function correlation(a: number[], b: number[]): number {
   return covariance(a, b) / Math.sqrt(va * vb);
 }
 
-// ─── computeBeta ─────────────────────────────────────────────────────
+//  computeBeta 
 
 export function computeBeta(
   asset: number[],
@@ -71,7 +71,7 @@ export function computeBeta(
   };
 }
 
-// ─── yahooResolve ───────────────────────────────────────────────────
+//  yahooResolve 
 
 interface YSearchQuote {
   symbol?: string;
@@ -97,7 +97,7 @@ export async function yahooResolve(query: string): Promise<string | null> {
   }
 }
 
-// ─── Sector ETF mapping ─────────────────────────────────────────────
+//  Sector ETF mapping 
 
 const ETF_SECTOR: Record<string, string> = {
   Technology: "XLK",
@@ -113,7 +113,7 @@ const ETF_SECTOR: Record<string, string> = {
   "Communication Services": "XLC",
 };
 
-// ─── Yahoo quoteSummary helper ───────────────────────────────────────
+//  Yahoo quoteSummary helper 
 
 export interface YFSnapshot {
   trailingPE: number | null;
@@ -250,7 +250,7 @@ async function fetchYahooQuoteSummaryJsonSafe(
   }
 }
 
-// ─── yahooFundamentalsBatch ─────────────────────────────────────────
+//  yahooFundamentalsBatch 
 
 export const yahooFundamentalsBatch = createServerFn({ method: "POST" })
   .validator(

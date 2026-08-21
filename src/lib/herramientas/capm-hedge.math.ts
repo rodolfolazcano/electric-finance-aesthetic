@@ -39,7 +39,7 @@ export function computeBeta(posReturns: number[], benchReturns: number[]): BetaR
   };
 }
 
-// ─── Labadie §3.2: p-variance beta ───
+//  Labadie §3.2: p-variance beta 
 // beta_p = Cov_p(r_i, r_m) / Var_p(r_m)
 // donde Cov_p usa p-variance conjunta en vez de covarianza estándar
 export function computeBetaPVariance(

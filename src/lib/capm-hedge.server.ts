@@ -155,7 +155,7 @@ function computeBeta(
   };
 }
 
-// ─── Resolución de posiciones manuales ──────────────────────────────
+//  Resolución de posiciones manuales 
 
 const MANUAL_POSITION_SCHEMA = z.object({
   ticker: z.string().min(1).max(50),
@@ -799,7 +799,7 @@ export const computeHedge = createServerFn({ method: "POST" })
       posicionesQueLoUsan: a.posTicker,
     })));
 
-    // ── Portfolio equity curve (recomendación vs benchmark promedio) ──
+    //  Portfolio equity curve (recomendación vs benchmark promedio) 
     let portfolioEquityCurve: { date: string; portfolio: number; benchmark: number }[] | undefined;
     try {
       // Juntar todos los hedgeAssets únicos con sus montos

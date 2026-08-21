@@ -1,5 +1,5 @@
 // @ts-nocheck
-// ─── Cycle Phase Banner — Fase del ciclo + Rotación sectorial ────
+//  Cycle Phase Banner — Fase del ciclo + Rotación sectorial 
 // Componente visual para el PASO 1 del análisis (Murphy).
 // Muestra la fase económica detectada y los sectores a comprar/vender.
 
@@ -14,17 +14,17 @@ import {
 } from "@/lib/cycle-phase-detector";
 import type { CompleteIntermarketResult } from "@/lib/intermarket-complete";
 
-// ─── Helpers de display ──────────────────────────────────────────
+//  Helpers de display 
 
 function ArrowIcon({ trend }: { trend: TrendArrow }) {
-  if (trend === "up") return <span className="text-green-400 text-[10px]">▲</span>;
-  if (trend === "down") return <span className="text-red-400 text-[10px]">▼</span>;
-  return <span className="text-muted-foreground text-[10px]">—</span>;
+  if (trend === "up") return <span className="text-green-400 text-[13px]"></span>;
+  if (trend === "down") return <span className="text-red-400 text-[13px]"></span>;
+  return <span className="text-muted-foreground text-[13px]">—</span>;
 }
 
 function TrendLabel({ trend, label }: { trend: TrendArrow; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1 text-[10px] font-mono">
+    <span className="inline-flex items-center gap-1 text-[13px] font-mono">
       <ArrowIcon trend={trend} />
       <span
         className={cn(
@@ -45,7 +45,7 @@ function SectorTag({ name, type }: { name: string; type: "buy" | "sell" }) {
   return (
     <span
       className={cn(
-        "inline-block px-1.5 py-0.5 rounded text-[9px] font-mono leading-tight border",
+        "inline-block px-1.5 py-0.5 rounded text-[13px] font-mono leading-tight border",
         type === "buy"
           ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
           : "bg-red-500/10 border-red-500/30 text-red-400",
@@ -56,13 +56,13 @@ function SectorTag({ name, type }: { name: string; type: "buy" | "sell" }) {
   );
 }
 
-// ─── Props ───────────────────────────────────────────────────────
+//  Props 
 
 interface CyclePhaseBannerProps {
   data: CompleteIntermarketResult;
 }
 
-// ─── Componente principal ────────────────────────────────────────
+//  Componente principal 
 
 export function CyclePhaseBanner({ data }: CyclePhaseBannerProps) {
   const diagnosis: PhaseDiagnosis | null = useMemo(() => {
@@ -100,7 +100,7 @@ export function CyclePhaseBanner({ data }: CyclePhaseBannerProps) {
 
   return (
     <Card className={cn("border-2 overflow-hidden", phase.borderColor, phase.bgColor)}>
-      {/* ── Header: fase detectada ─────────────────────────────── */}
+      {/*  Header: fase detectada  */}
       <div className="p-4 pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -112,7 +112,7 @@ export function CyclePhaseBanner({ data }: CyclePhaseBannerProps) {
               >
                 {phase.label}
               </div>
-              <p className="text-[9px] text-muted-foreground/70 mt-0.5 max-w-xl leading-relaxed">
+              <p className="text-[13px] text-muted-foreground/70 mt-0.5 max-w-xl leading-relaxed">
                 {phase.description}
               </p>
             </div>
@@ -120,7 +120,7 @@ export function CyclePhaseBanner({ data }: CyclePhaseBannerProps) {
           <div className="flex items-center gap-2">
             <span
               className={cn(
-                "text-[9px] px-1.5 py-0.5 rounded font-mono border",
+                "text-[13px] px-1.5 py-0.5 rounded font-mono border",
                 confidence === "alta"
                   ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                   : confidence === "media"
@@ -132,7 +132,7 @@ export function CyclePhaseBanner({ data }: CyclePhaseBannerProps) {
             </span>
             <span
               className={cn(
-                "text-[9px] px-1.5 py-0.5 rounded font-mono border",
+                "text-[13px] px-1.5 py-0.5 rounded font-mono border",
                 confidence === "alta"
                   ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                   : confidence === "media"
@@ -146,9 +146,9 @@ export function CyclePhaseBanner({ data }: CyclePhaseBannerProps) {
         </div>
       </div>
 
-      {/* ── 3 Flechas core (Pring) ────────────────────────────── */}
+      {/*  3 Flechas core (Pring)  */}
       <div className="px-4 pb-2">
-        <div className="flex items-center gap-3 text-[9px] font-mono text-muted-foreground/60">
+        <div className="flex items-center gap-3 text-[13px] font-mono text-muted-foreground/60">
           <span className="uppercase tracking-wider">Tendencias Pring:</span>
           <TrendLabel
             trend={
@@ -183,9 +183,9 @@ export function CyclePhaseBanner({ data }: CyclePhaseBannerProps) {
         </div>
       </div>
 
-      {/* ── Confirmaciones Murphy ─────────────────────────────── */}
+      {/*  Confirmaciones Murphy  */}
       <div className="px-4 pb-2">
-        <div className="flex items-center gap-2 text-[9px] font-mono text-muted-foreground/60">
+        <div className="flex items-center gap-2 text-[13px] font-mono text-muted-foreground/60">
           <span className="uppercase tracking-wider">Confirmación:</span>
           <TrendLabel trend={diagnosis.confirmationSignals.xlyXlp} label="XLY/XLP" />
           <TrendLabel trend={diagnosis.confirmationSignals.iwmSpy} label="IWM/SPY" />
@@ -198,13 +198,13 @@ export function CyclePhaseBanner({ data }: CyclePhaseBannerProps) {
         </div>
       </div>
 
-      {/* ── Rotación sectorial ────────────────────────────────── */}
+      {/*  Rotación sectorial  */}
       <div className="border-t border-border/20 px-4 py-3">
-        <div className="grid gap-2 md:grid-cols-2">
+        <div className="grid w-full gap-2 md:grid-cols-2">
           {/* COMPRAR */}
           <div>
-            <div className="text-[9px] font-mono font-semibold uppercase tracking-wider text-emerald-400 mb-1.5 flex items-center gap-1">
-              <span>✅ COMPRAR / SOBREPONDER</span>
+            <div className="text-[13px] font-mono font-semibold uppercase tracking-wider text-emerald-400 mb-1.5 flex items-center gap-1">
+              <span>[OK] COMPRAR / SOBREPONDER</span>
               <span className="text-[7px] text-muted-foreground/50 font-normal">
                 ({rotation.style})
               </span>
@@ -218,8 +218,8 @@ export function CyclePhaseBanner({ data }: CyclePhaseBannerProps) {
 
           {/* VENDER */}
           <div>
-            <div className="text-[9px] font-mono font-semibold uppercase tracking-wider text-red-400 mb-1.5 flex items-center gap-1">
-              <span>❌ VENDER / INFRAPONDERAR</span>
+            <div className="text-[13px] font-mono font-semibold uppercase tracking-wider text-red-400 mb-1.5 flex items-center gap-1">
+              <span>[ERROR] VENDER / INFRAPONDERAR</span>
             </div>
             <div className="flex flex-wrap gap-1">
               {rotation.sell.map((sector) => (

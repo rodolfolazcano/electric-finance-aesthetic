@@ -33,7 +33,7 @@ export function GovernanceSection({ result }: GovernanceSectionProps) {
 
   return (
     <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
-      <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-3">
+      <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-3">
         Gobierno Corporativo
       </p>
 
@@ -41,9 +41,9 @@ export function GovernanceSection({ result }: GovernanceSectionProps) {
       {governanceRiskLabel && (
         <div className="mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-medium text-foreground">Riesgo General:</span>
+            <span className="text-[13px] font-medium text-foreground">Riesgo General:</span>
             <span
-              className={`text-[10px] font-semibold ${getRiskColor(governanceRiskScores.overallRisk)}`}
+              className={`text-[13px] font-semibold ${getRiskColor(governanceRiskScores.overallRisk)}`}
             >
               {governanceRiskLabel}
             </span>
@@ -54,46 +54,46 @@ export function GovernanceSection({ result }: GovernanceSectionProps) {
       {/* Scores de Riesgo */}
       {governanceRiskScores.overallRisk !== null && (
         <div className="mb-4">
-          <p className="text-[8px] text-muted-foreground mb-2">
+          <p className="text-[12px] text-muted-foreground mb-2">
             Riesgos de Governance (1=mejor, 10=peor)
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1">
+          <div className="grid w-full grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1">
             <div className="flex justify-between">
-              <span className="text-[9px] text-muted-foreground">Riesgo de Auditoría</span>
+              <span className="text-[13px] text-muted-foreground">Riesgo de Auditoría</span>
               <span
-                className={`text-[9px] font-mono ${getRiskColor(governanceRiskScores.auditRisk)}`}
+                className={`text-[13px] font-mono ${getRiskColor(governanceRiskScores.auditRisk)}`}
               >
                 {formatScore(governanceRiskScores.auditRisk)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[9px] text-muted-foreground">Riesgo de Directorio</span>
+              <span className="text-[13px] text-muted-foreground">Riesgo de Directorio</span>
               <span
-                className={`text-[9px] font-mono ${getRiskColor(governanceRiskScores.boardRisk)}`}
+                className={`text-[13px] font-mono ${getRiskColor(governanceRiskScores.boardRisk)}`}
               >
                 {formatScore(governanceRiskScores.boardRisk)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[9px] text-muted-foreground">Riesgo de Compensación</span>
+              <span className="text-[13px] text-muted-foreground">Riesgo de Compensación</span>
               <span
-                className={`text-[9px] font-mono ${getRiskColor(governanceRiskScores.compensationRisk)}`}
+                className={`text-[13px] font-mono ${getRiskColor(governanceRiskScores.compensationRisk)}`}
               >
                 {formatScore(governanceRiskScores.compensationRisk)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[9px] text-muted-foreground">Riesgo de Accionistas</span>
+              <span className="text-[13px] text-muted-foreground">Riesgo de Accionistas</span>
               <span
-                className={`text-[9px] font-mono ${getRiskColor(governanceRiskScores.shareHolderRightsRisk)}`}
+                className={`text-[13px] font-mono ${getRiskColor(governanceRiskScores.shareHolderRightsRisk)}`}
               >
                 {formatScore(governanceRiskScores.shareHolderRightsRisk)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[9px] text-muted-foreground">Riesgo General (Overall)</span>
+              <span className="text-[13px] text-muted-foreground">Riesgo General (Overall)</span>
               <span
-                className={`text-[9px] font-mono ${getRiskColor(governanceRiskScores.overallRisk)}`}
+                className={`text-[13px] font-mono ${getRiskColor(governanceRiskScores.overallRisk)}`}
               >
                 {formatScore(governanceRiskScores.overallRisk)}
               </span>
@@ -105,9 +105,9 @@ export function GovernanceSection({ result }: GovernanceSectionProps) {
       {/* Directivos */}
       {companyOfficers.length > 0 && (
         <div>
-          <p className="text-[8px] text-muted-foreground mb-2">Directivos Ejecutivos</p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-[9px]">
+          <p className="text-[12px] text-muted-foreground mb-2">Directivos Ejecutivos</p>
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-[13px]">
               <thead>
                 <tr className="border-b border-border/30">
                   <th className="text-left py-1 px-2 text-muted-foreground font-normal">Nombre</th>
@@ -138,7 +138,7 @@ export function GovernanceSection({ result }: GovernanceSectionProps) {
       )}
 
       {result.governanceEpochDate && (
-        <p className="mt-2 text-[8px] text-muted-foreground">
+        <p className="mt-2 text-[12px] text-muted-foreground">
           Datos de governance actualizados: {result.governanceEpochDate}
         </p>
       )}

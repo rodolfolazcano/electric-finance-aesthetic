@@ -63,7 +63,7 @@ export interface ReglaContexto {
   descripcion: string;
 }
 
-// ─── Tipos unificados (Fase 1: motor de scoring unificado) ──────────────
+//  Tipos unificados (Fase 1: motor de scoring unificado) 
 
 export type TipoActivo = "ACCION" | "CEDEAR" | "ADR" | "ETF" | "BONO" | "ON" | "OTRO";
 

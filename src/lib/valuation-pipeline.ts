@@ -415,7 +415,7 @@ export function textoAnalisis(a: AnalisisCompleto): string {
   }
   const s = a.moneda === "ARS" ? "ARS " : "USD ";
   const lineas = [
-    `📊 **Análisis Valor Intrínseco — ${a.empresa ?? a.simboloResuelto}**`,
+    ` **Análisis Valor Intrínseco — ${a.empresa ?? a.simboloResuelto}**`,
     ``,
     `**Valor calculado:** ${s}${nf2.format(a.valorPorAccion ?? 0)}`,
     `**Precio actual:** ${s}${nf2.format(a.precioActual ?? 0)} (Yahoo Finance, ${a.fechaDatos})`,

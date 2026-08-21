@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { FundamentalAFResult } from "./fundamental-af.functions";
 
-// ─── Tipos ─────────────────────────────────────────────────────────────
+//  Tipos 
 
 export interface DuPontResult {
   margenNeto: number | null;
@@ -88,7 +88,7 @@ export interface ValuacionResult {
   ratiosAmat: RatiosAmatResult | null;
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────
+//  Helpers 
 
 function safeNum(v: number | null | undefined): number | null {
   return v != null && isFinite(v) ? v : null;
@@ -98,7 +98,7 @@ function clamp(v: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, v));
 }
 
-// ─── BLOQUE 4 — Costo de nuevas emisiones y utilidades retenidas ────
+//  BLOQUE 4 — Costo de nuevas emisiones y utilidades retenidas 
 // Fuente: Pascale, Cap. 13, Apéndice. DOCUMENTACIÓN ONLY — no implementado
 // (ajuste fino, no prioritario para el ciclo actual). No perder la fuente.
 //
@@ -122,7 +122,7 @@ function clamp(v: number, min: number, max: number): number {
 //     // kr = k * (1 - td) * (1 - c) — td y c en decimal
 // Fórmula literal de Pascale (no inventada); pendiente de decisión de alcance.
 
-// ─── BLOQUE 1 — CAPM + Beta apalancado (Hamada) ─────────────────────
+//  BLOQUE 1 — CAPM + Beta apalancado (Hamada) 
 // Fuente: Pascale, Cap. 13, "El rendimiento requerido para las inversiones", 13.2.
 //   ke = rf + [rm - rf]·βE        con  βE = β·[1 + (D/S)(1 - t)]
 // Yahoo Finance trae β ya apalancada con la estructura contable actual;
@@ -190,7 +190,7 @@ export function betaPuraAF(r: FundamentalAFResult): BetaHamadaResult {
   return { betaDesapalancada, betaApalancada, debtToEquity: dE, taxRate: t, fuente };
 }
 
-// ─── PASO 9 — DuPont ──────────────────────────────────────────────────
+//  PASO 9 — DuPont 
 
 export function calcularDuPont(r: FundamentalAFResult): DuPontResult {
   const totalRevenue = safeNum(r.totalRevenue);
@@ -262,7 +262,7 @@ export function calcularDuPont(r: FundamentalAFResult): DuPontResult {
   };
 }
 
-// ─── PASO 10 — CCC ────────────────────────────────────────────────────
+//  PASO 10 — CCC 
 
 export function calcularCCC(r: FundamentalAFResult): CCCResult {
   const inventory = safeNum(r.inventory);
@@ -345,7 +345,7 @@ export function calcularCCC(r: FundamentalAFResult): CCCResult {
   };
 }
 
-// ─── PASO 11 — Altman Z-Score ─────────────────────────────────────────
+//  PASO 11 — Altman Z-Score 
 
 export function calcularAltmanZ(r: FundamentalAFResult): AltmanZResult {
   const totalAssets = safeNum(r.totalAssets);
@@ -395,7 +395,7 @@ export function calcularAltmanZ(r: FundamentalAFResult): AltmanZResult {
   return { x1, x2, x3, x4, x5, zScore: z, zona };
 }
 
-// ─── PASO 12 — Piotroski F-Score ──────────────────────────────────────
+//  PASO 12 — Piotroski F-Score 
 
 export function calcularPiotroski(
   r: FundamentalAFResult,
@@ -513,7 +513,7 @@ export function calcularPiotroski(
   return { puntaje, puntosPosibles: 9, desglose, interpretacion };
 }
 
-// ─── PASO 13 — Dilución vs Buyback ────────────────────────────────────
+//  PASO 13 — Dilución vs Buyback 
 
 export function calcularDilucion(r: FundamentalAFResult): DilucionResult {
   const sharesActual = safeNum(r.sharesOutstanding);
@@ -543,7 +543,7 @@ export function calcularDilucion(r: FundamentalAFResult): DilucionResult {
   return { sharesActual, sharesHistoria: sharesHist, variacionPct, interpretacion };
 }
 
-// ─── PASO 13.5 — Ratios de balance y cuenta de resultados (Oriol Amat) ────
+//  PASO 13.5 — Ratios de balance y cuenta de resultados (Oriol Amat) 
 
 /**
  * Calcula los ratios de la metodología de Oriol Amat ("Contabilidad y Finanzas
@@ -564,7 +564,7 @@ export function calcularRatiosAmat(r: FundamentalAFResult): RatiosAmatResult {
   const ebit = safeNum(r.ebit);
   const interestExpense = safeNum(r.interestExpense);
 
-  // ── Ratios brutos ──
+  //  Ratios brutos 
 
   // 1) Endeudamiento = Pasivo / (Patrimonio + Pasivo) — umbral general ≤ 0.6
   let endeudamiento: number | null = null;
@@ -620,7 +620,7 @@ export function calcularRatiosAmat(r: FundamentalAFResult): RatiosAmatResult {
     }
   }
 
-  // ── Interpretación sectorial (metodología Amat) ──
+  //  Interpretación sectorial (metodología Amat) 
 
   const sector = r.sector ?? "";
   const industry = r.industry ?? "";
@@ -747,7 +747,7 @@ function interpretarRatiosAmat(params: {
     industry,
   } = params;
 
-  // ── Ratio de endeudamiento (umbral general 0.6, sector-dependiente) ──
+  //  Ratio de endeudamiento (umbral general 0.6, sector-dependiente) 
   if (endeudamiento != null) {
     const umbralEndeudamiento =
       tipoSector === "utilidades" || tipoSector === "financiero" ? 0.75 : 0.6;
@@ -761,7 +761,7 @@ function interpretarRatiosAmat(params: {
       );
     } else if (endeudamiento > umbralEndeudamiento) {
       out.push(
-        `⚠️ Endeudamiento ${(endeudamiento * 100).toFixed(1)}% supera el umbral del ${(umbralEndeudamiento * 100).toFixed(0)}% — riesgo de descapitalización. Verificar si la deuda financia activos productivos y no se usa para cubrir gastos corrientes.`,
+        `[ADVERTENCIA] Endeudamiento ${(endeudamiento * 100).toFixed(1)}% supera el umbral del ${(umbralEndeudamiento * 100).toFixed(0)}% — riesgo de descapitalización. Verificar si la deuda financia activos productivos y no se usa para cubrir gastos corrientes.`,
       );
     } else if (endeudamiento <= 0.5) {
       out.push(
@@ -774,7 +774,7 @@ function interpretarRatiosAmat(params: {
     }
   }
 
-  // ── Calidad de la deuda (menor = mejor, pasivo corriente = baja calidad) ──
+  //  Calidad de la deuda (menor = mejor, pasivo corriente = baja calidad) 
   if (calidadDeuda != null) {
     if (tipoSector === "financiero") {
       out.push(
@@ -782,7 +782,7 @@ function interpretarRatiosAmat(params: {
       );
     } else if (calidadDeuda > 0.75) {
       out.push(
-        `⚠️ Calidad deuda ${(calidadDeuda * 100).toFixed(1)}% — la mayor parte del pasivo es a corto plazo (baja calidad), riesgo de renovación/refinanciación.`,
+        `[ADVERTENCIA] Calidad deuda ${(calidadDeuda * 100).toFixed(1)}% — la mayor parte del pasivo es a corto plazo (baja calidad), riesgo de renovación/refinanciación.`,
       );
     } else if (calidadDeuda < 0.4) {
       out.push(
@@ -795,7 +795,7 @@ function interpretarRatiosAmat(params: {
     }
   }
 
-  // ── Liquidez (ideal 1.5-2, excepto comerciales con rotación rápida) ──
+  //  Liquidez (ideal 1.5-2, excepto comerciales con rotación rápida) 
   if (liquidez != null) {
     if (tipoSector === "comercial" && liquidez < 1) {
       const industriaMsg = industry || "este sector";
@@ -804,7 +804,7 @@ function interpretarRatiosAmat(params: {
       );
     } else if (tipoSector === "industrial" && liquidez < 1.2) {
       out.push(
-        `⚠️ Liquidez ${liquidez.toFixed(2)} < 1.2 en industria con activos pesados — vigilar que no se financie activo no corriente con deuda a corto plazo (financiación desequilibrada).`,
+        `[ADVERTENCIA] Liquidez ${liquidez.toFixed(2)} < 1.2 en industria con activos pesados — vigilar que no se financie activo no corriente con deuda a corto plazo (financiación desequilibrada).`,
       );
     } else if (liquidez > 2.5) {
       out.push(
@@ -816,7 +816,7 @@ function interpretarRatiosAmat(params: {
       );
     } else if (liquidez < 1) {
       out.push(
-        `⚠️ Liquidez ${liquidez.toFixed(2)} < 1: el activo corriente no cubre el pasivo corriente — riesgo potencial de tesorería.`,
+        `[ADVERTENCIA] Liquidez ${liquidez.toFixed(2)} < 1: el activo corriente no cubre el pasivo corriente — riesgo potencial de tesorería.`,
       );
     } else {
       out.push(
@@ -825,7 +825,7 @@ function interpretarRatiosAmat(params: {
     }
   }
 
-  // ── Rotación del activo (mayor = mejor, vigilancia sectorial) ──
+  //  Rotación del activo (mayor = mejor, vigilancia sectorial) 
   if (rotacionActivo != null) {
     if (tipoSector === "industrial") {
       out.push(
@@ -846,15 +846,15 @@ function interpretarRatiosAmat(params: {
     }
   }
 
-  // ── Apalancamiento financiero favorable (ROA > Kd) ──
+  //  Apalancamiento financiero favorable (ROA > Kd) 
   if (apalancamientoFavorable != null) {
     if (apalancamientoFavorable) {
       out.push(
-        `✓ Apalancamiento financiero favorable: el rendimiento del activo (ROA) supera el coste de la deuda — la deuda amplifica la rentabilidad del accionista sin destruir valor.`,
+        ` Apalancamiento financiero favorable: el rendimiento del activo (ROA) supera el coste de la deuda — la deuda amplifica la rentabilidad del accionista sin destruir valor.`,
       );
     } else {
       out.push(
-        `⚠️ Apalancamiento financiero desfavorable: el coste de la deuda supera el rendimiento del activo (ROA < Kd) — cada unidad de deuda destruye valor, conviene desapalancar.`,
+        `[ADVERTENCIA] Apalancamiento financiero desfavorable: el coste de la deuda supera el rendimiento del activo (ROA < Kd) — cada unidad de deuda destruye valor, conviene desapalancar.`,
       );
     }
   }
@@ -862,7 +862,7 @@ function interpretarRatiosAmat(params: {
   return out;
 }
 
-// ─── Valuación completa ────────────────────────────────────────────────
+//  Valuación completa 
 
 export function calcularValuacionCompleta(
   r: FundamentalAFResult,
@@ -911,7 +911,7 @@ export function calcularValuacionCompleta(
   };
 }
 
-// ─── DCF completo (requiere inputs manuales del usuario) ───────────────
+//  DCF completo (requiere inputs manuales del usuario) 
 
 export interface DCFInputs {
   rf: number; // Risk-free rate (UST10Y), %
@@ -1125,7 +1125,7 @@ export function calcularDCF(
   return { valorIntrinseco, margenSeguridad, wacc, ke, kd, advertencias };
 }
 
-// ─── PASO 14 — WACC standalone ────────────────────────────────────────────
+//  PASO 14 — WACC standalone 
 
 export interface WACCResult {
   ke: number | null;
@@ -1343,7 +1343,7 @@ export function calcularWACC(
     betaUnlevered = Math.round((betaUsada / (1 + (1 - taxRate) * dE)) * 10000) / 10000;
   }
 
-  // ─── Paso 5: Valor actual de flujos netos descontados al WACC ──────────
+  //  Paso 5: Valor actual de flujos netos descontados al WACC 
   let valorIntrinseco: number | null = null;
   let margenSeguridad: number | null = null;
   let enterpriseValue: number | null = null;
@@ -1382,7 +1382,7 @@ export function calcularWACC(
       const debtVal = totalDebt;
       const cashVal = cash;
 
-      // ─── Paso 6: Deducir valor de mercado de la deuda ─────────────────
+      //  Paso 6: Deducir valor de mercado de la deuda 
       if (debtVal != null && cashVal != null) {
         equityValue = Math.round((enterpriseValue - debtVal + cashVal) * 100) / 100;
         valorIntrinseco = Math.round((equityValue / shares) * 100) / 100;
@@ -1426,7 +1426,7 @@ export function calcularWACC(
   };
 }
 
-// ─── BLOQUE 9.3/9.4 — PERT y ajuste de tasa por riesgo (documentación only) ──
+//  BLOQUE 9.3/9.4 — PERT y ajuste de tasa por riesgo (documentación only) 
 // Fuente: Alonso/Sapetnitzky, "Administración Financiera de las Organizaciones",
 // capítulo sobre PyMEs, secciones 4 y 5.
 //
@@ -1447,7 +1447,7 @@ export function calcularWACC(
 // no se implementa acá — se documenta para el Paso 10 (robustecer la valuación con
 // hipótesis optimista/pesimista/media en vez de un solo flujo esperado).
 
-// ─── BLOQUE 3 — APV y comparación de métodos ─────────────────────────
+//  BLOQUE 3 — APV y comparación de métodos 
 
 export interface APVResult {
   valorIntrinseco: number | null;
@@ -1712,7 +1712,7 @@ export function calcularAPV(
   };
 }
 
-// ─── PASO 16 — Múltiplos implícitos (valuación relativa) ────────────────────
+//  PASO 16 — Múltiplos implícitos (valuación relativa) 
 
 export interface MultiplosImplicitosResult {
   valorPE: number | null;
@@ -1881,7 +1881,7 @@ export function calcularMultiplosImplicitos(
   };
 }
 
-// ─── PASO 17 — Valor técnico de activos neto de deudas operativas ──────────
+//  PASO 17 — Valor técnico de activos neto de deudas operativas 
 
 export interface ValorTecnicoActivosResult {
   valorActivosNetos: number | null;
@@ -2026,7 +2026,7 @@ export function calcularValorTecnicoActivos(r: FundamentalAFResult): ValorTecnic
   };
 }
 
-// ─── BLOQUE 7 — Duration de bonos (Macaulay + modifcada) ────────────
+//  BLOQUE 7 — Duration de bonos (Macaulay + modifcada) 
 // Fuente: Elbaum/IFACI, Unidad 4, Cap. 10, puntos 10.10-10.11.
 // El paper da tres interpretaciones conceptuales de la duration (plazo del cupón
 // cero equivalente; punto de recuperación de mitad de la inversión ajustada por

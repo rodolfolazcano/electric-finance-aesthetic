@@ -57,15 +57,15 @@ export interface PairConfig {
   capitalPerPair: number;
   txCost: number;
   inSampleRatio?: number;
-  // ─── Labadie: p-variance risk measure (paper §3.2) ───
+  //  Labadie: p-variance risk measure (paper §3.2) 
   /** p para p-variance. p=2 → varianza clásica; p≠2 → riesgo generalizado (Labadie §3.2, p=1/H) */
   pValue?: number;
-  // ─── Labadie: Market Impact Model (paper §2.1) ───
+  //  Labadie: Market Impact Model (paper §2.1) 
   /** γ: exponente de impacto de mercado. Típico 0.3–0.7. I(v) = sign(v) × σ × |v/V|^γ × τ^(1/p) */
   marketImpactGamma?: number;
   /** Participación sobre volumen total del período (v/V). Default 0.1 (10%) */
   participationRate?: number;
-  // ─── Labadie: Target Close / Implementation Shortfall (paper §2.3–2.4) ───
+  //  Labadie: Target Close / Implementation Shortfall (paper §2.3–2.4) 
   /** "pairs" = clásico Z-score; "tc" = Target Close; "is" = Implementation Shortfall */
   executionAlgo?: "pairs" | "tc" | "is";
   /** σ: volatilidad anualizada para el modelo de ejecución óptima */
@@ -124,7 +124,7 @@ export interface PairAnalysisResult {
   splitDate?: string;
   pnlHistogram?: { binStart: number; binEnd: number; count: number }[];
   correlationBreakdown?: { current: number; historical: number; isBreaking: boolean };
-  // ─── Labadie: Hurst exponent + p-variance (paper §3.2) ───
+  //  Labadie: Hurst exponent + p-variance (paper §3.2) 
   hurstExponent?: number;
   pVarianceUsed?: number;
   /** implied p = 1/H (identidad del paper §3.2). H=0.5 → p=2 (random walk) */
@@ -133,10 +133,10 @@ export interface PairAnalysisResult {
   impliedPRegression?: number;
   /** p estimado por regresión multi-escala §4.3 (momentos absolutos log-log) */
   impliedPFromReturns?: number;
-  // ─── Labadie: Optimal execution curve (paper §2.3–2.5) ───
+  //  Labadie: Optimal execution curve (paper §2.3–2.5) 
   optimalStartPct?: number;   // % del período donde empezar a ejecutar (TC)
   optimalStopPct?: number;    // % del período donde dejar de ejecutar (IS)
-  // ─── Labadie: Trading curve (TC/IS) ───
+  //  Labadie: Trading curve (TC/IS) 
   tradingCurve?: { step: number; volume: number; cumulative: number }[];
 }
 
@@ -147,11 +147,11 @@ export interface PairPerformance {
   maxDrawdown: number;
   sharpe: number;
   avgDuration: number;
-  // ─── Labadie: p-variance Sharpe (paper §3.2) ───
+  //  Labadie: p-variance Sharpe (paper §3.2) 
   pSharpe?: number;          // Sharpe usando p-variance como risk measure
   pVariance?: number;        // Valor de E[|r-μ|^p]
   pValueUsed?: number;       // p usado (default 2)
-  // ─── Labadie: Optimal starting/stopping times (paper §2.5–2.7) ───
+  //  Labadie: Optimal starting/stopping times (paper §2.5–2.7) 
   optimalStartTime?: number; // Fracción [0,1] del período donde TC empieza
   optimalStopTime?: number;  // Fracción [0,1] del período donde IS termina
 }
@@ -172,7 +172,7 @@ export interface BacktestConfig {
   bMax: number;
   bStep: number;
   metric: "sharpe" | "pnl" | "winrate" | "maxdd" | "psharpe";
-  // ─── Labadie: p-variance para backtest ───
+  //  Labadie: p-variance para backtest 
   pValue?: number;
   marketImpactGamma?: number;
   participationRate?: number;

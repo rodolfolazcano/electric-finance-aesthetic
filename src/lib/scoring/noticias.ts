@@ -16,7 +16,7 @@ import {
 } from "./news-scoring";
 import { keywordSentimentProvider, type NoticiaAnalizada } from "../news-scoring.functions";
 
-// ─── Clasificador keywords (copia 1:1 de news-scoring.functions.ts:32-65) ───
+//  Clasificador keywords (copia 1:1 de news-scoring.functions.ts:32-65) 
 
 interface KeywordRule {
   patron: RegExp;

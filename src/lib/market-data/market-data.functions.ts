@@ -91,7 +91,7 @@ function buildEmptyYahooQuote(symbol: string): QuoteData {
   };
 }
 
-// ─── YAHOO: Cotizacion actual ──────────────────────────────────────────────
+//  YAHOO: Cotizacion actual 
 export const getYahooQuoteServer = createServerFn({ method: "GET" })
   .inputValidator((input: { symbol: string }) =>
     z.object({ symbol: z.string().min(1).max(20) }).parse(input),
@@ -129,7 +129,7 @@ export const getYahooQuoteServer = createServerFn({ method: "GET" })
     }
   });
 
-// ─── YAHOO: Serie historica ─────────────────────────────────────────────────
+//  YAHOO: Serie historica 
 export const getYahooHistoricalServer = createServerFn({ method: "GET" })
   .inputValidator(
     (input: { symbol: string; rango: RangoHistorico; intervalo?: IntervaloHistorico }) =>
@@ -148,7 +148,7 @@ export const getYahooHistoricalServer = createServerFn({ method: "GET" })
     yahooHistoricalBars(data.symbol, data.rango, data.intervalo),
   );
 
-// ─── IOL: helpers ───────────────────────────────────────────────────────────
+//  IOL: helpers 
 function parseIOLQuote(raw: any, ticker: string, mercado: MercadoIOL): QuoteData {
   return {
     ticker,
@@ -233,7 +233,7 @@ async function iolFetch<T>(
 
 type IOLResult<T> = { data: T; newToken?: string; newRefreshToken?: string };
 
-// ─── IOL: Cotizacion actual ─────────────────────────────────────────────────
+//  IOL: Cotizacion actual 
 export const getIOLQuoteServer = createServerFn({ method: "POST" })
   .inputValidator(
     (input: { ticker: string; mercado: MercadoIOL; token: string; refreshToken: string | null }) =>
@@ -253,7 +253,7 @@ export const getIOLQuoteServer = createServerFn({ method: "POST" })
     return { ...result, data: parseIOLQuote(result.data, data.ticker, data.mercado) };
   });
 
-// ─── IOL: Serie historica ───────────────────────────────────────────────────
+//  IOL: Serie historica 
 export const getIOLHistoricalServer = createServerFn({ method: "POST" })
   .inputValidator(
     (input: {
@@ -284,7 +284,7 @@ export const getIOLHistoricalServer = createServerFn({ method: "POST" })
     return { ...raw, data: parseIOLHistorical(raw.data) };
   });
 
-// ─── IOL: Panel completo (todos los instrumentos de un tipo) ────────────────
+//  IOL: Panel completo (todos los instrumentos de un tipo) 
 export const getIOLPanelServer = createServerFn({ method: "POST" })
   .inputValidator(
     (input: { instrumento: string; pais: string; token: string; refreshToken: string | null }) =>

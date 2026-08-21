@@ -18,7 +18,7 @@ function ChartTip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
     <div className="glass p-2 text-xs font-mono space-y-0.5">
-      <div className="text-[10px] text-muted-foreground">{label}</div>
+      <div className="text-[13px] text-muted-foreground">{label}</div>
       {payload.map((p: any) => (
         <div key={p.name}>
           <span style={{ color: p.color }}>{p.name}: </span>
@@ -57,18 +57,18 @@ export function HedgeResultCard({ result }: Props) {
         </h4>
         <div className="flex items-center gap-2">
           {isBetaNeutral && (
-            <span className="rounded-full border border-success/40 bg-success/10 px-2 py-0.5 font-mono text-[10px] text-success">
+            <span className="rounded-full border border-success/40 bg-success/10 px-2 py-0.5 font-mono text-[13px] text-success">
               Beta &lt; 0.1 — neutra
             </span>
           )}
           {!postHedge.ejecutable && (
-            <span className="rounded-full border border-danger/40 bg-danger/10 px-2 py-0.5 font-mono text-[10px] text-danger">
+            <span className="rounded-full border border-danger/40 bg-danger/10 px-2 py-0.5 font-mono text-[13px] text-danger">
               No ejecutable
             </span>
           )}
           {leverageBruto > 0 && (
             <span
-              className={`rounded-full border px-2 py-0.5 font-mono text-[10px] group relative ${
+              className={`rounded-full border px-2 py-0.5 font-mono text-[13px] group relative ${
                 leverageAlerta
                   ? "border-warning/40 bg-warning/10 text-warning"
                   : "border-border/40 text-muted-foreground"
@@ -81,9 +81,9 @@ export function HedgeResultCard({ result }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <div className="space-y-0.5">
-          <span className="font-mono text-[10px] text-muted-foreground">Benchmark activo</span>
+          <span className="font-mono text-[13px] text-muted-foreground">Benchmark activo</span>
           <p className="font-mono text-xs text-foreground">
             {position.bestBenchmark}
             <span className="ml-1 text-muted-foreground">
@@ -92,7 +92,7 @@ export function HedgeResultCard({ result }: Props) {
           </p>
           {position.bestBenchmarkConfiabilidad && (
             <span
-              className={`inline-block rounded border px-1.5 py-0.5 font-mono text-[9px] ${confiabilidadColor(position.bestBenchmarkConfiabilidad)}`}
+              className={`inline-block rounded border px-1.5 py-0.5 font-mono text-[13px] ${confiabilidadColor(position.bestBenchmarkConfiabilidad)}`}
               title={
                 position.bestBenchmarkConfiabilidad === "baja"
                   ? "Correlación débil — esta cobertura reduce el riesgo solo parcialmente"
@@ -104,26 +104,26 @@ export function HedgeResultCard({ result }: Props) {
           )}
         </div>
         <div className="space-y-0.5">
-          <span className="font-mono text-[10px] text-muted-foreground">Beta posición</span>
+          <span className="font-mono text-[13px] text-muted-foreground">Beta posición</span>
           <p className="font-mono text-xs text-foreground">{position.beta.toFixed(4)}</p>
         </div>
         <div className="space-y-0.5">
-          <span className="font-mono text-[10px] text-muted-foreground">Delta USD</span>
+          <span className="font-mono text-[13px] text-muted-foreground">Delta USD</span>
           <p className="font-mono text-xs text-foreground">${position.deltaUSD.toFixed(2)}</p>
         </div>
         <div className="space-y-0.5">
-          <span className="font-mono text-[10px] text-muted-foreground">Beta USD</span>
+          <span className="font-mono text-[13px] text-muted-foreground">Beta USD</span>
           <p className="font-mono text-xs text-foreground">${position.betaUSD.toFixed(2)}</p>
         </div>
         <div className="space-y-0.5">
-          <span className="font-mono text-[10px] text-muted-foreground">Observaciones</span>
+          <span className="font-mono text-[13px] text-muted-foreground">Observaciones</span>
           <p className="font-mono text-xs text-foreground">{position.observations}</p>
         </div>
       </div>
 
       {position.equityCurve && position.equityCurve.length > 0 && (
         <div className="h-48">
-          <div className="mono mb-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          <div className="mono mb-1 text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
             Evolución histórica — {position.ticker} vs {position.bestBenchmark}
           </div>
           <ResponsiveContainer width="100%" height="100%">
@@ -175,13 +175,13 @@ export function HedgeResultCard({ result }: Props) {
       {hedgeAssets.length > 0 && (
         <>
           <div className="border-t border-border/20 pt-2">
-            <span className="font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            <span className="font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
               Cobertura propuesta
             </span>
             <div className="mt-1.5 overflow-x-auto">
-              <table className="w-full text-left font-mono text-[11px]">
+              <table className="w-full text-left font-mono text-[14px]">
                 <thead>
-                  <tr className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <tr className="text-[13px] uppercase tracking-wider text-muted-foreground">
                     <th className="px-2 py-1">Instrumento</th>
                     <th className="px-2 py-1">Tipo</th>
                     <th className="px-2 py-1 text-right">Monto USD</th>
@@ -225,37 +225,37 @@ export function HedgeResultCard({ result }: Props) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 rounded-md border border-border/30 bg-muted/10 p-3 sm:grid-cols-4">
+          <div className="grid w-full grid-cols-2 gap-3 rounded-md border border-border/30 bg-muted/10 p-3 sm:grid-cols-4">
             <div className="space-y-0.5">
-              <span className="font-mono text-[10px] text-muted-foreground">Delta neto</span>
+              <span className="font-mono text-[13px] text-muted-foreground">Delta neto</span>
               <p
                 className={`font-mono text-xs ${Math.abs(postHedge.deltaNeto) < 0.1 ? "text-success" : "text-foreground"}`}
               >
                 ${postHedge.deltaNeto.toFixed(2)}
-                <span className="ml-1 text-[10px] text-muted-foreground">
+                <span className="ml-1 text-[13px] text-muted-foreground">
                   (↓{postHedge.deltaReductionPct.toFixed(0)}%)
                 </span>
               </p>
             </div>
             <div className="space-y-0.5">
-              <span className="font-mono text-[10px] text-muted-foreground">Beta neto</span>
+              <span className="font-mono text-[13px] text-muted-foreground">Beta neto</span>
               <p
                 className={`font-mono text-xs ${Math.abs(postHedge.betaNeto) < 0.1 ? "text-success" : "text-foreground"}`}
               >
                 ${postHedge.betaNeto.toFixed(2)}
-                <span className="ml-1 text-[10px] text-muted-foreground">
+                <span className="ml-1 text-[13px] text-muted-foreground">
                   (↓{postHedge.betaReductionPct.toFixed(0)}%)
                 </span>
               </p>
             </div>
             <div className="space-y-0.5">
-              <span className="font-mono text-[10px] text-muted-foreground">Costo total</span>
+              <span className="font-mono text-[13px] text-muted-foreground">Costo total</span>
               <p className="font-mono text-xs text-foreground">
                 ${postHedge.totalCostoUSD.toFixed(2)}
               </p>
             </div>
             <div className="space-y-0.5">
-              <span className="font-mono text-[10px] text-muted-foreground">Saldo restante</span>
+              <span className="font-mono text-[13px] text-muted-foreground">Saldo restante</span>
               {postHedge.ejecutable ? (
                 <p className="font-mono text-xs text-foreground">
                   ${postHedge.saldoRestante.toFixed(2)}
@@ -269,7 +269,7 @@ export function HedgeResultCard({ result }: Props) {
             </div>
             {leverageBruto > 0 && (
               <div className="space-y-0.5 group relative">
-                <span className="font-mono text-[10px] text-muted-foreground">Leverage bruto</span>
+                <span className="font-mono text-[13px] text-muted-foreground">Leverage bruto</span>
                 <p
                   className={`font-mono text-xs ${leverageAlerta ? "text-warning" : "text-foreground"}`}
                   title="Exposición total de la cobertura dividida el saldo disponible"
@@ -280,7 +280,7 @@ export function HedgeResultCard({ result }: Props) {
             )}
             {leverageNeto > 0 && (
               <div className="space-y-0.5 group relative">
-                <span className="font-mono text-[10px] text-muted-foreground">Leverage neto</span>
+                <span className="font-mono text-[13px] text-muted-foreground">Leverage neto</span>
                 <p
                   className="font-mono text-xs text-foreground"
                   title="Exposición neta (descontando costos) dividida el saldo disponible"
@@ -291,7 +291,7 @@ export function HedgeResultCard({ result }: Props) {
             )}
             {(postHedge.costoFinanciamiento ?? 0) > 0 && (
               <div className="space-y-0.5">
-                <span className="font-mono text-[10px] text-muted-foreground">
+                <span className="font-mono text-[13px] text-muted-foreground">
                   Costo financ. (cauc.)
                 </span>
                 <p className="font-mono text-xs text-warning">
@@ -305,7 +305,7 @@ export function HedgeResultCard({ result }: Props) {
 
       {hedgeAssets.filter((a) => a.montoUSD < 0).length > 0 && (
         <div className="space-y-1 rounded-md border border-border/20 bg-muted/5 p-3">
-          <span className="font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <span className="font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
             Nota — Asimetría del short
           </span>
           {hedgeAssets
@@ -313,7 +313,7 @@ export function HedgeResultCard({ result }: Props) {
             .map((a) => (
               <p
                 key={a.ticker}
-                className="font-mono text-[10px] leading-relaxed text-muted-foreground"
+                className="font-mono text-[13px] leading-relaxed text-muted-foreground"
               >
                 {a.ticker}: si sube X%, la pérdida es -X% - costo de préstamo; si baja X%, la
                 ganancia es solo +X% - costo de préstamo.
@@ -323,7 +323,7 @@ export function HedgeResultCard({ result }: Props) {
       )}
 
       {hedgeAssets.length === 0 && (
-        <div className="rounded-md border border-warning/30 bg-warning/5 px-3 py-2 font-mono text-[11px] text-warning">
+        <div className="rounded-md border border-warning/30 bg-warning/5 px-3 py-2 font-mono text-[14px] text-warning">
           No se encontraron activos de cobertura adecuados para esta posición.
         </div>
       )}

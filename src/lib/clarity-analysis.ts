@@ -570,7 +570,7 @@ async function extraerDatos(simbolo: string): Promise<DatosClarity> {
   };
 }
 
-// ─────────────────────────── Capa Cualitativa ───────────────────────────
+//  Capa Cualitativa 
 
 export interface ResultadoCualitativo {
   ticker: string;
@@ -704,7 +704,7 @@ export async function claCualitativo(simbolo: string): Promise<ResultadoCualitat
   };
 }
 
-// ──────────────────────────── Capa Cuantitativa ────────────────────────────
+//  Capa Cuantitativa 
 
 export interface MetricasCuantitativas {
   M1_ingresos_netos?: number;
@@ -831,7 +831,7 @@ export async function claCuantitativo(simbolo: string): Promise<ResultadoCuantit
   };
 }
 
-// ───────────────────────────── Capa WACC ─────────────────────────────
+//  Capa WACC 
 
 export interface ResultadoWacc {
   ticker: string;
@@ -974,7 +974,7 @@ export async function claWacc(simbolo: string): Promise<ResultadoWacc> {
   };
 }
 
-// ────────────────────────────── Capa DCF ──────────────────────────────
+//  Capa DCF 
 
 export interface ResultadoDcf {
   ticker: string;
@@ -1122,7 +1122,7 @@ export async function claDcf(simbolo: string): Promise<ResultadoDcf> {
   };
 }
 
-// ───────────────────────────── Capa Múltiplos ─────────────────────────────
+//  Capa Múltiplos 
 
 export interface ResultadoMultiples {
   ticker: string;
@@ -1204,7 +1204,7 @@ export async function claMultiples(simbolo: string): Promise<ResultadoMultiples>
   };
 }
 
-// ───────────────────────────── Capa Valor Libro / APV ─────────────────────────────
+//  Capa Valor Libro / APV 
 
 export interface ResultadoBookValue {
   ticker: string;
@@ -1266,7 +1266,7 @@ export async function claBookValue(simbolo: string): Promise<ResultadoBookValue>
   };
 }
 
-// ─────────────────────────────── Triangulación ───────────────────────────────
+//  Triangulación 
 
 export interface ResultadoTriangulacion {
   ticker: string;
@@ -1364,7 +1364,7 @@ export async function claTriangulacion(simbolo: string): Promise<ResultadoTriang
   };
 }
 
-// ───────────────────────────── Contexto Macro ─────────────────────────────
+//  Contexto Macro 
 
 export interface ResultadoMacro {
   timestamp: string;
@@ -1518,7 +1518,7 @@ export async function claContextoMacro(): Promise<ResultadoMacro> {
   };
 }
 
-// ─────────────────────────────── Ficha de Decisión ───────────────────────────────
+//  Ficha de Decisión 
 
 export interface ResultadoFicha {
   ticker: string;
@@ -1670,7 +1670,7 @@ export async function claFicha(simbolo: string): Promise<ResultadoFicha> {
   };
 }
 
-// ───────────────────────────── Ciclo Económico (Intermarket) ─────────────────────────────
+//  Ciclo Económico (Intermarket) 
 
 export interface ResultadoCiclo {
   stage: number;
@@ -1837,7 +1837,7 @@ export async function claCiclo(): Promise<ResultadoCiclo> {
   };
 }
 
-// ───────────────────────────── Performance Sectorial ─────────────────────────────
+//  Performance Sectorial 
 
 export interface ResultadoPerformanceSectorial {
   items: Array<{
@@ -1894,7 +1894,7 @@ export async function claPerformanceSectorial(
   return { items, period: periodo };
 }
 
-// ───────────────────────────── Valuation Sectorial ─────────────────────────────
+//  Valuation Sectorial 
 
 interface FundSectorial {
   errores: string | null;
@@ -2127,7 +2127,7 @@ export async function claValuacionSectorial(
   };
 }
 
-// ───────────────────────────── Formateo de texto ─────────────────────────────
+//  Formateo de texto 
 
 const nf0 = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 0 });
 const nf2 = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 });
@@ -2160,11 +2160,11 @@ export function textoCuantitativo(r: ResultadoCuantitativo): string {
   if (r.metricas.ev_ebitda != null) L.push(`- EV/EBITDA: ${r.metricas.ev_ebitda.toFixed(2)}`);
   if (r.alertas.rojas.length) {
     L.push(`\nAlertas ROJAS (${r.alertas.total_rojas}):`);
-    for (const al of r.alertas.rojas) L.push(`- 🔴 ${al}`);
+    for (const al of r.alertas.rojas) L.push(`- [ROJO] ${al}`);
   }
   if (r.alertas.amarillas.length) {
     L.push(`\nAlertas amarillas (${r.alertas.total_amarillas}):`);
-    for (const al of r.alertas.amarillas) L.push(`- 🟡 ${al}`);
+    for (const al of r.alertas.amarillas) L.push(`- [AMARILLO] ${al}`);
   }
   if (!r.alertas.rojas.length && !r.alertas.amarillas.length)
     L.push(`\nSin alertas de riesgo detectadas.`);

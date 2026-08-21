@@ -10,7 +10,7 @@ export interface PlanificacionInputs {
   nombreEmpresa: string;
   moneda: string;
   iva: number; // 0.18
-  // ── Presupuesto de ventas ──
+  //  Presupuesto de ventas 
   ventas: {
     unidadesMes1: number;
     precio1: number;
@@ -21,7 +21,7 @@ export interface PlanificacionInputs {
     /** Stock inicial de cuentas a cobrar (ventas del año anterior) */
     stockInicialCreditos: number;
   };
-  // ── Presupuesto de producción ──
+  //  Presupuesto de producción 
   produccion: {
     /** Costo variable unitario por semestre */
     costoVariableUnit1: number;
@@ -38,7 +38,7 @@ export interface PlanificacionInputs {
     /** Plazo de pago a proveedores en días (crédito de proveedores) */
     plazoPagoProveedoresDias: number;
   };
-  // ── Presupuesto de inversiones ──
+  //  Presupuesto de inversiones 
   inversiones: {
     /** Compra de bienes de uso ($) */
     compraActivoFijo: number;
@@ -53,7 +53,7 @@ export interface PlanificacionInputs {
     /** Depreciación del ejercicio */
     depreciacion: number;
   };
-  // ── Plan financiero ──
+  //  Plan financiero 
   financiamiento: {
     /** Préstamo bancario a corto plazo al inicio */
     prestamoBancarioInicial: number;
@@ -227,7 +227,7 @@ export interface PlanificacionFinancieraResult {
   observaciones: string[];
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────
+//  Helpers 
 
 function r(num: number, den: number): number | null {
   if (den === 0) return null;
@@ -238,7 +238,7 @@ function round2(v: number): number {
   return Math.round(v * 100) / 100;
 }
 
-// ─── Simulación completa ────────────────────────────────────────────────
+//  Simulación completa 
 
 export function calcularPlanificacionFinanciera(
   inputs: PlanificacionInputs,
@@ -249,7 +249,7 @@ export function calcularPlanificacionFinanciera(
   const fin = inputs.financiamiento;
   const iva = inputs.iva;
 
-  // ── Presupuesto de ventas ──
+  //  Presupuesto de ventas 
   const unidades1 = v.unidadesMes1 * 6;
   const unidades2 = v.unidadesMes2 * 6;
   const ventas1 = round2(unidades1 * v.precio1);
@@ -273,7 +273,7 @@ export function calcularPlanificacionFinanciera(
   const cobranzas2 = round2(ventas2 * pctCobro2 + ventas1 * (1 - pctCobro1));
   const creditosFinal = round2(ventas2 * (1 - pctCobro2));
 
-  // ── Presupuesto de producción ──
+  //  Presupuesto de producción 
   const costoVentas1 = round2(unidades1 * p.costoVariableUnit1);
   const costoVentas2 = round2(unidades2 * p.costoVariableUnit2);
   const costoVentasTotal = round2(costoVentas1 + costoVentas2);
@@ -298,7 +298,7 @@ export function calcularPlanificacionFinanciera(
   const pagosProveedores2 = round2(compras2 * pctPagoProv1 + compras1 * (1 - pctPagoProv1));
   const proveedoresFinal = round2(compras2 * (1 - pctPagoProv1));
 
-  // ── Presupuesto de inversiones ──
+  //  Presupuesto de inversiones 
   const pctContado = inv.pctContadoCompra;
   const contado = round2(inv.compraActivoFijo * pctContado);
   const saldoFinanciado = inv.compraActivoFijo * (1 - pctContado);
@@ -318,7 +318,7 @@ export function calcularPlanificacionFinanciera(
   );
   const resultadoVentaActivoFijo = round2(inv.ventaActivoFijo * 0.25); // utilidad estimada 25% del costo
 
-  // ── Plan financiero ──
+  //  Plan financiero 
   const tasaSem1 = fin.tasaPrestamoBancario;
   const interesesBancario = round2(fin.prestamoBancarioInicial * tasaSem1 * 1.5);
   const pagoCapitalBancario = round2(fin.prestamoBancarioInicial / 3);
@@ -339,7 +339,7 @@ export function calcularPlanificacionFinanciera(
   // Intereses por nuevos préstamos (proxy: tasa de la línea × 50% de la necesidad de caja)
   const interesesNuevosPrestamos = round2((fin.prestamoBancarioInicial * fin.lineaCreditoTasa) / 2);
 
-  // ── PER ──
+  //  PER 
   const gaii = round2(
     ventasTotal - costoVentasTotal - p.costosFijos1 - p.costosFijos2 - resultadoVentaActivoFijo,
   );
@@ -350,7 +350,7 @@ export function calcularPlanificacionFinanciera(
   const impuesto = round2(Math.max(0, gai) * fin.tasaImpuesto);
   const gananciaNeta = round2(gai - impuesto);
 
-  // ── PES ──
+  //  PES 
   const caja = round2(
     inputs.caja.inicial +
       (cobranzas1 + cobranzas2) -
@@ -379,7 +379,7 @@ export function calcularPlanificacionFinanciera(
   const patrimonioFinal = round2(patrimonioInicial + gananciaNeta - fin.dividendosEfectivo);
   const totalPasivoPatrimonio = round2(totalPasivo + patrimonioFinal);
 
-  // ── PFC ──
+  //  PFC 
   const flujoNeto1 = round2(
     cobranzas1 -
       (pagosProveedores1 + p.costosFijos1 + pagosInversion1 + pagosBancario1 + pagosDeudaLP1),
@@ -396,7 +396,7 @@ export function calcularPlanificacionFinanciera(
   const cajaFinal1 = round2(inputs.caja.inicial + flujoNeto1);
   const cajaFinal2 = round2(cajaFinal1 + flujoNeto2);
 
-  // ── Ratios forward ──
+  //  Ratios forward 
   const totalAssets = totalActivo;
   const totalEquity = patrimonioFinal;
   const totalDebt = round2(prestamoBancarioFinal + deudaLargoPlazoFinal + acreedoresCompraFinal);
@@ -423,37 +423,37 @@ export function calcularPlanificacionFinanciera(
       ? round2(margenUtilidad * rotacionActivosTotales * multiplicadorPatrimonio * 100)
       : null;
 
-  // ── Observaciones ──
+  //  Observaciones 
   const observaciones: string[] = [];
   if (razonCirculante != null && razonCirculante < 1.5) {
     observaciones.push(
-      `⚠️ Razón circulante proyectada ${razonCirculante.toFixed(2)} < 1.5 — revisar la política de financiamiento de corto plazo y el crédito de proveedores.`,
+      `[ADVERTENCIA] Razón circulante proyectada ${razonCirculante.toFixed(2)} < 1.5 — revisar la política de financiamiento de corto plazo y el crédito de proveedores.`,
     );
   }
   if (dso != null && dso > 90) {
     observaciones.push(
-      `⚠️ DSO proyectado de ${dso.toFixed(0)} días — cobranzas lentas; considerar acortar el plazo de crédito a clientes.`,
+      `[ADVERTENCIA] DSO proyectado de ${dso.toFixed(0)} días — cobranzas lentas; considerar acortar el plazo de crédito a clientes.`,
     );
   }
   if (tie != null && tie < 2) {
     observaciones.push(
-      `⚠️ TIE proyectado ${tie.toFixed(1)}x < 2 — el GAII apenas cubre los intereses; revisar la estructura de deuda.`,
+      `[ADVERTENCIA] TIE proyectado ${tie.toFixed(1)}x < 2 — el GAII apenas cubre los intereses; revisar la estructura de deuda.`,
     );
   }
   if (cajaFinal2 < inputs.caja.minimo) {
     observaciones.push(
-      `⚠️ La caja proyectada (${cajaFinal2.toFixed(0)}) queda por debajo del mínimo (${inputs.caja.minimo.toFixed(0)}) — se requiere financiamiento adicional o reducción de egresos.`,
+      `[ADVERTENCIA] La caja proyectada (${cajaFinal2.toFixed(0)}) queda por debajo del mínimo (${inputs.caja.minimo.toFixed(0)}) — se requiere financiamiento adicional o reducción de egresos.`,
     );
   } else {
     observaciones.push(
-      `✓ La caja proyectada (${cajaFinal2.toFixed(0)}) cubre el saldo mínimo requerido (${inputs.caja.minimo.toFixed(0)}).`,
+      ` La caja proyectada (${cajaFinal2.toFixed(0)}) cubre el saldo mínimo requerido (${inputs.caja.minimo.toFixed(0)}).`,
     );
   }
   if (fin.deudaLargoPlazoInicial > 0 && interesesDeudaLP > 0) {
     const palanca = roe != null && roa != null && roa !== 0 ? roe / roa : null;
     if (palanca != null && palanca > 1)
       observaciones.push(
-        `✓ Efecto de palanca proyectado de ${palanca.toFixed(2)} — el apalancamiento amplifica el retorno del capital propio (Pascale: utilización del capital ajeno conveniente).`,
+        ` Efecto de palanca proyectado de ${palanca.toFixed(2)} — el apalancamiento amplifica el retorno del capital propio (Pascale: utilización del capital ajeno conveniente).`,
       );
   }
 
@@ -558,7 +558,7 @@ export function calcularPlanificacionFinanciera(
   };
 }
 
-// ─── Valores por defecto (referencia: caso desarrollado en el capítulo) ──
+//  Valores por defecto (referencia: caso desarrollado en el capítulo) 
 
 export function planificacionPorDefecto(): PlanificacionInputs {
   return {

@@ -71,19 +71,19 @@ export function ExchangeCompareTable({
 
   function sortArrow(key: SortKey) {
     if (sortKey !== key) return "";
-    return sortDir === "asc" ? " ▲" : " ▼";
+    return sortDir === "asc" ? " " : " ";
   }
 
   return (
     <div>
-      <div className="mono mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="mono mb-2 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
         Comparativa Exchanges
-        <span className="ml-2 text-[9px] text-muted-foreground/60">
+        <span className="ml-2 text-[13px] text-muted-foreground/60">
           (clic en columna para ordenar)
         </span>
       </div>
-      <div className="overflow-x-auto">
-        <table className="mono w-full text-[10px]">
+      <div className="overflow-x-auto w-full">
+        <table className="mono w-full text-[13px]">
           <thead className="uppercase tracking-wider text-muted-foreground">
             <tr className="border-b border-border/60">
               <th
@@ -151,7 +151,7 @@ export function ExchangeCompareTable({
                     {fmtNum(e.spreadNeto, 2)}%
                   </td>
                   <td className="px-2 py-1">
-                    {e.spreadNeto > 0.5 ? "" : e.spreadNeto > 0 ? "️" : ""}
+                    {e.spreadNeto > 0.5 ? "" : e.spreadNeto > 0 ? "" : ""}
                   </td>
                 </tr>
               );

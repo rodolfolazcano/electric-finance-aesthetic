@@ -66,13 +66,13 @@ export function InvestorTest() {
 
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3 text-center">
-              <div className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Horizonte temporal
               </div>
               <div className="mono mt-1 text-xs text-foreground">2 preguntas</div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3 text-center">
-              <div className="mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Tolerancia al riesgo
               </div>
               <div className="mono mt-1 text-xs text-foreground">5 preguntas</div>
@@ -101,7 +101,7 @@ export function InvestorTest() {
       <div className="mx-auto max-w-2xl">
         <div className="glass p-8">
           <div className="text-center">
-            <div className="mono text-[11px] uppercase tracking-[0.22em] text-primary/80">
+            <div className="mono text-[14px] uppercase tracking-[0.22em] text-primary/80">
               Tu perfil de inversor
             </div>
             <h3 className="mt-2 text-2xl font-medium tracking-tight text-primary">{result}</h3>
@@ -109,13 +109,13 @@ export function InvestorTest() {
 
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3 text-center">
-              <div className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              <div className="text-[13px] uppercase tracking-[0.16em] text-muted-foreground">
                 Horizonte temporal
               </div>
               <div className="mono mt-1 text-lg font-light text-foreground">{htScore}</div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3 text-center">
-              <div className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              <div className="text-[13px] uppercase tracking-[0.16em] text-muted-foreground">
                 Tolerancia al riesgo
               </div>
               <div className="mono mt-1 text-lg font-light text-foreground">{trScore}</div>
@@ -125,7 +125,7 @@ export function InvestorTest() {
           <p className="mt-6 text-sm leading-relaxed text-muted-foreground">{info.description}</p>
 
           <div className="mt-6">
-            <div className="mono mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
               Composición sugerida de cartera
             </div>
             <div className="space-y-2">
@@ -197,7 +197,7 @@ export function InvestorTest() {
 
         {sectionChanged && currentSection && (
           <div className="mb-4 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2">
-            <span className="mono text-[11px] uppercase tracking-[0.18em] text-primary">
+            <span className="mono text-[14px] uppercase tracking-[0.18em] text-primary">
               Sección: {SECTION_NAMES[currentSection]}
             </span>
           </div>

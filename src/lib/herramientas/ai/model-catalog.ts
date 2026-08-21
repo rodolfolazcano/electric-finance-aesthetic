@@ -526,9 +526,9 @@ export function deepChain(chain: ModelRef[]): ModelRef[] {
   return out;
 }
 
-// ══════════════════════════════════════════════════════════════════════
+// 
 // MODEL_TIERS — cadenas por nivel del clasificador
-// ══════════════════════════════════════════════════════════════════════
+// 
 
 export const MODEL_TIERS: Record<string, ModelRef[]> = {
   fast: [

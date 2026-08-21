@@ -84,7 +84,7 @@ export const TOOLS: ToolSpec[] = [
     function: {
       name: "consultar_base_conocimiento",
       description:
-        "Consulta la base de conocimiento interna del sitio web de Cintia Boos y el corpus académico indexado (55 documentos de finanzas y contabilidad: Pascale, Fowler Newton, Dumrauf, Blanchard, Dornbusch, Biondi, etc.). Úsala para preguntas sobre servicios (7 ítems), instrumentos (12 ítems), brokers (3 ítems), preguntas frecuentes (4 ítems), alianzas (2 ítems), sistema financiero argentino y su regulación (BCRA, Ley 21.526, CAMELBIG, efectivo mínimo, capitales mínimos/RPC, NIIF 9, SEDESA/seguro de depósitos, política monetaria, BADLAR, ETTI, mercado interbancario), sistema financiero europeo y español (ESI/EAF, MiFID II, mercados regulados y SMN, grupo BME, FGD y FOGAIN, BCE y política monetaria, TLTRO/QE, TARGET2, EONIA/EURIBOR/€STR), matemática financiera y rentabilidad (valor temporal del dinero, capitalización simple/compuesta/continua, descuento comercial/racional/compuesto, tasas spot y forward, curvas de tasas, tasa nominal vs real, TAE/CFT, TIR/VAN, TRE), calculadora financiera (HP 12C/Casio: rentas, VAN/TIR con flujos de caja, bonos, estadística descriptiva), asesoramiento y planificación financiera (banca personal y privada, perfiles de riesgo conservador/moderado/arriesgado, tríada rentabilidad-seguridad-liquidez, proceso de planificación en 5 fases, diseño, reajuste y reequilibrio de carteras, EAFI, idoneidad CNV), ética y conducta profesional del asesor (códigos de ética IEAF e IAEF, interés del cliente primero, conflictos de interés, prohibición de asegurar rendimientos), seguros según la Ley 17.418 (riesgo asegurable, contrato y póliza, prima, siniestro y reticencia, sobreseguro/infraseguro, seguros de daños patrimoniales y de personas, tipos de seguro de vida), administración de riesgos (identificación, evaluación con mapa de riesgos, prevención, transferencia al mercado de seguros), o para explicar conceptos, métodos, fórmulas y teoría de finanzas, contabilidad y macroeconomía (valoración, tasas, estados contables, carteras, costo de capital, DCF, etc.). El parámetro query es la pregunta del usuario en español.",
+        "Consulta la base de conocimiento interna del sitio web de Cintia Boos y el corpus académico indexado (55 documentos de finanzas y contabilidad: Pascale, Fowler Newton, Dumrauf, Blanchard, Dornbusch, Biondi, etc.). Úsala para preguntas sobre servicios (7 ítems), instrumentos (12 ítems), brokers (3 ítems), preguntas frecuentes (4 ítems), alianzas (2 ítems), sistema financiero argentino y su regulación (BCRA, Ley 21.526, CAMELBIG, efectivo mínimo, capitales mínimos/RPC, NIIF 9, SEDESA/seguro de depósitos, política monetaria, BADLAR, ETTI, mercado interbancario), sistema financiero europeo y español (ESI/EAF, MiFID II, mercados regulados y SMN, grupo BME, FGD y FOGAIN, BCE y política monetaria, TLTRO/QE, TARGET2, EONIA/EURIBOR/€STR), matemática financiera y rentabilidad (valor temporal del dinero, capitalización simple/compuesta/continua, descuento comercial/racional/compuesto, tasas spot y forward, curvas de tasas, tasa nominal vs real, TAE/CFT, TIR/VAN, TRE), calculadora financiera (HP 12C/Casio: rentas, VAN/TIR con flujos de caja, bonos, estadística descriptiva), asesoramiento y planificación financiera (banca personal y privada, perfiles de riesgo conservador/moderado/arriesgado, tríada rentabilidad-seguridad-liquidez, proceso de planificación en 5 fases, diseño, reajuste y reequilibrio de carteras, EAFI, idoneidad CNV), ética y conducta profesional del asesor (códigos de ética IEAF e IAEF, interés del cliente primero, conflictos de interés, prohibición de asegurar rendimientos), seguros según la Ley 17.418 (riesgo asegurable, contrato y póliza, prima, siniestro y reticencia, sobreseguro/infraseguro, seguros de daños patrimoniales y de personas, tipos de seguro de vida), administración de riesgos (identificación, evaluación con mapa de riesgos, prevención, transferencia al mercado de seguros), o para explicar conceptos, métodos, fórmulas y teoría de finanzas, contabilidad y macroeconomía (valoración, tasas, estados contables, carteras, costo de capital, DCF, etc.), y el corpus metodológico cuantitativo de Labadie (ejecución óptima Almgren-Chriss con Target Close/Implementation Shortfall/PVol/p-varianza/Hurst, market-making de alta frecuencia Fodra-Labadie con HJB e intensidades exponenciales, microestructura Kyle/Glosten-Milgrom/LOB/tipos de órdenes, taxonomía HFT Makers-Takers-Gamers, scheduling TWAP/VWAP/PoV y smart order routing, arbitraje estadístico y backtesting en 5 etapas, zoología financiera y hedge funds, ETFs y replicación, geometría de carteras y PCA, procesos estocásticos y Black-Scholes, AMMs DeFi). El parámetro query es la pregunta del usuario en español.",
       parameters: {
         type: "object",
         properties: {
@@ -1196,6 +1196,90 @@ export const TOOLS: ToolSpec[] = [
       parameters: { type: "object", properties: {}, additionalProperties: false },
     },
   },
+  // -------------------------------------------------------------------------
+  // Metodologías cuantitativas de Labadie (stat-arb y ejecución óptima).
+  // -------------------------------------------------------------------------
+  {
+    type: "function",
+    function: {
+      name: "pairs_trading_labadie",
+      description:
+        "Analiza un PAR de activos con la metodología de arbitraje estadístico de Labadie sobre series reales de Yahoo Finance: correlación, beta de hedge por regresión, test ADF de cointegración, spread con media/volatilidad móviles, z-score actual, bandas de entrada mu±a·sigma y stop-loss ±b·sigma, Hurst del spread con p implícita (1/H), backtest completo (trades, win rate, Sharpe, Sharpe p-varianza, max drawdown) y validación In-Sample vs Out-of-Sample. Para preguntas como 'analizá el par GGAL y BMA', 'pairs trading entre X e Y', 'está cointegrado X con Y', 'spread entre AAPL y MSFT', 'arbitraje estadístico de X e Y'. Requiere DOS tickers.",
+      parameters: {
+        type: "object",
+        properties: {
+          simboloA: {
+            type: "string",
+            description: "Primer ticker del par (ej. 'GGAL.BA', 'AAPL', 'PAMP.BA').",
+          },
+          simboloB: {
+            type: "string",
+            description: "Segundo ticker del par (ej. 'BMA.BA', 'MSFT', 'YPF').",
+          },
+          ventana: {
+            type: "number",
+            description: "Ventana móvil del spread en días (5-120). Default 20.",
+          },
+          umbralEntrada: {
+            type: "number",
+            description: "Umbral de entrada a en múltiplos de sigma (0.3-4). Default 1.5.",
+          },
+          umbralStop: {
+            type: "number",
+            description:
+              "Umbral de stop-loss b en múltiplos de sigma, debe ser > umbralEntrada. Default 2.5.",
+          },
+          rangoDias: {
+            type: "number",
+            description: "Días de historia para el análisis (90-730). Default 365.",
+          },
+        },
+        required: ["simboloA", "simboloB"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "curva_ejecucion_labadie",
+      description:
+        "Calcula la CURVA DE EJECUCIÓN ÓPTIMA de un activo con la metodología Almgren-Chriss extendida de Labadie-Lehalle sobre datos reales de Yahoo Finance: volúmenes óptimos por slice (Target Close hacia adelante o Implementation Shortfall hacia atrás), impacto cóncavo (v/V)^gamma, restricción PVol de participación máxima, tiempos óptimos de inicio/parada y medida de riesgo p-varianza con exponente de Hurst (p=1/H). Para preguntas como 'cómo ejecuto una orden grande de X', 'curva de trading óptima de X', 'Target Close vs Implementation Shortfall', 'impacto de mercado de X', 'con qué agresividad compro X'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description: "Ticker del activo a ejecutar (ej. 'AAPL', 'GGAL.BA', 'SPY').",
+          },
+          benchmark: {
+            type: "string",
+            description: "'tc' = Target Close (default) o 'is' = Implementation Shortfall.",
+          },
+          participacionMaxima: {
+            type: "number",
+            description: "Participación máxima del volumen PVol q (0.01-0.5). Default 0.1.",
+          },
+          pVarianza: {
+            type: "number",
+            description:
+              "Exponente p de la p-varianza (1.1-4; p=2 varianza clásica; p=1/Hurst según Hurst estimado). Default 2.",
+          },
+          gammaImpacto: {
+            type: "number",
+            description: "Exponente gamma del impacto cóncavo (0-1). Default 0.5.",
+          },
+          volatilidadAnual: {
+            type: "number",
+            description:
+              "Volatilidad anual opcional (fracción, ej. 0.25). Si falta se estima de los datos.",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
 ];
 
 export type EstadoHerramienta =
@@ -1281,6 +1365,10 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
       return "portafolio";
     case "oportunidades_diarias":
       return "mercado";
+    case "pairs_trading_labadie":
+      return "portafolio";
+    case "curva_ejecucion_labadie":
+      return "portafolio";
     default:
       return "searching";
   }

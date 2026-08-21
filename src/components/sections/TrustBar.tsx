@@ -12,7 +12,7 @@ export function TrustBar() {
         {items.map((item) => (
           <div
             key={item.label}
-            className="flex items-center gap-2 text-[11px] text-muted-foreground"
+            className="flex items-center gap-2 text-[14px] text-muted-foreground"
           >
             <item.icon className="h-3.5 w-3.5 shrink-0 text-primary" />
             <span>{item.label}</span>

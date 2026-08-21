@@ -33,7 +33,7 @@ export function calcularVentajaCompetitiva(
 ): VentajaCompetitiva {
   const desglose: { criterio: string; puntos: number; maxPuntos: number; detalle: string }[] = [];
 
-  // ── 1. Profitability Consistency (30 pts) ──
+  //  1. Profitability Consistency (30 pts) 
   // Usa netMargin histórico (disponible en incomeStatementHistory) + ROE actual como validación cruzada
   const profitPeriods = periodos.filter((p) => p.netMargin != null);
   const profitValues = profitPeriods.map((p) => p.netMargin!);
@@ -68,7 +68,7 @@ export function calcularVentajaCompetitiva(
     detalle: profitDetalle,
   });
 
-  // ── Early return si < 3 años ──
+  //  Early return si < 3 años 
   if (aniosAnalizados < 3) {
     const detalleAnios = `Se analizaron ${aniosAnalizados} año(s) de datos financieros. Se requieren al menos 3 ejercicios completos con income statement disponibles en Yahoo Finance para calcular el moat.`;
     return {
@@ -87,7 +87,7 @@ export function calcularVentajaCompetitiva(
     };
   }
 
-  // ── 2. Net Margin Stability (25 pts) ──
+  //  2. Net Margin Stability (25 pts) 
   let marginPts = 0;
   let marginDetalle = "";
   if (profitValues.length >= 2) {
@@ -123,7 +123,7 @@ export function calcularVentajaCompetitiva(
     detalle: marginDetalle,
   });
 
-  // ── 3. Debt Intensity (20 pts) ──
+  //  3. Debt Intensity (20 pts) 
   const de = result.debtToEquityRaw;
   let dePts = 0;
   let deDetalle = "";
@@ -145,7 +145,7 @@ export function calcularVentajaCompetitiva(
     detalle: deDetalle,
   });
 
-  // ── 4. Revenue Growth Consistency (15 pts) ──
+  //  4. Revenue Growth Consistency (15 pts) 
   const growthPeriods = periodos.filter((p) => p.revenueChgPct != null);
   const growthValues = growthPeriods.map((p) => p.revenueChgPct!);
   let growthPts = 0;
@@ -174,7 +174,7 @@ export function calcularVentajaCompetitiva(
     detalle: growthDetalle,
   });
 
-  // ── 5. FCF Consistency (10 pts) ──
+  //  5. FCF Consistency (10 pts) 
   const fcfPeriods = periodos.filter((p) => p.fcf != null);
   const fcfValues = fcfPeriods.map((p) => p.fcf!);
 
@@ -210,7 +210,7 @@ export function calcularVentajaCompetitiva(
     detalle: fcfDetalle,
   });
 
-  // ── Total Score (excluyendo componentes sin datos suficientes) ──
+  //  Total Score (excluyendo componentes sin datos suficientes) 
   const componentesExcluidos: string[] = [];
 
   // Verificar qué componentes tienen datos suficientes

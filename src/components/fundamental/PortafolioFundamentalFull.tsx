@@ -21,12 +21,12 @@ import { fetchPortfolioCharts, type SeriePunto } from "@/lib/portfolio-charts.fu
 import { resolveDraftTickerFromIOL } from "@/lib/draft-asset-iol-resolver";
 import type { DraftAssetResolvedFromIOL } from "@/lib/draft-asset-iol-resolver";
 
-// ── Constants ──
+//  Constants 
 const RF_RATE = 4.5; // US 10y risk-free rate %
 const ERP = 6; // Equity Risk Premium %
 const MARKET_VOL = 18; // SPY annualized vol %
 
-// ── Formatters ──
+//  Formatters 
 function f(v: number | null | undefined, dp = 2): string {
   if (v == null || !Number.isFinite(v)) return "\u2014";
   return v.toFixed(dp);
@@ -52,7 +52,7 @@ function recBadge(rec: string | null): { label: string; color: string } {
   return { label: "\u2014", color: "text-muted-foreground border-border/40 bg-muted/10" };
 }
 
-// ── Interfaces ──
+//  Interfaces 
 interface PortfolioItem {
   ticker: string;
   priceTicker: string; // Yahoo ticker for price/chart data (e.g., "AAPL.BA" for CEDEAR ARS)
@@ -84,7 +84,7 @@ interface SectorGroup {
   industries: { industry: string; items: PortfolioItem[]; totalWeight: number; avgScore: number }[];
 }
 
-// ── Helpers ──
+//  Helpers 
 function expectedRet(item: PortfolioItem): number | null {
   if (item.upside != null && Math.abs(item.upside) >= 0.5) return item.upside;
   if (item.beta != null) return RF_RATE + item.beta * ERP;
@@ -129,7 +129,7 @@ function computeFundScore(r: FundamentalAFResult): number | null {
   return maxPts > 0 ? Math.round((pts / maxPts) * 100) : null;
 }
 
-// ── Component ──
+//  Component 
 export function PortafolioFundamentalFull() {
   // Mismo método de obtención de clientes/portafolios que el resto de los tabs
   const iol = useIOLPortafolio();
@@ -180,7 +180,7 @@ export function PortafolioFundamentalFull() {
     [allTickers],
   );
 
-  // ── IOL helpers (usa el hook compartido, SIN dependencia al objeto iol) ──
+  //  IOL helpers (usa el hook compartido, SIN dependencia al objeto iol) 
   const loadIOL = useCallback(
     async (cliente?: number) => {
       if (!accessToken) return;
@@ -243,7 +243,7 @@ export function PortafolioFundamentalFull() {
     [accessToken, loadPortfolio, fn, resolveIndustry],
   );
 
-  // ── Add ticker (auto, no recalc button) ──
+  //  Add ticker (auto, no recalc button) 
   const addTicker = async (sym: string) => {
     const s = sym.trim().toUpperCase();
     if (!s || items.some((i) => i.ticker === s)) return;
@@ -296,7 +296,7 @@ export function PortafolioFundamentalFull() {
     addTicker(ticker);
   };
 
-  // ── Edit weight ──
+  //  Edit weight 
   const updateWeight = (ticker: string, newWeight: number) => {
     setItems((prev) =>
       prev.map((i) =>
@@ -310,7 +310,7 @@ export function PortafolioFundamentalFull() {
     );
   };
 
-  // ── Remove ticker ──
+  //  Remove ticker 
   const removeTicker = (ticker: string) => {
     setItems((prev) => {
       const next = prev.filter((i) => i.ticker !== ticker);
@@ -319,7 +319,7 @@ export function PortafolioFundamentalFull() {
     });
   };
 
-  // ── Real-time computed metrics ──
+  //  Real-time computed metrics 
   const portfolioMetrics = useMemo(() => {
     const total = items.reduce((s, i) => s + i.weight, 0);
     if (total === 0 || items.length === 0) return null;
@@ -332,7 +332,7 @@ export function PortafolioFundamentalFull() {
     return { wScore, wRet, wBeta, wRisk, n: items.length };
   }, [items]);
 
-  // ── Sector grouping ──
+  //  Sector grouping 
   const sectorGroups = useMemo((): SectorGroup[] => {
     const map = new Map<string, PortfolioItem[]>();
     for (const item of items) {
@@ -383,14 +383,14 @@ export function PortafolioFundamentalFull() {
       });
   }, [items]);
 
-  // ── Interpret score ──
+  //  Interpret score 
   const interpretScore = (s: number) => {
     if (s > 70) return "Cartera con fundamentos sólidos.";
     if (s >= 40) return "Cartera con fundamentos mixtos.";
     return "Varias posiciones con fundamentos débiles.";
   };
 
-  // ── Optimizer ──
+  //  Optimizer 
   const runOptimization = async () => {
     const tickers = items.map((i) => i.usdTicker ?? i.ticker);
     if (tickers.length < 2) return;
@@ -413,7 +413,7 @@ export function PortafolioFundamentalFull() {
     setOptLoading(false);
   };
 
-  // ── Toggle sector in suggestion panel ──
+  //  Toggle sector in suggestion panel 
   const toggleSector = (s: string) => {
     setExpandedSectors((prev) => {
       const next = new Set(prev);
@@ -455,7 +455,7 @@ export function PortafolioFundamentalFull() {
 
   return (
     <div className="space-y-4">
-      {/* ── IOL controls (unified) ── */}
+      {/*  IOL controls (unified)  */}
       <div className="flex flex-wrap items-center gap-2">
         {esAsesor === null ? (
           <button
@@ -497,7 +497,7 @@ export function PortafolioFundamentalFull() {
         )}
       </div>
 
-      {/* ── Agregar tickers manualmente ── */}
+      {/*  Agregar tickers manualmente  */}
       <div className="space-y-3">
         <div className="flex gap-2">
           <input
@@ -525,7 +525,7 @@ export function PortafolioFundamentalFull() {
         </div>
       )}
 
-      {/* ── Portfolio summary header ── */}
+      {/*  Portfolio summary header  */}
       {portfolioMetrics && (
         <div className="rounded-lg border border-border/40 bg-background/40/60 p-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
@@ -625,7 +625,7 @@ export function PortafolioFundamentalFull() {
         </div>
       )}
 
-      {/* ── Real-time dataframe con agrupación por sector/industria ── */}
+      {/*  Real-time dataframe con agrupación por sector/industria  */}
       {items.length > 0 && (
         <div className="overflow-x-auto rounded-lg border border-border/40">
           <table className="w-full text-left font-mono text-[11px]">
@@ -650,7 +650,7 @@ export function PortafolioFundamentalFull() {
             <tbody>
               {sectorGroups.map((sg) => (
                 <Fragment key={sg.sector}>
-                  {/* ── Sector total row ── */}
+                  {/*  Sector total row  */}
                   <tr className="bg-muted/10 border-b border-border/30">
                     <td
                       colSpan={2}
@@ -675,7 +675,7 @@ export function PortafolioFundamentalFull() {
                     <td className="px-2 py-1.5 text-right text-[10px]">{sg.avgRisk.toFixed(1)}%</td>
                     <td colSpan={4}></td>
                   </tr>
-                  {/* ── Industry sub-rows ── */}
+                  {/*  Industry sub-rows  */}
                   {sg.industries.map((ind) => (
                     <Fragment key={ind.industry}>
                       <tr className="border-b border-border/10">
@@ -694,7 +694,7 @@ export function PortafolioFundamentalFull() {
                         </td>
                         <td colSpan={8}></td>
                       </tr>
-                      {/* ── Individual ticker rows ── */}
+                      {/*  Individual ticker rows  */}
                       {ind.items.map((item) => {
                         const ret = expectedRet(item);
                         const rsk = risk(item);
@@ -781,7 +781,7 @@ export function PortafolioFundamentalFull() {
                                 onClick={() => removeTicker(item.ticker)}
                                 className="text-[9px] text-red-400 hover:text-red-300"
                               >
-                                ✕
+                                
                               </button>
                             </td>
                           </tr>
@@ -792,7 +792,7 @@ export function PortafolioFundamentalFull() {
                 </Fragment>
               ))}
             </tbody>
-            {/* ── Portfolio total row ── */}
+            {/*  Portfolio total row  */}
             {portfolioMetrics && (
               <tfoot className="border-t border-border/40 bg-muted/5">
                 <tr>
@@ -831,7 +831,7 @@ export function PortafolioFundamentalFull() {
         </div>
       )}
 
-      {/* ── Charts de series históricas ── */}
+      {/*  Charts de series históricas  */}
       {items.length > 0 && (
         <details className="rounded-lg border border-border/40 bg-background/40/40">
           <summary className="px-4 py-3 text-[10px] font-mono text-muted-foreground cursor-pointer hover:text-foreground select-none">
@@ -931,7 +931,7 @@ export function PortafolioFundamentalFull() {
         </details>
       )}
 
-      {/* ── Optimization results ── */}
+      {/*  Optimization results  */}
       {optResult && (
         <div className="space-y-4">
           <div className="rounded-lg border border-border/40 bg-muted/5 p-4">
