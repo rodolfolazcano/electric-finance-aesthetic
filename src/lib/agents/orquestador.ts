@@ -42,6 +42,14 @@ import {
   ejecutarCicloEconomico,
   ejecutarPerformanceSectorial,
   ejecutarValuacionSectorial,
+  ejecutarIolLogin,
+  ejecutarIolCuenta,
+  ejecutarIolMercado,
+  ejecutarIolOperar,
+  ejecutarDatosFinancieros,
+  ejecutarGraficoChat,
+  ejecutarGenerarInforme,
+  type EventoChat,
   type ResultadoConocimiento,
 } from "@/lib/agents/ejecutores";
 import type { ConfiguracionOrquestacion } from "@/lib/model-orchestration";
@@ -79,6 +87,8 @@ export type OpcionesOrquestador = {
   plannerPrompt: string;
   siteContext: string;
   ragMsg?: ApiMsg;
+  /** Id de sesión del chat: clave de la sesión IOL y de la memoria persistente. */
+  sessionId?: string;
 };
 
 const MODELO_AGENTES = MODELO_POR_DEFECTO; // rapidez: los especialistas responden al toque.
@@ -246,6 +256,18 @@ function detectarIntencionSkill(pregunta: string): string[] {
   if (/backtest|desempe[ñn]o pasado|se[ñn]ales pasadas|rendimiento hist[oó]rico/.test(p)) {
     skills.push("backtesting-senales");
   }
+  if (
+    /iol|invertir\s*online|mi\s+portafolio|mi\s+cuenta|mis\s+operaciones|estadocuenta|estado\s+de\s+cuenta|comprar\s+\w+\s+en\s+iol|vender\s+\w+\s+en\s+iol/.test(
+      p,
+    ) ||
+    /grafic|chart|tradingview|velas|candel|visualiz|serie\s+(de\s+)?(precio|tiempo)/.test(p) ||
+    /informe|reporte|resumen\s+ejecutivo|pdf|descargable/.test(p) ||
+    /yfinance|yahoo\s+finance|argentinadatos|criptoya|bcra.*(cambiaria|monetaria)|estadisticas\s+cambiarias|estadisticas\s+monetarias/.test(
+      p,
+    )
+  ) {
+    skills.push("orquestacion-fuentes-datos");
+  }
 
   return skills;
 }
@@ -348,7 +370,8 @@ export async function ejecutarTool(
   name: string,
   argsRaw: string,
   baseUrl?: string,
-): Promise<{ texto: string; fuentes: FuenteMercado[]; ok: boolean }> {
+  sessionId = "anon",
+): Promise<{ texto: string; fuentes: FuenteMercado[]; ok: boolean; eventos?: EventoChat[] }> {
   const { query, periodo, simbolo } = extraerDatosTool(argsRaw);
   console.log(`[TOOL] ${name} ${argsRaw.slice(0, 220)}`); // TEMP PASO4
   switch (name) {
@@ -436,9 +459,28 @@ export async function ejecutarTool(
       const res = await ejecutarValuacionSectorial(argsRaw);
       return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
     }
+    case "iol_login":
+      return await ejecutarIolLogin(argsRaw, sessionId);
+    case "iol_cuenta":
+      return await ejecutarIolCuenta(argsRaw, sessionId);
+    case "iol_mercado":
+      return await ejecutarIolMercado(argsRaw, sessionId);
+    case "iol_operar":
+      return await ejecutarIolOperar(argsRaw, sessionId);
+    case "datos_financieros":
+      return await ejecutarDatosFinancieros(argsRaw);
+    case "grafico_chat":
+      return await ejecutarGraficoChat(argsRaw);
+    case "generar_informe":
+      return await ejecutarGenerarInforme(argsRaw);
     default:
       return { ...(await ejecutarBusqueda(query)), ok: true };
   }
+}
+
+/** Envía al chat los eventos (gráficos / informes) que produjo una herramienta. */
+function enviarEventos(enviar: Enviar, eventos?: EventoChat[]): void {
+  for (const ev of eventos ?? []) enviar(ev);
 }
 
 /** Un agente especializado: modelo rápido + sus herramientas + nota en la pizarra. */
@@ -453,6 +495,7 @@ async function trabajarAgente(
   memoria: MemoriaDeSesion,
   orquestacion: ConfiguracionOrquestacion,
   ragMsg?: ApiMsg,
+  sessionId = "anon",
 ): Promise<AgentResult> {
   const agente = obtenerAgente(rol);
   enviar({ t: "status", v: agente.status, q: pregunta });
@@ -514,9 +557,10 @@ async function trabajarAgente(
     for (const call of calls) {
       const name = call.function?.name ?? "buscar_web";
       const argsRaw = call.function?.arguments ?? "";
-      const ejecucion = await ejecutarTool(name, argsRaw, baseUrl);
+      const ejecucion = await ejecutarTool(name, argsRaw, baseUrl, sessionId);
       fuentes = [...fuentes, ...ejecucion.fuentes];
       if (ejecucion.fuentes.length) enviar({ t: "sources", v: ejecucion.fuentes });
+      enviarEventos(enviar, ejecucion.eventos);
       mensajes.push({
         role: "tool",
         tool_call_id: call.id ?? "0",
@@ -673,6 +717,7 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
     plannerPrompt,
     siteContext,
     ragMsg,
+    sessionId = "anon",
   } = opts;
 
   const fuentes: FuenteMercado[] = [];
@@ -704,6 +749,7 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
           memoria,
           orquestacion,
           ragMsg,
+          sessionId,
         ),
       ),
     ),
@@ -828,12 +874,13 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
                 ? extraerDatosTool(argsRaw).simbolo
                 : query,
         });
-        const ejecucion = await ejecutarTool(name, argsRaw, baseUrl);
+        const ejecucion = await ejecutarTool(name, argsRaw, baseUrl, sessionId);
         fuentes.push(...ejecucion.fuentes);
         if (name === "buscar_noticias" && esTextoConDato(ejecucion.texto)) {
           huboDatoNoticias = true;
         }
         if (ejecucion.fuentes.length) enviar({ t: "sources", v: ejecucion.fuentes });
+        enviarEventos(enviar, ejecucion.eventos);
         if (!ejecucion.ok && esValoracion) {
           valoracionFallida = true;
           textoValoracionFallida = `No se pudo completar la valoración con datos reales en este momento.`;
@@ -1169,12 +1216,13 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
       for (const call of calls) {
         const name = call.function?.name ?? "buscar_web";
         const argsRaw = call.function?.arguments ?? "";
-        const ejecucion = await ejecutarTool(name, argsRaw, baseUrl);
+        const ejecucion = await ejecutarTool(name, argsRaw, baseUrl, sessionId);
         fuentes.push(...ejecucion.fuentes);
         if (name === "buscar_noticias" && esTextoConDato(ejecucion.texto)) {
           huboDatoNoticias = true;
         }
         if (ejecucion.fuentes.length) enviar({ t: "sources", v: ejecucion.fuentes });
+        enviarEventos(enviar, ejecucion.eventos);
         messages.push({
           role: "tool",
           tool_call_id: call.id ?? "0",

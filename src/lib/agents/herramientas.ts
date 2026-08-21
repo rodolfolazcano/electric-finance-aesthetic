@@ -84,7 +84,7 @@ export const TOOLS: ToolSpec[] = [
     function: {
       name: "consultar_base_conocimiento",
       description:
-        "Consulta la base de conocimiento interna del sitio web de Cintia Boos y el corpus académico indexado (55 documentos de finanzas y contabilidad: Pascale, Fowler Newton, Dumrauf, Blanchard, Dornbusch, Biondi, etc.). Úsala para preguntas sobre servicios (7 ítems), instrumentos (12 ítems), brokers (3 ítems), preguntas frecuentes (4 ítems), alianzas (2 ítems), o para explicar conceptos, métodos, fórmulas y teoría de finanzas, contabilidad y macroeconomía (valoración, tasas, estados contables, carteras, costo de capital, DCF, etc.). El parámetro query es la pregunta del usuario en español.",
+        "Consulta la base de conocimiento interna del sitio web de Cintia Boos y el corpus académico indexado (55 documentos de finanzas y contabilidad: Pascale, Fowler Newton, Dumrauf, Blanchard, Dornbusch, Biondi, etc.). Úsala para preguntas sobre servicios (7 ítems), instrumentos (12 ítems), brokers (3 ítems), preguntas frecuentes (4 ítems), alianzas (2 ítems), sistema financiero argentino y su regulación (BCRA, Ley 21.526, CAMELBIG, efectivo mínimo, capitales mínimos/RPC, NIIF 9, SEDESA/seguro de depósitos, política monetaria, BADLAR, ETTI, mercado interbancario), sistema financiero europeo y español (ESI/EAF, MiFID II, mercados regulados y SMN, grupo BME, FGD y FOGAIN, BCE y política monetaria, TLTRO/QE, TARGET2, EONIA/EURIBOR/€STR), matemática financiera y rentabilidad (valor temporal del dinero, capitalización simple/compuesta/continua, descuento comercial/racional/compuesto, tasas spot y forward, curvas de tasas, tasa nominal vs real, TAE/CFT, TIR/VAN, TRE), calculadora financiera (HP 12C/Casio: rentas, VAN/TIR con flujos de caja, bonos, estadística descriptiva), asesoramiento y planificación financiera (banca personal y privada, perfiles de riesgo conservador/moderado/arriesgado, tríada rentabilidad-seguridad-liquidez, proceso de planificación en 5 fases, diseño, reajuste y reequilibrio de carteras, EAFI, idoneidad CNV), ética y conducta profesional del asesor (códigos de ética IEAF e IAEF, interés del cliente primero, conflictos de interés, prohibición de asegurar rendimientos), seguros según la Ley 17.418 (riesgo asegurable, contrato y póliza, prima, siniestro y reticencia, sobreseguro/infraseguro, seguros de daños patrimoniales y de personas, tipos de seguro de vida), administración de riesgos (identificación, evaluación con mapa de riesgos, prevención, transferencia al mercado de seguros), o para explicar conceptos, métodos, fórmulas y teoría de finanzas, contabilidad y macroeconomía (valoración, tasas, estados contables, carteras, costo de capital, DCF, etc.). El parámetro query es la pregunta del usuario en español.",
       parameters: {
         type: "object",
         properties: {
@@ -612,6 +612,276 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  // -------------------------------------------------------------------------
+  // IOL (InvertirOnline) — cuenta personal vía API oficial con login.
+  // -------------------------------------------------------------------------
+  {
+    type: "function",
+    function: {
+      name: "iol_login",
+      description:
+        "Inicia sesión en la API de InvertirOnline (IOL) con el usuario y contraseña que el usuario comparta en el chat. Necesario ANTES de usar iol_cuenta, iol_mercado o iol_operar. Las credenciales se guardan solo en memoria del servidor para esta conversación (nunca se guardan en disco ni se repiten en la respuesta). Si el usuario pide ver su portafolio, estado de cuenta u operaciones de IOL pero no inició sesión, pedile usuario y contraseña e invocá esta herramienta. Para cerrar sesión usá accion='cerrar'.",
+      parameters: {
+        type: "object",
+        properties: {
+          usuario: { type: "string", description: "Usuario (o DNI/CUIT) de IOL." },
+          password: { type: "string", description: "Contraseña de IOL." },
+          accion: {
+            type: "string",
+            description:
+              "'iniciar' (default) para iniciar sesión; 'estado' para consultar si hay sesión activa; 'cerrar' para cerrarla.",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "iol_cuenta",
+      description:
+        "Consulta la cuenta personal de IOL del usuario autenticado (requiere iol_login previo). Acciones: 'perfil' (datos personales y perfil inversor), 'estadocuenta' (saldos disponibles/comprometidos por moneda), 'portafolio' (posiciones valorizadas de un país), 'operaciones' (historial con filtros), 'operacion' (detalle por número), 'notificacion' (avisos de IOL), 'test_inversor' (preguntas del test de perfil). Presentá los resultados en tablas cuando haya varias filas.",
+      parameters: {
+        type: "object",
+        properties: {
+          accion: {
+            type: "string",
+            description:
+              "Una de: perfil | estadocuenta | portafolio | operaciones | operacion | notificacion | test_inversor.",
+          },
+          pais: {
+            type: "string",
+            description: "Para 'portafolio': 'argentina' o 'estados_Unidos'. Default 'argentina'.",
+          },
+          numero: { type: "number", description: "Para 'operacion': número de operación." },
+          estado: {
+            type: "string",
+            description: "Para 'operaciones': todas | pendientes | terminadas | canceladas.",
+          },
+          fechaDesde: { type: "string", description: "Para 'operaciones': YYYY-MM-DD." },
+          fechaHasta: { type: "string", description: "Para 'operaciones': YYYY-MM-DD." },
+        },
+        required: ["accion"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "iol_mercado",
+      description:
+        "Consulta datos de MERCADO de IOL (requiere iol_login previo): cotización detallada de un título (último precio, puntas, apertura, máximo/mínimo, volumen), panel completo de un instrumento (acciones, cedears, titulospublicos, letras, bonos, futuros, opciones, adrs), opciones de un subyacente, fondos comunes de inversión (FCI listado o por símbolo), dólar MEP implícito de un bono y serie histórica de precios. Útil para cotizaciones argentinas puntuales (ej. AL30, GGAL, CEDEARs) que no están en fuentes públicas.",
+      parameters: {
+        type: "object",
+        properties: {
+          accion: {
+            type: "string",
+            description:
+              "Una de: cotizacion_detalle | cotizacion | panel_todos | fci_todos | fci_simbolo | mep | serie_historica | opciones | instrumentos | paneles.",
+          },
+          simbolo: {
+            type: "string",
+            description: "Símbolo del título (ej. 'AL30', 'GGAL', 'AAPL').",
+          },
+          mercado: {
+            type: "string",
+            description: "Mercado IOL: 'bCBA' (default) o 'nYSE'/'nasdaq' para EE.UU.",
+          },
+          instrumento: {
+            type: "string",
+            description:
+              "Para 'panel_todos': acciones | cedears | titulospublicos | letras | bonos | futuros | opciones | adrs.",
+          },
+          pais: { type: "string", description: "'argentina' (default) o 'estados_Unidos'." },
+          fechaDesde: { type: "string", description: "Para 'serie_historica': YYYY-MM-DD." },
+          fechaHasta: { type: "string", description: "Para 'serie_historica': YYYY-MM-DD." },
+        },
+        required: ["accion"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "iol_operar",
+      description:
+        "Ejecuta o SIMULA operaciones en IOL del usuario autenticado (requiere iol_login previo). Acciones de consulta/simulación: 'montos_estimados', 'venta_mep_simple_montos', 'parametros_operatoria', 'validar_monto', 'comisiones_cpd', 'subastas_cpd', 'puede_operar_cpd', 'suscripcion_fci' (con soloValidar=true), 'rescate_fci' (con soloValidar=true), 'token_ddjj'. Acciones que ENVÍAN una orden real (comprar, vender, comprar_especie_d, vender_especie_d, suscripcion_fci/rescate_fci con soloValidar=false, cpd_operar, operatoria_comprar): SOLO se invocan con confirmar=true DESPUÉS de que el usuario confirmó explícitamente los parámetros exactos (símbolo, cantidad/precio, mercado, validez). Sin confirmación explícita, mostrá el detalle de lo que harías y preguntá. Nunca sugieras qué comprar: solo ejecutás lo que el usuario ordena.",
+      parameters: {
+        type: "object",
+        properties: {
+          accion: {
+            type: "string",
+            description:
+              "comprar | vender | comprar_especie_d | vender_especie_d | suscripcion_fci | rescate_fci | cpd_operar | cpd_comisiones | cpd_subastas | puede_operar_cpd | token_ddjj | montos_estimados | venta_mep_simple_montos | parametros_operatoria | validar_monto | operatoria_comprar.",
+          },
+          mercado: { type: "string", description: "'bCBA' (default) o 'nYSE'/'nasdaq'." },
+          simbolo: { type: "string", description: "Símbolo del título o FCI." },
+          cantidad: { type: "number", description: "Cantidad de títulos (órdenes y rescate FCI)." },
+          precio: { type: "number", description: "Precio límite de la orden." },
+          monto: {
+            type: "number",
+            description: "Monto en pesos (FCI suscripción, operatoria simplificada).",
+          },
+          tipoOrden: {
+            type: "string",
+            description: "'precioLimite' (default) o 'precioMercado'.",
+          },
+          plazo: { type: "string", description: "'t0' (default), 't1' o 't2'." },
+          validez: {
+            type: "string",
+            description: "Fecha de validez ISO (ej. 2026-08-25T00:00:00Z).",
+          },
+          idCuentaBancaria: {
+            type: "number",
+            description: "Para especie D / operatoria simplificada.",
+          },
+          importe: { type: "number", description: "Para 'cpd_comisiones': importe a invertir." },
+          tasa: { type: "number", description: "Para 'cpd_comisiones' y 'cpd_operar'." },
+          idSubasta: { type: "number", description: "Para 'cpd_operar'." },
+          estado: { type: "string", description: "Para 'cpd_subastas': estado de subastas." },
+          segmento: { type: "string", description: "Para 'cpd_subastas': segmento." },
+          idTipoOperatoria: {
+            type: "number",
+            description: "Para 'parametros_operatoria' / 'validar_monto'.",
+          },
+          idTipoOperatoriaSimplificada: {
+            type: "number",
+            description: "Para 'operatoria_comprar'.",
+          },
+          soloValidar: {
+            type: "boolean",
+            description: "Para FCI: true = solo valida sin ejecutar (default true).",
+          },
+          confirmar: {
+            type: "boolean",
+            description:
+              "Debe ser true SOLO si el usuario ya confirmó explícitamente la operación con esos parámetros exactos. Si falta, la orden no se envía.",
+          },
+        },
+        required: ["accion"],
+        additionalProperties: false,
+      },
+    },
+  },
+  // -------------------------------------------------------------------------
+  // Fuentes públicas genéricas
+  // -------------------------------------------------------------------------
+  {
+    type: "function",
+    function: {
+      name: "datos_financieros",
+      description:
+        "Consulta directa a APIs financieras públicas por fuente. fuente='yfinance': cualquier dato de Yahoo Finance de un símbolo (módulos: price, summaryDetail, financialData, defaultKeyStatistics, assetProfile, earnings, recommendationTrend, calendarEvents, insiderTransactions, history para histórico 6 meses, news para noticias, search para buscar ticker); fuente='argentinadatos': endpoint v1 (cotizaciones/dolares[/casa], finanzas/indices/{inflacion,inflacionInteranual,uva,riesgo-pais[/ultimo]}, finanzas/tasas/{plazoFijo,depositos30Dias}, finanzas/criptopesos, finanzas/letras, finanzas/fci/...); fuente='criptoya': dólar ('dolar', 'dolar/blue') o exchange cripto ('belo/BTC/ARS'); fuente='bcra_cambiarias': divisas y cotizaciones oficiales BCRA de cualquier moneda; fuente='bcra_monetarias': variables monetarias BCRA v4 (principales_variables para listar, datos con idVariable para la serie). Usala cuando la consulta apunte claramente a una de estas fuentes o cuando consultar_mercado no cubra el dato.",
+      parameters: {
+        type: "object",
+        properties: {
+          fuente: {
+            type: "string",
+            description:
+              "yfinance | argentinadatos | criptoya | bcra_cambiarias | bcra_monetarias.",
+          },
+          simbolo: {
+            type: "string",
+            description: "yfinance: ticker (ej. AAPL, GGAL.BA, BTC-USD).",
+          },
+          modulo: {
+            type: "string",
+            description:
+              "yfinance: módulo(s) quoteSummary separados por coma, o 'history', 'news', 'search'. Default 'price,summaryDetail,financialData'.",
+          },
+          endpoint: {
+            type: "string",
+            description:
+              "argentinadatos: ruta v1 (ej. 'finanzas/indices/uva'). criptoya: recurso (ej. 'dolar/blue').",
+          },
+          accion: {
+            type: "string",
+            description:
+              "bcra_cambiarias: divisas | cotizaciones | cotizacion_moneda. bcra_monetarias: principales_variables | datos.",
+          },
+          codMoneda: {
+            type: "string",
+            description: "bcra_cambiarias: código de moneda (USD, EUR...).",
+          },
+          idVariable: { type: "number", description: "bcra_monetarias: id de la variable." },
+          categoria: {
+            type: "string",
+            description: "bcra_monetarias: filtro de texto sobre descripción/categoría.",
+          },
+          fechaDesde: { type: "string", description: "Fecha desde (YYYY-MM-DD) según fuente." },
+          fechaHasta: { type: "string", description: "Fecha hasta (YYYY-MM-DD) según fuente." },
+        },
+        required: ["fuente"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "grafico_chat",
+      description:
+        "Genera un GRÁFICO que se muestra dentro del chat. Tipos: 'linea' (serie temporal con datos propios o traídos de Yahoo Finance con simbolo+rango), 'barras' (categoría/valor), 'tradingview' (gráfico profesional interactivo de TradingView embebido para cualquier símbolo global, ej. NASDAQ:AAPL, BCBA:GGAL, BINANCE:BTCUSDT). Usalo SIEMPRE que el usuario pida un gráfico, chart, evolución de precio, velas o visualización de una serie. Devuelve además un resumen numérico para que redactes el análisis.",
+      parameters: {
+        type: "object",
+        properties: {
+          tipo: { type: "string", description: "linea | barras | tradingview." },
+          titulo: { type: "string", description: "Título visible del gráfico." },
+          unidad: { type: "string", description: "Unidad del eje Y (USD, ARS, %...)." },
+          simbolo: {
+            type: "string",
+            description:
+              "Para 'linea' con datos de Yahoo: ticker (ej. AAPL, ^MERV, BTC-USD). Para 'tradingview': símbolo con exchange (ej. NASDAQ:AAPL, BCBA:GGAL, BINANCE:BTCUSDT).",
+          },
+          rango: {
+            type: "string",
+            description: "Para 'linea' Yahoo: 1mo|3mo|6mo|1y|2y|5y. Default 6mo.",
+          },
+          intervalo: {
+            type: "string",
+            description: "Para 'tradingview': D (default), W, M, 60, 30, 15, 5, 1.",
+          },
+          categorias: {
+            type: "array",
+            items: { type: "string" },
+            description: "Para 'barras': etiquetas de cada barra.",
+          },
+          valores: {
+            type: "array",
+            items: { type: "number" },
+            description: "Para 'barras': valores numéricos de cada barra.",
+          },
+        },
+        required: ["tipo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "generar_informe",
+      description:
+        "Genera un INFORME estructurado (título + secciones en Markdown) que se muestra como documento en el chat, con botones para descargarlo e imprimirlo/guardarlo como PDF. Usalo cuando el usuario pida un informe, reporte, resumen ejecutivo o análisis consolidado (ej. 'informe de mi portafolio', 'reporte del dólar', 'informe PDF de YPF'). Redactá cada sección con los datos reales obtenidos de las herramientas en este turno; NO inventes cifras. El parámetro contenidoMarkdown es el informe completo en Markdown (con tablas GFM si aportan claridad).",
+      parameters: {
+        type: "object",
+        properties: {
+          titulo: { type: "string", description: "Título del informe." },
+          contenidoMarkdown: {
+            type: "string",
+            description:
+              "Informe completo en Markdown: encabezados ##, párrafos, listas y tablas. Incluí fecha, fuentes citadas y disclaimer final.",
+          },
+        },
+        required: ["titulo", "contenidoMarkdown"],
+        additionalProperties: false,
+      },
+    },
+  },
 ];
 
 export type EstadoHerramienta =
@@ -624,7 +894,10 @@ export type EstadoHerramienta =
   | "semaforo"
   | "capm"
   | "riesgo"
-  | "portafolio";
+  | "portafolio"
+  | "iol"
+  | "grafico"
+  | "informe";
 
 export function estadoDeHerramienta(name: string): EstadoHerramienta {
   switch (name) {
@@ -663,6 +936,17 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
     case "performance_sectorial":
     case "valuacion_sectorial":
       return "portafolio";
+    case "iol_login":
+    case "iol_cuenta":
+    case "iol_mercado":
+    case "iol_operar":
+      return "iol";
+    case "datos_financieros":
+      return "mercado";
+    case "grafico_chat":
+      return "grafico";
+    case "generar_informe":
+      return "informe";
     default:
       return "searching";
   }

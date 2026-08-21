@@ -261,6 +261,24 @@ const SKILLS: Skill[] = [
 - Clasificá la confiabilidad: Alta (winRate > 55% y ≥ 10 ocurrencias), Media (winRate > 50% y ≥ 5 ocurrencias), Baja (resto).
 - NUNCA inventes resultados: todo se calcula con la serie real obtenida en este turno y se aclara que es un análisis educativo.`,
   },
+  {
+    id: "orquestacion-fuentes-datos",
+    nombre: "Orquestación Multi-Fuente y Reciclado de Sesión",
+    descripcion:
+      "Enrutado de cada consulta a la fuente correcta (IOL, yfinance, ArgentinaDatos, CriptoYa, BCRA cambiarias/monetarias, TradingView) y reciclado del estado de sesión (login IOL, memoria, gráficos e informes) entre turnos del chat.",
+    instrucciones: `[SKILL · Orquestación Multi-Fuente y Reciclado de Sesión — adaptada de nemo-rl-session-memory + rag-blueprint + nvidia-skill-finder]
+- ENRUTADO POR FUENTE (elegí SIEMPRE la fuente más específica antes de responder):
+  · Cuenta personal del usuario (portafolio, saldo, operaciones, órdenes, FCI propios, CPD) → IOL: iol_login primero; si no hay sesión activa, pedile usuario y contraseña al usuario. iol_cuenta para consulta, iol_mercado para cotizaciones argentinas puntuales (AL30, GGAL, CEDEARs, paneles), iol_operar SOLO con confirmación explícita.
+  · Datos globales de un ticker (precio, fundamentales, estados contables, analistas, insiders, noticias, histórico) → datos_financieros(fuente="yfinance").
+  · Macro argentina (inflación, UVA, riesgo país, letras, tasas bancarias, FCI CAFCI, criptopesos) → datos_financieros(fuente="argentinadatos") o consultar_mercado si ya lo cubre.
+  · Dólar en vivo por casa y cotizaciones cripto por exchange → datos_financieros(fuente="criptoya") o consultar_mercado.
+  · Cotizaciones oficiales BCRA de cualquier moneda → datos_financieros(fuente="bcra_cambiarias").
+  · Variables monetarias BCRA (base, reservas, LELIQ, circulación...) → datos_financieros(fuente="bcra_monetarias"): primero "principales_variables" para hallar el idVariable, luego "datos".
+  · Análisis cuantitativo pesado (CAPM, riesgo, portafolio, valoración) → las herramientas especializadas (analizar_capm, analizar_riesgo, optimizar_portafolio, ficha_de_decision).
+- RECICLADO DE SESIÓN: el login de IOL persiste entre turnos de la misma conversación (clave sessionId): NO pidas credenciales dos veces; ante "sesión expirada" pedilas una vez más. La memoria de hechos del usuario también persiste: reutilizala en vez de volver a preguntar.
+- VISUALIZACIÓN Y ENTREGA: cuando los datos sean una serie temporal → grafico_chat(tipo="linea"); comparativas → tipo="barras"; gráfico interactivo profesional → tipo="tradingview" con símbolo EXCHANGE:TICKER. Cuando el análisis sea extenso o lo pidan → generar_informe con el documento completo en Markdown (tablas GFM permitidas) y ofrecé descarga/PDF.
+- REGLA DE ORO: cada cifra que muestres debe venir de una herramienta ejecutada en ESTE turno o de la memoria declarada por el usuario. Si una fuente falla, probá la fuente alternativa del enrutado antes de decir "no tengo el dato".`,
+  },
 ];
 
 const POR_ID = new Map(SKILLS.map((s) => [s.id, s]));

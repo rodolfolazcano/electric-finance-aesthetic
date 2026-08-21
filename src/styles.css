@@ -775,3 +775,50 @@ html {
   text-transform: uppercase;
   color: var(--color-gold);
 }
+
+/* ---------------------------------------------------------------------------
+   Impresión / guardado como PDF de un mensaje del chat.
+   Se activa con body.print-chat + .print-target en la burbuja elegida:
+   oculta todo lo demás y fuerza colores claros legibles sobre papel.
+--------------------------------------------------------------------------- */
+@media print {
+  body.print-chat * {
+    visibility: hidden !important;
+    box-shadow: none !important;
+  }
+  body.print-chat .print-target,
+  body.print-chat .print-target * {
+    visibility: visible !important;
+  }
+  body.print-chat .print-target {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+  }
+  body.print-chat .print-target * {
+    color: #111111 !important;
+    background: transparent !important;
+    border-color: #cccccc !important;
+  }
+  body.print-chat .print-target a {
+    text-decoration: underline !important;
+  }
+  body.print-chat .print-target table {
+    border-collapse: collapse !important;
+  }
+  body.print-chat .print-target th,
+  body.print-chat .print-target td {
+    border: 1px solid #cccccc !important;
+    padding: 4px 6px !important;
+  }
+  body.print-chat .print-target iframe,
+  body.print-chat .print-target svg {
+    max-width: 100% !important;
+  }
+}

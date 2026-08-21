@@ -919,7 +919,11 @@ import {
   textoValuacionSectorial,
 } from "@/lib/clarity-analysis";
 
-function parseArgsClarity(argsRaw: string): { simbolo?: string; periodo?: string; sector?: string } {
+function parseArgsClarity(argsRaw: string): {
+  simbolo?: string;
+  periodo?: string;
+  sector?: string;
+} {
   try {
     const j = JSON.parse(argsRaw) as {
       simbolo?: unknown;
@@ -927,7 +931,8 @@ function parseArgsClarity(argsRaw: string): { simbolo?: string; periodo?: string
       sector?: unknown;
     };
     if (!j || typeof j !== "object") return {};
-    const str = (v: unknown): string => (typeof v === "string" ? v : typeof v === "number" ? String(v) : "");
+    const str = (v: unknown): string =>
+      typeof v === "string" ? v : typeof v === "number" ? String(v) : "";
     return { simbolo: str(j.simbolo), periodo: str(j.periodo), sector: str(j.sector) };
   } catch {
     return {};
@@ -1085,7 +1090,11 @@ export async function ejecutarPerformanceSectorial(argsRaw: string): Promise<{
 }> {
   const periodo = (parseArgsClarity(argsRaw).periodo ?? "").toString().trim() || "5d";
   try {
-    return { texto: textoPerformanceSectorial(await claPerformanceSectorial(periodo)), fuentes: [], ok: true };
+    return {
+      texto: textoPerformanceSectorial(await claPerformanceSectorial(periodo)),
+      fuentes: [],
+      ok: true,
+    };
   } catch (e) {
     return {
       texto: `SIN RESULTADOS: error en la performance sectorial (${e instanceof Error ? e.message : "desconocido"}).`,
@@ -1113,7 +1122,11 @@ export async function ejecutarValuacionSectorial(argsRaw: string): Promise<{
     };
   }
   try {
-    return { texto: textoValuacionSectorial(await claValuacionSectorial(sector, periodo)), fuentes: [], ok: true };
+    return {
+      texto: textoValuacionSectorial(await claValuacionSectorial(sector, periodo)),
+      fuentes: [],
+      ok: true,
+    };
   } catch (e) {
     return {
       texto: `SIN RESULTADOS: error en la valuación del sector ${sector} (${e instanceof Error ? e.message : "desconocido"}).`,
@@ -1121,4 +1134,1129 @@ export async function ejecutarValuacionSectorial(argsRaw: string): Promise<{
       ok: false,
     };
   }
+}
+
+// ---------------------------------------------------------------------------
+// IOL (InvertirOnline), fuentes públicas genéricas, gráficos e informes.
+// Los ejecutores pueden emitir EVENTOS (gráfico / informe) que el orquestador
+// envía al chat para renderizar visualizaciones dentro de la conversación.
+// ---------------------------------------------------------------------------
+
+import {
+  iolLogin,
+  iolSesionActiva,
+  iolCerrarSesion,
+  iolPerfil,
+  iolEstadoCuenta,
+  iolPortafolio,
+  iolOperaciones,
+  iolOperacion,
+  iolNotificacion,
+  iolTestInversorObtener,
+  iolTitulo,
+  iolCotizacionDetalle,
+  iolCotizacion,
+  iolOpciones,
+  iolSerieHistorica,
+  iolInstrumentosCotizacion,
+  iolPanelesCotizacion,
+  iolPanelTodos,
+  iolFCITodos,
+  iolFCISimbolo,
+  iolFCITipoFondos,
+  iolMEPGet,
+  iolMEPPost,
+  iolComprar,
+  iolVender,
+  iolComprarEspecieD,
+  iolVenderEspecieD,
+  iolSuscripcionFCI,
+  iolRescateFCI,
+  iolTokenDDJJ,
+  iolPuedeOperarCPD,
+  iolSubastasCPD,
+  iolComisionesCPD,
+  iolOperarCPD,
+  iolMontosEstimados,
+  iolParametrosOperatoria,
+  iolValidarMonto,
+  iolVentaMepSimpleMontos,
+  iolOperatoriaComprar,
+  FUENTE_IOL,
+  type ActivoPortafolio,
+} from "@/lib/iol.server";
+import {
+  yfinanceConsulta,
+  argentinaDatosConsulta,
+  criptoyaConsulta,
+  bcraCambiariasConsulta,
+  bcraMonetariasConsulta,
+  type SeriePunto,
+} from "@/lib/fuentes.server";
+import { fetchYahooChart } from "@/lib/yahoo-http";
+
+export type EventoChat =
+  | { t: "chart"; v: Record<string, unknown> }
+  | { t: "informe"; v: { titulo: string; contenidoMarkdown: string } };
+
+export type ResultadoToolConEventos = {
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+  eventos?: EventoChat[];
+};
+
+function nfIOL(n: unknown, dec = 2): string {
+  return typeof n === "number" && isFinite(n)
+    ? new Intl.NumberFormat("es-AR", { maximumFractionDigits: dec }).format(n)
+    : "s/d";
+}
+
+function tablaMD(headers: string[], filas: Array<Array<string | number>>): string {
+  const celdas = (row: Array<string | number>) => `| ${row.map((c) => String(c)).join(" | ")} |`;
+  return [celdas(headers), `|${headers.map(() => "---").join("|")}|`, ...filas.map(celdas)].join(
+    "\n",
+  );
+}
+
+function portafolioATexto(pais: string, activos: ActivoPortafolio[] | undefined): string {
+  if (!activos?.length) return `El portafolio de ${pais} no tiene posiciones abiertas.`;
+  const filas = activos.map((a) => [
+    a.titulo?.simbolo ?? "s/d",
+    a.titulo?.descripcion ?? "",
+    nfIOL(a.cantidad, 0),
+    nfIOL(a.ppc),
+    nfIOL(a.ultimoPrecio),
+    `${nfIOL(a.variacionDiaria)}%`,
+    `${nfIOL(a.gananciaPorcentaje)}%`,
+    nfIOL(a.valorizado),
+  ]);
+  const total = activos.reduce((s, a) => s + (a.valorizado ?? 0), 0);
+  return [
+    `Portafolio IOL (${pais}) — ${activos.length} posiciones, valorizado total ${nfIOL(total)}:`,
+    tablaMD(
+      ["Símbolo", "Descripción", "Cantidad", "PPC", "Último", "Var. día", "Gan. %", "Valorizado"],
+      filas,
+    ),
+  ].join("\n");
+}
+
+// --- iol_login -------------------------------------------------------------
+
+export async function ejecutarIolLogin(
+  argsRaw: string,
+  sessionId: string,
+): Promise<ResultadoToolConEventos> {
+  let usuario = "";
+  let password = "";
+  let accion = "iniciar";
+  try {
+    const args = JSON.parse(argsRaw) as { usuario?: string; password?: string; accion?: string };
+    usuario = String(args.usuario ?? "").trim();
+    password = String(args.password ?? "");
+    accion = String(args.accion ?? "iniciar").trim() || "iniciar";
+  } catch {
+    /* sin args */
+  }
+  if (accion === "estado") {
+    return {
+      texto: iolSesionActiva(sessionId)
+        ? "HAY SESIÓN ACTIVA de IOL para esta conversación: podés usar iol_cuenta, iol_mercado e iol_operar."
+        : "NO hay sesión activa de IOL. Pedile al usuario su usuario y contraseña de IOL e invocá iol_login.",
+      fuentes: [FUENTE_IOL],
+      ok: true,
+    };
+  }
+  if (accion === "cerrar") {
+    iolCerrarSesion(sessionId);
+    return { texto: "Sesión de IOL cerrada.", fuentes: [FUENTE_IOL], ok: true };
+  }
+  if (!usuario || !password) {
+    return {
+      texto:
+        "FALTAN CREDENCIALES: para iniciar sesión en IOL necesito el usuario y la contraseña. Pedíselos al usuario y reinvocá iol_login(usuario, password).",
+      fuentes: [FUENTE_IOL],
+      ok: false,
+    };
+  }
+  const r = await iolLogin(sessionId, usuario, password);
+  return {
+    texto: r.ok
+      ? `${r.detalle} Ya podés consultar perfil, estado de cuenta, portafolio, operaciones y mercado con iol_cuenta / iol_mercado / iol_operar.`
+      : `${r.detalle} No reintentes sin nuevas credenciales del usuario.`,
+    fuentes: [FUENTE_IOL],
+    ok: r.ok,
+  };
+}
+
+// --- iol_cuenta ------------------------------------------------------------
+
+export async function ejecutarIolCuenta(
+  argsRaw: string,
+  sessionId: string,
+): Promise<ResultadoToolConEventos> {
+  let accion = "";
+  let pais = "argentina";
+  let numero = 0;
+  let estado = "";
+  let fechaDesde = "";
+  let fechaHasta = "";
+  try {
+    const args = JSON.parse(argsRaw) as {
+      accion?: string;
+      pais?: string;
+      numero?: number;
+      estado?: string;
+      fechaDesde?: string;
+      fechaHasta?: string;
+    };
+    accion = String(args.accion ?? "").trim();
+    pais = String(args.pais ?? "argentina").trim() || "argentina";
+    numero = Number(args.numero ?? 0);
+    estado = String(args.estado ?? "").trim();
+    fechaDesde = String(args.fechaDesde ?? "").trim();
+    fechaHasta = String(args.fechaHasta ?? "").trim();
+  } catch {
+    /* sin args */
+  }
+  if (!iolSesionActiva(sessionId)) {
+    return {
+      texto:
+        "NO AUTENTICADO: no hay sesión de IOL activa. Invocá primero iol_login con las credenciales que te dé el usuario.",
+      fuentes: [FUENTE_IOL],
+      ok: false,
+    };
+  }
+  switch (accion) {
+    case "perfil": {
+      const r = await iolPerfil(sessionId);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Perfil IOL:\n${JSON.stringify(r.data, null, 1).slice(0, 2500)}`
+            : `SIN RESULTADOS: ${r.error ?? "sin datos de perfil"}.`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "estadocuenta": {
+      const r = await iolEstadoCuenta(sessionId);
+      if (!r.ok || !r.data)
+        return {
+          texto: `SIN RESULTADOS: ${r.error ?? "sin datos"}.`,
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const cuentas = (r.data as { cuentas?: Array<Record<string, unknown>> }).cuentas ?? [];
+      const filas = cuentas.map((c) => [
+        String(c["numero"] ?? ""),
+        String(c["tipo"] ?? ""),
+        String(c["moneda"] ?? ""),
+        nfIOL(c["disponible"] as number),
+        nfIOL(c["comprometido"] as number),
+        nfIOL(c["total"] as number),
+      ]);
+      const totalPesos = (r.data as { totalEnPesos?: number }).totalEnPesos;
+      return {
+        texto: [
+          "Estado de cuenta IOL:",
+          filas.length
+            ? tablaMD(["N°", "Tipo", "Moneda", "Disponible", "Comprometido", "Total"], filas)
+            : "(sin cuentas)",
+          typeof totalPesos === "number"
+            ? `\nTotal consolidado en pesos: ${nfIOL(totalPesos)}.`
+            : "",
+        ].join("\n"),
+        fuentes: [FUENTE_IOL],
+        ok: true,
+      };
+    }
+    case "portafolio": {
+      const r = await iolPortafolio(sessionId, pais);
+      if (!r.ok) return { texto: `SIN RESULTADOS: ${r.error}`, fuentes: [FUENTE_IOL], ok: false };
+      return {
+        texto: portafolioATexto(pais, r.data?.activos),
+        fuentes: [FUENTE_IOL],
+        ok: true,
+      };
+    }
+    case "operaciones": {
+      const r = await iolOperaciones(sessionId, {
+        ...(numero ? { numero } : {}),
+        ...(estado ? { estado } : {}),
+        ...(fechaDesde ? { fechaDesde } : {}),
+        ...(fechaHasta ? { fechaHasta } : {}),
+        pais,
+      });
+      if (!r.ok) return { texto: `SIN RESULTADOS: ${r.error}`, fuentes: [FUENTE_IOL], ok: false };
+      const ops = (Array.isArray(r.data) ? r.data : []) as Array<Record<string, unknown>>;
+      if (!ops.length)
+        return { texto: "Sin operaciones para ese filtro.", fuentes: [FUENTE_IOL], ok: true };
+      const filas = ops
+        .slice(0, 30)
+        .map((o) => [
+          String(o["numero"] ?? ""),
+          String(o["simbolo"] ?? ""),
+          String(o["tipo"] ?? ""),
+          String(o["estado"] ?? ""),
+          nfIOL(o["cantidad"] as number, 0),
+          nfIOL(o["precio"] as number),
+          nfIOL(o["monto"] as number),
+          String(o["fechaOrden"] ?? "").slice(0, 10),
+        ]);
+      return {
+        texto: `Operaciones IOL (${ops.length}):\n${tablaMD(
+          ["N°", "Símbolo", "Tipo", "Estado", "Cant.", "Precio", "Monto", "Fecha"],
+          filas,
+        )}`,
+        fuentes: [FUENTE_IOL],
+        ok: true,
+      };
+    }
+    case "operacion": {
+      if (!numero)
+        return {
+          texto: "Falta el número de operación (parámetro numero).",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolOperacion(sessionId, numero);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Detalle de la operación ${numero}:\n${JSON.stringify(r.data, null, 1).slice(0, 3000)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "notificacion": {
+      const r = await iolNotificacion(sessionId);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Notificaciones IOL:\n${JSON.stringify(r.data, null, 1).slice(0, 1500)}`
+            : `SIN RESULTADOS: ${r.error ?? "sin notificaciones"}.`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "test_inversor": {
+      const r = await iolTestInversorObtener(sessionId);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Preguntas del test de inversor de IOL:\n${JSON.stringify(r.data, null, 1).slice(0, 4000)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    default:
+      return {
+        texto:
+          "Acción inválida para iol_cuenta. Usá: perfil | estadocuenta | portafolio | operaciones | operacion | notificacion | test_inversor.",
+        fuentes: [FUENTE_IOL],
+        ok: false,
+      };
+  }
+}
+
+// --- iol_mercado -----------------------------------------------------------
+
+export async function ejecutarIolMercado(
+  argsRaw: string,
+  sessionId: string,
+): Promise<ResultadoToolConEventos> {
+  let accion = "";
+  let simbolo = "";
+  let mercado = "bCBA";
+  let instrumento = "";
+  let pais = "argentina";
+  let fechaDesde = "";
+  let fechaHasta = "";
+  try {
+    const args = JSON.parse(argsRaw) as Record<string, unknown>;
+    accion = String(args["accion"] ?? "").trim();
+    simbolo = String(args["simbolo"] ?? "").trim();
+    mercado = String(args["mercado"] ?? "bCBA").trim() || "bCBA";
+    instrumento = String(args["instrumento"] ?? "").trim();
+    pais = String(args["pais"] ?? "argentina").trim() || "argentina";
+    fechaDesde = String(args["fechaDesde"] ?? "").trim();
+    fechaHasta = String(args["fechaHasta"] ?? "").trim();
+  } catch {
+    /* sin args */
+  }
+  if (!iolSesionActiva(sessionId)) {
+    return {
+      texto:
+        "NO AUTENTICADO: los datos de mercado de IOL requieren sesión iniciada. Invocá primero iol_login.",
+      fuentes: [FUENTE_IOL],
+      ok: false,
+    };
+  }
+  switch (accion) {
+    case "cotizacion_detalle":
+    case "cotizacion": {
+      if (!simbolo)
+        return { texto: "Falta el símbolo del título.", fuentes: [FUENTE_IOL], ok: false };
+      const r =
+        accion === "cotizacion"
+          ? await iolCotizacion(sessionId, mercado, simbolo)
+          : await iolCotizacionDetalle(sessionId, mercado, simbolo);
+      if (!r.ok || !r.data)
+        return { texto: `SIN RESULTADOS: ${r.error}`, fuentes: [FUENTE_IOL], ok: false };
+      const d = r.data as Record<string, unknown>;
+      const punta0 = (d["puntas"] as Array<Record<string, unknown>> | undefined)?.[0];
+      return {
+        texto: [
+          `Cotización IOL de ${simbolo} (${mercado}):`,
+          `- Último precio: ${nfIOL(d["ultimoPrecio"] as number)} ${String(d["moneda"] ?? "")}`,
+          `- Variación: ${nfIOL(d["variacion"] as number)}% (${nfIOL(d["puntosVariacion"] as number)} pts) · Tendencia: ${String(d["tendencia"] ?? "s/d")}`,
+          `- Apertura ${nfIOL(d["apertura"] as number)} · Máximo ${nfIOL(d["maximo"] as number)} · Mínimo ${nfIOL(d["minimo"] as number)} · Cierre anterior ${nfIOL(d["cierreAnterior"] as number)}`,
+          `- Volumen nominal ${nfIOL(d["volumenNominal"] as number, 0)} · Monto operado ${nfIOL(d["montoOperado"] as number, 0)} · Operaciones ${nfIOL(d["cantidadOperaciones"] as number, 0)}`,
+          `- Puntas: compra ${nfIOL(punta0?.["precioCompra"] as number)} x ${nfIOL(punta0?.["cantidadCompra"] as number, 0)} · venta ${nfIOL(punta0?.["precioVenta"] as number)} x ${nfIOL(punta0?.["cantidadVenta"] as number, 0)}`,
+          `- Fecha/hora: ${String(d["fechaHora"] ?? "s/d")}`,
+        ].join("\n"),
+        fuentes: [FUENTE_IOL],
+        ok: true,
+      };
+    }
+    case "panel_todos": {
+      if (!instrumento)
+        return {
+          texto:
+            "Para panel_todos indicá instrumento (acciones, cedears, titulospublicos, letras, bonos...).",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolPanelTodos(sessionId, instrumento, pais);
+      const titulos = r.data?.titulos ?? [];
+      if (!r.ok || !titulos.length)
+        return {
+          texto: `SIN RESULTADOS: ${r.error ?? "panel vacío"}.`,
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const filas = titulos
+        .slice(0, 40)
+        .map((t) => [
+          String(t["simbolo"] ?? ""),
+          String(t["descripcion"] ?? "").slice(0, 28),
+          nfIOL(t["ultimoPrecio"] as number),
+          `${nfIOL(t["variacionPorcentual"] as number)}%`,
+          nfIOL(t["volumen"] as number, 0),
+        ]);
+      return {
+        texto: `Panel IOL ${instrumento}/${pais} (${titulos.length} títulos, primeros ${filas.length}):\n${tablaMD(
+          ["Símbolo", "Descripción", "Último", "Var %", "Volumen"],
+          filas,
+        )}`,
+        fuentes: [FUENTE_IOL],
+        ok: true,
+      };
+    }
+    case "fci_todos": {
+      const r = await iolFCITodos(sessionId);
+      const lista = (Array.isArray(r.data) ? r.data : []) as Array<Record<string, unknown>>;
+      if (!r.ok || !lista.length)
+        return {
+          texto: `SIN RESULTADOS: ${r.error ?? "sin FCI"}.`,
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const filas = lista
+        .slice(0, 30)
+        .map((f) => [
+          String(f["simbolo"] ?? ""),
+          String(f["descripcion"] ?? "").slice(0, 34),
+          nfIOL(f["ultimoOperado"] as number),
+          `${nfIOL(f["variacionMensual"] as number)}%`,
+          String(f["tipoAdministradoraTituloFCI"] ?? ""),
+        ]);
+      return {
+        texto: `FCI disponibles en IOL (${lista.length}, primeros ${filas.length}):\n${tablaMD(
+          ["Símbolo", "Nombre", "VCP", "Var. mes", "Administradora"],
+          filas,
+        )}\nTipos de fondo: usa fci_tipos.`,
+        fuentes: [FUENTE_IOL],
+        ok: true,
+      };
+    }
+    case "fci_simbolo": {
+      if (!simbolo) return { texto: "Falta el símbolo del FCI.", fuentes: [FUENTE_IOL], ok: false };
+      const r = await iolFCISimbolo(sessionId, simbolo);
+      return {
+        texto:
+          r.ok && r.data
+            ? `FCI ${simbolo}:\n${JSON.stringify(r.data, null, 1).slice(0, 2500)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "fci_tipos": {
+      const r = await iolFCITipoFondos(sessionId);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Tipos de fondos FCI IOL:\n${JSON.stringify(r.data).slice(0, 1500)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "mep": {
+      if (!simbolo)
+        return {
+          texto: "Indicá el bono para calcular el MEP (ej. AL30).",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolMEPGet(sessionId, simbolo);
+      return {
+        texto:
+          r.ok && typeof r.data === "number"
+            ? `Dólar MEP implícito de ${simbolo} (IOL): $${nfIOL(r.data)}.`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "serie_historica": {
+      if (!simbolo || !fechaDesde || !fechaHasta)
+        return {
+          texto: "Para serie_historica necesitás simbolo, fechaDesde y fechaHasta (YYYY-MM-DD).",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolSerieHistorica(sessionId, mercado, simbolo, fechaDesde, fechaHasta, true);
+      const serie = (Array.isArray(r.data) ? r.data : []) as Array<Record<string, unknown>>;
+      if (!r.ok || !serie.length)
+        return {
+          texto: `SIN RESULTADOS: ${r.error ?? "serie vacía"}.`,
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const puntos: SeriePunto[] = serie
+        .filter((p) => typeof p["ultimoPrecio"] === "number")
+        .map((p) => ({
+          f: String(p["fechaHora"] ?? "").slice(0, 10),
+          v: p["ultimoPrecio"] as number,
+        }));
+      const ult = puntos[puntos.length - 1]!;
+      return {
+        texto: `Serie histórica IOL de ${simbolo}: ${puntos.length} sesiones, último ${nfIOL(ult.v)}, mínimo ${nfIOL(Math.min(...puntos.map((p) => p.v)))}, máximo ${nfIOL(Math.max(...puntos.map((p) => p.v)))}.`,
+        fuentes: [FUENTE_IOL],
+        ok: true,
+        ...(puntos.length > 2
+          ? {
+              eventos: [
+                {
+                  t: "chart",
+                  v: { tipo: "linea", titulo: `${simbolo} (IOL)`, unidad: "ARS", serie: puntos },
+                },
+              ] as EventoChat[],
+            }
+          : {}),
+      };
+    }
+    case "opciones": {
+      if (!simbolo)
+        return {
+          texto: "Indicá el subyacente para listar opciones.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolOpciones(sessionId, mercado, simbolo);
+      const lista = (Array.isArray(r.data) ? r.data : []) as Array<Record<string, unknown>>;
+      if (!r.ok || !lista.length)
+        return {
+          texto: `SIN RESULTADOS: ${r.error ?? "sin opciones"}.`,
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const filas = lista
+        .slice(0, 25)
+        .map((o) => [
+          String(o["simbolo"] ?? ""),
+          String(o["tipoOpcion"] ?? ""),
+          nfIOL(o["precioEjercicio"] as number),
+          String(o["fechaVencimiento"] ?? "").slice(0, 10),
+        ]);
+      return {
+        texto: `Opciones de ${simbolo} (${lista.length}):\n${tablaMD(["Símbolo", "Tipo", "Strike", "Vencimiento"], filas)}`,
+        fuentes: [FUENTE_IOL],
+        ok: true,
+      };
+    }
+    case "instrumentos": {
+      const r = await iolInstrumentosCotizacion(sessionId, pais);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Instrumentos con cotización en ${pais}:\n${JSON.stringify(r.data).slice(0, 1500)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "paneles": {
+      if (!instrumento)
+        return {
+          texto: "Indicá el instrumento para listar paneles.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolPanelesCotizacion(sessionId, pais, instrumento);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Paneles de ${instrumento} en ${pais}:\n${JSON.stringify(r.data).slice(0, 1500)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    default:
+      return {
+        texto:
+          "Acción inválida para iol_mercado. Usá: cotizacion_detalle | cotizacion | panel_todos | fci_todos | fci_simbolo | fci_tipos | mep | serie_historica | opciones | instrumentos | paneles.",
+        fuentes: [FUENTE_IOL],
+        ok: false,
+      };
+  }
+}
+
+// --- iol_operar ------------------------------------------------------------
+
+const ORDENES_REALES = new Set([
+  "comprar",
+  "vender",
+  "comprar_especie_d",
+  "vender_especie_d",
+  "cpd_operar",
+  "operatoria_comprar",
+]);
+
+export async function ejecutarIolOperar(
+  argsRaw: string,
+  sessionId: string,
+): Promise<ResultadoToolConEventos> {
+  const args = (() => {
+    try {
+      return (JSON.parse(argsRaw) ?? {}) as Record<string, unknown>;
+    } catch {
+      return {} as Record<string, unknown>;
+    }
+  })();
+  const str = (k: string, def = "") => String(args[k] ?? def).trim();
+  const num = (k: string): number | undefined => {
+    const v = Number(args[k]);
+    return args[k] != null && isFinite(v) ? v : undefined;
+  };
+  const bool = (k: string): boolean => args[k] === true;
+
+  const accion = str("accion");
+  if (!accion) return { texto: "Falta la acción de iol_operar.", fuentes: [FUENTE_IOL], ok: false };
+
+  if (!iolSesionActiva(sessionId)) {
+    return {
+      texto:
+        "NO AUTENTICADO: para operar en IOL hace falta sesión iniciada. Invocá primero iol_login con las credenciales del usuario.",
+      fuentes: [FUENTE_IOL],
+      ok: false,
+    };
+  }
+
+  // Guardia de seguridad: órdenes reales exigen confirmación explícita.
+  if (ORDENES_REALES.has(accion) && !bool("confirmar")) {
+    return {
+      texto: `SIMULACIÓN (confirmar=false): NO se envió ninguna orden a IOL. La orden "${accion}" quedaría así: ${argsRaw}. Mostrale estos parámetros al usuario y pedile una confirmación explícita; recién entonces reinvocá iol_operar con confirmar=true.`,
+      fuentes: [FUENTE_IOL],
+      ok: true,
+    };
+  }
+
+  const precioArg = num("precio");
+  const validezArg = str("validez");
+  const montoArg = num("monto");
+  const idFuenteArg = num("idFuente");
+  const idCuentaBancariaArg = num("idCuentaBancaria");
+  const ordenBase = () => ({
+    mercado: str("mercado", "bCBA") || "bCBA",
+    simbolo: str("simbolo"),
+    cantidad: num("cantidad") ?? 0,
+    ...(precioArg != null ? { precio: precioArg } : {}),
+    ...(validezArg ? { validez: validezArg } : {}),
+    tipoOrden: str("tipoOrden", "precioLimite") || "precioLimite",
+    plazo: str("plazo", "t0") || "t0",
+    ...(montoArg != null ? { monto: montoArg } : {}),
+    ...(idFuenteArg != null ? { idFuente: idFuenteArg } : {}),
+  });
+  switch (accion) {
+    case "comprar": {
+      const o = ordenBase();
+      if (!o.simbolo || !o.cantidad)
+        return {
+          texto: "Para comprar hacen falta simbolo y cantidad.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolComprar(sessionId, o);
+      return {
+        texto: r.resumen ?? r.error ?? "Respuesta de IOL vacía.",
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "vender": {
+      const o = ordenBase();
+      if (!o.simbolo || !o.cantidad)
+        return {
+          texto: "Para vender hacen falta simbolo y cantidad.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolVender(sessionId, o);
+      return {
+        texto: r.resumen ?? r.error ?? "Respuesta de IOL vacía.",
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "comprar_especie_d": {
+      const o = ordenBase();
+      if (!o.simbolo || !o.cantidad)
+        return {
+          texto: "Para comprar especie D hacen falta simbolo y cantidad.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolComprarEspecieD(sessionId, o);
+      return {
+        texto: r.resumen ?? r.error ?? "Respuesta de IOL vacía.",
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "vender_especie_d": {
+      const o = ordenBase();
+      if (!o.simbolo || !o.cantidad)
+        return {
+          texto: "Para vender especie D hacen falta simbolo y cantidad.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolVenderEspecieD(sessionId, {
+        ...o,
+        ...(idCuentaBancariaArg != null ? { idCuentaBancaria: idCuentaBancariaArg } : {}),
+      });
+      return {
+        texto: r.resumen ?? r.error ?? "Respuesta de IOL vacía.",
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "suscripcion_fci": {
+      const soloValidar = args["soloValidar"] !== false;
+      if (!str("simbolo") || num("monto") == null)
+        return {
+          texto: "Para suscripción FCI hacen falta simbolo y monto.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolSuscripcionFCI(sessionId, str("simbolo"), num("monto")!, soloValidar);
+      return {
+        texto: `${soloValidar ? "[VALIDACIÓN]" : "[ORDEN ENVIADA]"} ${r.resumen ?? r.error ?? ""}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "rescate_fci": {
+      const soloValidar = args["soloValidar"] !== false;
+      if (!str("simbolo") || num("cantidad") == null)
+        return {
+          texto: "Para rescate FCI hacen falta simbolo y cantidad.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolRescateFCI(sessionId, str("simbolo"), num("cantidad")!, soloValidar);
+      return {
+        texto: `${soloValidar ? "[VALIDACIÓN]" : "[ORDEN ENVIADA]"} ${r.resumen ?? r.error ?? ""}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "token_ddjj": {
+      if (!str("simbolo"))
+        return { texto: "Para token DDJJ hace falta simbolo.", fuentes: [FUENTE_IOL], ok: false };
+      const r = await iolTokenDDJJ(sessionId, {
+        mercado: str("mercado", "bCBA") || "bCBA",
+        simbolo: str("simbolo"),
+        cantidad: num("cantidad") ?? 0,
+        monto: num("monto") ?? 0,
+      });
+      return {
+        texto:
+          r.ok && r.data
+            ? `Token DDJJ obtenido: ${String(r.data.token ?? "").slice(0, 12)}… (vence ${String(r.data.expiration ?? "s/d")}).`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "puede_operar_cpd": {
+      const r = await iolPuedeOperarCPD(sessionId);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Operatoria CPD habilitada: ${r.data.operatoriaHabilitada ? "SÍ" : "NO"}.`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "cpd_subastas": {
+      const r = await iolSubastasCPD(
+        sessionId,
+        str("estado", "activas") || "activas",
+        str("segmento"),
+      );
+      return {
+        texto:
+          r.ok && r.data
+            ? `Subastas CPD:\n${JSON.stringify(r.data, null, 1).slice(0, 3000)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "cpd_comisiones": {
+      if (num("importe") == null || num("tasa") == null)
+        return {
+          texto: "Para cpd_comisiones hacen falta importe y tasa.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolComisionesCPD(
+        sessionId,
+        num("importe")!,
+        str("plazo", "t0") || "t0",
+        num("tasa")!,
+      );
+      return {
+        texto:
+          r.ok && r.data
+            ? `Comisiones CPD:\n${JSON.stringify(r.data, null, 1).slice(0, 1500)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "cpd_operar": {
+      if (num("idSubasta") == null || num("tasa") == null)
+        return {
+          texto: "Para cpd_operar hacen falta idSubasta y tasa.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolOperarCPD(sessionId, num("idSubasta")!, num("tasa")!);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Operación CPD registrada (idTransacción ${r.data.idTransaccion ?? "s/d"}).`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "montos_estimados": {
+      if (num("monto") == null)
+        return { texto: "Indicá el monto.", fuentes: [FUENTE_IOL], ok: false };
+      const r = await iolMontosEstimados(sessionId, num("monto")!);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Montos estimados operatoria simplificada:\n${JSON.stringify(r.data, null, 1).slice(0, 1500)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "venta_mep_simple_montos": {
+      if (num("monto") == null)
+        return { texto: "Indicá el monto en dólares.", fuentes: [FUENTE_IOL], ok: false };
+      const r = await iolVentaMepSimpleMontos(sessionId, num("monto")!);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Venta MEP simple — montos estimados:\n${JSON.stringify(r.data, null, 1).slice(0, 1500)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "parametros_operatoria": {
+      if (num("idTipoOperatoria") == null)
+        return { texto: "Indicá idTipoOperatoria.", fuentes: [FUENTE_IOL], ok: false };
+      const r = await iolParametrosOperatoria(sessionId, num("idTipoOperatoria")!);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Parámetros de la operatoria:\n${JSON.stringify(r.data, null, 1).slice(0, 2000)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "validar_monto": {
+      if (num("monto") == null || num("idTipoOperatoria") == null)
+        return {
+          texto: "Para validar_monto hacen falta monto e idTipoOperatoria.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolValidarMonto(sessionId, num("monto")!, num("idTipoOperatoria")!);
+      return { texto: r.resumen ?? r.error ?? "", fuentes: [FUENTE_IOL], ok: r.ok };
+    }
+    case "operatoria_comprar": {
+      if (num("monto") == null || num("idTipoOperatoriaSimplificada") == null)
+        return {
+          texto: "Para operatoria_comprar hacen falta monto e idTipoOperatoriaSimplificada.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolOperatoriaComprar(
+        sessionId,
+        num("monto")!,
+        num("idTipoOperatoriaSimplificada")!,
+        num("idCuentaBancaria"),
+      );
+      return { texto: r.resumen ?? r.error ?? "", fuentes: [FUENTE_IOL], ok: r.ok };
+    }
+    default:
+      return {
+        texto:
+          "Acción inválida para iol_operar. Consultá la descripción de la herramienta para las acciones disponibles.",
+        fuentes: [FUENTE_IOL],
+        ok: false,
+      };
+  }
+}
+
+// --- datos_financieros -----------------------------------------------------
+
+export async function ejecutarDatosFinancieros(argsRaw: string): Promise<ResultadoToolConEventos> {
+  const args = (() => {
+    try {
+      return (JSON.parse(argsRaw) ?? {}) as Record<string, unknown>;
+    } catch {
+      return {} as Record<string, unknown>;
+    }
+  })();
+  const fuente = String(args["fuente"] ?? "").trim();
+  const str = (k: string) => String(args[k] ?? "").trim();
+  try {
+    switch (fuente) {
+      case "yfinance": {
+        const simbolo = str("simbolo");
+        if (!simbolo)
+          return {
+            texto: "Para yfinance indicá el símbolo (ej. AAPL, GGAL.BA, BTC-USD).",
+            fuentes: [],
+            ok: false,
+          };
+        return {
+          ...(await yfinanceConsulta(
+            simbolo,
+            str("modulo") || "price,summaryDetail,financialData",
+          )),
+          ok: true,
+        };
+      }
+      case "argentinadatos": {
+        const endpoint = str("endpoint");
+        if (!endpoint)
+          return {
+            texto: 'Para argentinadatos indicá el endpoint (ej. "finanzas/indices/uva").',
+            fuentes: [],
+            ok: false,
+          };
+        return { ...(await argentinaDatosConsulta(endpoint)), ok: true };
+      }
+      case "criptoya":
+        return { ...(await criptoyaConsulta(str("endpoint") || "dolar")), ok: true };
+      case "bcra_cambiarias":
+        return {
+          ...(await bcraCambiariasConsulta(str("accion") || "divisas", {
+            codMoneda: str("codMoneda"),
+            fechaDesde: str("fechaDesde"),
+            fechaHasta: str("fechaHasta"),
+          })),
+          ok: true,
+        };
+      case "bcra_monetarias": {
+        const idVar = Number(args["idVariable"]);
+        return {
+          ...(await bcraMonetariasConsulta(str("accion") || "principales_variables", {
+            idVariable: isFinite(idVar) && idVar > 0 ? idVar : undefined,
+            categoria: str("categoria"),
+            desde: str("fechaDesde"),
+            hasta: str("fechaHasta"),
+          })),
+          ok: true,
+        };
+      }
+      default:
+        return {
+          texto:
+            "Fuente inválida. Usá una de: yfinance | argentinadatos | criptoya | bcra_cambiarias | bcra_monetarias.",
+          fuentes: [],
+          ok: false,
+        };
+    }
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: error consultando ${fuente} (${e instanceof Error ? e.message : "desconocido"}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
+// --- grafico_chat ----------------------------------------------------------
+
+export async function ejecutarGraficoChat(argsRaw: string): Promise<ResultadoToolConEventos> {
+  const args = (() => {
+    try {
+      return (JSON.parse(argsRaw) ?? {}) as Record<string, unknown>;
+    } catch {
+      return {} as Record<string, unknown>;
+    }
+  })();
+  const tipo = String(args["tipo"] ?? "linea").trim();
+  const titulo = String(args["titulo"] ?? "").trim();
+
+  if (tipo === "tradingview") {
+    const simbolo = String(args["simbolo"] ?? "").trim();
+    if (!simbolo.includes(":")) {
+      return {
+        texto: `SIN GRÁFICO: para TradingView usá el símbolo con exchange (ej. NASDAQ:AAPL, BCBA:GGAL, NYSE:BMA, BINANCE:BTCUSDT). Recibí "${simbolo}".`,
+        fuentes: [],
+        ok: false,
+      };
+    }
+    const intervalo = String(args["intervalo"] ?? "D").trim() || "D";
+    return {
+      texto: `Gráfico de TradingView generado para ${simbolo} (intervalo ${intervalo}). El usuario lo ve embebido en el chat; comentalo y ofrecé cambiar símbolo o temporalidad.`,
+      fuentes: [],
+      ok: true,
+      eventos: [
+        { t: "chart", v: { tipo: "tradingview", titulo: titulo || simbolo, simbolo, intervalo } },
+      ],
+    };
+  }
+
+  if (tipo === "barras") {
+    const categorias = (Array.isArray(args["categorias"]) ? args["categorias"] : []).map(String);
+    const valores = (Array.isArray(args["valores"]) ? args["valores"] : [])
+      .map(Number)
+      .filter(isFinite);
+    if (!categorias.length || categorias.length !== valores.length) {
+      return {
+        texto: "SIN GRÁFICO: para barras necesitás categorias[] y valores[] de igual longitud.",
+        fuentes: [],
+        ok: false,
+      };
+    }
+    return {
+      texto: `Gráfico de barras generado (${categorias.length} categorías): ${categorias
+        .map((c, i) => `${c}=${valores[i]}`)
+        .join(", ")}. Comentá el resultado.`,
+      fuentes: [],
+      ok: true,
+      eventos: [
+        { t: "chart", v: { tipo: "barras", titulo: titulo || "Comparativa", categorias, valores } },
+      ],
+    };
+  }
+
+  // linea: datos propios o Yahoo Finance.
+  let puntos: SeriePunto[] = [];
+  let unidad = String(args["unidad"] ?? "").trim();
+  let tituloFinal = titulo;
+  if (Array.isArray(args["serie"])) {
+    puntos = (args["serie"] as Array<{ f?: unknown; v?: unknown }>)
+      .map((p) => ({ f: String(p.f ?? ""), v: Number(p.v) }))
+      .filter((p) => isFinite(p.v));
+  }
+  if (!puntos.length) {
+    const simbolo = String(args["simbolo"] ?? "").trim();
+    if (!simbolo)
+      return {
+        texto: "SIN GRÁFICO: para línea indicá simbolo (Yahoo Finance) o una serie [{f,v}].",
+        fuentes: [],
+        ok: false,
+      };
+    const rango = String(args["rango"] ?? "6mo").trim() || "6mo";
+    const chart = await fetchYahooChart(simbolo, rango, "1d");
+    const res = chart?.chart?.result?.[0];
+    const closes = res?.indicators?.quote?.[0]?.close ?? [];
+    const ts = res?.timestamp ?? [];
+    puntos = ts
+      .map((t, i) => ({
+        f: new Date(t * 1000).toISOString().slice(0, 10),
+        v: closes[i] as number,
+      }))
+      .filter((p) => isFinite(p.v));
+    unidad = unidad || res?.meta?.currency || "";
+    tituloFinal = tituloFinal || res?.meta?.longName || res?.meta?.shortName || simbolo;
+    if (!puntos.length)
+      return {
+        texto: `SIN GRÁFICO: Yahoo Finance no devolvió datos para ${simbolo}.`,
+        fuentes: [],
+        ok: false,
+      };
+  }
+  const valores = puntos.map((p) => p.v);
+  const ult = valores[valores.length - 1]!;
+  const min = Math.min(...valores);
+  const max = Math.max(...valores);
+  return {
+    texto: `Gráfico de línea generado: ${tituloFinal} — ${puntos.length} puntos, último ${nfIOL(ult)}, mínimo ${nfIOL(min)}, máximo ${nfIOL(max)}${unidad ? ` (${unidad})` : ""}. Redactá un comentario breve de la evolución.`,
+    fuentes: [],
+    ok: true,
+    eventos: [{ t: "chart", v: { tipo: "linea", titulo: tituloFinal, unidad, serie: puntos } }],
+  };
+}
+
+// --- generar_informe -------------------------------------------------------
+
+export async function ejecutarGenerarInforme(argsRaw: string): Promise<ResultadoToolConEventos> {
+  let titulo = "";
+  let contenido = "";
+  try {
+    const args = JSON.parse(argsRaw) as { titulo?: string; contenidoMarkdown?: string };
+    titulo = String(args.titulo ?? "").trim();
+    contenido = String(args.contenidoMarkdown ?? "");
+  } catch {
+    /* sin args */
+  }
+  if (!titulo || contenido.trim().length < 80) {
+    return {
+      texto:
+        "SIN INFORME: necesito titulo y contenidoMarkdown (mínimo ~80 caracteres). Redactá el informe completo con los datos reales obtenidos en este turno; no inventes cifras.",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  const fecha = new Date().toLocaleDateString("es-AR", { dateStyle: "long" });
+  const documento = `# ${titulo}\n\n_${fecha}_\n\n${contenido}\n\n---\n\n*Documento generado por IA con datos de fuentes públicas citadas. Información general, no constituye recomendación de inversión.*`;
+  return {
+    texto: `Informe "${titulo}" generado y mostrado en el chat con botones de descarga (.md) e impresión/PDF. Avisale al usuario que puede descargarlo o imprimirlo como PDF.`,
+    fuentes: [],
+    ok: true,
+    eventos: [{ t: "informe", v: { titulo, contenidoMarkdown: documento } }],
+  };
 }

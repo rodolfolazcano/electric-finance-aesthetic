@@ -20,6 +20,11 @@ import {
   RotateCw,
   Pause,
   Play,
+  BarChart3,
+  LineChart,
+  Printer,
+  Download,
+  KeyRound,
 } from "lucide-react";
 import { CHAT_OPEN_EVENT_NAME } from "@/lib/chat-open";
 import {
@@ -69,21 +74,35 @@ const MODELOS_RAPIDEZ = obtenerModelosPorCategoria("rapidez");
 const MODELOS_RAZONAMIENTO = obtenerModelosPorCategoria("razonamiento");
 
 type Fuente = { dominio: string; url: string; title?: string };
-type Msg = { role: "user" | "assistant"; content: string; sources?: Fuente[] };
+type SeriePuntoUI = { f: string; v: number };
+type ChartData =
+  | { tipo: "linea"; titulo: string; unidad?: string; serie: SeriePuntoUI[] }
+  | { tipo: "barras"; titulo: string; categorias: string[]; valores: number[] }
+  | { tipo: "tradingview"; titulo: string; simbolo: string; intervalo?: string };
+type InformeData = { titulo: string; contenidoMarkdown: string };
+type Msg = {
+  role: "user" | "assistant";
+  content: string;
+  sources?: Fuente[];
+  chart?: ChartData;
+  informe?: InformeData;
+};
 
 const WELCOME: Msg = {
   role: "assistant",
   content:
-    "Soy **IA**, asistente del mercado de capitales argentino. Respondo sobre instrumentos, riesgo y cotizaciones con material académico y fuentes oficiales — y te digo siempre de dónde saqué el dato.\n\nPodés arrancar por acá:\n- **¿Qué pasa si la acción cae?**\n- Diferencia entre **acciones y CFDs**\n- **¿Tu bróker está regulado por la CNV?**\n- **¿Cómo arranco a invertir?**\n- ONs que se **operan en pesos y pagan en dólares**\n\nSi el dato es de mercado, lo busco en fuentes reales y te muestro la fuente. Información general. No constituye recomendación de inversión.",
+    "Soy **IA**, asistente del mercado de capitales argentino. Respondo sobre instrumentos, riesgo y cotizaciones con fuentes reales — y te muestro de dónde saqué cada dato.\n\n**Qué puedo hacer por vos:**\n- Cotizaciones: dólar blue/MEP/CCL, riesgo país, inflación, tasas del BCRA\n- **Gráficos** en el chat (línea, barras y **TradingView** interactivo)\n- Análisis: valor intrínseco, semáforo técnico, CAPM/beta, portafolios\n- **Tu cuenta de IOL**: iniciá sesión desde acá y veo tu portafolio, operaciones y podés simular órdenes\n- **Informes descargables** en PDF/Markdown\n\nProbá una sugerencia o preguntame directo. Información general. No constituye recomendación de inversión.",
 };
 
 const SUGGESTIONS = [
+  "¿Cuánto está el dólar blue y el MEP hoy?",
+  "Mostrame un gráfico de AAPL",
+  "Gráfico TradingView de BCBA:GGAL",
+  "Inflación mensual del BCRA con gráfico",
+  "Iniciá sesión en IOL para ver mi portafolio",
   "¿Qué pasa si la acción cae?",
-  "¿Qué diferencia hay entre acciones y CFDs?",
+  "Haceme un informe del riesgo país",
   "¿Cómo sé si mi bróker está regulado por la CNV?",
-  "¿Cómo arranco a invertir si recién empiezo?",
-  "¿Qué son las obligaciones negociables que se operan en pesos y pagan en dólares?",
-  "¿Cuánto está el dólar hoy?",
 ];
 
 function isWhatsAppLink(url: string): boolean {
@@ -131,6 +150,233 @@ function LinkRenderer({
   );
 }
 
+// ---------------------------------------------------------------------------
+// Gráficos embebidos en el chat (SVG sin dependencias + TradingView iframe).
+// ---------------------------------------------------------------------------
+
+const CHART_W = 420;
+const CHART_H = 190;
+const CHART_PAD = { t: 14, r: 12, b: 22, l: 46 };
+
+function fmtNum(v: number, dec = 2): string {
+  return new Intl.NumberFormat("es-AR", { maximumFractionDigits: dec }).format(v);
+}
+
+function GraficoLinea({
+  titulo,
+  unidad = "",
+  serie,
+}: {
+  titulo: string;
+  unidad?: string | undefined;
+  serie: SeriePuntoUI[];
+}) {
+  const pts = serie.filter((p) => isFinite(p.v));
+  if (pts.length < 2) return null;
+  const w = CHART_W - CHART_PAD.l - CHART_PAD.r;
+  const h = CHART_H - CHART_PAD.t - CHART_PAD.b;
+  const min = Math.min(...pts.map((p) => p.v));
+  const max = Math.max(...pts.map((p) => p.v));
+  const span = max - min || 1;
+  const x = (i: number) => CHART_PAD.l + (i / (pts.length - 1)) * w;
+  const y = (v: number) => CHART_PAD.t + h - ((v - min) / span) * h;
+  const line = pts
+    .map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`)
+    .join(" ");
+  const area = `${line} L${x(pts.length - 1).toFixed(1)},${(CHART_PAD.t + h).toFixed(1)} L${x(0).toFixed(1)},${(CHART_PAD.t + h).toFixed(1)} Z`;
+  const subio = pts[pts.length - 1]!.v >= pts[0]!.v;
+  const color = subio ? "#34d399" : "#f87171";
+  const ultimo = pts[pts.length - 1]!;
+  const ticksY = [max, min + span / 2, min];
+  return (
+    <figure className="my-2 overflow-hidden rounded-xl border border-border/70 bg-background/60 p-2">
+      <figcaption className="mb-1 flex items-center justify-between gap-2 px-1 text-[11px] font-semibold text-foreground/80">
+        <span className="flex items-center gap-1.5 truncate">
+          <LineChart className="h-3.5 w-3.5 flex-none text-primary" />
+          {titulo}
+        </span>
+        <span className={subio ? "text-emerald-400" : "text-red-400"}>
+          {fmtNum(ultimo.v)} {unidad}
+        </span>
+      </figcaption>
+      <svg
+        viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+        className="h-auto w-full"
+        role="img"
+        aria-label={`Gráfico de línea: ${titulo}`}
+      >
+        <defs>
+          <linearGradient id="grad-linea" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.35" />
+            <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+        {ticksY.map((t, i) => (
+          <g key={i}>
+            <line
+              x1={CHART_PAD.l}
+              x2={CHART_W - CHART_PAD.r}
+              y1={y(t)}
+              y2={y(t)}
+              stroke="currentColor"
+              strokeOpacity="0.12"
+              strokeDasharray="3 3"
+            />
+            <text
+              x={CHART_PAD.l - 6}
+              y={y(t) + 3}
+              textAnchor="end"
+              fontSize="9"
+              fill="currentColor"
+              fillOpacity="0.55"
+            >
+              {fmtNum(t, span > 500 ? 0 : 1)}
+            </text>
+          </g>
+        ))}
+        <path d={area} fill="url(#grad-linea)" />
+        <path
+          d={line}
+          fill="none"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        <circle cx={x(pts.length - 1)} cy={y(ultimo.v)} r="3" fill={color} />
+        <text x={CHART_PAD.l} y={CHART_H - 6} fontSize="9" fill="currentColor" fillOpacity="0.55">
+          {pts[0]!.f}
+        </text>
+        <text
+          x={CHART_W - CHART_PAD.r}
+          y={CHART_H - 6}
+          fontSize="9"
+          textAnchor="end"
+          fill="currentColor"
+          fillOpacity="0.55"
+        >
+          {ultimo.f}
+        </text>
+      </svg>
+    </figure>
+  );
+}
+
+function GraficoBarras({
+  titulo,
+  categorias,
+  valores,
+}: {
+  titulo: string;
+  categorias: string[];
+  valores: number[];
+}) {
+  if (!categorias.length || categorias.length !== valores.length) return null;
+  const w = CHART_W - CHART_PAD.l - CHART_PAD.r;
+  const h = CHART_H - CHART_PAD.t - CHART_PAD.b;
+  const max = Math.max(...valores.map(Math.abs)) || 1;
+  const bw = w / valores.length;
+  return (
+    <figure className="my-2 overflow-hidden rounded-xl border border-border/70 bg-background/60 p-2">
+      <figcaption className="mb-1 flex items-center gap-1.5 px-1 text-[11px] font-semibold text-foreground/80">
+        <BarChart3 className="h-3.5 w-3.5 flex-none text-primary" />
+        {titulo}
+      </figcaption>
+      <svg
+        viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+        className="h-auto w-full"
+        role="img"
+        aria-label={`Gráfico de barras: ${titulo}`}
+      >
+        {valores.map((v, i) => {
+          const bh = (Math.abs(v) / max) * h;
+          const bx = CHART_PAD.l + i * bw + bw * 0.15;
+          const by = v >= 0 ? CHART_PAD.t + h - bh : CHART_PAD.t + h;
+          return (
+            <g key={i}>
+              <rect
+                x={bx}
+                y={by}
+                width={bw * 0.7}
+                height={Math.max(bh, 1)}
+                rx="2"
+                fill={v >= 0 ? "#2563eb" : "#f87171"}
+                opacity="0.85"
+              />
+              <text
+                x={bx + bw * 0.35}
+                y={v >= 0 ? by - 3 : by + bh + 10}
+                textAnchor="middle"
+                fontSize="8.5"
+                fill="currentColor"
+                fillOpacity="0.75"
+              >
+                {fmtNum(v, 1)}
+              </text>
+              <text
+                x={bx + bw * 0.35}
+                y={CHART_H - 6}
+                textAnchor="middle"
+                fontSize="8"
+                fill="currentColor"
+                fillOpacity="0.55"
+              >
+                {categorias[i]!.slice(0, 8)}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </figure>
+  );
+}
+
+function TradingViewChart({
+  simbolo,
+  intervalo = "D",
+}: {
+  simbolo: string;
+  intervalo?: string | undefined;
+}) {
+  const iv = intervalo || "D";
+  const url = `https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(simbolo)}&interval=${encodeURIComponent(iv)}&theme=dark&style=1&timezone=Etc%2FUTC&withdateranges=1&hide_side_toolbar=0&allow_symbol_change=1&save_image=0&studies=%5B%5D&locale=es`;
+  return (
+    <figure className="my-2 overflow-hidden rounded-xl border border-border/70 bg-background/60">
+      <figcaption className="flex items-center gap-1.5 px-2 py-1.5 text-[11px] font-semibold text-foreground/80">
+        <TrendingUp className="h-3.5 w-3.5 flex-none text-primary" />
+        TradingView · {simbolo} · {iv}
+      </figcaption>
+      <iframe
+        src={url}
+        title={`Gráfico TradingView ${simbolo}`}
+        className="h-[360px] w-full border-0 bg-[#131722]"
+        loading="lazy"
+        allow="clipboard-write"
+      />
+    </figure>
+  );
+}
+
+function ChartBox({ chart }: { chart: ChartData }) {
+  if (chart.tipo === "linea")
+    return <GraficoLinea titulo={chart.titulo} unidad={chart.unidad} serie={chart.serie} />;
+  if (chart.tipo === "barras")
+    return (
+      <GraficoBarras titulo={chart.titulo} categorias={chart.categorias} valores={chart.valores} />
+    );
+  return <TradingViewChart simbolo={chart.simbolo} intervalo={chart.intervalo} />;
+}
+
+function InformeDoc({ informe }: { informe: InformeData }) {
+  return (
+    <div className="informe-doc my-2 rounded-xl border border-gold/30 bg-background/70 p-3">
+      <div className="chat-md min-w-0">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{informe.contenidoMarkdown}</ReactMarkdown>
+      </div>
+    </div>
+  );
+}
+
 function clamp(v: number, min: number, max: number): number {
   return Math.min(Math.max(v, min), max);
 }
@@ -154,6 +400,8 @@ export function ChatWidget() {
   const [leyendo, setLeyendo] = useState(false);
   const [valorando, setValorando] = useState(false);
   const [analizandoSemaforo, setAnalizandoSemaforo] = useState(false);
+  const [conectandoIol, setConectandoIol] = useState(false);
+  const [printIdx, setPrintIdx] = useState<number | null>(null);
   const [agentesActivos, setAgentesActivos] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -171,6 +419,45 @@ export function ChatWidget() {
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  // Impresión / guardado como PDF de un mensaje: se marca el objetivo y se
+  // abre el diálogo de impresión (el CSS de impresión oculta el resto).
+  useEffect(() => {
+    if (printIdx === null) return;
+    document.body.classList.add("print-chat");
+    const t = window.setTimeout(() => {
+      window.print();
+      document.body.classList.remove("print-chat");
+      setPrintIdx(null);
+    }, 60);
+    return () => {
+      window.clearTimeout(t);
+      document.body.classList.remove("print-chat");
+    };
+  }, [printIdx]);
+
+  function descargarMarkdown(m: Msg, i: number) {
+    const base = `informe-ia-${new Date().toISOString().slice(0, 10)}`;
+    const contenido = m.informe
+      ? m.informe.contenidoMarkdown
+      : [
+          m.content,
+          ...(m.chart && m.chart.tipo === "linea"
+            ? [
+                "",
+                `Datos del gráfico (${m.chart.titulo}):`,
+                ...m.chart.serie.map((p) => `${p.f};${p.v}`),
+              ]
+            : []),
+        ].join("\n");
+    const blob = new Blob([contenido], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${base}-${i}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -326,6 +613,7 @@ export function ChatWidget() {
             setLeyendo(false);
             setValorando(false);
             setAnalizandoSemaforo(false);
+            setConectandoIol(false);
           } else if (evt.v === "searching") {
             setAgentesActivos((prev) => {
               const sin = prev.filter(
@@ -344,12 +632,14 @@ export function ChatWidget() {
             setLeyendo(false);
             setValorando(false);
             setAnalizandoSemaforo(false);
+            setConectandoIol(false);
           } else if (evt.v === "mercado") {
             setSearching(null);
             setBuscandoNoticias(false);
             setLeyendo(false);
             setValorando(false);
             setAnalizandoSemaforo(false);
+            setConectandoIol(false);
             setConsultando(true);
             setAgentesActivos((prev) => (prev.includes("mercado") ? prev : [...prev, "mercado"]));
           } else if (evt.v === "noticias") {
@@ -359,6 +649,7 @@ export function ChatWidget() {
             setLeyendo(false);
             setValorando(false);
             setAnalizandoSemaforo(false);
+            setConectandoIol(false);
             setAgentesActivos((prev) => (prev.includes("noticias") ? prev : [...prev, "noticias"]));
           } else if (evt.v === "base_conocimiento") {
             setLeyendo(true);
@@ -367,6 +658,7 @@ export function ChatWidget() {
             setBuscandoNoticias(false);
             setValorando(false);
             setAnalizandoSemaforo(false);
+            setConectandoIol(false);
             setAgentesActivos((prev) => (prev.includes("base") ? prev : [...prev, "base"]));
           } else if (evt.v === "valoracion") {
             setValorando(true);
@@ -375,6 +667,7 @@ export function ChatWidget() {
             setBuscandoNoticias(false);
             setLeyendo(false);
             setAnalizandoSemaforo(false);
+            setConectandoIol(false);
             setAgentesActivos((prev) =>
               prev.includes("valoracion") ? prev : [...prev, "valoracion"],
             );
@@ -385,7 +678,24 @@ export function ChatWidget() {
             setBuscandoNoticias(false);
             setLeyendo(false);
             setValorando(false);
+            setConectandoIol(false);
             setAgentesActivos((prev) => (prev.includes("semaforo") ? prev : [...prev, "semaforo"]));
+          } else if (evt.v === "iol") {
+            setConectandoIol(true);
+            setSearching(evt.q ?? "");
+            setConsultando(false);
+            setBuscandoNoticias(false);
+            setLeyendo(false);
+            setValorando(false);
+            setAnalizandoSemaforo(false);
+          } else if (evt.v === "grafico" || evt.v === "informe") {
+            setSearching(evt.v === "grafico" ? "Generando gráfico…" : "Componiendo informe…");
+            setConsultando(false);
+            setBuscandoNoticias(false);
+            setLeyendo(false);
+            setValorando(false);
+            setAnalizandoSemaforo(false);
+            setConectandoIol(false);
           } else if (evt.v === "capm" || evt.v === "portafolio" || evt.v === "riesgo") {
             setSearching(evt.q ?? "");
             setConsultando(false);
@@ -393,6 +703,7 @@ export function ChatWidget() {
             setLeyendo(false);
             setValorando(false);
             setAnalizandoSemaforo(false);
+            setConectandoIol(false);
           } else {
             setSearching(null);
             setConsultando(false);
@@ -400,16 +711,25 @@ export function ChatWidget() {
             setLeyendo(false);
             setValorando(false);
             setAnalizandoSemaforo(false);
+            setConectandoIol(false);
           }
         } else if (evt.t === "sources") {
           fuentes = [...fuentes, ...((evt.v as Fuente[]) ?? [])];
           updateLast({ sources: fuentes });
+        } else if (evt.t === "chart") {
+          const c = evt.v as ChartData | undefined;
+          if (c?.tipo) updateLast({ chart: c });
+        } else if (evt.t === "informe") {
+          const inf = evt.v as InformeData | undefined;
+          if (inf?.titulo) updateLast({ informe: inf });
         } else if (evt.t === "text") {
           setSearching(null);
           setConsultando(false);
           setBuscandoNoticias(false);
           setLeyendo(false);
           setValorando(false);
+          setAnalizandoSemaforo(false);
+          setConectandoIol(false);
           setAgentesActivos([]);
           acc += String(evt.v ?? "");
           updateLast({ content: acc });
@@ -456,6 +776,7 @@ export function ChatWidget() {
     setBuscandoNoticias(false);
     setLeyendo(false);
     setValorando(false);
+    setConectandoIol(false);
     setAgentesActivos([]);
     busyRef.current = false;
     setLoading(false);
@@ -699,7 +1020,7 @@ export function ChatWidget() {
                             ? "max-w-[min(86%,min(92vw,640px))] min-w-0 rounded-2xl rounded-br-sm bg-primary px-3.5 py-2.5 text-[13px] leading-relaxed text-primary-foreground shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
                             : `max-w-[min(94%,min(96vw,980px))] min-w-0 rounded-2xl rounded-bl-sm border border-border/70 bg-background/45 px-3.5 py-2.5 text-[13px] leading-relaxed text-foreground backdrop-blur-sm ${
                                 isStreamingTurn ? "border-primary/40 bg-primary/[0.05]" : ""
-                              }`
+                              } ${printIdx === i ? "print-target" : ""}`
                         }
                       >
                         {wasEditing ? (
@@ -741,20 +1062,26 @@ export function ChatWidget() {
                           </div>
                         ) : isUser ? (
                           <span className="whitespace-pre-wrap break-words">{m.content}</span>
-                        ) : !m.content ? (
+                        ) : !m.content && !m.chart && !m.informe ? (
                           <span className="text-muted-foreground">Escribiendo…</span>
                         ) : (
-                          <div className="chat-md min-w-0">
-                            <ReactMarkdown
-                              remarkPlugins={[remarkGfm]}
-                              components={{
-                                a: ({ href, children }) => (
-                                  <LinkRenderer href={href}>{children}</LinkRenderer>
-                                ),
-                              }}
-                            >
-                              {m.content}
-                            </ReactMarkdown>
+                          <div className="min-w-0">
+                            {m.chart && <ChartBox chart={m.chart} />}
+                            {m.content ? (
+                              <div className="chat-md min-w-0">
+                                <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
+                                  components={{
+                                    a: ({ href, children }) => (
+                                      <LinkRenderer href={href}>{children}</LinkRenderer>
+                                    ),
+                                  }}
+                                >
+                                  {m.content}
+                                </ReactMarkdown>
+                              </div>
+                            ) : null}
+                            {m.informe && <InformeDoc informe={m.informe} />}
                           </div>
                         )}
                         {!wasEditing &&
@@ -842,6 +1169,28 @@ export function ChatWidget() {
                           <RotateCw className="h-3 w-3" />
                           Reenviar
                         </button>
+                        {(m.informe || m.content.length > 400) && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => setPrintIdx(i)}
+                              aria-label="Imprimir o guardar como PDF"
+                              title="Imprimir / guardar como PDF"
+                              className={accBtn}
+                            >
+                              <Printer className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => descargarMarkdown(m, i)}
+                              aria-label="Descargar en Markdown"
+                              title="Descargar .md"
+                              className={accBtn}
+                            >
+                              <Download className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     ) : null}
                   </div>
@@ -881,6 +1230,12 @@ export function ChatWidget() {
                 <p className="flex items-center gap-2 text-[12px] text-primary">
                   <Activity className="h-3.5 w-3.5 animate-pulse" />
                   Calculando semáforo técnico y fundamental con datos reales…
+                </p>
+              )}
+              {conectandoIol && (
+                <p className="flex items-center gap-2 text-[12px] text-gold">
+                  <KeyRound className="h-3.5 w-3.5 animate-pulse" />
+                  Conectando con InvertirOnline…
                 </p>
               )}
               {agentesActivos.length > 1 && (
