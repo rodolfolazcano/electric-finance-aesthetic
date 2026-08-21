@@ -1,0 +1,949 @@
+// @ts-nocheck
+import { createServerFn } from "@tanstack/react-start";
+import { getCached, setCache } from "../cache";
+import { computePearsonCorrelation } from "../intermarket-complete";
+
+// ─── Tipos ────────────────────────────────────────────────────────────────
+
+export interface RatioInfo {
+  ratio: number | null;
+  changePct1m: number | null;
+  changePct3m: number | null;
+  trend: "rising" | "falling" | "flat" | null;
+  label: string;
+  formula: string;
+  interpretacion: string;
+  favoreceSectores: string[];
+}
+
+export interface YieldCurveSpread {
+  valor10y2y: number | null;   // ^TNX - ^FVX (10Y-2Y)
+  valor10y3m: number | null;   // ^TNX - ^IRX (10Y-3M)
+  invertida: boolean | null;   // true if negative
+  steepness: "steepening" | "flattening" | "inverted" | "normal" | null;
+  interpretacion: string;
+}
+
+export interface BondsStocksRelation {
+  ratio: number | null;
+  trend: "bonds_lideran" | "stocks_lideran" | "ambos_suben" | "ambos_bajan" | "incierto" | null;
+  tltReturn60d: number | null;
+  spyReturn60d: number | null;
+  correlacion60d: number | null;
+  escenario: string;
+  interpretacion: string;
+}
+
+export interface CrossAssetCorrelation {
+  pair: string;
+  assetA: string;
+  assetB: string;
+  correlation60d: number | null;
+  correlation250d: number | null;
+  interpretacion: string;
+}
+
+export interface CycleDiagnosis {
+  stage: 1 | 2 | 3 | 4 | 5 | 6;
+  label: string;
+  description: string;
+  sectoresLideres: string[];
+  sectoresEvitar: string[];
+  confianza: "alta" | "media" | "baja";
+  bondsTrend: "up" | "down" | "flat" | null;
+  stocksTrend: "up" | "down" | "flat" | null;
+  commoditiesTrend: "up" | "down" | "flat" | null;
+}
+
+export interface DowTheorySignal {
+  industrialsTrend: "up" | "down" | "flat" | null;
+  transportsTrend: "up" | "down" | "flat" | null;
+  confirmed: boolean;
+  divergence: "bullish" | "bearish" | null;
+  interpretacion: string;
+}
+
+export interface LeadLagSummary {
+  pair: string;
+  leader: string;
+  lagDays: number;
+  correlation: number | null;
+}
+
+export interface IntermarketMurphyResult {
+  // Core ratios
+  crbBonds: RatioInfo;
+  commoditiesStocks: RatioInfo;
+  bondsStocks: BondsStocksRelation;
+  goldOil: RatioInfo;
+  copperGold: RatioInfo;
+  dowGold: RatioInfo;
+  xlyXlp: RatioInfo;
+  iwmSpy: RatioInfo;
+  ndxSpx: RatioInfo;
+  efaEem: RatioInfo;
+  growthValue: RatioInfo;
+  hyglqd: RatioInfo;
+  tipsSpread: RatioInfo;
+  // Yield curve
+  yieldCurve: YieldCurveSpread;
+  // Dow Theory
+  dowTheory: DowTheorySignal;
+  // Cycle
+  cycle: CycleDiagnosis;
+  // Cross-asset correlations
+  crossAssetCorrelations: CrossAssetCorrelation[];
+  // Lead-lag
+  leadLag: LeadLagSummary[];
+  generatedAt: string;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
+
+const CACHE_TTL = 10 * 60 * 1000;
+const CACHE_KEY = "intermarket-murphy-v2";
+
+async function fetchYahooHistory(ticker: string, period: string): Promise<{ date: string; close: number }[]> {
+  try {
+    const mod: any = await import("yahoo-finance2");
+    const YF = mod.default ?? mod;
+    const yf = typeof YF === "function" ? new YF() : YF;
+    try { yf.suppressNotices?.(["yahooSurvey", "ripHistorical"]); } catch { /* noop */ }
+    const period2 = new Date();
+    const days = period === "max" ? 25 * 365
+      : period === "5y" ? 5 * 365
+      : period === "2y" ? 730
+      : period === "1y" ? 365
+      : period === "6mo" ? 180
+      : period === "3mo" ? 90
+      : 365;
+    const period1 = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const rows = await yf.chart(ticker, { period1, period2, interval: "1d" });
+    return (rows?.quotes ?? [])
+      .filter((q: any) => q.close != null && q.close > 0 && q.date != null)
+      .map((q: any) => ({ date: new Date(q.date * 1000).toISOString().slice(0, 10), close: q.close }));
+  } catch {
+    const { yahooChartCloses } = await import("../yahoo-chart");
+    const mapRange: Record<string, string> = { "max": "max", "5y": "5y", "2y": "2y", "1y": "1y", "6mo": "6mo", "3mo": "3mo" };
+    return await yahooChartCloses(ticker, mapRange[period] ?? "1y");
+  }
+}
+
+function computeReturns(closes: { date: string; close: number }[]): number[] {
+  const rets: number[] = [];
+  for (let i = 1; i < closes.length; i++) {
+    if (closes[i - 1].close > 0) rets.push((closes[i].close - closes[i - 1].close) / closes[i - 1].close);
+  }
+  return rets;
+}
+
+function computeReturn(closes: { date: string; close: number }[], days: number): number | null {
+  if (closes.length < days + 1) return null;
+  const start = closes[closes.length - 1 - days]?.close;
+  const end = closes[closes.length - 1]?.close;
+  if (!start || start <= 0 || !end) return null;
+  return (end - start) / start;
+}
+
+// pearsonR unificado via computePearsonCorrelation (intermarket-complete)
+
+function trendFromChange(pct: number | null): "rising" | "falling" | "flat" | null {
+  if (pct == null) return null;
+  if (pct > 2) return "rising";
+  if (pct < -2) return "falling";
+  return "flat";
+}
+
+function trendFromChangeStrict(pct: number | null): "up" | "down" | "flat" | null {
+  if (pct == null) return null;
+  if (pct > 1.5) return "up";
+  if (pct < -1.5) return "down";
+  return "flat";
+}
+
+// ─── Cross-correlation with lag ──────────────────────────────────────────
+
+function crossCorrelationLagged(
+  rets1: number[], rets2: number[], label1: string, label2: string, maxLag = 60, step = 5,
+): { bestLag: number; bestCorr: number | null; text: string } {
+  const n = Math.min(rets1.length, rets2.length);
+  if (n < 30) return { bestLag: 0, bestCorr: null, text: "Datos insuficientes" };
+  let bestCorr = 0, bestLag = 0;
+  for (let lag = -maxLag; lag <= maxLag; lag += step) {
+    let x: number[], y: number[];
+    if (lag >= 0) { x = rets1.slice(0, n - lag); y = rets2.slice(lag); }
+    else { x = rets1.slice(-lag); y = rets2.slice(0, n + lag); }
+    if (x.length < 10 || y.length < 10) continue;
+    const corr = computePearsonCorrelation(x, y) ?? 0;
+    if (Math.abs(corr) > Math.abs(bestCorr)) { bestCorr = corr; bestLag = lag; }
+  }
+  const absLag = Math.abs(bestLag);
+  const text = absLag <= step
+    ? "Relación sincrónica"
+    : bestLag > 0
+      ? `${label1} lidera a ${label2} por ~${absLag} días (r=${(bestCorr ?? 0).toFixed(2)})`
+      : `${label2} lidera a ${label1} por ~${absLag} días (r=${(bestCorr ?? 0).toFixed(2)})`;
+  return { bestLag, bestCorr, text };
+}
+
+function buildRatio(
+  numValues: { date: string; close: number }[],
+  denValues: { date: string; close: number }[],
+  label: string,
+  formula: string,
+  upSectors: string[],
+  downSectors: string[],
+  upInterpretation: string,
+  downInterpretation: string,
+): RatioInfo {
+  if (numValues.length < 20 || denValues.length < 20) {
+    return { ratio: null, changePct1m: null, changePct3m: null, trend: null, label, formula, interpretacion: "Datos insuficientes", favoreceSectores: [] };
+  }
+  const minLen = Math.min(numValues.length, denValues.length);
+  const ratios: number[] = [];
+  for (let i = 0; i < minLen; i++) {
+    if (denValues[denValues.length - minLen + i].close > 0) {
+      ratios.push(numValues[numValues.length - minLen + i].close / denValues[denValues.length - minLen + i].close);
+    }
+  }
+  if (ratios.length === 0) return { ratio: null, changePct1m: null, changePct3m: null, trend: null, label, formula, interpretacion: "Sin datos", favoreceSectores: [] };
+
+  const ratio = Math.round(ratios[ratios.length - 1] * 10000) / 10000;
+  const change1m = ratios.length > 21 ? Math.round(((ratios[ratios.length - 1] / ratios[ratios.length - 22]) - 1) * 10000) / 100 : null;
+  const change3m = ratios.length > 63 ? Math.round(((ratios[ratios.length - 1] / ratios[ratios.length - 64]) - 1) * 10000) / 100 : null;
+  const trend = trendFromChange(change1m);
+
+  let interpretacion: string;
+  let favoreceSectores: string[];
+  if (trend === "rising") {
+    interpretacion = `${label} en alza (${change1m?.toFixed(1)}% 1m). ${upInterpretation}`;
+    favoreceSectores = upSectors;
+  } else if (trend === "falling") {
+    interpretacion = `${label} en baja (${change1m?.toFixed(1)}% 1m). ${downInterpretation}`;
+    favoreceSectores = downSectors;
+  } else {
+    interpretacion = `${label} estable. Sin sesgo direccional claro.`;
+    favoreceSectores = [];
+  }
+
+  return { ratio, changePct1m: change1m, changePct3m: change3m, trend, label, formula, interpretacion, favoreceSectores };
+}
+
+// ─── TIPS Spread (Breakeven Inflation) ──────────────────────────────────
+// BEI = TNX Nominal Yield - TIPS Real Yield (approximated from TIP ETF price)
+// TIP price moves inversely to real yields; we use a calibrated linear model:
+//   TIPS_real_yield ≈ 8.75 - 0.0625 × TIP_close
+// This maps: TIP=108 → real~2.0%, TIP=100 → real~2.5%, TIP=95 → real~2.8%
+// producing BEI values in the 0-5% range centered around 2% for current markets.
+// The constants are tunable if the real-yield regime shifts significantly.
+function computeTIPSSpread(
+  tipData: { date: string; close: number }[],
+  tnxData: { date: string; close: number }[],
+  label: string,
+  formula: string,
+  upSectors: string[],
+  downSectors: string[],
+  upInterpretation: string,
+  downInterpretation: string,
+): RatioInfo {
+  if (tipData.length < 20 || tnxData.length < 20) {
+    return { ratio: null, changePct1m: null, changePct3m: null, trend: null, label, formula, interpretacion: "Datos insuficientes", favoreceSectores: [] };
+  }
+
+  const minLen = Math.min(tipData.length, tnxData.length);
+  const tipSlice = tipData.slice(-minLen);
+  const tnxSlice = tnxData.slice(-minLen);
+
+  // Calibration: real_yield ≈ 8.75 - 0.0625 × TIP_price
+  // Derived from: at TIP=108 → real=2.0%, at TIP=100 → real=2.5%
+  // (tunable for regime shifts)
+  const A = 8.75;
+  const B = 0.0625;
+
+  const beiValues: number[] = [];
+  for (let i = 0; i < minLen; i++) {
+    const tipPrice = tipSlice[i].close;
+    const tnxYield = tnxSlice[i].close; // ^TNX returns yield in % (e.g., 4.25)
+    if (tipPrice > 0 && tnxYield > 0) {
+      const tipRealYield = Math.max(0, A - B * tipPrice);
+      const bei = tnxYield - tipRealYield;
+      beiValues.push(bei);
+    }
+  }
+
+  if (beiValues.length === 0) {
+    return { ratio: null, changePct1m: null, changePct3m: null, trend: null, label, formula, interpretacion: "Sin datos", favoreceSectores: [] };
+  }
+
+  const ratio = Math.round(beiValues[beiValues.length - 1] * 100) / 100;
+  const change1m = beiValues.length > 21
+    ? Math.round(((beiValues[beiValues.length - 1] / beiValues[beiValues.length - 22]) - 1) * 10000) / 100
+    : null;
+  const change3m = beiValues.length > 63
+    ? Math.round(((beiValues[beiValues.length - 1] / beiValues[beiValues.length - 64]) - 1) * 10000) / 100
+    : null;
+  const trend = trendFromChange(change1m);
+
+  let interpretacion: string;
+  let favoreceSectores: string[];
+  if (trend === "rising") {
+    interpretacion = `${label} en alza (${change1m?.toFixed(1)}% 1m). ${upInterpretation}`;
+    favoreceSectores = upSectors;
+  } else if (trend === "falling") {
+    interpretacion = `${label} en baja (${change1m?.toFixed(1)}% 1m). ${downInterpretation}`;
+    favoreceSectores = downSectors;
+  } else {
+    interpretacion = `${label} estable. Sin sesgo direccional claro.`;
+    favoreceSectores = [];
+  }
+
+  return { ratio, changePct1m: change1m, changePct3m: change3m, trend, label, formula, interpretacion, favoreceSectores };
+}
+
+// ─── REGLA TRANSPORTES-PETRÓLEO (Cap. 13) ───────────────────────────
+// Murphy: "Dow Theory... Industrials and Transports must move up together"
+// "rising oil prices... especially damaging to Transportation stocks"
+// Reemplaza reglaGoldOilStocks (DEPRECADA)
+
+/** Fuente: Murphy, "Intermarket Analysis", cap. 13 */
+export interface ReglaTransportesPetroleoResult {
+  confirmacionDowTheory: boolean;
+  divergenciaPetroleoTransportes: number | null; // correlación 60d
+  interpretacion: "presion_alcista_petroleo_negativa_para_ciclo" | "senal_positiva_expansion_temprana" | "dato_no_disponible" | "sin_senal_clara";
+  petroleoTrend60d: number | null;
+  transportesTrend60d: number | null;
+  industrialesTrend60d: number | null;
+}
+
+/** Fuente: Murphy, "Intermarket Analysis", cap. 13 */
+export function reglaTransportesPetroleo(params: {
+  petroleoPrices: number[]; // USO o CL=F
+  transportesPrices: number[]; // ^DJT o IYT
+  industrialesPrices: number[]; // ^DJI o XLI
+}): ReglaTransportesPetroleoResult {
+  const { petroleoPrices, transportesPrices, industrialesPrices } = params;
+
+  // Pre-chequeo: requerir mínimo 60 registros
+  if (petroleoPrices.length < 60 || transportesPrices.length < 60 || industrialesPrices.length < 60) {
+    return {
+      confirmacionDowTheory: false,
+      divergenciaPetroleoTransportes: null,
+      interpretacion: "dato_no_disponible",
+      petroleoTrend60d: null,
+      transportesTrend60d: null,
+      industrialesTrend60d: null,
+    };
+  }
+
+  // Extraer últimos 60 registros
+  const petroleoSlice = petroleoPrices.slice(-60);
+  const transportesSlice = transportesPrices.slice(-60);
+  const industrialesSlice = industrialesPrices.slice(-60);
+
+  // Calcular retornos 60d
+  const petroleoTrend60d = petroleoSlice[0] > 0
+    ? ((petroleoSlice[petroleoSlice.length - 1] - petroleoSlice[0]) / petroleoSlice[0]) * 100
+    : null;
+  const transportesTrend60d = transportesSlice[0] > 0
+    ? ((transportesSlice[transportesSlice.length - 1] - transportesSlice[0]) / transportesSlice[0]) * 100
+    : null;
+  const industrialesTrend60d = industrialesSlice[0] > 0
+    ? ((industrialesSlice[industrialesSlice.length - 1] - industrialesSlice[0]) / industrialesSlice[0]) * 100
+    : null;
+
+  if (petroleoTrend60d == null || transportesTrend60d == null || industrialesTrend60d == null) {
+    return {
+      confirmacionDowTheory: false,
+      divergenciaPetroleoTransportes: null,
+      interpretacion: "dato_no_disponible",
+      petroleoTrend60d: null,
+      transportesTrend60d: null,
+      industrialesTrend60d: null,
+    };
+  }
+
+  // Confirmación Dow Theory: Industrials y Transports deben moverse en la misma dirección
+  const confirmacionDowTheory = Math.sign(transportesTrend60d) === Math.sign(industrialesTrend60d);
+
+  // Calcular correlación 60d petróleo vs transportes
+  const petroleoReturns: number[] = [];
+  const transportesReturns: number[] = [];
+  for (let i = 1; i < petroleoSlice.length; i++) {
+    if (petroleoSlice[i - 1] > 0) {
+      petroleoReturns.push((petroleoSlice[i] - petroleoSlice[i - 1]) / petroleoSlice[i - 1]);
+    }
+  }
+  for (let i = 1; i < transportesSlice.length; i++) {
+    if (transportesSlice[i - 1] > 0) {
+      transportesReturns.push((transportesSlice[i] - transportesSlice[i - 1]) / transportesSlice[i - 1]);
+    }
+  }
+
+  let divergenciaPetroleoTransportes: number | null = null;
+  if (petroleoReturns.length >= 60 && transportesReturns.length >= 60) {
+    const corr = computePearsonCorrelation(petroleoReturns.slice(-60), transportesReturns.slice(-60));
+    divergenciaPetroleoTransportes = corr != null ? Math.round(corr * 10000) / 10000 : null;
+  }
+
+  // Interpretación
+  let interpretacion: "presion_alcista_petroleo_negativa_para_ciclo" | "senal_positiva_expansion_temprana" | "dato_no_disponible" | "sin_senal_clara";
+  if (petroleoTrend60d > 0 && transportesTrend60d < 0) {
+    interpretacion = "presion_alcista_petroleo_negativa_para_ciclo";
+  } else if (petroleoTrend60d < 0 && transportesTrend60d > 0) {
+    interpretacion = "senal_positiva_expansion_temprana";
+  } else {
+    interpretacion = "sin_senal_clara";
+  }
+
+  return {
+    confirmacionDowTheory,
+    divergenciaPetroleoTransportes,
+    interpretacion,
+    petroleoTrend60d,
+    transportesTrend60d,
+    industrialesTrend60d,
+  };
+}
+
+// ─── TEST SINTÉTICO (validación post-implementación) ─────────────
+// Test: petróleo subiendo, transportes cayendo → divergenciaPetroleoTransportes negativa
+// Ejemplo de uso:
+// const testPetroleo = Array.from({length: 60}, (_, i) => 100 * (1 + 0.10 * i / 59));
+// const testTransportes = Array.from({length: 60}, (_, i) => 100 * (1 - 0.05 * i / 59));
+// const testIndustriales = Array.from({length: 60}, (_, i) => 100 * (1 - 0.05 * i / 59));
+// const result = reglaTransportesPetroleo({ petroleoPrices: testPetroleo, transportesPrices: testTransportes, industrialesPrices: testIndustriales });
+// Resultado esperado: divergenciaPetroleoTransportes < 0 (correlación negativa), interpretacion='presion_alcista_petroleo_negativa_para_ciclo'
+
+// ─── STOVALL SECTOR ROTATION (Cap. 13) ─────────────────────────────
+// Murphy: Ciclo de Stovall para rotación sectorial
+// Early Expansion = Consumer Discretionary + Technology
+// Full Expansion = Industrials + Materials
+// Late Expansion = Energy
+// Early Contraction = Consumer Staples + Utilities
+// Late Contraction = Financials
+
+/** Fuente: Murphy, "Intermarket Analysis", cap. 13 (modelo de Stovall) */
+export interface StovallFaseResult {
+  faseActual: "EarlyExpansion" | "FullExpansion" | "LateExpansion" | "EarlyContraction" | "LateContraction" | "Mixed" | "dato_no_disponible";
+  sectoresLiderando: string[];
+  ranking: { sector: string; retornoRelativo60d: number }[];
+}
+
+/** Fuente: Murphy, "Intermarket Analysis", cap. 13 (modelo de Stovall) */
+export function clasificarFaseStovall(params: {
+  retornosRelativos: { [sector: string]: number | null }; // XLY, XLK, XLI, XLB, XLE, XLP, XLU, XLF, XLV vs SPY
+}): StovallFaseResult {
+  const { retornosRelativos } = params;
+
+  // Mapeo de tickers a nombres de sectores
+  const sectorNames: { [ticker: string]: string } = {
+    "XLY": "Consumer Discretionary",
+    "XLK": "Technology",
+    "XLI": "Industrials",
+    "XLB": "Basic Materials",
+    "XLE": "Energy",
+    "XLP": "Consumer Staples",
+    "XLU": "Utilities",
+    "XLF": "Financial Services",
+    "XLV": "Healthcare",
+  };
+
+  // Pre-chequeo: requerir mínimo 9 sectores con datos
+  const sectoresConDatos = Object.keys(retornosRelativos).filter(k => retornosRelativos[k] != null);
+  if (sectoresConDatos.length < 9) {
+    return {
+      faseActual: "dato_no_disponible",
+      sectoresLiderando: [],
+      ranking: [],
+    };
+  }
+
+  // Construir ranking por retorno relativo 60d (descendente)
+  const ranking = Object.entries(retornosRelativos)
+    .filter(([_, val]) => val != null)
+    .map(([ticker, val]) => ({ sector: sectorNames[ticker] || ticker, retornoRelativo60d: val! }))
+    .sort((a, b) => b.retornoRelativo60d - a.retornoRelativo60d);
+
+  if (ranking.length === 0) {
+    return {
+      faseActual: "dato_no_disponible",
+      sectoresLiderando: [],
+      ranking: [],
+    };
+  }
+
+  // Definir fases de Stovall (sectores líderes esperados)
+  const fasesStovall: { [fase: string]: string[] } = {
+    "EarlyExpansion": ["Consumer Discretionary", "Technology"],
+    "FullExpansion": ["Industrials", "Basic Materials"],
+    "LateExpansion": ["Energy"],
+    "EarlyContraction": ["Consumer Staples", "Utilities"],
+    "LateContraction": ["Financial Services"],
+  };
+
+  // Top-3 del ranking
+  const top3 = ranking.slice(0, 3).map(r => r.sector);
+
+  // Encontrar fase con mayor intersección con top-3
+  let mejorFase = "Mixed";
+  let maxInterseccion = 0;
+
+  for (const [fase, sectores] of Object.entries(fasesStovall)) {
+    const interseccion = sectores.filter(s => top3.includes(s)).length;
+    if (interseccion > maxInterseccion) {
+      maxInterseccion = interseccion;
+      mejorFase = fase;
+    }
+  }
+
+  // Si no hay intersección clara, marcar como Mixed
+  if (maxInterseccion === 0) {
+    mejorFase = "Mixed";
+  }
+
+  return {
+    faseActual: mejorFase as StovallFaseResult["faseActual"],
+    sectoresLiderando: top3,
+    ranking,
+  };
+}
+
+// ─── TEST SINTÉTICO (validación post-implementación) ─────────────
+// Test: ConsDisc+Tech en top-2 → faseActual='EarlyExpansion'
+// Ejemplo de uso:
+// const testRetornos = { XLY: 5.0, XLK: 4.5, XLI: 2.0, XLB: 1.5, XLE: 1.0, XLP: 0.5, XLU: 0.3, XLF: 0.2, XLV: 0.1 };
+// const result = clasificarFaseStovall({ retornosRelativos: testRetornos });
+// Resultado esperado: faseActual='EarlyExpansion', sectoresLiderando=['Consumer Discretionary', 'Technology', ...]
+
+// ─── Determine Pring cycle stage ────────────────────────────────────────
+
+/** Fuente: Murphy, "Intermarket Analysis", cap. 12-13 (diagnóstico de ciclo según Pring/Murphy) */
+function determineCycleStage(
+  bondTrend: number | null,
+  stockTrend: number | null,
+  commTrend: number | null,
+): { stage: 1 | 2 | 3 | 4 | 5 | 6; confianza: "alta" | "media" | "baja" } {
+  const bUp = bondTrend != null && bondTrend > 1.5;
+  const bDown = bondTrend != null && bondTrend < -1.5;
+  const sUp = stockTrend != null && stockTrend > 1.5;
+  const sDown = stockTrend != null && stockTrend < -1.5;
+  const cUp = commTrend != null && commTrend > 1.5;
+  const cDown = commTrend != null && commTrend < -1.5;
+
+  // Stage 1: B↑ S↓ C↓ (Bottom)
+  if (bUp && sDown && cDown) return { stage: 1, confianza: "alta" };
+  // Stage 2: B↑ S↑ C↓ (Early expansion)
+  if (bUp && sUp && cDown) return { stage: 2, confianza: "alta" };
+  // Stage 3: B↑ S↑ C↑ (Full expansion)
+  if (bUp && sUp && cUp) return { stage: 3, confianza: "alta" };
+  // Stage 4: B↓ S↑ C↑ (Late expansion / bond peak)
+  if (bDown && sUp && cUp) return { stage: 4, confianza: "alta" };
+  // Stage 5: B↓ S↓ C↑ (Early contraction)
+  if (bDown && sDown && cUp) return { stage: 5, confianza: "alta" };
+  // Stage 6: B↓ S↓ C↓ (Full contraction)
+  if (bDown && sDown && cDown) return { stage: 6, confianza: "alta" };
+
+  // Partial matches with lower confidence
+  if (bUp && sDown) return { stage: 1, confianza: "media" };
+  if (bUp && sUp) return { stage: cDown ? 2 : 3, confianza: "media" };
+  if (bDown && sUp) return { stage: 4, confianza: "media" };
+  if (sDown && cDown) return { stage: 6, confianza: "media" };
+  if (bDown && cUp) return { stage: 5, confianza: "media" };
+  if (sUp && cUp) return { stage: bDown ? 4 : 3, confianza: "baja" };
+
+  return { stage: 2, confianza: "baja" };
+}
+
+const STAGE_LABELS: Record<number, { label: string; description: string; leaders: string[]; avoid: string[] }> = {
+  1: { label: "Stage 1 — Bottom / Transición", description: "Bonos suben (flight-to-quality), Acciones caen, Commodities caen. Mercado buscando piso. Anticipar rotación hacia Technology y Consumer Cyclical.", leaders: ["Technology", "Consumer Cyclical"], avoid: ["Energy", "Basic Materials", "Financial Services"] },
+  2: { label: "Stage 2 — Expansión Temprana", description: "Bonos suben (yields bajan), Acciones suben, Commodities aún débiles. Mejor momento para comprar. Lideran Technology y Consumer Cyclical.", leaders: ["Technology", "Consumer Cyclical", "Industrials"], avoid: ["Utilities", "Consumer Defensive"] },
+  3: { label: "Stage 3 — Expansión Plena", description: "Los 3 activos suben sincronizados. Liquidez abundante. Technology aún fuerte, Industriales toman liderazgo.", leaders: ["Technology", "Industrials", "Consumer Cyclical"], avoid: ["Utilities", "Consumer Defensive"] },
+  4: { label: "Stage 4 — Techo / Expansión Tardía", description: "Bonos caen (yields suben), Acciones suben, Commodities suben fuerte. Inflación presiona. Rotar a Energy, Basic Materials. Cautela con Technology.", leaders: ["Energy", "Basic Materials"], avoid: ["Technology", "Consumer Cyclical", "Real Estate"] },
+  5: { label: "Stage 5 — Contracción Temprana", description: "Bonos caen, Acciones caen, Commodities aún suben por inercia. Inflación de costos. Refugio en Consumer Defensive y Utilities.", leaders: ["Consumer Defensive", "Utilities", "Healthcare"], avoid: ["Technology", "Consumer Cyclical", "Financial Services"] },
+  6: { label: "Stage 6 — Contracción Total / Recesión", description: "Los 3 activos caen. Cash es king. Bonos largos empiezan a subir (flight-to-quality). Preparar para Stage 1.", leaders: ["Utilities", "Consumer Defensive", "Financial Services"], avoid: ["Technology", "Energy", "Basic Materials", "Consumer Cyclical"] },
+};
+
+// ─── Server function ──────────────────────────────────────────────────────
+
+/** EXTENSION PROPIA — no proviene de Murphy, verificar con Cintia si mantener */
+export const getIntermarketMurphyIndicators = createServerFn({ method: "GET" }).handler(
+  async (): Promise<IntermarketMurphyResult> => {
+    const cached = getCached<IntermarketMurphyResult>(CACHE_KEY, CACHE_TTL);
+    if (cached) return cached;
+
+    // ── Fetch ALL tickers in parallel ──
+    const [
+      crbData, tltData, spyData, dxyData,
+      gldData, slvData, usoData,
+      xlyData, xlpData, iwmData,
+      ndxData, efaData, eemData,
+      ivwData, iveData, hygData, lqdData,
+      tipData, tnxData,
+      djiData, djtData,
+      fvxData, irxData,
+      xlbData, xleData, xluData,
+    ] = await Promise.all([
+      fetchYahooHistory("DBC", "max"),        // Commodities
+      fetchYahooHistory("TLT", "max"),        // Long bonds
+      fetchYahooHistory("SPY", "max"),        // S&P 500
+      fetchYahooHistory("DX-Y.NYB", "max"),   // Dollar
+      fetchYahooHistory("GLD", "max"),        // Gold
+      fetchYahooHistory("SLV", "max"),        // Silver
+      fetchYahooHistory("USO", "max"),        // Oil
+      fetchYahooHistory("XLY", "max"),        // Consumer Disc.
+      fetchYahooHistory("XLP", "max"),        // Consumer Staples
+      fetchYahooHistory("IWM", "max"),        // Small Caps
+      fetchYahooHistory("^NDX", "max"),       // Nasdaq 100
+      fetchYahooHistory("EFA", "max"),        // Developed ex-US
+      fetchYahooHistory("EEM", "max"),        // Emerging Markets
+      fetchYahooHistory("IVW", "max"),        // S&P 500 Growth
+      fetchYahooHistory("IVE", "max"),        // S&P 500 Value
+      fetchYahooHistory("HYG", "max"),        // High Yield
+      fetchYahooHistory("LQD", "max"),        // Investment Grade
+      fetchYahooHistory("TIP", "max"),        // TIPS
+      fetchYahooHistory("^TNX", "max"),       // 10Y yield
+      fetchYahooHistory("^DJI", "max"),       // Dow Industrials
+      fetchYahooHistory("^DJT", "max"),       // Dow Transports
+      fetchYahooHistory("^FVX", "max"),       // 5Y yield
+      fetchYahooHistory("^IRX", "max"),       // 13-week (3M) yield
+      fetchYahooHistory("XLB", "max"),        // Materials
+      fetchYahooHistory("XLE", "max"),        // Energy
+      fetchYahooHistory("XLU", "max"),        // Utilities
+    ]);
+
+    // Helper returns
+    const crbRets = computeReturns(crbData);
+    const tltRets = computeReturns(tltData);
+    const spyRets = computeReturns(spyData);
+    const dxyRets = computeReturns(dxyData);
+    const gldRets = computeReturns(gldData);
+    const usoRets = computeReturns(usoData);
+    const slvRets = computeReturns(slvData);
+    const xlyRets = computeReturns(xlyData);
+    const xlpRets = computeReturns(xlpData);
+    const iwmRets = computeReturns(iwmData);
+    const ndxRets = computeReturns(ndxData);
+    const efaRets = computeReturns(efaData);
+    const eemRets = computeReturns(eemData);
+    const ivwRets = computeReturns(ivwData);
+    const iveRets = computeReturns(iveData);
+    const hygRets = computeReturns(hygData);
+    const lqdRets = computeReturns(lqdData);
+    const tipRets = computeReturns(tipData);
+
+    // ─── 1. RATIO CRB/BONDS ──────────────────────────────────────────
+    const crbBonds = buildRatio(crbData, tltData,
+      "CRB/Bonds", "DBC ÷ TLT",
+      ["Materiales Básicos (XLB)", "Energía (XLE)"],
+      ["Consumo Básico (XLP)", "Utilities (XLU)"],
+      "Commodities superan a bonos. Señal de fortaleza económica o presión inflacionaria. Rotar a Energía y Materiales (Murphy Cap. 1).",
+      "Bonos superan a commodities. Señal de desaceleración o búsqueda de refugio. Rotar a defensivos (Murphy Cap. 7).",
+    );
+
+    // ─── 2. RATIO COMMODITIES/STOCKS ────────────────────────────────
+    const commoditiesStocks = buildRatio(crbData, spyData,
+      "Commodities/Stocks", "DBC ÷ SPY",
+      ["Energy (XLE)", "Basic Materials (XLB)"],
+      ["Technology (XLK)", "Consumer Discretionary (XLY)"],
+      "Inflación lidera sobre crecimiento real. Favorecer Energy y Materials. El régimen dominante es inflacionario.",
+      "Stocks superan a commodities — crecimiento real. Favorecer Technology y Consumer Cyclical. Régimen desinflacionario.",
+    );
+
+    // ─── 3. RATIO GOLD/OIL ──────────────────────────────────────────
+    const goldOil = buildRatio(gldData, usoData,
+      "Gold/Oil", "GLD ÷ USO",
+      ["Gold miners (GDX)", "Utilities (XLU)", "Consumer Defensive (XLP)"],
+      ["Energy (XLE)", "Industrials (XLI)", "Consumer Discretionary (XLY)"],
+      "Oro supera al petróleo — inflación de incertidumbre/geopolítica. Refugio en defensivos.",
+      "Petróleo supera al oro — inflación de demanda (crecimiento real). Favorecer Energy e Industrials.",
+    );
+
+    // ─── 4. RATIO COPPER/GOLD (Dr. Copper) ─────────────────────────
+    let copperGold: RatioInfo;
+    try {
+      const hgData = await fetchYahooHistory("HG=F", "max");
+      copperGold = buildRatio(hgData, gldData,
+        "Copper/Gold", "HG=F ÷ GLD",
+        ["Industrials (XLI)", "Basic Materials (XLB)", "Technology (XLK)"],
+        ["Utilities (XLU)", "Consumer Defensive (XLP)", "Gold miners (GDX)"],
+        "Cobre supera al oro — demanda industrial real. Señal más temprana de expansión económica. Dr. Copper confirma crecimiento.",
+        "Oro supera al cobre — incertidumbre económica. Flight-to-safety. Dr. Copper alerta desaceleración.",
+      );
+    } catch {
+      copperGold = { ratio: null, changePct1m: null, changePct3m: null, trend: null, label: "Copper/Gold", formula: "HG=F ÷ GLD", interpretacion: "No disponible (fallo en datos de futuros)", favoreceSectores: [] };
+    }
+
+    // ─── 5. RATIO DOW/GOLD ─────────────────────────────────────────
+    const dowGold = buildRatio(djiData, gldData,
+      "Dow/Gold", "^DJI ÷ GLD",
+      ["Financial Services (XLF)", "Technology (XLK)", "Consumer Cyclical (XLY)"],
+      ["Gold miners (GDX)", "Utilities (XLU)"],
+      "Activos financieros (papel) superan a activos duros — ciclo de confianza en el sistema monetario. Risk-on.",
+      "Oro supera a acciones — ciclo de activos duros. Desconfianza en monedas fiduciarias. Risk-off estructural.",
+    );
+
+    // ─── 6. RATIO XLY/XLP (Consumer Disc./Staples) ─────────────────
+    const xlyXlp = buildRatio(xlyData, xlpData,
+      "XLY/XLP", "XLY ÷ XLP (Disc./Staples)",
+      ["Consumer Discretionary (XLY)", "Technology (XLK)"],
+      ["Consumer Defensive (XLP)", "Utilities (XLU)", "Healthcare (XLV)"],
+      "Consumidor confiado — optimismo económico. Gasto discrecional lidera.",
+      "Consumidor refugiándose en básico — cautela. Economy preocupada. Señal temprana de desaceleración (Murphy Cap. 6).",
+    );
+
+    // ─── 7. RATIO IWM/SPY (Small Caps vs Large Caps) ──────────────
+    const iwmSpy = buildRatio(iwmData, spyData,
+      "IWM/SPY", "IWM ÷ SPY (Small/Large)",
+      ["Technology (XLK)", "Consumer Cyclical (XLY)", "Financials (XLF)"],
+      ["Utilities (XLU)", "Consumer Defensive (XLP)"],
+      "Small caps lideran — confianza en economía doméstica. Rotación típica de Stage 2-3.",
+      "Large caps lideran — flight-to-quality dentro de equities. Small caps débiles anticipan desaceleración (Murphy Cap. 5).",
+    );
+
+    // ─── 8. RATIO NDX/SPX (Tech vs Market) ────────────────────────
+    const ndxSpx = buildRatio(ndxData, spyData,
+      "NDX/SPX", "^NDX ÷ SPY (Tech/S&P)",
+      ["Technology (XLK)", "Consumer Cyclical (XLY)"],
+      ["Energy (XLE)", "Financials (XLF)", "Utilities (XLU)"],
+      "Tech lidera — crecimiento, innovación, bajas tasas reales. Stage 2-3.",
+      "Tech bajoperform — rotación a value. Stage 4-5 típico. Suben Energy, Financials, Materials.",
+    );
+
+    // ─── 9. RATIO EFA/EEM (Developed vs Emerging) ─────────────────
+    const efaEem = buildRatio(efaData, eemData,
+      "EFA/EEM", "EFA ÷ EEM (Dev/EM)",
+      ["Desarrollados (EFA)"],
+      ["Emergentes (EEM)"],
+      "Desarrollados superan a Emergentes — USD fuerte, capital flight-to-safety. Mercado global cauteloso.",
+      "Emergentes superan a Desarrollados — risk-on global, USD débil. Confianza en crecimiento global (Murphy Cap. 9).",
+    );
+
+    // ─── 10. RATIO GROWTH/VALUE ────────────────────────────────────
+    const growthValue = buildRatio(ivwData, iveData,
+      "Growth/Value", "IVW ÷ IVE (Growth/Value)",
+      ["Technology (XLK)", "Consumer Cyclical (XLY)", "Communication Services (XLC)"],
+      ["Financials (XLF)", "Energy (XLE)", "Industrials (XLI)"],
+      "Growth lidera — bajas tasas, expansión. Stage 2-3.",
+      "Value lidera — subida de tasas, inflación. Stage 4-5. Financials, Energy, Materials toman liderazgo.",
+    );
+
+    // ─── 11. RATIO HYG/LQD (Credit Stress) ─────────────────────────
+    const hyglqd = buildRatio(hygData, lqdData,
+      "HYG/LQD", "HYG ÷ LQD (High Yield/IG)",
+      ["Risk-on activo"],
+      ["Risk-off — cautela crediticia"],
+      "High Yield supera a Investment Grade — apetito por riesgo crediticio. Confianza en economía. (Stage 2-3).",
+      "Investment Grade supera a High Yield — flight-to-quality dentro de crédito. Señal temprana de estrés. (Stage 4-5, Murphy Cap. 12).",
+    );
+
+    // ─── 12. RATIO TIPS SPREAD (Inflación implícita) ──────────────
+    // BEI = ^TNX yield - TIPS real yield (from TIP price)
+    const tipsSpread = computeTIPSSpread(tipData, tnxData,
+      "TIPS Spread", "^TNX - TIPS_yield(TIP)",
+      ["Energy (XLE)", "Basic Materials (XLB)", "Gold (GLD)"],
+      ["Technology (XLK)", "Consumer Cyclical (XLY)", "Real Estate (XLRE)"],
+      "Inflación implícita subiendo — expectativas de inflación al alza. Protegerse con Energy, Materials.",
+      "Inflación implícita bajando — desinflación. Favorecer Technology y growth stocks.",
+    );
+
+    // ─── 13. YIELD CURVE SPREAD ─────────────────────────────────────
+    let yieldCurve: YieldCurveSpread;
+    if (tnxData.length > 0 && fvxData.length > 0 && irxData.length > 0) {
+      const tnxYield = tnxData[tnxData.length - 1].close;
+      const fvxYield = fvxData[fvxData.length - 1].close;
+      const irxYield = irxData[irxData.length - 1].close;
+      const spread10y2y = tnxYield - fvxYield;
+      const spread10y3m = tnxYield - irxYield;
+      const invertida = spread10y2y < 0 || spread10y3m < 0;
+
+      // Determine steepness trend (compare current vs 60d ago)
+      let steepness: YieldCurveSpread["steepness"] = "normal";
+      if (spread10y2y < 0) steepness = "inverted";
+      else if (tnxData.length > 60 && fvxData.length > 60) {
+        const spread60dAgo = tnxData[tnxData.length - 61].close - fvxData[fvxData.length - 61].close;
+        if (spread10y2y > spread60dAgo) steepness = "steepening";
+        else if (spread10y2y < spread60dAgo) steepness = "flattening";
+      }
+
+      yieldCurve = {
+        valor10y2y: Math.round(spread10y2y * 100) / 100,
+        valor10y3m: Math.round(spread10y3m * 100) / 100,
+        invertida,
+        steepness,
+        interpretacion: invertida
+          ? `CURVA INVERTIDA (10Y-2Y: ${spread10y2y.toFixed(2)}%, 10Y-3M: ${spread10y3m.toFixed(2)}%). La señal más temprana y confiable de recesión según Murphy (Cap. 14). Históricamente precede recesión por 6-18 meses.`
+          : steepness === "steepening"
+          ? `Curva steepening (10Y-2Y: ${spread10y2y.toFixed(2)}%, 10Y-3M: ${spread10y3m.toFixed(2)}%). Señal de normalización post-inversión o expansión temprana. Stage 1-2.`
+          : steepness === "flattening"
+          ? `Curva flattening (10Y-2Y: ${spread10y2y.toFixed(2)}%, 10Y-3M: ${spread10y3m.toFixed(2)}%). Se acerca inversión. Cautela. Stage 4-5.`
+          : `Curva normal (10Y-2Y: ${spread10y2y.toFixed(2)}%, 10Y-3M: ${spread10y3m.toFixed(2)}%). Sin señal de estrés inmediato.`,
+      };
+    } else {
+      yieldCurve = { valor10y2y: null, valor10y3m: null, invertida: null, steepness: null, interpretacion: "Datos insuficientes para calcular curva de yields." };
+    }
+
+    // ─── 14. BONDS/STOCKS RELATIONSHIP ──────────────────────────────
+    const tltReturn1m = computeReturn(tltData, 21);
+    const spyReturn1m = computeReturn(spyData, 21);
+    // Pearson R returns [-1, 1]; keep as decimal for display
+    const bondsStockCorr = tltRets.length > 60 && spyRets.length > 60
+      ? Math.round((computePearsonCorrelation(tltRets.slice(-60), spyRets.slice(-60)) ?? 0) * 10000) / 10000 : null;
+
+    let escenario = "";
+    let trend: BondsStocksRelation["trend"] = null;
+    if (bondsStockCorr != null) {
+      const tltPos = (tltReturn1m ?? 0) > 0;
+      const spyPos = (spyReturn1m ?? 0) > 0;
+      const corrNeg = bondsStockCorr < -0.3;
+      const corrPos = bondsStockCorr > 0.3;
+
+      // Murphy Cap. 13: when TLT and SPY move in OPPOSITE directions with
+      // negative correlation -> classic regime (deflation or growth).
+      // When they move TOGETHER with positive correlation -> monetary regime.
+      if (corrNeg && tltPos && !spyPos) {
+        escenario = "DEFLACIÓN / FLIGHT-TO-QUALITY"; trend = "bonds_lideran";
+      } else if (corrNeg && !tltPos && spyPos) {
+        escenario = "CRECIMIENTO / RISK-ON"; trend = "stocks_lideran";
+      } else if (!tltPos && spyPos) {
+        // TLT down, SPY up regardless of corr → Growth scenario
+        escenario = "CRECIMIENTO / RISK-ON"; trend = "stocks_lideran";
+      } else if (tltPos && !spyPos) {
+        // TLT up, SPY down regardless of corr → Flight-to-quality
+        escenario = "DEFLACIÓN / FLIGHT-TO-QUALITY"; trend = "bonds_lideran";
+      } else if (corrPos && tltPos && spyPos) {
+        escenario = "EXPANSIÓN MONETARIA (ambos suben)"; trend = "ambos_suben";
+      } else if (corrPos && !tltPos && !spyPos) {
+        escenario = "CONTRACCIÓN (ambos caen)"; trend = "ambos_bajan";
+      } else if (tltPos && spyPos) {
+        escenario = "AMBOS SUBEN (correlación baja)"; trend = "incierto";
+      } else if (!tltPos && !spyPos) {
+        escenario = "AMBOS CAEN (correlación baja)"; trend = "incierto";
+      } else {
+        escenario = "SIN SEÑAL CLARA"; trend = "incierto";
+      }
+    }
+
+    const bondsStocks: BondsStocksRelation = {
+      ratio: tltData.length > 0 && spyData.length > 0
+        ? Math.round((tltData[tltData.length - 1].close / spyData[spyData.length - 1].close) * 10000) / 10000 : null,
+      trend, tltReturn60d: computeReturn(tltData, 60), spyReturn60d: computeReturn(spyData, 60),
+      correlacion60d: bondsStockCorr, escenario,
+      interpretacion: escenario === "DEFLACIÓN / FLIGHT-TO-QUALITY"
+        ? "Bonos suben mientras acciones caen — flight-to-quality clásico. Refugio en TLT, XLP, XLU. Evitar cíclicos (Murphy Cap. 13)."
+        : escenario === "CRECIMIENTO / RISK-ON"
+        ? "Bonos caen mientras acciones suben — risk-on. Favorecer XLK, XLY, XLI."
+        : escenario === "EXPANSIÓN MONETARIA (ambos suben)"
+        ? "Bonos y acciones suben — expansión monetaria o bajas de tasas. Favorecer duration larga y growth."
+        : escenario === "CONTRACCIÓN (ambos caen)"
+        ? "Bonos y acciones caen — estrés de liquidez. Cash es king."
+        : "Relación sin señal clara.",
+    };
+
+    // ─── 15. DOW THEORY ─────────────────────────────────────────────
+    const djiTrendVal = computeReturn(djiData, 42);  // 2-month
+    const djtTrendVal = computeReturn(djtData, 42);
+    const djiTrend = trendFromChangeStrict(djiTrendVal != null ? djiTrendVal * 100 : null);
+    const djtTrend = trendFromChangeStrict(djtTrendVal != null ? djtTrendVal * 100 : null);
+    const confirmed = djiTrend === djtTrend && djiTrend !== null;
+    let divergence: "bullish" | "bearish" | null = null;
+    if (djiTrend === "up" && djtTrend !== "up") divergence = "bearish";
+    else if (djiTrend === "down" && djtTrend !== "down") divergence = "bullish";
+
+    const dowTheory: DowTheorySignal = {
+      industrialsTrend: djiTrend, transportsTrend: djtTrend, confirmed, divergence,
+      interpretacion: confirmed
+        ? `Dow Theory CONFIRMADA — ambos índices en tendencia ${djiTrend}. La tendencia actual está confirmada.`
+        : divergence === "bearish"
+        ? `Dow Theory con DIVERGENCIA BAJISTA. Industriales (^DJI) en alza pero Transportes (^DJT) no confirman. Señal clásica de debilidad inminente (Murphy Cap. 5).`
+        : divergence === "bullish"
+        ? `Dow Theory con DIVERGENCIA ALCISTA. Industriales (^DJI) en baja pero Transportes (^DJT) no confirman. Posible fondo.`
+        : `Dow Theory sin señal clara. Esperar confirmación direccional.`,
+    };
+
+    // ─── 16. CYCLE DIAGNOSIS (Pring 3 Arrows) ──────────────────────
+    // Use TLT price data directly (inverse of yields, but more accurate than TNX inversion)
+    // TLT: ETF price of 20+ year US treasuries — direct bond price
+    const tltTrendVal = computeReturn(tltData, 42) != null ? computeReturn(tltData, 42)! * 100 : null; // 2-month
+    const spyTrendVal = computeReturn(spyData, 42) != null ? computeReturn(spyData, 42)! * 100 : null;
+    const crbTrendVal = computeReturn(crbData, 42) != null ? computeReturn(crbData, 42)! * 100 : null;
+
+    const { stage, confianza } = determineCycleStage(tltTrendVal, spyTrendVal, crbTrendVal);
+    const stageInfo = STAGE_LABELS[stage];
+
+    const cycle: CycleDiagnosis = {
+      stage,
+      label: stageInfo.label,
+      description: stageInfo.description,
+      sectoresLideres: stageInfo.leaders,
+      sectoresEvitar: stageInfo.avoid,
+      confianza,
+      bondsTrend: trendFromChangeStrict(tltTrendVal),
+      stocksTrend: trendFromChangeStrict(spyTrendVal),
+      commoditiesTrend: trendFromChangeStrict(crbTrendVal),
+    };
+
+    // ─── 17. CROSS-ASSET CORRELATIONS ──────────────────────────────
+    const crossAssetCorrelations: CrossAssetCorrelation[] = [];
+    // Compute returns for sector ETFs we already fetched
+    const xlbRets = computeReturns(xlbData);
+    const xleRets = computeReturns(xleData);
+    const xluRets = computeReturns(xluData);
+    const sectorPairs: [string, string, number[]][] = [
+      ["XLK (Tech)", "Technology", computeReturns(await fetchYahooHistory("XLK", "max"))],
+      ["XLF (Financials)", "Financial Services", computeReturns(await fetchYahooHistory("XLF", "max"))],
+      ["XLE (Energy)", "Energy", xleRets],
+      ["XLB (Materials)", "Basic Materials", xlbRets],
+      ["XLV (Healthcare)", "Healthcare", computeReturns(await fetchYahooHistory("XLV", "max"))],
+      ["XLP (Cons. Def.)", "Consumer Defensive", xlpRets],
+      ["XLY (Cons. Disc.)", "Consumer Discretionary", xlyRets],
+      ["XLU (Utilities)", "Utilities", xluRets],
+      ["XLRE (Real Estate)", "Real Estate", computeReturns(await fetchYahooHistory("XLRE", "max"))],
+    ];
+    for (const [name, _, rets] of sectorPairs) {
+      const corr60 = dxyRets.length > 60 && rets.length > 60
+        ? Math.round((computePearsonCorrelation(dxyRets.slice(-60), rets.slice(-60)) ?? 0) * 10000) / 100 : null;
+      const corr250 = dxyRets.length > 250 && rets.length > 250
+        ? Math.round((computePearsonCorrelation(dxyRets.slice(-250), rets.slice(-250)) ?? 0) * 10000) / 100 : null;
+      const interp = corr60 != null && corr60 < -0.3
+        ? `Dólar presiona a la BAJA a ${name} (r=${corr60.toFixed(2)}). USD fuerte lastra el sector.`
+        : corr60 != null && corr60 > 0.3
+        ? `Dólar correlaciona ALTO con ${name} (r=${corr60.toFixed(2)}). Sector se beneficia de USD fuerte.`
+        : `DXY y ${name} tienen baja correlación (${corr60 != null ? corr60.toFixed(2) : "N/A"}).`;
+      crossAssetCorrelations.push({ pair: `DXY vs ${name}`, assetA: "DXY", assetB: name, correlation60d: corr60, correlation250d: corr250, interpretacion: interp });
+    }
+
+    // ─── 18. LEAD-LAG ANALYSIS ─────────────────────────────────────
+    const leadLag: LeadLagSummary[] = [];
+    // Dollar leads commodities
+    if (dxyRets.length > 60 && crbRets.length > 60) {
+      const ll = crossCorrelationLagged(dxyRets.slice(-180), crbRets.slice(-180), "DXY", "DBC (Commodities)", 90, 5);
+      leadLag.push({ pair: "DXY vs DBC", leader: ll.text.includes("DXY lidera") ? "DXY" : ll.text.includes("DBC lidera") ? "DBC" : "Sincrónico", lagDays: Math.abs(ll.bestLag), correlation: ll.bestCorr });
+    }
+    // Bonds lead stocks
+    if (tltRets.length > 60 && spyRets.length > 60) {
+      const ll = crossCorrelationLagged(tltRets.slice(-180), spyRets.slice(-180), "TLT (Bonds)", "SPY (Stocks)", 90, 5);
+      leadLag.push({ pair: "TLT vs SPY", leader: ll.text.includes("TLT lidera") ? "TLT (Bonds)" : ll.text.includes("SPY lidera") ? "SPY (Stocks)" : "Sincrónico", lagDays: Math.abs(ll.bestLag), correlation: ll.bestCorr });
+    }
+    // Commodities lead stocks (Murphy: CRB leads SPY by ~2-4 months)
+    if (crbRets.length > 60 && spyRets.length > 60) {
+      const ll = crossCorrelationLagged(crbRets.slice(-250), spyRets.slice(-250), "DBC (Commodities)", "SPY (Stocks)", 120, 10);
+      leadLag.push({ pair: "DBC vs SPY", leader: ll.text.includes("DBC lidera") ? "DBC (Commodities)" : ll.text.includes("SPY lidera") ? "SPY (Stocks)" : "Sincrónico", lagDays: Math.abs(ll.bestLag), correlation: ll.bestCorr });
+    }
+    // Copper leads industrials
+    if (slvRets.length > 60 && xlyRets.length > 60) {
+      const ll = crossCorrelationLagged(slvRets.slice(-180), xlyRets.slice(-180), "Gold/Silver", "XLY (Cons. Disc.)", 90, 5);
+      leadLag.push({ pair: "Gold/Silver vs XLY", leader: ll.text, lagDays: Math.abs(ll.bestLag), correlation: ll.bestCorr });
+    }
+
+    const result: IntermarketMurphyResult = {
+      crbBonds, commoditiesStocks, bondsStocks, goldOil, copperGold, dowGold,
+      xlyXlp, iwmSpy, ndxSpx, efaEem, growthValue, hyglqd, tipsSpread,
+      yieldCurve, dowTheory, cycle,
+      crossAssetCorrelations, leadLag,
+      generatedAt: new Date().toISOString(),
+    };
+
+    setCache(CACHE_KEY, result);
+    return result;
+  },
+);

@@ -1,0 +1,174 @@
+// @ts-nocheck
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { getYahooHistoricalServer } from "./market-data.functions";
+import type { RangoHistorico } from "./market-data.types";
+import { getCached, setCache } from "./cache";
+import { calcularSerieSemaforo, detectarSenalesSemaforo } from "./senales-tecnicas";
+
+const CACHE_TTL = 24 * 60 * 60 * 1000;
+const DEFAULT_COSTO = 0.0015; // 0.15% por operación
+const WALKFORWARD_SPLIT = 0.7;
+
+export type Confiabilidad = "baja" | "media" | "alta";
+
+export interface ResultadoSenal {
+  fecha: string;
+  tipo: "mejora" | "empeora";
+  clasificacionAnterior: string;
+  clasificacionActual: string;
+  scoreAnterior: number;
+  scoreActual: number;
+  precioEntrada: number;
+  retorno5d: number | null;
+  retorno20d: number | null;
+  retorno60d: number | null;
+}
+
+export interface ResumenBacktest {
+  tipo: "mejora" | "empeora" | "total";
+  ocurrencias: number;
+  confiabilidad: Confiabilidad;
+  winRate20d: number;
+  retornoPromedio20d: number;
+  retornoMediano20d: number;
+  mejorCaso20d: number;
+  peorCaso20d: number;
+  equityCurve: { fecha: string; valor: number }[];
+}
+
+export interface BacktestSenalesResult {
+  ticker: string;
+  periodo: string;
+  totalSenales: number;
+  resumen: ResumenBacktest[];
+  detalle: ResultadoSenal[];
+  walkforward: {
+    entrenamiento: ResumenBacktest[];
+    validacion: ResumenBacktest[];
+  } | null;
+  cacheKey: string;
+  costoTransaccion: number;
+  error?: string;
+}
+
+export const getBacktestSenalesTecnicas = createServerFn({ method: "POST" })
+  .validator((input: unknown) =>
+    z.object({
+      ticker: z.string().min(1).max(20),
+      rango: z.enum(["1Y", "3Y", "5Y", "MAX"]).default("3Y"),
+      costoTransaccion: z.number().min(0).max(0.05).default(DEFAULT_COSTO),
+    }).parse(input),
+  )
+  .handler(async ({ data }): Promise<BacktestSenalesResult> => {
+    const { ticker, rango, costoTransaccion } = data;
+    const cacheKey = `bts_${ticker}_${rango}_c${(costoTransaccion * 10000).toFixed(0)}`;
+
+    const cached = getCached<BacktestSenalesResult>(cacheKey, CACHE_TTL);
+    if (cached) return cached;
+
+    const rangoMap: Record<string, RangoHistorico> = { "1Y": "1A", "3Y": "2A", "5Y": "5A", "MAX": "5A" };
+    const rangoYahoo = rangoMap[rango] ?? "2A";
+
+    const bars = await getYahooHistoricalServer({ data: { symbol: ticker, rango: rangoYahoo } }).catch(() => null);
+    if (!bars || bars.length < 250) {
+      return { ticker, periodo: rango, totalSenales: 0, resumen: [], detalle: [], walkforward: null, cacheKey, costoTransaccion, error: `Histórico insuficiente para ${ticker} (${bars?.length ?? 0} velas, mínimo 250)` };
+    }
+
+    const velas = bars.map((b) => ({
+      fecha: b.fecha, apertura: b.apertura, maximo: b.maximo, minimo: b.minimo, cierre: b.cierre,
+    }));
+
+    const serie = calcularSerieSemaforo(velas);
+    if (serie.length < 50) {
+      return { ticker, periodo: rango, totalSenales: 0, resumen: [], detalle: [], walkforward: null, cacheKey, costoTransaccion, error: "No se pudo calcular la serie del semáforo" };
+    }
+
+    const senales = detectarSenalesSemaforo(serie);
+    const fechas = serie.map((s) => s.fecha);
+
+    const detalle: ResultadoSenal[] = [];
+    for (const s of senales) {
+      const idx = fechas.indexOf(s.fecha);
+      if (idx === -1) continue;
+
+      const getRet = (offset: number): number | null => {
+        const targetIdx = idx + offset;
+        if (targetIdx >= fechas.length) return null;
+        const p = serie[targetIdx].precio;
+        const retBruto = p > 0 ? p / s.precio - 1 : null;
+        // Descontar costos de transacción (ida + vuelta)
+        return retBruto != null ? retBruto - costoTransaccion * 2 : null;
+      };
+
+      detalle.push({
+        fecha: s.fecha,
+        tipo: s.tipo,
+        clasificacionAnterior: s.clasificacionAnterior,
+        clasificacionActual: s.clasificacionActual,
+        scoreAnterior: s.scoreAnterior,
+        scoreActual: s.scoreActual,
+        precioEntrada: s.precio,
+        retorno5d: getRet(5),
+        retorno20d: getRet(20),
+        retorno60d: getRet(60),
+      });
+    }
+
+    const resumen = construirResumen(detalle);
+    const walkforward = construirWalkforward(detalle);
+
+    const result: BacktestSenalesResult = {
+      ticker, periodo: rango, totalSenales: detalle.length,
+      resumen, detalle, walkforward, cacheKey, costoTransaccion,
+    };
+
+    setCache(cacheKey, result);
+    return result;
+  });
+
+function confiabilidad(n: number): Confiabilidad {
+  if (n >= 30) return "alta";
+  if (n >= 10) return "media";
+  return "baja";
+}
+
+function construirResumen(detalle: ResultadoSenal[]): ResumenBacktest[] {
+  const agrupar = (items: ResultadoSenal[]): ResumenBacktest => {
+    const ret20s = items.map((i) => i.retorno20d).filter((r): r is number => r != null);
+    if (ret20s.length === 0) return { tipo: "total", ocurrencias: 0, confiabilidad: "baja", winRate20d: 0, retornoPromedio20d: 0, retornoMediano20d: 0, mejorCaso20d: 0, peorCaso20d: 0, equityCurve: [] };
+    const wins = ret20s.filter((r) => r > 0).length;
+    const sorted = [...ret20s].sort((a, b) => a - b);
+    const n = ret20s.length;
+    const mid = Math.floor(n / 2);
+    const mediana = n % 2 === 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    let valor = 1;
+    const equityCurve: { fecha: string; valor: number }[] = [];
+    for (const item of items.sort((a, b) => a.fecha.localeCompare(b.fecha))) {
+      if (item.retorno20d != null) { valor *= (1 + item.retorno20d); equityCurve.push({ fecha: item.fecha, valor }); }
+    }
+    return { tipo: "total", ocurrencias: n, confiabilidad: confiabilidad(n), winRate20d: (wins / n) * 100, retornoPromedio20d: ret20s.reduce((s, r) => s + r, 0) / n, retornoMediano20d: mediana, mejorCaso20d: sorted[n - 1], peorCaso20d: sorted[0], equityCurve };
+  };
+
+  const mejoras = detalle.filter((d) => d.tipo === "mejora");
+  const empeoras = detalle.filter((d) => d.tipo === "empeora");
+
+  const r: ResumenBacktest[] = [];
+  if (mejoras.length > 0) r.push({ ...agrupar(mejoras), tipo: "mejora" });
+  if (empeoras.length > 0) r.push({ ...agrupar(empeoras), tipo: "empeora" });
+  r.push({ ...agrupar(detalle), tipo: "total" });
+
+  return r;
+}
+
+function construirWalkforward(detalle: ResultadoSenal[]): BacktestSenalesResult["walkforward"] {
+  if (detalle.length < 10) return null;
+  const sorted = [...detalle].sort((a, b) => a.fecha.localeCompare(b.fecha));
+  const splitIdx = Math.floor(sorted.length * WALKFORWARD_SPLIT);
+  const train = sorted.slice(0, splitIdx);
+  const test = sorted.slice(splitIdx);
+  return {
+    entrenamiento: construirResumen(train),
+    validacion: construirResumen(test),
+  };
+}

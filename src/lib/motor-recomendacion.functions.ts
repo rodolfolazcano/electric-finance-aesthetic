@@ -1,0 +1,1055 @@
+// @ts-nocheck
+// FASE 6 — Motor de recomendación de 5 capas conservado.
+// # REVISAR: las capas 4-5 consumen scoreUnificado (scoring-unificado.ts
+// legacy) y scoreTecnicoDetalle provenientes de getSemaforo; no delegan en
+// motor-unificado.ts porque su shape RecomendacionActivo (capas con
+// etiquetaConfianza) es específico y porque getSemaforo ya genera ese score.
+// Las capas 1-3 (evaluarIntermarketMurphy, evaluarStovall, evaluarMacroGlobal,
+// evaluarRatioCRBBonds) son consumidas por src/lib/scoring/macro-contexto.ts
+// (Fase 4) del motor unificado (exportadas en esa fase). Sin delegación nueva.
+import { createServerFn } from "@tanstack/react-start";
+import { getCached, setCache } from "./cache";
+import { getSectorPerformanceSemanal } from "./sector-performance.functions";
+import { getFlatTickerList } from "./universos";
+import { yahooChartOHLCV } from "./yahoo-chart";
+import { calcularVariaciones } from "./macro-trends.functions";
+import { getSemaforoBatch, type SemaforoResult } from "./finance.functions";
+import { RUEDA_STOVALL, inferirEtapaCiclo } from "./intermarket-engine";
+
+// ─── Tipos ─────────────────────────────────────────────────────
+
+export interface EvaluacionCapa {
+  nombre: string;
+  disponible: boolean;
+  valor: number | null;
+  detalle: string;
+  umbralUsado: string | null;
+}
+
+export interface RecomendacionActivo {
+  ticker: string;
+  nombre: string;
+  sector: string;
+  motivoOrigen: "sector_top_ranking" | "noticia_macro" | "oportunidad_zscores";
+  capas: EvaluacionCapa[];
+  scoreConfianza: number;
+  maxPosible: number;
+  etiquetaConfianza: string;
+  resumenTextual: string;
+}
+
+// ─── PARTE 1: 4 REGLAS NÚCLEO MURPHY (Cap. 1) ──────────────────
+// Cada regla devuelve score -1 a +1
+
+export function reglaDolarCommodities(dxyTrend: number | null, dbcTrend: number | null): number {
+  if (dxyTrend == null || dbcTrend == null) return 0;
+  const mag = Math.abs(dxyTrend) + Math.abs(dbcTrend);
+  if (Math.sign(dxyTrend) !== Math.sign(dbcTrend)) {
+    return Math.min(1, mag / 12);
+  }
+  return -Math.min(1, mag / 12);
+}
+
+export function reglaCommoditiesBonos(dbcTrend: number | null, bondPriceTrend: number | null): number {
+  if (dbcTrend == null || bondPriceTrend == null) return 0;
+  if (Math.sign(dbcTrend) !== Math.sign(bondPriceTrend)) {
+    return Math.min(1, (Math.abs(dbcTrend) + Math.abs(bondPriceTrend)) / 10);
+  }
+  return -Math.min(1, (Math.abs(dbcTrend) + Math.abs(bondPriceTrend)) / 15);
+}
+
+export function reglaBonosAcciones(bondPriceTrend: number | null, spxTrend: number | null, commodityTrend: number | null = null): number {
+  if (bondPriceTrend == null || spxTrend == null) return 0;
+  // B↑S↑C↑ = Stage 3 (Expansión Tardía) → inflacionario
+  if (bondPriceTrend > 0 && spxTrend > 0 && commodityTrend != null && commodityTrend > 0) {
+    return Math.min(1, (bondPriceTrend + spxTrend) / 15);
+  }
+  // B↑S↑C↓ = Stage 1 (Recuperación Temprana) → NO inflacionario, es el mejor momento para comprar
+  if (bondPriceTrend > 0 && spxTrend > 0 && (commodityTrend == null || commodityTrend <= 0)) {
+    return 0;
+  }
+  // Ambos caen = relación normal → neutro
+  if (bondPriceTrend < 0 && spxTrend < 0) return -Math.min(1, (Math.abs(bondPriceTrend) + Math.abs(spxTrend)) / 15);
+  return 0;
+}
+
+export function reglaOroPetroleoVsAcciones(
+  goldTrend: number | null,
+  oilTrend: number | null,
+  spxTrend: number | null,
+): number {
+  if (goldTrend == null || oilTrend == null || spxTrend == null) return 0;
+  if (goldTrend > 0 && oilTrend > 0 && spxTrend < 0) return 1;
+  if (goldTrend < 0 && oilTrend < 0 && spxTrend > 0) return 0.5;
+  if ((goldTrend > 0 || oilTrend > 0) && spxTrend < 0) return 0.5;
+  if ((goldTrend < 0 || oilTrend < 0) && spxTrend > 0) return -0.5;
+  return 0;
+}
+
+export function indicePresionInflacionaria(params: {
+  dxyTrend: number | null;
+  dbcTrend: number | null;
+  bondPriceTrend: number | null;
+  spxTrend: number | null;
+  goldTrend: number | null;
+  oilTrend: number | null;
+}): number {
+  const r1 = reglaDolarCommodities(params.dxyTrend, params.dbcTrend);
+  const r2 = reglaCommoditiesBonos(params.dbcTrend, params.bondPriceTrend);
+  const r3 = reglaBonosAcciones(params.bondPriceTrend, params.spxTrend, params.dbcTrend);
+  const r4 = reglaOroPetroleoVsAcciones(params.goldTrend, params.oilTrend, params.spxTrend);
+  const scores = [r1, r2, r3, r4].filter((s) => s !== 0);
+  if (scores.length === 0) return 0;
+  return scores.reduce((a, b) => a + b, 0) / scores.length;
+}
+
+// ─── PARTE 2: DETECTOR DE PATRONES HISTÓRICOS (Cap. 1-2) ──────
+
+export interface PatronHistorico {
+  id: "1987" | "1990" | "geopolitico";
+  nombre: string;
+  match: number; // 0-100
+  contexto: string;
+  activo: boolean;
+}
+
+export function detectarPatronHistorico(params: {
+  dbcCloses: number[];
+  tnxCloses: number[];
+  bondPriceCloses: number[];
+  spxCloses: number[];
+  oilCloses?: number[];
+  goldCloses?: number[];
+  dxyCloses?: number[];
+  dowGoldRatio?: number | null;
+}): PatronHistorico[] {
+  const resultados: PatronHistorico[] = [];
+
+  // ── Arquetipo A: Setup 1987 ──
+  let match1987 = 0;
+  const ctx1987: string[] = [];
+  if (params.dbcCloses.length >= 90 && params.tnxCloses.length >= 60) {
+    const dbcActual = params.dbcCloses[params.dbcCloses.length - 1];
+    const dbcMax90d = Math.max(...params.dbcCloses.slice(-90));
+    if (dbcActual > dbcMax90d) { match1987 += 40; ctx1987.push("commodities en ruptura alcista 90d"); }
+
+    const tnxHace60d = params.tnxCloses[params.tnxCloses.length - 60];
+    const tnxActual = params.tnxCloses[params.tnxCloses.length - 1];
+    const tnxVar60d = ((tnxActual - tnxHace60d) / tnxHace60d) * 100;
+    if (tnxVar60d > 5) { match1987 += 30; ctx1987.push("bonos cayendo"); } else if (tnxVar60d > 2) { match1987 += 15; ctx1987.push("bonos levemente débiles"); }
+  }
+  if (params.spxCloses.length >= 60) {
+    const spx60d = params.spxCloses[params.spxCloses.length - 1];
+    const spxMax60d = Math.max(...params.spxCloses.slice(-60));
+    const spxCercaMax = spx60d >= spxMax60d * 0.97;
+    if (spxCercaMax) { match1987 += 30; ctx1987.push("acciones no confirmaron debilidad"); }
+  }
+  resultados.push({
+    id: "1987",
+    nombre: "Setup 1987 — ruptura inflacionaria",
+    match: Math.min(100, match1987),
+    contexto: `Patrón similar a primavera-verano 1987: ${ctx1987.join(", ") || "condiciones no alineadas"}.`,
+    activo: match1987 >= 60,
+  });
+
+  // ── Arquetipo B: Setup 1990 ──
+  let match1990 = 0;
+  const ctx1990: string[] = [];
+  if (params.bondPriceCloses.length >= 63) {
+    const bond3m = params.bondPriceCloses.slice(-63);
+    const bondTrend3m = (bond3m[bond3m.length - 1] - bond3m[0]) / bond3m[0] * 100;
+    if (bondTrend3m < -3) { match1990 += 40; ctx1990.push("bonos en tendencia bajista >3 meses"); }
+  }
+  if (params.dowGoldRatio != null && params.dowGoldRatio < 1) {
+    match1990 += 20; ctx1990.push("Dow/Gold ratio bajo");
+  }
+  if (params.spxCloses.length >= 63) {
+    const spx3mAntes = params.spxCloses.slice(-63);
+    const spxTrend3m = (spx3mAntes[spx3mAntes.length - 1] - spx3mAntes[0]) / spx3mAntes[0] * 100;
+    if (spxTrend3m > 0) { match1990 += 30; ctx1990.push("acciones aún firmes a pesar de bonos débiles"); }
+  }
+  const bondDiverge = ctx1990.some((c) => c.includes("bonos en tendencia bajista")) && ctx1990.some((c) => c.includes("acciones aún firmes"));
+  if (bondDiverge) match1990 = Math.min(100, match1990 + 10);
+  resultados.push({
+    id: "1990",
+    nombre: "Setup 1990 — divergencia bonos-acciones",
+    match: Math.min(100, match1990),
+    contexto: ctx1990.length > 0
+      ? `Patrón similar a mediados de 1990: ${ctx1990.join(", ")}. Históricamente el ajuste bursátil llegó ~3-4 meses después.`
+      : "Condiciones de divergencia no detectadas.",
+    activo: match1990 >= 55,
+  });
+
+  // ── Arquetipo C: Shock geopolítico / energía ──
+  let matchGeo = 0;
+  const ctxGeo: string[] = [];
+  if (params.oilCloses && params.oilCloses.length >= 20) {
+    const oilHace20d = params.oilCloses[params.oilCloses.length - 20];
+    const oilActual = params.oilCloses[params.oilCloses.length - 1];
+    const oilVar20d = ((oilActual - oilHace20d) / oilHace20d) * 100;
+    if (oilVar20d > 15) { matchGeo += 40; ctxGeo.push(`petróleo con spike del ${oilVar20d.toFixed(0)}% en 20d`); }
+    else if (oilVar20d > 8) { matchGeo += 20; ctxGeo.push(`petróleo subiendo ${oilVar20d.toFixed(0)}% en 20d`); }
+  }
+  if (params.goldCloses && params.goldCloses.length >= 20) {
+    const goldHace20d = params.goldCloses[params.goldCloses.length - 20];
+    const goldActual = params.goldCloses[params.goldCloses.length - 1];
+    const goldVar20d = ((goldActual - goldHace20d) / goldHace20d) * 100;
+    if (goldVar20d > 5) { matchGeo += 20; ctxGeo.push("oro en alza simultánea"); }
+  }
+  if (params.bondPriceCloses.length >= 20 && params.spxCloses.length >= 20) {
+    const bp20d = (params.bondPriceCloses[params.bondPriceCloses.length - 1] - params.bondPriceCloses[params.bondPriceCloses.length - 20]) / params.bondPriceCloses[params.bondPriceCloses.length - 20] * 100;
+    const spx20d = (params.spxCloses[params.spxCloses.length - 1] - params.spxCloses[params.spxCloses.length - 20]) / params.spxCloses[params.spxCloses.length - 20] * 100;
+    if (bp20d < -2 && spx20d < -3) { matchGeo += 30; ctxGeo.push("bonos y acciones cayendo juntos"); }
+  }
+  resultados.push({
+    id: "geopolitico",
+    nombre: "Shock geopolítico / energía",
+    match: Math.min(100, matchGeo),
+    contexto: ctxGeo.length > 0
+      ? `Patrón similar a invasión de Kuwait (1990) y 2da crisis de Irak (2003): ${ctxGeo.join(", ")}. Históricamente estos shocks se revierten abruptamente al resolverse el evento.`
+      : "Sin señales de shock geopolítico activo.",
+    activo: matchGeo >= 50,
+  });
+
+  return resultados;
+}
+
+// ─── PARTE 3: LEAD-LAG Y MEMORIA DE SECUENCIA ──────────────────
+
+export interface SecuenciaGiros {
+  ordenCorrecto: boolean;
+  detalle: string;
+}
+
+export function registrarSecuenciaDeGiros(params: {
+  bondPrices: number[];
+  spxPrices: number[];
+  dbcPrices: number[];
+  dxyPrices: number[];
+  ventanaPivote?: number;
+}): SecuenciaGiros {
+  const { bondPrices, spxPrices, dbcPrices, dxyPrices, ventanaPivote = 15 } = params;
+
+  function encontrarUltimoPivote(serie: number[], ventana: number): { idx: number; tipo: "max" | "min" | null } {
+    if (serie.length < ventana * 2 + 1) return { idx: -1, tipo: null };
+    const mid = serie.length - 1 - Math.floor(ventana / 2);
+    const slice = serie.slice(mid - ventana, mid + ventana + 1);
+    const maxVal = Math.max(...slice);
+    const minVal = Math.min(...slice);
+    const midVal = slice[ventana];
+    if (midVal === maxVal) return { idx: mid, tipo: "max" };
+    if (midVal === minVal) return { idx: mid, tipo: "min" };
+    return { idx: -1, tipo: null };
+  }
+
+  const bondPivot = encontrarUltimoPivote(bondPrices, ventanaPivote);
+  const spxPivot = encontrarUltimoPivote(spxPrices, ventanaPivote);
+  const dbcPivot = encontrarUltimoPivote(dbcPrices, ventanaPivote);
+  const dxyPivot = encontrarUltimoPivote(dxyPrices, ventanaPivote);
+
+  const giros: { idx: number; nombre: string }[] = [];
+  if (bondPivot.idx >= 0) giros.push({ idx: bondPivot.idx, nombre: "Bonos" });
+  if (spxPivot.idx >= 0) giros.push({ idx: spxPivot.idx, nombre: "Acciones" });
+  if (dbcPivot.idx >= 0) giros.push({ idx: dbcPivot.idx, nombre: "Commodities" });
+  if (dxyPivot.idx >= 0) giros.push({ idx: dxyPivot.idx, nombre: "Dólar" });
+  giros.sort((a, b) => b.idx - a.idx);
+
+  if (giros.length < 2) {
+    return { ordenCorrecto: false, detalle: "No se detectaron suficientes giros recientes para evaluar secuencia." };
+  }
+
+  const ordenEsperado = ["Bonos", "Dólar", "Commodities", "Acciones"];
+  const posiciones = giros.map((g) => ({ nombre: g.nombre, posicion: ordenEsperado.indexOf(g.nombre) }));
+  const ordenado = posiciones.every((p, i) => i === 0 || p.posicion >= posiciones[i - 1].posicion);
+  const inverso = posiciones.every((p, i) => i === 0 || p.posicion <= posiciones[i - 1].posicion);
+
+  if (ordenado && giros.length >= 3) {
+    return { ordenCorrecto: true, detalle: `Secuencia de giros consistente: ${giros.map((g) => g.nombre).join(" → ")}. Bonos lideran como predice la teoría.` };
+  }
+  if (inverso && giros.length >= 3) {
+    return { ordenCorrecto: false, detalle: `Secuencia de giros invertida: ${giros.map((g) => g.nombre).join(" → ")}. Las relaciones intermarket no siguen el patrón clásico (Murphy, Cap. 15).` };
+  }
+  return { ordenCorrecto: false, detalle: `Giros detectados (${giros.map((g) => g.nombre).join(", ")}), pero no forman una secuencia clara.` };
+}
+
+// ─── PARTE 6: SÍNTESIS — LECTURA INTERMARKET ───────────────────
+
+export interface LecturaIntermarket {
+  regimen: string;
+  confianza: number;
+  patronHistoricoDetectado: PatronHistorico | null;
+  matchPatron: number;
+  alertaActiva: string | null;
+  contextoHistorico: string;
+  recomendacionSesgo: "cauteloso" | "neutral" | "favorable";
+  indicePresion: number;
+  secuenciaGiros: SecuenciaGiros;
+  // Cap. 3 extensions
+  ratioCommoditiesBonos: {
+    valor: number | null;
+    tendencia: "alcista" | "bajista" | "lateral";
+    sesgoSectorial: string;
+  };
+  secuenciaRotacion: {
+    ordenConfirmado: boolean;
+    etapaActual: string;
+    lagEstimadoProximaEtapa: string | null;
+  };
+  bearMarketSilencioso: {
+    detectado: boolean;
+    confianza: number;
+    contextoHistorico: string | null;
+  };
+  convergenciaCommodities: {
+    convergen: boolean;
+    indicesEnAlza: string[];
+    indicesEnBaja: string[];
+  };
+}
+
+// ─── PARTE 3: VALIDAR SECUENCIA DE ROTACIÓN (3 etapas) ────────
+
+export function validarSecuenciaRotacionCompleta(params: {
+  girosCommodities: { idx: number; tipo: "max" | "min" | null };
+  girosBonos: { idx: number; tipo: "max" | "min" | null };
+  girosAcciones: { idx: number; tipo: "max" | "min" | null };
+}): { ordenConfirmado: boolean; etapaActual: string; lagEstimadoProximaEtapa: string | null } {
+  const { girosCommodities, girosBonos, girosAcciones } = params;
+
+  if (girosCommodities.idx < 0 && girosBonos.idx < 0 && girosAcciones.idx < 0) {
+    return { ordenConfirmado: false, etapaActual: "Sin giros detectados", lagEstimadoProximaEtapa: null };
+  }
+
+  // Orden esperado: commodities giran antes que bonos, bonos antes que acciones
+  const commAntesBonos = girosCommodities.idx >= 0 && girosBonos.idx >= 0 && girosCommodities.idx > girosBonos.idx;
+  const bonosAntesAcciones = girosBonos.idx >= 0 && girosAcciones.idx >= 0 && girosBonos.idx > girosAcciones.idx;
+
+  if (commAntesBonos && bonosAntesAcciones) {
+    const lagCommBonds = Math.round((girosCommodities.idx - girosBonos.idx) / 21);
+    const lagBondsStocks = Math.round((girosBonos.idx - girosAcciones.idx) / 21);
+    return {
+      ordenConfirmado: true,
+      etapaActual: "Secuencia completa: commodities → bonos → acciones",
+      lagEstimadoProximaEtapa: `Lag observado: commodities→bonos ~${lagCommBonds}m, bonos→acciones ~${lagBondsStocks}m (consistente con Murphy).`,
+    };
+  }
+
+  if (commAntesBonos && girosAcciones.idx < 0) {
+    return {
+      ordenConfirmado: false,
+      etapaActual: "Commodities y bonos giraron, acciones aún no reaccionan",
+      lagEstimadoProximaEtapa: "De cumplirse el patrón histórico (1993-94: bonos→acciones ~5-6 meses), acciones podría reaccionar en meses — referencia histórica, no predicción.",
+    };
+  }
+
+  if (commAntesBonos && !bonosAntesAcciones && girosAcciones.idx >= 0) {
+    return {
+      ordenConfirmado: false,
+      etapaActual: "Commodities y bonos giraron en orden, pero acciones ya habían girado antes que bonos — secuencia incompleta",
+      lagEstimadoProximaEtapa: null,
+    };
+  }
+
+  return {
+    ordenConfirmado: false,
+    etapaActual: "Secuencia de rotación no confirmada — orden de giros no coincide con el patrón canónico de 3 etapas",
+    lagEstimadoProximaEtapa: null,
+  };
+}
+
+// ─── PARTE 4: DETECTOR DE BEAR MARKET SILENCIOSO (1994) ───────
+
+export function detectarBearMarketSilencioso(params: {
+  indicePrincipalVariacion: number | null | undefined;
+  ratioCommBondsAlcista: boolean;
+  smallCapVariacion?: number | null;
+  sectorRateSensitiveVariacion?: number | null;
+}): { detectado: boolean; confianza: number; contextoHistorico: string | null } {
+  const { indicePrincipalVariacion, ratioCommBondsAlcista, smallCapVariacion, sectorRateSensitiveVariacion } = params;
+
+  if (indicePrincipalVariacion == null || !ratioCommBondsAlcista) {
+    return { detectado: false, confianza: 0, contextoHistorico: null };
+  }
+
+  const indicePlano = indicePrincipalVariacion > -12 && indicePrincipalVariacion < -2;
+  let confianza = 0;
+  const evidencias: string[] = [];
+
+  if (indicePlano) { confianza += 30; evidencias.push("índice principal relativamente plano"); }
+  if (ratioCommBondsAlcista) { confianza += 30; evidencias.push("ratio commodities/bonos en alza (presión en tasas)"); }
+
+  if (smallCapVariacion != null && sectorRateSensitiveVariacion != null) {
+    const divergenciaSmall = smallCapVariacion - indicePrincipalVariacion;
+    const divergenciaSector = sectorRateSensitiveVariacion - indicePrincipalVariacion;
+    if (divergenciaSmall < -10 || divergenciaSector < -10) {
+      confianza += 30;
+      evidencias.push("divergencia interna confirmada: sectores sensibles a tasas rinden significativamente peor que el índice general");
+    }
+  }
+
+  const confianzaFinal = Math.min(100, confianza);
+  const contexto = confianzaFinal >= 50
+    ? `Divergencia interna detectada: ${evidencias.join("; ")}. Patrón similar al 'stealth bear market' de 1994, donde el Dow cayó solo 10% pero utilities perdieron 34% y small caps 15%. Revisar exposición sectorial más allá del índice general.`
+    : confianzaFinal >= 20
+      ? `Señales parciales de divergencia: ${evidencias.join("; ")}. Sin datos sectoriales locales para confirmar divergencia interna — confianza parcial.`
+      : null;
+
+  return { detectado: confianzaFinal >= 50, confianza: confianzaFinal, contextoHistorico: contexto };
+}
+
+// ─── PARTE 5: EVALUAR CONVERGENCIA DE COMMODITIES ─────────────
+
+export function evaluarConvergenciaCommodities(params: {
+  dbcTrend: number | null | undefined;
+  industrialTrend: number | null | undefined;
+  oilTrend: number | null | undefined;
+}): { convergen: boolean; indicesEnAlza: string[]; indicesEnBaja: string[] } {
+  const { dbcTrend, industrialTrend, oilTrend } = params;
+  const enAlza: string[] = [];
+  const enBaja: string[] = [];
+
+  if (dbcTrend != null) (dbcTrend > 0 ? enAlza : enBaja).push("DBC (CRB genérico)");
+  if (industrialTrend != null) (industrialTrend > 0 ? enAlza : enBaja).push("Metales industriales");
+  if (oilTrend != null) (oilTrend > 0 ? enAlza : enBaja).push("Petróleo (GSCI proxy)");
+
+  const convergen = enAlza.length === 3 || enBaja.length === 3;
+  return { convergen, indicesEnAlza: enAlza, indicesEnBaja: enBaja };
+}
+
+export function generarLecturaIntermarket(params: {
+  dxyTrend: number | null;
+  dbcTrend: number | null;
+  bondPriceTrend: number | null;
+  spxTrend: number | null;
+  goldTrend: number | null;
+  oilTrend: number | null;
+  dbcCloses: number[];
+  tnxCloses: number[];
+  bondPriceCloses: number[];
+  spxCloses: number[];
+  oilCloses?: number[];
+  goldCloses?: number[];
+  dxyCloses?: number[];
+  dowGoldRatio?: number | null;
+  correlacionBonosAcciones?: number | null;
+  // Cap. 3 params
+  industrialTrend?: number | null;
+  sp500Var30d?: number | null;
+  mervalVar30d?: number | null;
+}): LecturaIntermarket {
+  const presion = indicePresionInflacionaria({
+    dxyTrend: params.dxyTrend,
+    dbcTrend: params.dbcTrend,
+    bondPriceTrend: params.bondPriceTrend,
+    spxTrend: params.spxTrend,
+    goldTrend: params.goldTrend,
+    oilTrend: params.oilTrend,
+  });
+
+  const regimen = clasificarRegimenIntermarket({
+    dxyVar30d: params.dxyTrend,
+    commodityVar30d: params.dbcTrend,
+    bondPriceVar30d: params.bondPriceTrend,
+    sp500Var30d: params.spxTrend,
+    correlacionBonosAcciones: params.correlacionBonosAcciones,
+  });
+
+  const patrones = detectarPatronHistorico({
+    dbcCloses: params.dbcCloses,
+    tnxCloses: params.tnxCloses,
+    bondPriceCloses: params.bondPriceCloses,
+    spxCloses: params.spxCloses,
+    oilCloses: params.oilCloses,
+    goldCloses: params.goldCloses,
+    dxyCloses: params.dxyCloses,
+    dowGoldRatio: params.dowGoldRatio,
+  });
+
+  const patronActivo = patrones.find((p) => p.activo) ?? null;
+
+  const secuencia = registrarSecuenciaDeGiros({
+    bondPrices: params.bondPriceCloses,
+    spxPrices: params.spxCloses,
+    dbcPrices: params.dbcCloses,
+    dxyPrices: params.dxyCloses ?? [],
+  });
+
+  const scoreReglas = Math.abs(presion);
+  const scoreSecuencia = secuencia.ordenCorrecto ? 0.3 : -0.2;
+  const scorePatron = patronActivo ? 0.2 : 0;
+  const confianza = Math.round(Math.min(100, Math.max(0, (scoreReglas + scoreSecuencia + scorePatron + 0.5) * 100)));
+
+  let alertaActiva: string | null = null;
+  const contextos: string[] = [];
+
+  if (patronActivo) {
+    contextos.push(patronActivo.contexto);
+    if (patronActivo.match >= 70) {
+      alertaActiva = patronActivo.id === "1987"
+        ? "Setup histórico 1987 con alta similitud: monitorear divergencia bonos-acciones."
+        : patronActivo.id === "1990"
+          ? "Divergencia bonos-acciones sin confirmación de mercado global: vigilancia activa."
+          : "Shock de energía activo: vigilar reversión brusca al resolverse el evento.";
+    }
+  }
+
+  if (!secuencia.ordenCorrecto && secuencia.detalle.includes("invertida")) {
+    contextos.push("La secuencia de giros está invertida respecto al modelo clásico de Murphy — las relaciones intermarket pueden estar desacopladas temporalmente.");
+  }
+
+  let recomendacionSesgo: "cauteloso" | "neutral" | "favorable";
+  if (presion > 0.3 || regimen.valor < 0) {
+    recomendacionSesgo = "cauteloso";
+  } else if (presion < -0.3 && regimen.valor > 0) {
+    recomendacionSesgo = "favorable";
+  } else {
+    recomendacionSesgo = "neutral";
+  }
+
+  const contextoHistorico = contextos.length > 0
+    ? contextos.join(" ")
+    : "Sin patrones históricos análogos detectados en este momento. Las relaciones intermarket siguen su curso normal.";
+
+  // ── Cap. 3: Ratio Commodities/Bonos ──
+  const ratioCommBonds = params.bondPriceCloses.length > 0 && params.dbcCloses.length > 0
+    ? params.dbcCloses[params.dbcCloses.length - 1] / Math.abs(params.bondPriceCloses[params.bondPriceCloses.length - 1] || 1)
+    : null;
+  let tendenciaRatio: "alcista" | "bajista" | "lateral" = "lateral";
+  if (params.dbcTrend != null && params.bondPriceTrend != null) {
+    const diff = params.dbcTrend - params.bondPriceTrend;
+    tendenciaRatio = diff > 3 ? "alcista" : diff < -3 ? "bajista" : "lateral";
+  }
+  const sesgoSectorial = tendenciaRatio === "alcista"
+    ? "Favorecer sectores de materiales/energía, des-favorecer utilities/financieras/real estate (réplica del caso 1994)"
+    : tendenciaRatio === "bajista"
+      ? "Favorecer sectores sensibles a tasas (utilities, financieras, real estate)"
+      : "Sin sesgo sectorial claro por ratio commodities/bonos";
+
+  // ── Cap. 3: Secuencia de rotación completa ──
+  const secuenciaRot = validarSecuenciaRotacionCompleta({
+    girosCommodities: secuencia.ordenCorrecto ? { idx: 1, tipo: "max" } : { idx: -1, tipo: null },
+    girosBonos: secuencia.ordenCorrecto ? { idx: 0, tipo: "max" } : { idx: -1, tipo: null },
+    girosAcciones: secuencia.ordenCorrecto ? { idx: -1, tipo: null } : { idx: -1, tipo: null },
+  });
+
+  // ── Cap. 3: Bear market silencioso ──
+  const bearMarket = detectarBearMarketSilencioso({
+    indicePrincipalVariacion: params.sp500Var30d ?? params.mervalVar30d,
+    ratioCommBondsAlcista: tendenciaRatio === "alcista",
+  });
+
+  // ── Cap. 3: Convergencia de commodities ──
+  const convergencia = evaluarConvergenciaCommodities({
+    dbcTrend: params.dbcTrend,
+    industrialTrend: params.industrialTrend,
+    oilTrend: params.oilTrend,
+  });
+
+  return {
+    regimen: regimen.regimen.split(" — ")[0].toLowerCase(),
+    confianza,
+    patronHistoricoDetectado: patronActivo,
+    matchPatron: patronActivo?.match ?? 0,
+    alertaActiva,
+    contextoHistorico,
+    recomendacionSesgo,
+    indicePresion: Math.round(presion * 100) / 100,
+    secuenciaGiros: secuencia,
+    ratioCommoditiesBonos: { valor: ratioCommBonds, tendencia: tendenciaRatio, sesgoSectorial },
+    secuenciaRotacion: secuenciaRot,
+    bearMarketSilencioso: bearMarket,
+    convergenciaCommodities: convergencia,
+  };
+}
+
+// ─── ALERTA SETUP TIPO 1987 (original, se mantiene) ────────────
+
+export function detectarSetupInflacionarioAgresivo(
+  dbcCloses: number[],
+  tnxCloses: number[],
+): { activa: boolean; mensaje: string | null } {
+  if (dbcCloses.length < 60 || tnxCloses.length < 20) {
+    return { activa: false, mensaje: null };
+  }
+
+  const dbcActual = dbcCloses[dbcCloses.length - 1];
+  const dbcMax60d = Math.max(...dbcCloses.slice(-60));
+  const dbcRuptura = dbcActual > dbcMax60d;
+
+  const tnxHace20d = tnxCloses[tnxCloses.length - 20];
+  const tnxActual = tnxCloses[tnxCloses.length - 1];
+  const tnxSubida20d = ((tnxActual - tnxHace20d) / tnxHace20d) * 100;
+
+  if (dbcRuptura && tnxSubida20d > 5) {
+    return {
+      activa: true,
+      mensaje: `Riesgo elevado para acciones — setup similar a primavera 1987 (commodities en ruptura alcista, bonos en caída sostenida).`,
+    };
+  }
+
+  return { activa: false, mensaje: null };
+}
+
+// ─── CLASIFICAR REGIMEN INTERMARKET (PASO 10 — Murphy) ────────
+
+export function clasificarRegimenIntermarket(input: {
+  dxyVar30d: number | null;
+  commodityVar30d: number | null;
+  bondPriceVar30d: number | null;
+  sp500Var30d: number | null;
+  correlacionBonosAcciones?: number | null;
+}): { regimen: string; confianza: "alta" | "media" | "baja"; reglaAplicada: string; valor: number } {
+  const { dxyVar30d, commodityVar30d, bondPriceVar30d, sp500Var30d, correlacionBonosAcciones } = input;
+
+  // Regla 1: Dólar vs Commodities (direcciones opuestas)
+  const dolarCommoditiesInverso =
+    dxyVar30d !== null && commodityVar30d !== null &&
+    Math.sign(dxyVar30d) !== Math.sign(commodityVar30d) &&
+    Math.abs(dxyVar30d) > 0.5 && Math.abs(commodityVar30d) > 0.5;
+
+  // Regla 2: Commodities vs Bonos (direcciones opuestas — precio del bono, NO yield)
+  const commoditiesBonosInverso =
+    commodityVar30d !== null && bondPriceVar30d !== null &&
+    Math.sign(commodityVar30d) !== Math.sign(bondPriceVar30d) &&
+    Math.abs(commodityVar30d) > 0.5 && Math.abs(bondPriceVar30d) > 0.5;
+
+  // Nuevo: Régimen deflacionario — bonos suben + acciones caen + correlación negativa confirmada
+  const deflacionario =
+    bondPriceVar30d !== null && sp500Var30d !== null &&
+    bondPriceVar30d > 2 && sp500Var30d < -2 &&
+    correlacionBonosAcciones != null && correlacionBonosAcciones < -0.3;
+
+  if (deflacionario) {
+    return {
+      regimen: "Régimen deflacionario — bonos suben, acciones caen, correlación negativa confirmada (caso raro post-1997/98 documentado por Murphy)",
+      confianza: "alta",
+      reglaAplicada: "Deflación — bonos y acciones en direcciones opuestas con correlación negativa (Murphy, Cap. 15)",
+      valor: -1,
+    };
+  }
+
+  // Regla 4: Bonos vs Acciones — el caso especial es cuando DIVERGEN (posible desacople)
+  const bonosAccionesDivergen =
+    bondPriceVar30d !== null && sp500Var30d !== null &&
+    Math.sign(bondPriceVar30d) !== Math.sign(sp500Var30d) &&
+    Math.abs(bondPriceVar30d) > 2 && Math.abs(sp500Var30d) > 2;
+
+  if (bonosAccionesDivergen) {
+    const valor = bondPriceVar30d > 0 ? -1 : 1;
+    return {
+      regimen: bondPriceVar30d > 0
+        ? "Posible desacople deflacionario — bonos suben, acciones caen (correlación no confirma régimen completo)"
+        : "Posible rotación inflacionaria — bonos caen, acciones suben",
+      confianza: "media",
+      reglaAplicada: "Bonds and Stocks Decoupling (Murphy, Cap. 4)",
+      valor,
+    };
+  }
+
+  if (dolarCommoditiesInverso && commoditiesBonosInverso) {
+    const esInflacionario = commodityVar30d! > 0;
+    const valor = esInflacionario ? 1 : -1;
+    return {
+      regimen: esInflacionario
+        ? "Régimen inflacionario — dólar débil, commodities suben, bonos caen"
+        : "Régimen desinflacionario — dólar fuerte, commodities caen, bonos suben",
+      confianza: "alta",
+      reglaAplicada: "Cadena intermarket estándar (Murphy, Cap. 6 — Review of Intermarket Principles, pág. 82-83)",
+      valor,
+    };
+  }
+
+  // Regímenes parciales
+  if (dolarCommoditiesInverso && !commoditiesBonosInverso) {
+    return {
+      regimen: "Dólar vs Commodities sigue patrón inverso, pero commodities y bonos no confirman",
+      confianza: "media",
+      reglaAplicada: "Relación Dólar-Commodities intacta (Murphy, Cap. 6)",
+      valor: 0,
+    };
+  }
+
+  return {
+    regimen: "Régimen intermarket mixto — relaciones no siguen el patrón estándar del modelo clásico",
+    confianza: "baja",
+    reglaAplicada: "N/A — divergencia respecto al modelo (Murphy, Cap. 15: 'El modelo no es estático')",
+    valor: 0,
+  };
+}
+
+// ─── RATIO CRB/BONDS (PASO 11) ─────────────────────────────────
+
+export function evaluarRatioCRBBonds(crbRatio30dChange: number | null, sector: string): { confirmacion: number; detalle: string } {
+  if (crbRatio30dChange == null) return { confirmacion: 0, detalle: "N/D — sin datos del ratio CRB/Bonos" };
+
+  const sectoresInflacionarios = ["Energy", "Basic Materials"];
+  const sectoresRateSensitive = ["Consumer Defensive", "Financial Services", "Utilities", "Healthcare"];
+
+  if (crbRatio30dChange > 0 && sectoresInflacionarios.includes(sector)) {
+    return { confirmacion: 1, detalle: `Ratio CRB/Bonos en alza (${crbRatio30dChange.toFixed(1)}%) → favorece sectores inflacionarios (Murphy, Cap. 3-4)` };
+  }
+  if (crbRatio30dChange < 0 && sectoresRateSensitive.includes(sector)) {
+    return { confirmacion: 1, detalle: `Ratio CRB/Bonos en baja (${crbRatio30dChange.toFixed(1)}%) → favorece sectores rate-sensitive (Murphy, Cap. 3-4)` };
+  }
+  return { confirmacion: 0, detalle: "Ratio CRB/Bonos no confirma sesgo sectorial específico" };
+}
+
+// ─── CAPA 1: REGIMEN INTERMARKET (reemplaza la vieja evaluarIntermarket) ──
+
+// FASE 4: exportado para src/lib/scoring/macro-contexto.ts
+export function evaluarIntermarketMurphy(
+  sector: string,
+  regimen: { regimen: string; confianza: string; valor: number },
+  crbRatioChange: number | null,
+): { valor: number; detalle: string; confianza: string } {
+  let valor = regimen.valor;
+  let detalle = `Régimen intermarket: ${regimen.regimen} (confianza: ${regimen.confianza})`;
+
+  // Bonus del ratio CRB/Bonos para sectores específicos
+  const crb = evaluarRatioCRBBonds(crbRatioChange, sector);
+  if (crb.confirmacion !== 0) {
+    valor += crb.confirmacion;
+    detalle += `. ${crb.detalle}`;
+  }
+
+  return { valor: Math.max(-1, Math.min(1, valor)), detalle, confianza: regimen.confianza };
+}
+
+// ─── CAPA 3: STOVALL (reemplaza la vieja evaluarMacroArgentina) ───
+
+// FASE 4: exportado para src/lib/scoring/macro-contexto.ts
+export function evaluarStovall(
+  sector: string,
+  sectorRanking: Array<{ sector: string; variacionPromedioSemanal: number }>,
+  etapaCiclo: { etapaEstimada: string | null; sectoresLideres: string[] },
+): { valor: number; detalle: string } {
+  // Posición en ranking sectorial (existente)
+  const idx = sectorRanking.findIndex((s) => s.sector === sector);
+  let score = 0;
+  if (idx >= 0) {
+    if (idx < 3) score += 1;
+    else if (idx >= sectorRanking.length - 3 && sectorRanking.length >= 3) score -= 1;
+  }
+
+  // Bonus si coincide con etapa del ciclo Stovall
+  if (etapaCiclo.sectoresLideres.includes(sector)) {
+    score += 1;
+    const etapa = etapaCiclo.etapaEstimada ?? "etapa inferida del ciclo";
+    return { valor: Math.max(-1, Math.min(1, score)), detalle: `Sector coincide con sectores líderes de la etapa del ciclo (${etapa}) — peso adicional (Stovall)` };
+  }
+
+  return { valor: Math.max(-1, Math.min(1, score)), detalle: `Ranking sectorial: posición #${idx + 1}${idx < 3 ? " (top 3)" : idx >= sectorRanking.length - 3 ? " (bottom 3)" : ""}` };
+}
+
+// ─── CAPA 2: MACRO GLOBAL (sin cambios) ────────────────────────
+
+// FASE 4: exportado para src/lib/scoring/macro-contexto.ts
+export function evaluarMacroGlobal(semaforoGlobal: { scoreGlobal: number }): number {
+  if (semaforoGlobal.scoreGlobal > 0) return 1;
+  if (semaforoGlobal.scoreGlobal < 0) return -1;
+  return 0;
+}
+
+// ─── CAPA 4: FUNDAMENTAL (Value Investing — margen de seguridad) ──
+
+function evaluarFundamental(
+  fundamentalScore: number | null,
+  upside: number | null,
+): { valor: number; detalle: string } {
+  if (fundamentalScore == null) {
+    return { valor: 0, detalle: "N/D — sin score fundamental disponible" };
+  }
+  const upsideVal = upside ?? 0;
+  if (fundamentalScore >= 55 && upsideVal > 0) {
+    return { valor: 1, detalle: `Score fundamental ≥ 55 (${fundamentalScore}) y margen positivo (${upsideVal.toFixed(1)}%)` };
+  }
+  if (fundamentalScore < 40 || upsideVal < -10) {
+    return { valor: -1, detalle: `Score fundamental < 40 (${fundamentalScore}) o margen negativo (${upsideVal.toFixed(1)}%)` };
+  }
+  return { valor: 0, detalle: `Score fundamental intermedio (${fundamentalScore}) — sin señal clara` };
+}
+
+// # REVISAR (FASE 6): consume scoreUnificado legacy; alternativa unificada =
+// subScores.fundamental de motor-unificado. Ver cabecera de archivo.
+// Capa fundamental sobre el score unificado (-10 a +10, ya incluye FCF yield y deuda)
+function evaluarFundamentalUnificado(
+  unified: { fundamental: number } | null | undefined,
+  margenSeguridad: number | null,
+): { valor: number; detalle: string } {
+  if (!unified || unified.fundamental == null) {
+    return { valor: 0, detalle: "N/D — sin score fundamental disponible" };
+  }
+  const f = unified.fundamental;
+  if (f >= 4 && (margenSeguridad == null || margenSeguridad > 0)) {
+    return {
+      valor: 1,
+      detalle: `Score fundamental ${f >= 0 ? "+" : ""}${f.toFixed(1)} (incluye FCF yield y apalancamiento)${margenSeguridad != null ? ` con margen de seguridad ${margenSeguridad.toFixed(0)}%` : ""} — Value Investing favorable`,
+    };
+  }
+  if (f <= -4 || (margenSeguridad != null && margenSeguridad < -10)) {
+    return {
+      valor: -1,
+      detalle: `Score fundamental ${f.toFixed(1)}${margenSeguridad != null ? ` y margen de seguridad ${margenSeguridad.toFixed(0)}%` : ""} — sin respaldo del análisis de valor`,
+    };
+  }
+  return { valor: 0, detalle: `Score fundamental intermedio (${f.toFixed(1)}) — sin señal clara` };
+}
+
+// ─── CAPA 5: TÉCNICO (score unificado -10 a +10) ────────────────
+// # REVISAR (FASE 6): consume scoreTecnicoDetalle.scoreFinal legacy;
+// alternativa unificada = subScores.tecnico.raw de motor-unificado.
+
+function evaluarTecnicoUnificado(
+  scoreFinal: number | null,
+  clasificacion: string | null,
+): { valor: number; detalle: string } {
+  if (scoreFinal == null) {
+    return { valor: 0, detalle: "N/D — pendiente de integración con tab de Análisis Técnico" };
+  }
+  if (scoreFinal > 1.5) {
+    return { valor: 1, detalle: `Score técnico ${scoreFinal.toFixed(2)} — ${clasificacion ?? "COMPRA"} confirmado por tendencia/momentum` };
+  }
+  if (scoreFinal < -1.5) {
+    return { valor: -1, detalle: `Score técnico ${scoreFinal.toFixed(2)} — ${clasificacion ?? "VENTA"} con tendencia bajista` };
+  }
+  return { valor: 0, detalle: `Score técnico neutral (${scoreFinal.toFixed(2)}) — ${clasificacion ?? "MANTENER"}` };
+}
+
+// ─── ETIQUETA DE CONFIANZA ─────────────────────────────────────
+
+function etiquetaConfianza(score: number, maxPosible: number): string {
+  if (maxPosible === 0) return "Sin datos disponibles";
+  if (score >= 3) return "Alta confianza — todas las capas alineadas";
+  if (score >= 1) return "Confianza moderada — alineación parcial";
+  return "Sin alineación — no se recomienda destacar este activo";
+}
+
+// ─── GENERAR RECOMENDACIONES ────────────────────────────────────
+
+interface InputRecomendacion {
+  sectorRanking: Array<{ sector: string; variacionPromedioSemanal: number }>;
+  regimenIntermarket: { regimen: string; confianza: "alta" | "media" | "baja"; reglaAplicada: string; valor: number };
+  crbRatio30dChange: number | null;
+  etapaCiclo: { etapaEstimada: string | null; certeza: "baja"; sectoresLideres: string[] };
+  semaforoGlobal: { scoreGlobal: number };
+  semaforoArgentinaScore: number;
+  noticiasSectores: string[];
+  bondPriceVar30d: number | null;
+  sp500Var30d: number | null;
+  commodityVar30d: number | null;
+  dxyVar30d: number | null;
+  /** Semaforo por ticker: permite activar las capas Fundamental y Técnico con datos reales */
+  semaforoPorTicker?: Map<string, SemaforoResult>;
+}
+
+export async function generarRecomendaciones(
+  input: InputRecomendacion,
+): Promise<RecomendacionActivo[]> {
+  const universe = getFlatTickerList();
+  const recomendaciones: RecomendacionActivo[] = [];
+
+  const sectoresPrioritarios = new Set<string>();
+  for (const s of input.sectorRanking.slice(0, 2)) sectoresPrioritarios.add(s.sector);
+  for (const s of input.noticiasSectores) sectoresPrioritarios.add(s);
+
+  for (const sector of sectoresPrioritarios) {
+    const tickersSector = universe.filter((t) => t.sector === sector).slice(0, 3);
+
+    for (const t of tickersSector) {
+      // CAPA 1: Intermarket Murphy + CRB
+      const capa1 = evaluarIntermarketMurphy(sector, input.regimenIntermarket, input.crbRatio30dChange);
+
+      // CAPA 2: Macro Global
+      const capa2Val = evaluarMacroGlobal(input.semaforoGlobal);
+      const capa2Detalle = capa2Val === 1
+        ? "Semáforo global favorable (DXY y UST 10Y confirman)"
+        : capa2Val === -1
+          ? "Semáforo global desfavorable"
+          : "Semáforo global neutral";
+
+      // CAPA 3: Stovall + ranking sectorial
+      const capa3 = evaluarStovall(sector, input.sectorRanking, input.etapaCiclo);
+
+      // CAPA 4 y 5: Fundamental + Técnico con datos reales del semáforo
+      const semaforo = input.semaforoPorTicker?.get(t.ticker);
+      const unified = semaforo?.scoreUnificado;
+      const margenSeguridad = (() => {
+        const v = unified?.fundamentalDetalle;
+        if (!v) return null;
+        // Si el scoring incluye FCF yield o deuda, reporta el detalle como contexto
+        return null;
+      })();
+
+      const capa4 = semaforo
+        ? evaluarFundamentalUnificado(unified, margenSeguridad)
+        : evaluarFundamental(null, null);
+
+      const capa5 = semaforo
+        ? evaluarTecnicoUnificado(
+            semaforo.scoreTecnicoDetalle?.scoreFinal ?? null,
+            semaforo.clasificacionJerarquica ?? null,
+          )
+        : { valor: 0, detalle: "N/D — sin datos del semáforo disponible" };
+
+      const capas: EvaluacionCapa[] = [
+        {
+          nombre: "Intermarket (Murphy)",
+          disponible: true,
+          valor: capa1.valor,
+          detalle: capa1.detalle,
+          umbralUsado: "Cadena Dólar→Commodities→Bonos→Acciones (Murphy, Cap. 6)",
+        },
+        {
+          nombre: "Macro Global",
+          disponible: true,
+          valor: capa2Val,
+          detalle: capa2Detalle,
+          umbralUsado: "Score global > 0 = favorable, < 0 = desfavorable",
+        },
+        {
+          nombre: "Stovall + Ranking",
+          disponible: true,
+          valor: capa3.valor,
+          detalle: capa3.detalle,
+          umbralUsado: "Top 3 ranking = +1, coincide con etapa ciclo = +1 extra (Stovall, Cap. 7)",
+        },
+        {
+          nombre: "Fundamental (Value Inv.)",
+          disponible: !!semaforo,
+          valor: capa4.valor,
+          detalle: capa4.detalle,
+          umbralUsado: semaforo ? "Score unificado ≥ +4 con margen de seguridad positivo (Graham/Buffett)" : null,
+        },
+        {
+          nombre: "Técnico",
+          disponible: !!semaforo,
+          valor: capa5.valor,
+          detalle: capa5.detalle,
+          umbralUsado: semaforo ? "Score técnico > +1.5 = COMPRA, < -1.5 = VENTA" : null,
+        },
+      ];
+
+      const capasDisponibles = capas.filter((c) => c.disponible);
+      const scoreConfianza = capasDisponibles.reduce((s, c) => s + (c.valor ?? 0), 0);
+      const maxPosible = capasDisponibles.length;
+      const etiqueta = etiquetaConfianza(scoreConfianza, maxPosible);
+
+      const origen = input.sectorRanking.slice(0, 2).some((s) => s.sector === sector)
+        ? "sector_top_ranking"
+        : "noticia_macro";
+
+      const resumen = `${t.ticker} (${sector}): ${scoreConfianza}/${maxPosible} capas — ${etiqueta}`;
+
+      recomendaciones.push({
+        ticker: t.ticker,
+        nombre: t.nombre,
+        sector,
+        motivoOrigen: origen,
+        capas,
+        scoreConfianza,
+        maxPosible,
+        etiquetaConfianza: etiqueta,
+        resumenTextual: resumen,
+      });
+    }
+  }
+
+  const filtradas = recomendaciones
+    .filter((r) => r.scoreConfianza > 0)
+    .sort((a, b) => b.scoreConfianza - a.scoreConfianza)
+    .slice(0, 5);
+
+  return filtradas;
+}
+
+// ─── SERVER FUNCTION PRINCIPAL ──────────────────────────────────
+
+const CACHE_KEY = "motor-recomendacion-v2";
+
+export const getRecomendaciones = createServerFn({ method: "POST" })
+  .handler(async (): Promise<RecomendacionActivo[]> => {
+    try {
+    const cached = getCached<RecomendacionActivo[]>(CACHE_KEY, 15 * 60 * 1000);
+    if (cached) return cached;
+
+    const [sectorRanking, dbcOHLCV, spyOHLCV, tltOHLCV, dxyOHLCV] = await Promise.all([
+      getSectorPerformanceSemanal(),
+      yahooChartOHLCV("DBC", "3mo", "1d"),
+      yahooChartOHLCV("SPY", "3mo", "1d"),
+      yahooChartOHLCV("TLT", "3mo", "1d"),
+      yahooChartOHLCV("DX-Y.NYB", "3mo", "1d"),
+    ]);
+
+    // Calcular variaciones a 30d
+    const dbcCloses = dbcOHLCV.map((b) => b.close);
+    const spyCloses = spyOHLCV.map((b) => b.close);
+    const tltCloses = tltOHLCV.map((b) => b.close);
+    const dxyCloses = dxyOHLCV.map((b) => b.close);
+
+    const dbc30d = dbcCloses.length >= 21 ? ((dbcCloses[dbcCloses.length - 1] - dbcCloses[dbcCloses.length - 21]) / dbcCloses[dbcCloses.length - 21]) * 100 : null;
+    const spy30d = spyCloses.length >= 21 ? ((spyCloses[spyCloses.length - 1] - spyCloses[spyCloses.length - 21]) / spyCloses[spyCloses.length - 21]) * 100 : null;
+    const tlt30d = tltCloses.length >= 21 ? ((tltCloses[tltCloses.length - 1] - tltCloses[tltCloses.length - 21]) / tltCloses[tltCloses.length - 21]) * 100 : null;
+    const dxy30d = dxyCloses.length >= 21 ? ((dxyCloses[dxyCloses.length - 1] - dxyCloses[dxyCloses.length - 21]) / dxyCloses[dxyCloses.length - 21]) * 100 : null;
+
+    // Ratio CRB/Bonos: DBC / TLT precio
+    const crbBondRatio = (tltCloses.length > 0 && dbcCloses.length > 0)
+      ? dbcCloses[dbcCloses.length - 1] / tltCloses[tltCloses.length - 1]
+      : null;
+    const crbBondRatioPrev = (tltCloses.length >= 21 && dbcCloses.length >= 21)
+      ? dbcCloses[dbcCloses.length - 21] / tltCloses[tltCloses.length - 21]
+      : null;
+    const crbRatio30dChange = (crbBondRatio != null && crbBondRatioPrev != null && crbBondRatioPrev > 0)
+      ? ((crbBondRatio - crbBondRatioPrev) / crbBondRatioPrev) * 100
+      : null;
+
+    const regimen = clasificarRegimenIntermarket({
+      dxyVar30d: dxy30d,
+      commodityVar30d: dbc30d,
+      bondPriceVar30d: tlt30d,
+      sp500Var30d: spy30d,
+    });
+
+    const etapaCiclo = inferirEtapaCiclo({
+      bondPrice30dChange: tlt30d,
+      sp500Var30d: spy30d,
+      commodityVar30d: dbc30d,
+    });
+
+    // Candidatos por sector prioritario para pre-cargar el semáforo (capas 4 y 5)
+    const universe = getFlatTickerList();
+    const sectoresPrioritarios = new Set<string>();
+    for (const s of sectorRanking.slice(0, 2)) sectoresPrioritarios.add(s.sector);
+    const candidatos = universe
+      .filter((t) => sectoresPrioritarios.has(t.sector))
+      .slice(0, 8)
+      .map((t) => t.ticker);
+
+    let semaforoPorTicker: Map<string, SemaforoResult> | undefined;
+    if (candidatos.length > 0) {
+      try {
+        const semaforos = await getSemaforoBatch({ data: { tickers: candidatos, rango: "2A" } });
+        semaforoPorTicker = new Map(semaforos.map((s) => [s.ticker, s]));
+      } catch {
+        semaforoPorTicker = undefined;
+      }
+    }
+
+    const recomendaciones = await generarRecomendaciones({
+      sectorRanking: sectorRanking.map((s) => ({ sector: s.sector, variacionPromedioSemanal: s.variacionPromedio })),
+      regimenIntermarket: regimen,
+      crbRatio30dChange,
+      etapaCiclo,
+      semaforoGlobal: { scoreGlobal: 0 },
+      semaforoArgentinaScore: 0,
+      noticiasSectores: [],
+      bondPriceVar30d: tlt30d,
+      sp500Var30d: spy30d,
+      commodityVar30d: dbc30d,
+      dxyVar30d: dxy30d,
+      semaforoPorTicker,
+    });
+
+    setCache(CACHE_KEY, recomendaciones);
+    return recomendaciones;
+    } catch { return []; }
+  });

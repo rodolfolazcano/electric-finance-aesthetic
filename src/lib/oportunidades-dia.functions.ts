@@ -1,0 +1,731 @@
+// @ts-nocheck
+// FASE 6 — Motor de oportunidades del día (A+B+C+D) conservado.
+// # REVISAR: processTicker combina capas propias scoreTecnico (z-score+vol),
+// scoreSectorial (favorabilidad por régimen) y scoreFundamental (simple), que
+// no tienen equivalente directo en motor-unificado.ts (no son los sub-cores
+// 0-100 del motor). Se conservan con // LEGACY para no cambiar el shape
+// OportunidadItem ni los scores del panel.
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { getCached, setCache } from "./cache";
+import type { PanelItem } from "./iol-panels.functions";
+import type { SectorFavorabilidad } from "./intermarket-engine";
+import type { ScoreNoticias } from "./news-scoring.functions";
+import { getNoticiasPorTicker } from "./news-scoring.functions";
+import type { IntermarketResult } from "./intermarket-analysis.functions";
+
+
+// ─── Yahoo Finance 2 — mismo método que tab Análisis Fundamental y tab Sectores ───
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _yf: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function getYF(): Promise<any> {
+  if (_yf) return _yf;
+  const mod: any = await import("yahoo-finance2");
+  const YF = mod.default ?? mod;
+  try {
+    _yf = typeof YF === "function" ? new YF() : YF;
+  } catch {
+    _yf = YF;
+  }
+  try {
+    _yf.suppressNotices?.(["yahooSurvey", "ripHistorical"]);
+  } catch {
+    /* noop */
+  }
+  return _yf;
+}
+
+function num(v: unknown): number | null {
+  if (typeof v === "number" && isFinite(v)) return v;
+  if (v !== null && v !== undefined && typeof v === "object") {
+    const raw = (v as Record<string, unknown>).raw;
+    if (typeof raw === "number" && isFinite(raw)) return raw;
+  }
+  return null;
+}
+
+// ─── Resolver símbolo IOL → Yahoo Finance ──────────────────────
+
+async function yahooResolve(query: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=3&newsCount=0`,
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        },
+      },
+    );
+    if (!res.ok) return null;
+    const json = await res.json();
+    const quotes: Array<{ symbol: string; quoteType: string }> = json.quotes ?? [];
+    const equity = quotes.find((q) => q.quoteType === "EQUITY" && !q.symbol.includes("."));
+    return equity?.symbol ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function resolverSimboloYahoo(item: PanelItem): string {
+  switch (item.tipo) {
+    case "accion_us":
+    case "adr":
+      return item.simbolo; // directo
+    case "accion_ar":
+      return item.simbolo + ".BA";
+    case "cedear": {
+      // Intentar resolver por descripción
+      // Si hay descripción, buscar subyacente
+      // Si no, devolver el símbolo con .BA (fallback)
+      return item.simbolo; // se resuelve más abajo con yahooResolve si hay descripción
+    }
+    default:
+      return item.simbolo;
+  }
+}
+
+// ─── Tipos de salida extendidos ────────────────────────────────
+
+export interface OportunidadItem {
+  ticker: string;
+  nombre: string;
+  sector: string;
+  precio: number;
+  variacion: number;
+  volumenRelativo: number;
+  zscore: number;
+  pe: number | null;
+  fcfYield: number | null;
+  roe: number | null;
+  revenueGrowth: number | null;
+  marketCap: number | null;
+  upsideAnalistas: number | null;
+  // Nuevos campos
+  yfSymbol: string;
+  tipo: string;
+  // Score por capas
+  scoreA: number;  // Técnico/estadístico
+  scoreB: number;  // Sectorial/Intermarket
+  scoreC: number;  // Fundamental
+  scoreD: number;  // Noticias
+  scoreFinal: number;
+  // Desglose textual
+  detalleA: string;
+  detalleB: string;
+  detalleC: string;
+  detalleD: string;
+  // Favorabilidad sectorial
+  favorabilidadSector: "favorecido" | "desfavorecido" | "neutral" | null;
+  favorabilidadPeso: number;
+  regimenActual: string;
+  // Noticias
+  noticias: ScoreNoticias | null;
+  // Flag especulativo
+  esEspeculativo: boolean;
+  requiereRevision: boolean;
+  // Beta/riesgo
+  beta: number | null;
+  benchmarkUsado: string | null;
+  // Justificación compuesta
+  justificacion: string;
+}
+
+export interface OportunidadesResult {
+  items: OportunidadItem[];
+  totalAnalizados: number;
+  disclaimer: string;
+  timestamp: string;
+  periodo: "dia" | "mes";
+  // Fork renta fija
+  forkRentaFija: {
+    activo: boolean;
+    mensaje: string;
+    confianza: number;
+  };
+  // Régimen y sectores
+  regimenActual: string;
+  sectoresFavorecidos: SectorFavorabilidad[];
+}
+
+const BATCH_SIZE = 5;
+
+// ─── Fetch fundamental con yahoo-finance2 ──────────────────────
+
+interface FundData {
+  pe: number | null;
+  fcfYield: number | null;
+  roe: number | null;
+  revenueGrowth: number | null;
+  earningsGrowth: number | null;
+  marketCap: number | null;
+  currentPrice: number | null;
+  targetMeanPrice: number | null;
+  sector: string | null;
+  debtToEquity: number | null;
+  profitMargin: number | null;
+  recommendationMean: number | null;
+  trailingPE: number | null;
+  forwardPE: number | null;
+}
+
+async function yahooFundamentals(ticker: string): Promise<FundData | null> {
+  try {
+    const yf = await getYF();
+    const q = await yf.quoteSummary(ticker, {
+      modules: [
+        "assetProfile", "summaryDetail", "financialData",
+        "defaultKeyStatistics", "price",
+      ],
+    });
+    if (!q) return null;
+    const fd = q.financialData as Record<string, unknown> | undefined;
+    const sd = q.summaryDetail as Record<string, unknown> | undefined;
+    const dks = q.defaultKeyStatistics as Record<string, unknown> | undefined;
+    const pr = q.price as Record<string, unknown> | undefined;
+
+    const trailingPE = num(sd?.trailingPE) ?? num(dks?.trailingPE);
+    const forwardPE = num(sd?.forwardPE) ?? num(dks?.forwardPE);
+    const pe = forwardPE ?? trailingPE;
+    const marketCap = num(pr?.marketCap);
+    const currentPrice = num(fd?.currentPrice);
+    const fcf = num(fd?.freeCashflow);
+    const fcfYield = fcf != null && marketCap != null && marketCap > 0 ? fcf / marketCap : null;
+    const roe = num(fd?.returnOnEquity);
+    const revenueGrowth = num(fd?.revenueGrowth);
+    const earningsGrowth = num(fd?.earningsGrowth);
+    const targetMeanPrice = num(fd?.targetMeanPrice);
+    const ap = q.assetProfile as Record<string, unknown> | undefined;
+    const sector = ap?.sector ? String(ap.sector) : null;
+    const debtToEquity = num(fd?.debtToEquity);
+    const profitMargin = num(fd?.profitMargins);
+    const recommendationMean = num(fd?.recommendationMean);
+
+    return {
+      pe, fcfYield, roe, revenueGrowth, earningsGrowth, marketCap,
+      currentPrice, targetMeanPrice, sector, debtToEquity, profitMargin,
+      recommendationMean, trailingPE, forwardPE,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ─── Fetch chart con unified history cache ────────────────────
+
+import { getHistory } from "./history-cache.server";
+
+interface ChartPoint { date: string; close: number }
+async function fetchHistory(ticker: string, days: number): Promise<ChartPoint[]> {
+  try {
+    return await getHistory(ticker, days);
+  } catch {
+    return [];
+  }
+}
+
+// ─── Estadísticos ─────────────────────────────────────────────
+
+async function computeZScore(closes: number[], window = 20): Promise<number> {
+  if (closes.length < window) return 0;
+  const recent = closes.slice(-window);
+  const mean = recent.reduce((s, v) => s + v, 0) / window;
+  const std = Math.sqrt(recent.reduce((s, v) => s + (v - mean) ** 2, 0) / window);
+  if (std === 0) return 0;
+  return (closes[closes.length - 1] - mean) / std;
+}
+
+function computeBeta(
+  assetReturns: number[],
+  benchmarkReturns: number[],
+): { beta: number | null; r2: number | null } {
+  const n = Math.min(assetReturns.length, benchmarkReturns.length);
+  if (n < 10) return { beta: null, r2: null };
+  const a = assetReturns.slice(-n);
+  const b = benchmarkReturns.slice(-n);
+  const meanA = a.reduce((s, v) => s + v, 0) / n;
+  const meanB = b.reduce((s, v) => s + v, 0) / n;
+  let cov = 0, varB = 0;
+  for (let i = 0; i < n; i++) {
+    cov += (a[i] - meanA) * (b[i] - meanB);
+    varB += (b[i] - meanB) ** 2;
+  }
+  if (varB === 0) return { beta: null, r2: null };
+  const beta = cov / varB;
+  // R²
+  let ssRes = 0, ssTot = 0;
+  for (let i = 0; i < n; i++) {
+    const pred = meanA + beta * (b[i] - meanB);
+    ssRes += (a[i] - pred) ** 2;
+    ssTot += (a[i] - meanA) ** 2;
+  }
+  const r2 = ssTot > 0 ? Math.max(0, 1 - ssRes / ssTot) : 0;
+  return { beta: Math.round(beta * 10000) / 10000, r2: Math.round(r2 * 10000) / 10000 };
+}
+
+// ─── CAPA A: Score técnico/estadístico ─────────────────────────
+
+function scoreTecnico(zscore: number, volRel: number): { score: number; detalle: string } {
+  let score = 0;
+  const partes: string[] = [];
+
+  // Z-score
+  const absZ = Math.abs(zscore);
+  if (absZ > 2.5) { score += 2; partes.push("Z-score fuerte (>2.5σ)"); }
+  else if (absZ > 1.5) { score += 1; partes.push("Z-score moderado (>1.5σ)"); }
+  else if (absZ > 1) { score += 0.5; partes.push("Z-score leve (>1σ)"); }
+  else { score += 0; partes.push("Z-score dentro de rango normal"); }
+
+  // Volumen relativo
+  if (volRel > 2) { score += 1; partes.push("volumen >2x promedio"); }
+  else if (volRel > 1.5) { score += 0.5; partes.push("volumen elevado"); }
+
+  return {
+    score: Math.min(3, Math.max(-1, score)),
+    detalle: partes.join("; ") || "Sin señales técnicas relevantes",
+  };
+}
+
+// ─── CAPA B: Score sectorial/Intermarket ───────────────────────
+
+function scoreSectorial(
+  sector: string | null,
+  sectoresFav: SectorFavorabilidad[],
+  regimenActual: string,
+): { score: number; detalle: string; favorabilidad: SectorFavorabilidad | null } {
+  if (!sector || sectoresFav.length === 0) {
+    return { score: 0, detalle: "Sin datos sectoriales", favorabilidad: null };
+  }
+
+  const entry = sectoresFav.find(
+    (s) => s.sector.toLowerCase() === sector.toLowerCase(),
+  );
+
+  if (!entry || entry.direccion === "neutral") {
+    return { score: 0, detalle: `Sector ${sector} neutral para régimen ${regimenActual}`, favorabilidad: entry ?? null };
+  }
+
+  const intensidad = entry.peso;
+  if (entry.direccion === "favorecido") {
+    const bonus = Math.round(intensidad * 2 * 10) / 10;
+    return {
+      score: bonus,
+      detalle: `Régimen ${regimenActual} favorece ${sector} (peso ${Math.round(intensidad * 100)}%)`,
+      favorabilidad: entry,
+    };
+  } else {
+    const malus = Math.round(-intensidad * 1.5 * 10) / 10;
+    return {
+      score: malus,
+      detalle: `Régimen ${regimenActual} desfavorece ${sector} (peso ${Math.round(intensidad * 100)}%)`,
+      favorabilidad: entry,
+    };
+  }
+}
+
+// ─── CAPA C: Score fundamental ─────────────────────────────────
+
+function scoreFundamental(fund: FundData | null): { score: number; detalle: string; esEspeculativo: boolean; requiereRevision: boolean } {
+  if (!fund) return { score: 0, detalle: "Sin datos fundamentales", esEspeculativo: false, requiereRevision: false };
+
+  let score = 0;
+  const partes: string[] = [];
+  let incoherencias = 0;
+  let requiereRevision = false;
+
+  // ROE
+  if (fund.roe != null) {
+    const roePct = fund.roe * 100;
+    if (roePct >= 30) { score += 1.5; partes.push("ROE sólido (>30%)"); }
+    else if (roePct >= 20) { score += 1.0; partes.push("ROE bueno (20-30%)"); }
+    else if (roePct >= 12) { score += 0.5; partes.push("ROE aceptable (12-20%)"); }
+    else if (roePct >= 5) { score += 0.2; partes.push("ROE moderado (5-12%)"); }
+    else if (roePct > 0) { score += 0; partes.push("ROE bajo (>0%)"); }
+    else { score -= 1; partes.push("ROE negativo"); incoherencias++; }
+  }
+
+  // Revenue growth
+  if (fund.revenueGrowth != null) {
+    const rg = fund.revenueGrowth * 100;
+    if (Math.abs(rg) > 100) {
+      score += 0;
+      requiereRevision = true;
+      partes.push(`crecimiento ingresos atípico (${rg.toFixed(0)}%) — verificar base de comparación`);
+    } else if (rg >= 15) { score += 0.5; partes.push(`crecimiento ingresos sólido (${rg.toFixed(0)}%)`); }
+    else if (rg >= 5) { score += 0.3; partes.push(`crecimiento ingresos positivo (${rg.toFixed(0)}%)`); }
+    else if (rg >= 0) { score += 0; partes.push("crecimiento ingresos plano"); }
+    else { score -= 0.5; partes.push(`ingresos decrecientes (${rg.toFixed(0)}%)`); incoherencias++; }
+  }
+
+  // Deuda
+  if (fund.debtToEquity != null) {
+    if (fund.debtToEquity < 50) { score += 0.3; partes.push("deuda baja (<50%)"); }
+    else if (fund.debtToEquity < 100) { score += 0; partes.push("deuda moderada"); }
+    else if (fund.debtToEquity < 200) { score -= 0.5; partes.push("deuda elevada"); }
+    else { score -= 1; partes.push("deuda muy elevada (>200%)"); incoherencias++; }
+  }
+
+  // Profit margin
+  if (fund.profitMargin != null) {
+    const pm = fund.profitMargin * 100;
+    if (pm >= 20) { score += 0.5; partes.push(`margen neto sólido (${pm.toFixed(0)}%)`); }
+    else if (pm >= 10) { score += 0.3; partes.push(`margen neto positivo (${pm.toFixed(0)}%)`); }
+    else if (pm >= 0) { score += 0; }
+    else { score -= 0.5; partes.push("margen neto negativo"); incoherencias++; }
+  }
+
+  // Upside de analistas
+  if (fund.targetMeanPrice != null && fund.currentPrice != null && fund.currentPrice > 0) {
+    const upside = ((fund.targetMeanPrice - fund.currentPrice) / fund.currentPrice) * 100;
+    if (upside > 20) { score += 0.5; partes.push(`upside analistas >20% (${upside.toFixed(0)}%)`); }
+    else if (upside > 10) { score += 0.3; partes.push(`upside analistas positivo (${upside.toFixed(0)}%)`); }
+    else if (upside > 0) { score += 0; }
+    else { score -= 0.3; partes.push(`precio sobre objetivo de analistas`); }
+  }
+
+  // P/E relativo
+  if (fund.pe != null && fund.pe > 0 && fund.pe < 200) {
+    if (fund.pe < 12) { score += 0.3; partes.push(`P/E bajo (${fund.pe.toFixed(1)}x)`); }
+    else if (fund.pe < 20) { score += 0.2; partes.push(`P/E moderado (${fund.pe.toFixed(1)}x)`); }
+    else if (fund.pe < 30) { score += 0; partes.push(`P/E elevado (${fund.pe.toFixed(1)}x)`); }
+    else { score -= 0.3; partes.push(`P/E muy elevado (${fund.pe.toFixed(1)}x)`); }
+  }
+
+  const esEspeculativo = incoherencias >= 2;
+  if (esEspeculativo) {
+    partes.push("señal técnica sin respaldo fundamental");
+  }
+
+  return {
+    score: Math.max(-2, Math.min(3, Math.round(score * 10) / 10)),
+    detalle: partes.join("; ") || "Fundamental sin señales claras",
+    esEspeculativo,
+    requiereRevision,
+  };
+}
+
+// ─── CAPA D: Score de noticias ─────────────────────────────────
+
+function scoreNoticiasLayer(sn: ScoreNoticias | null): { score: number; detalle: string } {
+  if (!sn) return { score: 0, detalle: "Sin evaluación de noticias" };
+  return {
+    score: sn.scoreNoticias,
+    detalle: sn.resumenTextual,
+  };
+}
+
+// ─── Computar retornos diarios ─────────────────────────────────
+
+function dailyReturns(prices: number[]): number[] {
+  const rets: number[] = [];
+  for (let i = 1; i < prices.length; i++) {
+    if (prices[i - 1] > 0) rets.push((prices[i] - prices[i - 1]) / prices[i - 1]);
+  }
+  return rets;
+}
+
+// ─── Evaluar fork renta fija ───────────────────────────────────
+
+function evaluarForkRentaFija(intermarket: IntermarketResult | null): {
+  activo: boolean;
+  mensaje: string;
+  confianza: number;
+} {
+  if (!intermarket) return { activo: false, mensaje: "", confianza: 0 };
+
+  const li = intermarket.lecturaIntermarket;
+  let senialesRF = 0;
+  let total = 0;
+
+  // Régimen deflacionario → favorece RF
+  if (li.regimen === "deflacionario") { senialesRF += 2; total += 2; }
+  total += 2;
+
+  // Presión inflacionaria negativa fuerte
+  if (li.indicePresion < -0.3) { senialesRF += 1; total += 1; }
+  total += 1;
+
+  // Correlación bonos-acciones muy negativa (flight to quality)
+  const bondStockCorr = intermarket.correlations.find(
+    (c) => c.label.includes("Bonos") && c.label.includes("Acciones"),
+  );
+  if (bondStockCorr && bondStockCorr.current != null && bondStockCorr.current < -0.5) {
+    senialesRF += 1;
+  }
+  total += 1;
+
+  // Bear market silencioso
+  if (li.bearMarketSilencioso.detectado) { senialesRF += 1; }
+  total += 1;
+
+  const confianza = total > 0 ? Math.round((senialesRF / total) * 100) : 0;
+  const activo = confianza >= 50;
+
+  return {
+    activo,
+    mensaje: activo
+      ? "El contexto actual favorece renta fija sobre renta variable — considere evaluar bonos y obligaciones negociables."
+      : "",
+    confianza,
+  };
+}
+
+// ─── ProcessTicker extendido ───────────────────────────────────
+
+async function processTicker(
+  item: PanelItem,
+  periodo: "dia" | "mes",
+  sectoresFav: SectorFavorabilidad[],
+  regimenActual: string,
+  sp500Returns?: number[],
+  intermarket?: IntermarketResult | null,
+): Promise<OportunidadItem | null> {
+  try {
+    // Resolver símbolo Yahoo
+    let yfSymbol = resolverSimboloYahoo(item);
+    // Si es CEDEAR con descripción, resolver subyacente
+    if (item.tipo === "cedear" && item.descripcion && !item.simbolo.includes(".")) {
+      const resolved = await yahooResolve(item.descripcion);
+      if (resolved) yfSymbol = resolved;
+    }
+
+    const chartDays = periodo === "mes" ? 30 : 5;
+    const historyDays = periodo === "mes" ? 180 : 90;
+
+    const [chartData, histData, fund] = await Promise.all([
+      fetchHistory(yfSymbol, chartDays),
+      fetchHistory(yfSymbol, historyDays),
+      yahooFundamentals(yfSymbol),
+    ]);
+
+    if (chartData.length < 2 || histData.length < 20) return null;
+
+    const currentClose = chartData[chartData.length - 1].close;
+    const prevClose = chartData[chartData.length - 2].close;
+    const variacion = prevClose > 0 ? ((currentClose - prevClose) / prevClose) * 100 : 0;
+
+    const zscore = await computeZScore(histData.map((h) => h.close), 20);
+
+    const closes20 = histData.slice(-21, -1).map((h) => h.close);
+    const avg20 = closes20.reduce((s, v) => s + v, 0) / Math.min(20, closes20.length || 1);
+    const volRel = avg20 > 0 ? currentClose / avg20 : 1;
+
+    const signal = Math.abs(zscore) > 1.5 || Math.abs(variacion) > 2 * volRel;
+    if (!signal && Math.abs(variacion) < 0.3) return null;
+
+    // ─── CAPA A: Técnico ───
+    const capaA = scoreTecnico(zscore, volRel);
+
+    // ─── CAPA B: Sectorial ───
+    const capaB = scoreSectorial(fund?.sector ?? null, sectoresFav, regimenActual);
+
+    // ─── CAPA C: Fundamental ───
+    const capaC = scoreFundamental(fund);
+
+    // ─── CAPA D: Noticias (simplificado, sin fetch adicional por rendimiento en batch) ───
+    const capaD = { score: 0, detalle: "Score de noticias disponible al expandir" };
+
+    // ─── CAPA E: Beta ───
+    let beta: number | null = null;
+    let benchmarkUsado: string | null = null;
+    if (sp500Returns && histData.length > 20) {
+      const assetReturns = dailyReturns(histData.map((h) => h.close));
+      const b = computeBeta(assetReturns, sp500Returns);
+      beta = b.beta;
+      if (beta != null) benchmarkUsado = "SPY";
+    }
+
+    // ─── Score final ───
+    const scoreA = capaA.score;
+    const scoreB = capaB.favorabilidad ? (capaB.score * (intermarket?.lecturaIntermarket.confianza ?? 50) / 100) : 0;
+    const scoreC = capaC.score;
+    const scoreD = capaD.score;
+    const scoreFinal = Math.round((scoreA + scoreB + scoreC + scoreD) * 10) / 10;
+
+    // ─── Justificación compuesta ───
+    const partes: string[] = [
+      `${item.simbolo}: ${variacion >= 0 ? "+" : ""}${variacion.toFixed(2)}% ${periodo === "mes" ? "en el mes" : "en la rueda"}`,
+      `vol ${volRel.toFixed(1)}x, Z ${zscore.toFixed(2)}`,
+    ];
+    if (capaA.detalle) partes.push(capaA.detalle);
+    if (capaB.detalle) partes.push(capaB.detalle);
+    if (capaC.detalle && capaC.detalle !== "Sin datos fundamentales") partes.push(capaC.detalle);
+    partes.push(
+      `Score compuesto: Téc ${scoreA.toFixed(1)} + Sect ${scoreB.toFixed(1)} + Fund ${scoreC.toFixed(1)} = ${scoreFinal.toFixed(1)}`,
+    );
+
+    return {
+      ticker: item.simbolo,
+      nombre: item.descripcion,
+      sector: fund?.sector ?? "",
+      precio: currentClose,
+      variacion,
+      volumenRelativo: volRel,
+      zscore,
+      pe: fund?.pe ?? null,
+      fcfYield: fund?.fcfYield ?? null,
+      roe: fund?.roe ?? null,
+      revenueGrowth: fund?.revenueGrowth ?? null,
+      marketCap: fund?.marketCap ?? null,
+      upsideAnalistas:
+        fund?.targetMeanPrice != null && fund?.currentPrice != null && fund.currentPrice > 0
+          ? ((fund.targetMeanPrice - fund.currentPrice) / fund.currentPrice) * 100
+          : null,
+      // Nuevos
+      yfSymbol,
+      tipo: item.tipo,
+      scoreA: Math.round(scoreA * 10) / 10,
+      scoreB: Math.round(scoreB * 10) / 10,
+      scoreC: Math.round(scoreC * 10) / 10,
+      scoreD: Math.round(scoreD * 10) / 10,
+      scoreFinal,
+      detalleA: capaA.detalle,
+      detalleB: capaB.detalle,
+      detalleC: capaC.detalle,
+      detalleD: capaD.detalle,
+      favorabilidadSector: capaB.favorabilidad?.direccion ?? null,
+      favorabilidadPeso: capaB.favorabilidad?.peso ?? 0,
+      regimenActual,
+      noticias: null,
+      esEspeculativo: capaC.esEspeculativo,
+      requiereRevision: capaC.requiereRevision,
+      beta,
+      benchmarkUsado,
+      justificacion: partes.join(". "),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function chunkArray<T>(arr: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) chunks.push(arr.slice(i, i + size));
+  return chunks;
+}
+
+// ─── Server function principal ─────────────────────────────────
+
+export const getOportunidadesDelDia = createServerFn({ method: "GET" })
+  .validator(
+    z.object({
+      periodo: z.enum(["dia", "mes"]).optional().default("dia"),
+    }),
+  )
+  .handler(async ({ data }): Promise<OportunidadesResult> => {
+    const periodo = data.periodo ?? "dia";
+    const CACHE_KEY = `oportunidades-${periodo}`;
+    const cached = getCached<OportunidadesResult>(CACHE_KEY, 15 * 60 * 1000);
+    if (cached) return cached;
+
+    // 1. Obtener universo unificado (fallback directo a fuente estática)
+    // Usar universo reducido de tickers líquidos conocidos
+    const TICKERS_LIQUIDOS = [
+      "AAPL", "MSFT", "NVDA", "AMZN", "META", "GOOGL", "TSLA", "AVGO",
+      "JPM", "V", "MA", "UNH", "HD", "COST", "PG", "JNJ", "WMT",
+      "XOM", "CVX", "BA", "CAT", "GE", "IBM", "KO", "PEP", "DIS",
+      "NFLX", "ADBE", "CRM", "INTC", "AMD", "MU", "QCOM", "TXN",
+    ];
+    let panelItems: PanelItem[] = TICKERS_LIQUIDOS.map((t) => ({
+      simbolo: t, descripcion: "", tipo: "accion_us" as const,
+      mercado: "NYSE/NASDAQ", ultimoPrecio: null, variacionPorcentual: null,
+      apertura: null, maximo: null, minimo: null, volumen: null, cantidad: null,
+    }));
+
+    // 2. Usar defaults sin llamar a getIntermarketAnalysis (evita RPC server-to-server)
+    let sectoresFav: SectorFavorabilidad[] = [];
+    let regimenActual = "mixto";
+
+    // 3. Procesar en batches
+    const batches = chunkArray(panelItems, BATCH_SIZE);
+    const allResults: OportunidadItem[] = [];
+
+    for (const batch of batches) {
+      const batchResults = await Promise.allSettled(
+        batch.map((item) =>
+          processTicker(item, periodo, sectoresFav, regimenActual, undefined, null),
+        ),
+      );
+      for (const r of batchResults) {
+        if (r.status === "fulfilled" && r.value) allResults.push(r.value);
+      }
+    }
+
+    // 5. Computar promedios sectoriales y actualizar scoreB (sectorial)
+    const sectorMap = new Map<string, { vars: number[]; items: OportunidadItem[] }>();
+    for (const item of allResults) {
+      if (!sectorMap.has(item.sector)) sectorMap.set(item.sector, { vars: [], items: [] });
+      const entry = sectorMap.get(item.sector)!;
+      entry.vars.push(item.variacion);
+      entry.items.push(item);
+    }
+    for (const [, entry] of sectorMap) {
+      const avgVar = entry.vars.reduce((s, v) => s + v, 0) / entry.vars.length;
+      for (const item of entry.items) {
+        const delta = item.variacion - avgVar;
+        if (delta > 2) {
+          item.scoreB = 1.0;
+          item.detalleB = `Supera al promedio de ${item.sector} por ${delta.toFixed(2)}pp`;
+        } else if (delta > 0.5) {
+          item.scoreB = 0.5;
+          item.detalleB = `Supera levemente al promedio de ${item.sector} (${delta.toFixed(2)}pp)`;
+        } else {
+          item.scoreB = 0;
+          item.detalleB = `Rinde en línea o por debajo del promedio de ${item.sector} (${delta.toFixed(2)}pp vs promedio)`;
+        }
+        item.scoreFinal = Math.round((item.scoreA + item.scoreB + item.scoreC + item.scoreD) * 10) / 10;
+        item.justificacion = item.justificacion
+          .replace("Sin datos sectoriales", item.detalleB)
+          .replace(
+            /Score compuesto:.*$/,
+            `Score compuesto: Téc ${item.scoreA.toFixed(1)} + Sect ${item.scoreB.toFixed(1)} + Fund ${item.scoreC.toFixed(1)} = ${item.scoreFinal.toFixed(1)}`,
+          );
+      }
+    }
+
+    // 6. Ordenar por score final descendente con desempate explícito
+    allResults.sort((a, b) => {
+      if (b.scoreFinal !== a.scoreFinal) return b.scoreFinal - a.scoreFinal;
+      const upsideA = a.upsideAnalistas ?? -999;
+      const upsideB = b.upsideAnalistas ?? -999;
+      if (upsideB !== upsideA) return upsideB - upsideA;
+      return b.volumenRelativo - a.volumenRelativo;
+    });
+    const items = allResults.slice(0, 15);
+
+    // 7. Fetch noticias para los top 15 (en paralelo, fallan sin bloquear)
+    const newsResults = await Promise.allSettled(
+      items.map((item) => getNoticiasPorTicker(item.ticker, item.nombre)),
+    );
+    for (let i = 0; i < items.length; i++) {
+      const nr = newsResults[i];
+      if (nr.status === "fulfilled" && nr.value) {
+        items[i].noticias = nr.value;
+        items[i].scoreD = Math.round(nr.value.scoreNoticias * 10) / 10;
+        items[i].detalleD = nr.value.resumenTextual;
+        items[i].scoreFinal = Math.round(
+          (items[i].scoreA + items[i].scoreB + items[i].scoreC + items[i].scoreD) * 10,
+        ) / 10;
+        items[i].justificacion = items[i].justificacion.replace(
+          /Score compuesto:.*$/,
+          `Score compuesto: Téc ${items[i].scoreA.toFixed(1)} + Sect ${items[i].scoreB.toFixed(1)} + Fund ${items[i].scoreC.toFixed(1)} + News ${items[i].scoreD.toFixed(1)} = ${items[i].scoreFinal.toFixed(1)}`,
+        );
+      }
+    }
+
+    const result: OportunidadesResult = {
+      items,
+      totalAnalizados: panelItems.length,
+      periodo,
+      disclaimer: "",
+      timestamp: new Date().toISOString(),
+      forkRentaFija: { activo: false, mensaje: "", confianza: 0 },
+      regimenActual,
+      sectoresFavorecidos: sectoresFav,
+    };
+
+    setCache(CACHE_KEY, result);
+    return result;
+  });
