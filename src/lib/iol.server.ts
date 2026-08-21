@@ -276,13 +276,100 @@ export function iolTestInversorResponder(
   );
 }
 
-export function iolAsesorMovimientos(sessionId: string, request: Record<string, unknown>) {
-  return iolFetch<Record<string, unknown>>(
+// ---------------------------------------------------------------------------
+// Módulo ASESOR (cuentas asesoradas): movimientos, clientes y operación.
+// ---------------------------------------------------------------------------
+
+export type FiltroMovimientos = {
+  clientes?: number[];
+  from?: string;
+  to?: string;
+  dateType?: string;
+  status?: string;
+  type?: string;
+  country?: string;
+  currency?: string;
+  cuentaComitente?: string;
+};
+
+/** POST /api/v2/Asesor/Movimientos — movimientos de las cuentas asesoradas. */
+export function iolAsesorMovimientos(sessionId: string, filtro: FiltroMovimientos) {
+  return iolFetch<unknown>(sessionId, "POST", "/api/v2/Asesor/Movimientos", filtro);
+}
+
+/**
+ * Lista de clientes asesorados: la API v2 no expone un endpoint directo de
+ * "listar clientes"; se derivan los identificadores distintos (comitente /
+ * cliente / cuenta) de los movimientos del asesor en una ventana amplia.
+ */
+export async function iolAsesorClientes(sessionId: string): Promise<{
+  ok: boolean;
+  status: number;
+  clientes: Array<Record<string, unknown>>;
+  crudo: unknown;
+  error: string | null;
+}> {
+  const hasta = new Date();
+  const desde = new Date(hasta.getTime() - 730 * 24 * 3600 * 1000);
+  const iso = (d: Date) => d.toISOString();
+  const r = await iolFetch<unknown>(sessionId, "POST", "/api/v2/Asesor/Movimientos", {
+    from: iso(desde),
+    to: iso(hasta),
+  });
+  if (!r.ok || r.data == null) {
+    return { ok: false, status: r.status, clientes: [], crudo: r.data, error: r.error };
+  }
+  const vistos = new Map<string, Record<string, unknown>>();
+  const visitar = (nodo: unknown) => {
+    if (!nodo || typeof nodo !== "object") return;
+    if (Array.isArray(nodo)) {
+      for (const x of nodo) visitar(x);
+      return;
+    }
+    const obj = nodo as Record<string, unknown>;
+    const id =
+      obj["numeroComitente"] ??
+      obj["idClienteAsesorado"] ??
+      obj["numeroCuenta"] ??
+      obj["idCliente"] ??
+      obj["cliente"] ??
+      obj["comitente"] ??
+      obj["cuenta"];
+    if (id != null && (typeof id === "number" || typeof id === "string")) {
+      const clave = String(id);
+      if (!vistos.has(clave)) vistos.set(clave, obj);
+    }
+    for (const v of Object.values(obj)) {
+      if (v && typeof v === "object") visitar(v);
+    }
+  };
+  visitar(r.data);
+  return { ok: true, status: r.status, clientes: [...vistos.values()], crudo: r.data, error: null };
+}
+
+/** POST /api/v2/asesores/operar/VenderEspecieD — venta para un cliente asesorado. */
+export function iolAsesorVenderEspecieD(
+  sessionId: string,
+  o: {
+    idClienteAsesorado: number;
+    mercado: string;
+    simbolo: string;
+    cantidad: number;
+    precio?: number;
+    validez?: string;
+    tipoOrden?: string;
+    plazo?: string;
+    fondosParaOperacion?: number;
+    idCuentaBancaria?: number;
+    idFuente?: number;
+  },
+) {
+  return iolFetch<RespuestaOperacion>(
     sessionId,
     "POST",
-    "/api/v2/Asesor/Movimientos",
-    request,
-  );
+    "/api/v2/asesores/operar/VenderEspecieD",
+    o,
+  ).then((r) => ({ ...r, resumen: r.data ? textoRespuestaOperacion(r.data) : r.error }));
 }
 
 // ---------------------------------------------------------------------------

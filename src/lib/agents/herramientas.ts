@@ -767,6 +767,69 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "iol_asesor",
+      description:
+        "Módulo ASESOR de IOL para cuentas asesoradas (requiere iol_login con una cuenta que tenga rol de Asesor). Acciones: 'clientes' (LISTA DE CLIENTES ASESORADOS derivada de los movimientos del asesor), 'movimientos' (movimientos consolidados con filtros opcionales clientes[]/from/to/status/type/country/currency), 'test_inversor' (preguntas del test), 'responder_test_inversor' (perfil sugerido, opcionalmente para idClienteAsesorado) y 'vender_especie_d' (venta para un cliente asesorado, SOLO con confirmar=true tras confirmación explícita del usuario). Si IOL responde 401/403, informá que la cuenta no tiene el rol de Asesor habilitado.",
+      parameters: {
+        type: "object",
+        properties: {
+          accion: {
+            type: "string",
+            description:
+              "clientes | movimientos | test_inversor | responder_test_inversor | vender_especie_d.",
+          },
+          clientes: {
+            type: "array",
+            items: { type: "number" },
+            description: "Para 'movimientos': IDs de comitente/cliente a filtrar.",
+          },
+          from: { type: "string", description: "Fecha desde ISO (ej. 2026-01-01T00:00:00Z)." },
+          to: { type: "string", description: "Fecha hasta ISO." },
+          dateType: { type: "string", description: "Tipo de fecha del filtro." },
+          status: { type: "string", description: "Estado de los movimientos." },
+          type: { type: "string", description: "Tipo de movimiento." },
+          country: { type: "string", description: "'argentina' o 'estados_Unidos'." },
+          currency: {
+            type: "string",
+            description: "Moneda a filtrar (peso_Argentino, dolar_Estadounidense).",
+          },
+          cuentaComitente: {
+            type: "string",
+            description: "Número de cuenta comitente específica.",
+          },
+          idClienteAsesorado: {
+            type: "number",
+            description: "ID del cliente asesorado (responder_test_inversor / vender_especie_d).",
+          },
+          respuestas: {
+            type: "object",
+            additionalProperties: true,
+            description:
+              "Para responder_test_inversor: objeto con las respuestas según el esquema del test.",
+          },
+          mercado: { type: "string", description: "'bCBA' (default) o 'nYSE'/'nasdaq'." },
+          simbolo: { type: "string", description: "Símbolo del título a vender." },
+          cantidad: { type: "number", description: "Cantidad de títulos." },
+          precio: { type: "number", description: "Precio límite." },
+          validez: { type: "string", description: "Validez ISO de la orden." },
+          tipoOrden: { type: "string", description: "'precioLimite' (default) o 'precioMercado'." },
+          plazo: { type: "string", description: "'t0' (default), 't1', 't2'." },
+          fondosParaOperacion: { type: "number", description: "Fondos asignados a la operación." },
+          idCuentaBancaria: { type: "number", description: "Cuenta bancaria de acreditación." },
+          confirmar: {
+            type: "boolean",
+            description:
+              "true SOLO si el usuario confirmó explícitamente la orden para el cliente.",
+          },
+        },
+        required: ["accion"],
+        additionalProperties: false,
+      },
+    },
+  },
   // -------------------------------------------------------------------------
   // Fuentes públicas genéricas
   // -------------------------------------------------------------------------
@@ -1114,6 +1177,7 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
     case "iol_cuenta":
     case "iol_mercado":
     case "iol_operar":
+    case "iol_asesor":
       return "iol";
     case "datos_financieros":
       return "mercado";

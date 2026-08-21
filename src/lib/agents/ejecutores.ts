@@ -1153,6 +1153,10 @@ import {
   iolOperacion,
   iolNotificacion,
   iolTestInversorObtener,
+  iolTestInversorResponder,
+  iolAsesorMovimientos,
+  iolAsesorClientes,
+  iolAsesorVenderEspecieD,
   iolTitulo,
   iolCotizacionDetalle,
   iolCotizacion,
@@ -2664,5 +2668,195 @@ export async function ejecutarMatrizBenchmarks(): Promise<ResTool> {
       fuentes: [],
       ok: false,
     };
+  }
+}
+
+// --- iol_asesor (cuentas asesoradas) ---------------------------------------
+
+export async function ejecutarIolAsesor(
+  argsRaw: string,
+  sessionId: string,
+): Promise<ResultadoToolConEventos> {
+  const args = (() => {
+    try {
+      return (JSON.parse(argsRaw) ?? {}) as Record<string, unknown>;
+    } catch {
+      return {} as Record<string, unknown>;
+    }
+  })();
+  const str = (k: string, def = "") => String(args[k] ?? def).trim();
+  const num = (k: string): number | undefined => {
+    const v = Number(args[k]);
+    return args[k] != null && isFinite(v) ? v : undefined;
+  };
+
+  const accion = str("accion");
+  if (!accion) return { texto: "Falta la accion de iol_asesor.", fuentes: [FUENTE_IOL], ok: false };
+  if (!iolSesionActiva(sessionId)) {
+    return {
+      texto:
+        "NO AUTENTICADO: el modulo asesor requiere sesion IOL iniciada. Invoca primero iol_login con las credenciales del ASESOR.",
+      fuentes: [FUENTE_IOL],
+      ok: false,
+    };
+  }
+
+  switch (accion) {
+    case "clientes":
+    case "lista_clientes": {
+      const r = await iolAsesorClientes(sessionId);
+      if (!r.ok) {
+        return {
+          texto: `SIN RESULTADOS: IOL rechazo la consulta de clientes asesorados (HTTP ${r.status}: ${r.error ?? "sin detalle"}). Si el error es 401/403, la cuenta logueada NO tiene rol de Asesor habilitado en IOL y este modulo no esta disponible para ella.`,
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      }
+      if (!r.clientes.length) {
+        return {
+          texto:
+            "La consulta de movimientos del asesor no devolvio clientes asesorados (o no hay movimientos en los ultimos 2 anos). Si esperabas ver clientes, verifica que la cuenta tenga cuentas asesoradas vinculadas.",
+          fuentes: [FUENTE_IOL],
+          ok: true,
+        };
+      }
+      const filas = r.clientes
+        .slice(0, 40)
+        .map((c) => [
+          String(
+            c["numeroComitente"] ??
+              c["idClienteAsesorado"] ??
+              c["idCliente"] ??
+              c["comitente"] ??
+              c["numeroCuenta"] ??
+              c["cuenta"] ??
+              c["cliente"] ??
+              "s/d",
+          ),
+          String(c["nombre"] ?? c["razonSocial"] ?? c["apellido"] ?? c["descripcion"] ?? "").slice(
+            0,
+            30,
+          ),
+          String(c["pais"] ?? c["mercado"] ?? ""),
+        ]);
+      return {
+        texto: `Clientes asesorados detectados en IOL (${r.clientes.length}):\n${tablaMD(
+          ["ID / Comitente", "Nombre", "Pais/Mercado"],
+          filas,
+        )}\nCon cada ID podes consultar movimientos (iol_asesor accion=movimientos clientes=[id]) o responder su test de inversor.`,
+        fuentes: [FUENTE_IOL],
+        ok: true,
+      };
+    }
+    case "movimientos": {
+      const clientes = Array.isArray(args["clientes"])
+        ? (args["clientes"] as unknown[]).map(Number).filter((n) => isFinite(n))
+        : undefined;
+      const r = await iolAsesorMovimientos(sessionId, {
+        ...(clientes?.length ? { clientes } : {}),
+        ...(str("from") ? { from: str("from") } : {}),
+        ...(str("to") ? { to: str("to") } : {}),
+        ...(str("dateType") ? { dateType: str("dateType") } : {}),
+        ...(str("status") ? { status: str("status") } : {}),
+        ...(str("type") ? { type: str("type") } : {}),
+        ...(str("country") ? { country: str("country") } : {}),
+        ...(str("currency") ? { currency: str("currency") } : {}),
+        ...(str("cuentaComitente") ? { cuentaComitente: str("cuentaComitente") } : {}),
+      });
+      if (!r.ok)
+        return {
+          texto: `SIN RESULTADOS: ${r.error ?? "IOL rechazo la consulta"}. HTTP 401/403 suele indicar que la cuenta no tiene rol de Asesor.`,
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      return {
+        texto: `Movimientos de cuentas asesoradas (IOL):\n${JSON.stringify(r.data, null, 1).slice(0, 5000)}`,
+        fuentes: [FUENTE_IOL],
+        ok: true,
+      };
+    }
+    case "test_inversor": {
+      const r = await iolTestInversorObtener(sessionId);
+      return {
+        texto:
+          r.ok && r.data
+            ? `Preguntas del test de inversor IOL:\n${JSON.stringify(r.data, null, 1).slice(0, 4000)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "responder_test_inversor": {
+      const idCliente = num("idClienteAsesorado");
+      let respuestas = args["respuestas"];
+      if (typeof respuestas === "string") {
+        try {
+          respuestas = JSON.parse(respuestas) as Record<string, unknown>;
+        } catch {
+          respuestas = undefined;
+        }
+      }
+      if (!respuestas || typeof respuestas !== "object")
+        return {
+          texto: "Faltan las respuestas del test (parametro respuestas como objeto JSON).",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const r = await iolTestInversorResponder(
+        sessionId,
+        respuestas as Record<string, unknown>,
+        idCliente,
+      );
+      return {
+        texto:
+          r.ok && r.data
+            ? `Perfil sugerido por el test de inversor:\n${JSON.stringify(r.data, null, 1).slice(0, 2500)}`
+            : `SIN RESULTADOS: ${r.error}`,
+        fuentes: [FUENTE_IOL],
+        ok: r.ok,
+      };
+    }
+    case "vender_especie_d": {
+      if (args["confirmar"] !== true) {
+        return {
+          texto: `SIMULACION (confirmar=false): NO se envio ninguna orden. La orden de venta especie D para el cliente asesorado quedaria asi: ${argsRaw}. Mostrasela al usuario y pedi confirmacion explicita antes de reinvocar con confirmar=true.`,
+          fuentes: [FUENTE_IOL],
+          ok: true,
+        };
+      }
+      const idCliente = num("idClienteAsesorado");
+      if (!idCliente || !str("simbolo") || num("cantidad") == null)
+        return {
+          texto: "Para vender_especie_d hacen falta idClienteAsesorado, simbolo y cantidad.",
+          fuentes: [FUENTE_IOL],
+          ok: false,
+        };
+      const precioArg = num("precio");
+      const validezArg = str("validez");
+      const fondosArg = num("fondosParaOperacion");
+      const cuentaBancariaArg = num("idCuentaBancaria");
+      const idFuenteArg = num("idFuente");
+      const r = await iolAsesorVenderEspecieD(sessionId, {
+        idClienteAsesorado: idCliente,
+        mercado: str("mercado", "bCBA") || "bCBA",
+        simbolo: str("simbolo"),
+        cantidad: num("cantidad")!,
+        ...(precioArg != null ? { precio: precioArg } : {}),
+        ...(validezArg ? { validez: validezArg } : {}),
+        tipoOrden: str("tipoOrden", "precioLimite") || "precioLimite",
+        plazo: str("plazo", "t0") || "t0",
+        ...(fondosArg != null ? { fondosParaOperacion: fondosArg } : {}),
+        ...(cuentaBancariaArg != null ? { idCuentaBancaria: cuentaBancariaArg } : {}),
+        ...(idFuenteArg != null ? { idFuente: idFuenteArg } : {}),
+      });
+      return { texto: r.resumen ?? r.error ?? "", fuentes: [FUENTE_IOL], ok: r.ok };
+    }
+    default:
+      return {
+        texto:
+          "Accion invalida para iol_asesor. Usa: clientes | movimientos | test_inversor | responder_test_inversor | vender_especie_d.",
+        fuentes: [FUENTE_IOL],
+        ok: false,
+      };
   }
 }

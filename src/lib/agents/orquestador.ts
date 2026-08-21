@@ -54,6 +54,7 @@ import {
   ejecutarIolCuenta,
   ejecutarIolMercado,
   ejecutarIolOperar,
+  ejecutarIolAsesor,
   ejecutarDatosFinancieros,
   ejecutarGraficoChat,
   ejecutarGenerarInforme,
@@ -540,6 +541,8 @@ export async function ejecutarTool(
       return await ejecutarIolMercado(argsRaw, sessionId);
     case "iol_operar":
       return await ejecutarIolOperar(argsRaw, sessionId);
+    case "iol_asesor":
+      return await ejecutarIolAsesor(argsRaw, sessionId);
     case "datos_financieros":
       return await ejecutarDatosFinancieros(argsRaw);
     case "grafico_chat":
@@ -885,6 +888,8 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   let semaforoCalculado = false;
   let semaforoFallido = false;
   let semaforoFallidoDetalle = "";
+  let asesorFallido = false;
+  let asesorDetalle = "";
   let dcfEmpresa = "";
   let dcfValidadoWeb = false;
   const modeloPlanner = orquestacion.modeloPlanner;
@@ -954,6 +959,10 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
         }
         if (ejecucion.fuentes.length) enviar({ t: "sources", v: ejecucion.fuentes });
         enviarEventos(enviar, ejecucion.eventos);
+        if (name === "iol_asesor" && !ejecucion.ok) {
+          asesorFallido = true;
+          asesorDetalle = ejecucion.texto.slice(0, 400);
+        }
         if (!ejecucion.ok && esValoracion) {
           valoracionFallida = true;
           textoValoracionFallida = `No se pudo completar la valoración con datos reales en este momento.`;
@@ -1315,6 +1324,17 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   if (semaforoFallido) {
     return {
       final: semaforoFallidoDetalle || "No se pudo completar el análisis en este momento.",
+      fuentes,
+    };
+  }
+
+  // Módulo asesor rechazado por IOL (sin rol Asesor / sin comitentes vinculados):
+  // respuesta determinística honesta, sin dejar que el modelo improvise.
+  if (asesorFallido) {
+    return {
+      final:
+        asesorDetalle ||
+        "IOL rechazó la consulta del módulo asesor. La cuenta probablemente no tiene el rol de Asesor habilitado ni cuentas asesoradas vinculadas.",
       fuentes,
     };
   }
