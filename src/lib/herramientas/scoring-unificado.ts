@@ -86,73 +86,130 @@ export interface SenalUnificada {
 const PESOS_POR_TIPO: Record<string, { tecnico: number; fundamental: number }> = {
   ACCION: { tecnico: 0.4, fundamental: 0.6 },
   CEDEAR: { tecnico: 0.4, fundamental: 0.6 },
-  ADR:    { tecnico: 0.4, fundamental: 0.6 },
-  ETF:    { tecnico: 0.7, fundamental: 0.3 }, // ETFs: más técnico
-  BONO:   { tecnico: 0.8, fundamental: 0.2 },
-  ON:     { tecnico: 0.8, fundamental: 0.2 },
-  OTRO:   { tecnico: 0.9, fundamental: 0.1 },
+  ADR: { tecnico: 0.4, fundamental: 0.6 },
+  ETF: { tecnico: 0.7, fundamental: 0.3 }, // ETFs: más técnico
+  BONO: { tecnico: 0.8, fundamental: 0.2 },
+  ON: { tecnico: 0.8, fundamental: 0.2 },
+  OTRO: { tecnico: 0.9, fundamental: 0.1 },
 };
 
 // ─── Cálculo de score fundamental ──────────────────────────────────
 
-export function calcularScoreFundamental(
-  fin: ScoreFundamentalInput,
-): { score: number; detalle: Record<string, number> } {
+export function calcularScoreFundamental(fin: ScoreFundamentalInput): {
+  score: number;
+  detalle: Record<string, number>;
+} {
   let score = 0;
   const detalle: Record<string, number> = {};
 
   // P/E (0 a ±2)
   if (fin.pe != null && fin.pe > 0) {
-    if (fin.pe < 10)       { detalle.pe = 2;   score += 2; }
-    else if (fin.pe < 15)  { detalle.pe = 1.5; score += 1.5; }
-    else if (fin.pe < 25)  { detalle.pe = 0.5; score += 0.5; }
-    else if (fin.pe < 35)  { detalle.pe = -0.5; score -= 0.5; }
-    else if (fin.pe < 50)  { detalle.pe = -1;   score -= 1; }
-    else                   { detalle.pe = -2;   score -= 2; }
+    if (fin.pe < 10) {
+      detalle.pe = 2;
+      score += 2;
+    } else if (fin.pe < 15) {
+      detalle.pe = 1.5;
+      score += 1.5;
+    } else if (fin.pe < 25) {
+      detalle.pe = 0.5;
+      score += 0.5;
+    } else if (fin.pe < 35) {
+      detalle.pe = -0.5;
+      score -= 0.5;
+    } else if (fin.pe < 50) {
+      detalle.pe = -1;
+      score -= 1;
+    } else {
+      detalle.pe = -2;
+      score -= 2;
+    }
   } else {
     detalle.pe = 0;
   }
 
   // Revenue growth (0 a ±2)
   if (fin.revenueGrowth != null) {
-    if (fin.revenueGrowth > 0.25)   { detalle.revGrowth = 2;   score += 2; }
-    else if (fin.revenueGrowth > 0.10) { detalle.revGrowth = 1;   score += 1; }
-    else if (fin.revenueGrowth > 0)    { detalle.revGrowth = 0.5; score += 0.5; }
-    else if (fin.revenueGrowth > -0.05) { detalle.revGrowth = -0.5; score -= 0.5; }
-    else                              { detalle.revGrowth = -1;   score -= 1; }
+    if (fin.revenueGrowth > 0.25) {
+      detalle.revGrowth = 2;
+      score += 2;
+    } else if (fin.revenueGrowth > 0.1) {
+      detalle.revGrowth = 1;
+      score += 1;
+    } else if (fin.revenueGrowth > 0) {
+      detalle.revGrowth = 0.5;
+      score += 0.5;
+    } else if (fin.revenueGrowth > -0.05) {
+      detalle.revGrowth = -0.5;
+      score -= 0.5;
+    } else {
+      detalle.revGrowth = -1;
+      score -= 1;
+    }
   } else {
     detalle.revGrowth = 0;
   }
 
   // Profit margin (0 a ±2)
   if (fin.profitMargin != null) {
-    if (fin.profitMargin > 0.25)   { detalle.profitMargin = 2; score += 2; }
-    else if (fin.profitMargin > 0.15) { detalle.profitMargin = 1.5; score += 1.5; }
-    else if (fin.profitMargin > 0.05) { detalle.profitMargin = 0.5; score += 0.5; }
-    else if (fin.profitMargin > 0)    { detalle.profitMargin = 0; }
-    else if (fin.profitMargin > -0.10) { detalle.profitMargin = -0.5; score -= 0.5; }
-    else                              { detalle.profitMargin = -1.5; score -= 1.5; }
+    if (fin.profitMargin > 0.25) {
+      detalle.profitMargin = 2;
+      score += 2;
+    } else if (fin.profitMargin > 0.15) {
+      detalle.profitMargin = 1.5;
+      score += 1.5;
+    } else if (fin.profitMargin > 0.05) {
+      detalle.profitMargin = 0.5;
+      score += 0.5;
+    } else if (fin.profitMargin > 0) {
+      detalle.profitMargin = 0;
+    } else if (fin.profitMargin > -0.1) {
+      detalle.profitMargin = -0.5;
+      score -= 0.5;
+    } else {
+      detalle.profitMargin = -1.5;
+      score -= 1.5;
+    }
   } else {
     detalle.profitMargin = 0;
   }
 
   // ROE (0 a ±1.5)
   if (fin.roe != null) {
-    if (fin.roe > 0.20)  { detalle.roe = 1.5; score += 1.5; }
-    else if (fin.roe > 0.10) { detalle.roe = 1;   score += 1; }
-    else if (fin.roe > 0)    { detalle.roe = 0.5; score += 0.5; }
-    else if (fin.roe > -0.10) { detalle.roe = -0.5; score -= 0.5; }
-    else                    { detalle.roe = -1;   score -= 1; }
+    if (fin.roe > 0.2) {
+      detalle.roe = 1.5;
+      score += 1.5;
+    } else if (fin.roe > 0.1) {
+      detalle.roe = 1;
+      score += 1;
+    } else if (fin.roe > 0) {
+      detalle.roe = 0.5;
+      score += 0.5;
+    } else if (fin.roe > -0.1) {
+      detalle.roe = -0.5;
+      score -= 0.5;
+    } else {
+      detalle.roe = -1;
+      score -= 1;
+    }
   } else {
     detalle.roe = 0;
   }
 
   // Earnings growth (0 a ±1)
   if (fin.earningsGrowth != null) {
-    if (fin.earningsGrowth > 0.15)  { detalle.earningsGrowth = 1; score += 1; }
-    else if (fin.earningsGrowth > 0)   { detalle.earningsGrowth = 0.5; score += 0.5; }
-    else if (fin.earningsGrowth > -0.10) { detalle.earningsGrowth = -0.5; score -= 0.5; }
-    else                              { detalle.earningsGrowth = -1; score -= 1; }
+    if (fin.earningsGrowth > 0.15) {
+      detalle.earningsGrowth = 1;
+      score += 1;
+    } else if (fin.earningsGrowth > 0) {
+      detalle.earningsGrowth = 0.5;
+      score += 0.5;
+    } else if (fin.earningsGrowth > -0.1) {
+      detalle.earningsGrowth = -0.5;
+      score -= 0.5;
+    } else {
+      detalle.earningsGrowth = -1;
+      score -= 1;
+    }
   } else {
     detalle.earningsGrowth = 0;
   }
@@ -169,24 +226,50 @@ export function calcularScoreFundamental(
 
   // FCF yield (0 a ±2) — Método de Value Investing: flujo de caja sobre precio
   if (fin.fcfYield != null) {
-    if (fin.fcfYield > 0.08)        { detalle.fcfYield = 2;   score += 2; }
-    else if (fin.fcfYield > 0.05)   { detalle.fcfYield = 1.5; score += 1.5; }
-    else if (fin.fcfYield > 0.03)   { detalle.fcfYield = 1;   score += 1; }
-    else if (fin.fcfYield > 0)      { detalle.fcfYield = 0.5; score += 0.5; }
-    else if (fin.fcfYield > -0.05)  { detalle.fcfYield = -0.5; score -= 0.5; }
-    else                            { detalle.fcfYield = -1.5; score -= 1.5; }
+    if (fin.fcfYield > 0.08) {
+      detalle.fcfYield = 2;
+      score += 2;
+    } else if (fin.fcfYield > 0.05) {
+      detalle.fcfYield = 1.5;
+      score += 1.5;
+    } else if (fin.fcfYield > 0.03) {
+      detalle.fcfYield = 1;
+      score += 1;
+    } else if (fin.fcfYield > 0) {
+      detalle.fcfYield = 0.5;
+      score += 0.5;
+    } else if (fin.fcfYield > -0.05) {
+      detalle.fcfYield = -0.5;
+      score -= 0.5;
+    } else {
+      detalle.fcfYield = -1.5;
+      score -= 1.5;
+    }
   } else {
     detalle.fcfYield = 0;
   }
 
   // Deuda/Patrimonio (0 a ±1.5) — bajo apalancamiento es señal de calidad (Value Investing)
   if (fin.debtToEquity != null) {
-    if (fin.debtToEquity > 0 && fin.debtToEquity <= 0.30)  { detalle.deuda = 1.5; score += 1.5; }
-    else if (fin.debtToEquity <= 0.60)                     { detalle.deuda = 1;   score += 1; }
-    else if (fin.debtToEquity <= 1.0)                      { detalle.deuda = 0.5; score += 0.5; }
-    else if (fin.debtToEquity <= 2.0)                      { detalle.deuda = -0.5; score -= 0.5; }
-    else if (fin.debtToEquity <= 4.0)                      { detalle.deuda = -1;   score -= 1; }
-    else                                                   { detalle.deuda = -1.5; score -= 1.5; }
+    if (fin.debtToEquity > 0 && fin.debtToEquity <= 0.3) {
+      detalle.deuda = 1.5;
+      score += 1.5;
+    } else if (fin.debtToEquity <= 0.6) {
+      detalle.deuda = 1;
+      score += 1;
+    } else if (fin.debtToEquity <= 1.0) {
+      detalle.deuda = 0.5;
+      score += 0.5;
+    } else if (fin.debtToEquity <= 2.0) {
+      detalle.deuda = -0.5;
+      score -= 0.5;
+    } else if (fin.debtToEquity <= 4.0) {
+      detalle.deuda = -1;
+      score -= 1;
+    } else {
+      detalle.deuda = -1.5;
+      score -= 1.5;
+    }
   } else {
     detalle.deuda = 0;
   }
@@ -269,7 +352,8 @@ export function calcularScoreUnificado(
   infoActivo: InfoActivo,
 ): ScoreUnificadoResult {
   const pesos = PESOS_POR_TIPO[infoActivo.tipo] ?? PESOS_POR_TIPO.OTRO;
-  const { score: fundamentalScore, detalle: fundamentalDetalle } = calcularScoreFundamental(fundamentos);
+  const { score: fundamentalScore, detalle: fundamentalDetalle } =
+    calcularScoreFundamental(fundamentos);
 
   // Normalizar scores a escala común (-10 a +10)
   const tecnicoNorm = tecnico.scoreFinal * 4; // scoreFinal ~ -2.5 a +2.5 → -10 a +10

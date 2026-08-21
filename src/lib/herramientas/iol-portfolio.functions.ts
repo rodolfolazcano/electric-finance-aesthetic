@@ -19,7 +19,10 @@ async function iolFetch<T>(
     // Si el refresh falla, devolvemos un error indicando que la sesión expiró
     // sin lanzar throw, para que el caller pueda mostrar un mensaje amigable.
     try {
-      const tokens = await fetchTokens({ refresh_token: refreshToken, grant_type: "refresh_token" });
+      const tokens = await fetchTokens({
+        refresh_token: refreshToken,
+        grant_type: "refresh_token",
+      });
       if (!("error" in tokens)) {
         const retry = await fetch(url, {
           headers: { Authorization: `Bearer ${tokens.accessToken}`, Accept: "application/json" },
@@ -36,7 +39,9 @@ async function iolFetch<T>(
       // Ignorar error de refresh
     }
     // Refresh falló -> sesión expirada. Devolver error controlado en vez de throw.
-    throw new Error("Sesión IOL expirada. Iniciá sesión nuevamente desde el botón superior derecho.");
+    throw new Error(
+      "Sesión IOL expirada. Iniciá sesión nuevamente desde el botón superior derecho.",
+    );
   }
   if (!res.ok) throw new Error(`IOL error ${res.status}: ${await res.text().catch(() => "")}`);
   return { data: (await res.json()) as T };
@@ -274,15 +279,78 @@ export const getIOLCapm = createServerFn({ method: "POST" })
     function detectarMercadoUS(simbolo: string): string {
       // Lista de CEDEARs conocidos que cotizan en NASDAQ (vs NYSE)
       const nasdaqTickers = new Set([
-        "AAPL", "AMZN", "GOOGL", "GOOG", "META", "MSFT", "NVDA", "TSLA",
-        "NFLX", "AMD", "INTC", "MU", "CSCO", "ADBE", "CRM", "PYPL",
-        "GILD", "AMGN", "ISRG", "BKNG", "CHTR", "TMUS", "MDLZ", "REGN",
-        "CMCSA", "COST", "PEP", "QCOM", "TXN", "AVGO", "INTU", "AMAT",
-        "ADI", "SBUX", "ROST", "MAR", "MELI", "JD", "BABA", "PDD",
-        "GLOB", "NU", "MRNA", "BNTX", "ILMN", "VRTX", "CTSH", "LRCX",
-        "KLAC", "ASML", "SNPS", "CDNS", "PANW", "CRWD", "DDOG", "ZM",
-        "SPLK", "WDAY", "ADSK", "DOCU", "OKTA", "NET", "SQ", "SHOP",
-        "RBLX", "PINS", "SNAP", "UBER", "LYFT", "DASH", "ABNB", "TWLO",
+        "AAPL",
+        "AMZN",
+        "GOOGL",
+        "GOOG",
+        "META",
+        "MSFT",
+        "NVDA",
+        "TSLA",
+        "NFLX",
+        "AMD",
+        "INTC",
+        "MU",
+        "CSCO",
+        "ADBE",
+        "CRM",
+        "PYPL",
+        "GILD",
+        "AMGN",
+        "ISRG",
+        "BKNG",
+        "CHTR",
+        "TMUS",
+        "MDLZ",
+        "REGN",
+        "CMCSA",
+        "COST",
+        "PEP",
+        "QCOM",
+        "TXN",
+        "AVGO",
+        "INTU",
+        "AMAT",
+        "ADI",
+        "SBUX",
+        "ROST",
+        "MAR",
+        "MELI",
+        "JD",
+        "BABA",
+        "PDD",
+        "GLOB",
+        "NU",
+        "MRNA",
+        "BNTX",
+        "ILMN",
+        "VRTX",
+        "CTSH",
+        "LRCX",
+        "KLAC",
+        "ASML",
+        "SNPS",
+        "CDNS",
+        "PANW",
+        "CRWD",
+        "DDOG",
+        "ZM",
+        "SPLK",
+        "WDAY",
+        "ADSK",
+        "DOCU",
+        "OKTA",
+        "NET",
+        "SQ",
+        "SHOP",
+        "RBLX",
+        "PINS",
+        "SNAP",
+        "UBER",
+        "LYFT",
+        "DASH",
+        "ABNB",
+        "TWLO",
       ]);
       if (nasdaqTickers.has(simbolo.toUpperCase())) return "NASDAQ";
       return "NYSE";
@@ -291,7 +359,8 @@ export const getIOLCapm = createServerFn({ method: "POST" })
     // Resolve underlying ticker/currency for CAPM analysis
     function resolveSubyacente(a: IOLActivo): { simbolo: string; mercado: string; moneda: string } {
       const classified = classifyIOLActivo(a);
-      const { iolCurrency, canUseYahoo, yahooPriceSymbol, category, iolSymbol, iolMarket } = classified;
+      const { iolCurrency, canUseYahoo, yahooPriceSymbol, category, iolSymbol, iolMarket } =
+        classified;
       if (canUseYahoo && yahooPriceSymbol) {
         const isADR = category === "ACCION_BCBA_USD";
         const mercadoUS = isADR ? detectarMercadoUS(yahooPriceSymbol) : iolMarket;
@@ -362,7 +431,8 @@ export const getIOLCapm = createServerFn({ method: "POST" })
         for (const cand of benchCandidates) {
           const bmMap = new Map<string, number>();
           for (const r of cand.rows) bmMap.set(r.date, r.close);
-          let r2Sum = 0, count = 0;
+          let r2Sum = 0,
+            count = 0;
           for (const a of activos) {
             const sub = resolveSubyacente(a);
             const subRows = await fetchHistory(sub.simbolo, sub.mercado, a.titulo.tipo);
@@ -383,10 +453,15 @@ export const getIOLCapm = createServerFn({ method: "POST" })
             }
             if (assetRets.length < 30) continue;
             const lr = linregress(bmRets, assetRets);
-            r2Sum += lr.r2; count++;
+            r2Sum += lr.r2;
+            count++;
           }
           const avgR2 = count > 0 ? r2Sum / count : 0;
-          if (avgR2 > bestScore) { bestScore = avgR2; bestBm = cand.ticker; bestRows = cand.rows; }
+          if (avgR2 > bestScore) {
+            bestScore = avgR2;
+            bestBm = cand.ticker;
+            bestRows = cand.rows;
+          }
         }
         currentBenchmark = bestBm;
         benchRows = bestRows;
@@ -634,12 +709,28 @@ export const getIOLCapm = createServerFn({ method: "POST" })
         totalUSD,
         cantActivos: assetResults.length,
         porRegion: [
-          { region: "Argentina", valorizado: valARG, pct: totalValorizado > 0 ? valARG / totalValorizado : 0 },
-          { region: "EEUU", valorizado: valUS, pct: totalValorizado > 0 ? valUS / totalValorizado : 0 },
+          {
+            region: "Argentina",
+            valorizado: valARG,
+            pct: totalValorizado > 0 ? valARG / totalValorizado : 0,
+          },
+          {
+            region: "EEUU",
+            valorizado: valUS,
+            pct: totalValorizado > 0 ? valUS / totalValorizado : 0,
+          },
         ],
         porMoneda: [
-          { moneda: "ARS", valorizado: totalARS, pct: totalValorizado > 0 ? totalARS / totalValorizado : 0 },
-          { moneda: "USD", valorizado: totalUSD, pct: totalValorizado > 0 ? totalUSD / totalValorizado : 0 },
+          {
+            moneda: "ARS",
+            valorizado: totalARS,
+            pct: totalValorizado > 0 ? totalARS / totalValorizado : 0,
+          },
+          {
+            moneda: "USD",
+            valorizado: totalUSD,
+            pct: totalValorizado > 0 ? totalUSD / totalValorizado : 0,
+          },
         ],
       };
     })();
@@ -716,17 +807,29 @@ export interface IOLOperacion {
 }
 
 export const getIOLOperaciones = createServerFn({ method: "POST" })
-  .inputValidator((input: {
-    token: string; refreshToken: string | null;
-    clienteId: number; estado?: string; pais?: string;
-    fechaDesde?: string; fechaHasta?: string; numero?: number;
-  }) =>
-    z.object({
-      token: z.string().min(1), refreshToken: z.string().nullable(),
-      clienteId: z.number(), estado: z.string().optional(),
-      pais: z.string().optional(), fechaDesde: z.string().optional(),
-      fechaHasta: z.string().optional(), numero: z.number().optional(),
-    }).parse(input),
+  .inputValidator(
+    (input: {
+      token: string;
+      refreshToken: string | null;
+      clienteId: number;
+      estado?: string;
+      pais?: string;
+      fechaDesde?: string;
+      fechaHasta?: string;
+      numero?: number;
+    }) =>
+      z
+        .object({
+          token: z.string().min(1),
+          refreshToken: z.string().nullable(),
+          clienteId: z.number(),
+          estado: z.string().optional(),
+          pais: z.string().optional(),
+          fechaDesde: z.string().optional(),
+          fechaHasta: z.string().optional(),
+          numero: z.number().optional(),
+        })
+        .parse(input),
   )
   .handler(async ({ data }) => {
     let url = `https://api.invertironline.com/api/v2/Asesores/Operaciones?IdClienteAsesorado=${data.clienteId}`;
@@ -739,8 +842,16 @@ export const getIOLOperaciones = createServerFn({ method: "POST" })
   });
 
 export const getIOLOperacionDetalle = createServerFn({ method: "POST" })
-  .inputValidator((input: { token: string; refreshToken: string | null; clienteId: number; numero: number }) =>
-    z.object({ token: z.string().min(1), refreshToken: z.string().nullable(), clienteId: z.number(), numero: z.number() }).parse(input),
+  .inputValidator(
+    (input: { token: string; refreshToken: string | null; clienteId: number; numero: number }) =>
+      z
+        .object({
+          token: z.string().min(1),
+          refreshToken: z.string().nullable(),
+          clienteId: z.number(),
+          numero: z.number(),
+        })
+        .parse(input),
   )
   .handler(async ({ data }) => {
     const url = `https://api.invertironline.com/api/v2/Asesores/Operaciones/Detalle/${data.clienteId}/${data.numero}`;
@@ -748,8 +859,16 @@ export const getIOLOperacionDetalle = createServerFn({ method: "POST" })
   });
 
 export const getIOLBoletoOperacion = createServerFn({ method: "POST" })
-  .inputValidator((input: { token: string; refreshToken: string | null; clienteId: number; numero: number }) =>
-    z.object({ token: z.string().min(1), refreshToken: z.string().nullable(), clienteId: z.number(), numero: z.number() }).parse(input),
+  .inputValidator(
+    (input: { token: string; refreshToken: string | null; clienteId: number; numero: number }) =>
+      z
+        .object({
+          token: z.string().min(1),
+          refreshToken: z.string().nullable(),
+          clienteId: z.number(),
+          numero: z.number(),
+        })
+        .parse(input),
   )
   .handler(async ({ data }) => {
     const url = `https://api.invertironline.com/api/v2/Asesores/Operaciones/Boleto/${data.clienteId}/${data.numero}`;

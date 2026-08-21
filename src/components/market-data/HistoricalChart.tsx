@@ -106,4 +106,3 @@ export default function HistoricalChart({ data, height, moneda, ticker }: Props)
     </ResponsiveContainer>
   );
 }
-

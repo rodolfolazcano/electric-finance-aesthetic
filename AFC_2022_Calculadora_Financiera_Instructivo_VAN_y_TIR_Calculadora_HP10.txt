@@ -1,0 +1,184 @@
+﻿si desea presentar el flujo de la caja N 4, oprima [RCL] 4, y luego 
+RCL NJ para presentar el número de repeticiones. 
+Para reemplazar el valor de un flujo de caja, entre el nuevo valor y oprima STO] seguido del número de registro correspondiente. 
+Para modificar el número de repeticiones de un flujo de caja determinado, oprima [RCL] para recuperar el flujo de caja cuyo número de repeticiones desea cambiar. Luego entre el nuevo número de repeticiones y oprima NJ. 
+Si desea reemplazar tanto el flujo de caja como el número de repeticiones del mismo, entre el nuevo monto del flujo, luego oprima 
+STO] seguido del número de registro correspondiente. Entonces, entre el número de repeticiones y oprima 
+N. 
+Ya que no es posible ni borrar ni insertar flujos de caja, deberá utilizar 
+CLEAR ALL si desea comenzar de nuevo. 
+Cálculo del valor actual neto 
+La función del valor actual neto se utiliza para descontar (calcular el valor actual) de todos los flujos de caja mediante el uso de una tasa de interés nominal anual. 
+Para calcular 
+1. Oprima 
+NPV, utilice los siguientes pasos: 
+CLEAR ALL, almacene el número, y almacene el 
+número de períodos por año en P/YR. 
+2. Utilice [CF] y [N]] para entrar los flujos de caja. 
+3. Almacene la tasa de interés nominal anual en I/YR y oprima 
+NPV. 
+Ejemplo: Un contrato con flujos de caja disparejos. Se le presenta la oportunidad de comprar un contrato que consta de los siguientes flujos de caja: 
+80 
+Fin del mes 
+Ingreso 
+4 
+$ 5.000,00 
+9 
+$ 5.000,00 
+10 
+$ 5.000,00 
+15 
+$ 7.500,00 
+25 
+$10.000,00 
+6: Cálculos de flujos de caja 
+10.000 
+¿Cuánto deberá pagar Ud. por el contrato si desea obtener un rendi- miento anual del 15% sobre su inversión? 
+I/YR = 15% 
+7.500 
+5.000 
+5.000 
+9 10 
+Teclas: 
+Pantalla: 
+[CLEAR ALL 
+0,00 
+12 P/YR 
+12,00 
+0 [CF] 
+CF0 0,00 
+115 
+25 
+25 
+Descripción: 
+Borra los registros. 
+Especifica el número de pagos por año. 
+Entra el flujo de caja inicial (cero). El número del flujo de caja se 
+presenta mientras Ud. mantiene oprimida la tecla [CFJ. 
+Entra el primer flujo de caja. 
+Entra el número de 
+repeticiones. 
+0 CFI 
+CF 1 
+0,00 
+3 NI 
+n1 
+3,00 
+5000 [CF] 
+0 CFj 
+CF3 
+0,00 
+4 N 
+n3 
+4,00 
+CF 2 5.000,00 
+de caja. 
+de caja. 
+Entra el número de 
+repeticiones. 
+Entra el segundo flujo 
+Entra el tercer flujo 
+5000 [CFJ 
+CF 4 
+Entra el cuarto flujo 
+5.000,00 
+de caja. 
+2 Nj 
+n4 2,00 
+Entra el número de repeticiones. 
+6: Cálculos de flujos de caja 
+81 
+0 [CF] 
+CF5 0,00 
+4 NI 
+n5 
+4,00 
+7500 [CF] 
+CF6 
+Entra el quinto flujo 
+de caja. 
+Entra el número de 
+repeticiones. 
+Entra el sexto flujo 
+7.500,00 
+de caja. 
+0 [CFJ 
+CF7 
+Entra el séptimo flujo 
+0,00 
+9 NI 
+n7 
+9,00 
+de caja. 
+Entra el número de repeticiones. 
+10000 [CF] 
+CF8 10.000,00 
+Entra el próximo flujo 
+de caja. 
+Al llegar a este punto, Ud. habrá entrado en la calculadora los flujos de caja de los cuales se compone la inversión. Ahora puede oprimir 
+RCL O seguido de [RCL] [CF] y RCL NI, para visualizar los flujos de caja y el número de repeticiones correspondiente a cada uno. 
+Ahora que ha entrado los flujos de caja, almacene la tasa de interés y calcule el valor actual neto. 
+Teclas: 
+Pantalla: 
+15 1/YR 
+15,00 
+NPV 
+27.199,92 
+Descripción: 
+Almacena la tasa de interés anual. 
+Calcula el valor actual neto de los flujos de caja almacenados. (Véase en la página 58 el ejemplo rela- cionado con el redondeo.) 
+Mediante este ejemplo, se calcula que para obtener un rendimiento anual del 15%, Ud. deberá pagar $27.199,92 por el contrato. Observe que este es un valor positivo. El valor actual neto consiste simplemente de la suma de los valores actuales de una serie de flujos de caja. 
+82 
+6: Cálculos de flujos de caja 
+7.330,34 
+6.224,95 
+4.415,91 
+NPV 
+= 
+27.199,92 
+1% 
+15% anual 
+4.471,10 
+7.500,00 
+5.000,00 
+4.757,62 
+1 3 5 7 9 11 13 15 17 19 
+10.000,00 
+2232 
+21 
+23 25 
+Cálculo de la tasa interna de rendimiento 
+1. Oprima CLEAR ALL y almacene el número de períodos por 
+año en P/YR. 
+2. Entre los flujos de caja mediante el uso de [CF] y [NJ. 3. Oprima 
+IRR/YR. 
+Al calcular la tasa interna de rendimiento (IRR/YR), se obtiene la tasa nominal anual que rinde un valor actual neto de cero. 
+En el siguiente ejemplo se emplean los mismos flujos de caja que se entraron en el ejemplo anterior. 
+Es posible que exista más de un valor para IRR/YR. Si se le presenta el mensaje no Solution, consulte el apéndice B (página 127). 
+Ejemplo. Si el vendedor del contrato del ejemplo anterior desea un precio de $28.000 y si Ud. acepta dicho precio, ¿cuál será el rendimiento de su inversión? Este cálculo de tasa interna de rendimiento requiere una leve modificación de los flujos de caja previamente almacenados. 
+6: Cálculos de flujos de caja 83 
+5.000 
+7.500 
+5.000 
+10.000 
+Ta 
++ + 
+1 3 5 7 9 11 13 15 17 19 21 23 25 
+-28.000 
+IRR/YR = ? 
+Teclas: 
+Pantalla: 
+28000+ STO 0 -28.000,00 
+IRR/YR 
+12,49 
+Descripción: 
+Modifica el flujo de 
+caja inicial. 
+Calcula el rendimiento 
+nominal anual. 
+En el capítulo 8, "Ejemplos adicionales”, se proveen ejemplos adicionales de la utilización de NPV y IRR/YR. 
+Almacenamiento automático de IRR/YR Y NPV 
+Al calcular el valor actual neto (NPV), se almacena el resultado en la variable PV para facilitar cálculos subsecuentes. Para recuperar el resultado, oprima [RCL] [PV]. Si Ud. no ha modificado los valores VDT después de trabajar con el último ejemplo de NPV (página 82), al oprimir RCL] [PV] se presentará el resultado de 27.199,92. 
+Al calcular IRR/YR, el resultado se almacena en I/YR. Si Ud. ha trabajado con el último ejemplo, podrá oprimir (RCL) I/YR para presentar el rendimiento anual de 12,49. 
+84 
+6: Cálculos de flujos de caja

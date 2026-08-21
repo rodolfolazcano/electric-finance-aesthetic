@@ -77,9 +77,7 @@ async function quoteDirecto(ticker: string): Promise<any> {
       chartRango(ticker, new Date(Date.now() - 10 * 86400000), new Date()),
       fetchYahooQuoteSummaryJson<any>(ticker, ["price", "summaryDetail"]).catch(() => null),
     ]);
-    const meta = chartRes.length
-      ? null
-      : null;
+    const meta = chartRes.length ? null : null;
     void meta;
     const ultimo = chartRes.length ? chartRes[chartRes.length - 1]!.close : null;
     const price = summary?.json?.quoteSummary?.result?.[0];
@@ -88,7 +86,10 @@ async function quoteDirecto(ticker: string): Promise<any> {
     return {
       symbol: ticker,
       regularMarketPrice: p.regularMarketPrice ?? ultimo ?? null,
-      regularMarketPreviousClose: p.regularMarketPreviousClose ?? sd.previousClose ?? (chartRes.length > 1 ? chartRes[chartRes.length - 2]!.close : null),
+      regularMarketPreviousClose:
+        p.regularMarketPreviousClose ??
+        sd.previousClose ??
+        (chartRes.length > 1 ? chartRes[chartRes.length - 2]!.close : null),
       shortName: p.shortName ?? p.longName ?? ticker,
       longName: p.longName ?? p.shortName ?? ticker,
       currency: p.currency ?? null,
@@ -162,10 +163,7 @@ async function fetchRange(
   }
 }
 
-async function fetchFullHistory(
-  ticker: string,
-  days: number,
-): Promise<HistoryPayload> {
+async function fetchFullHistory(ticker: string, days: number): Promise<HistoryPayload> {
   const period2 = new Date();
   const period1 = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   const data = await fetchRange(ticker, period1, period2);
@@ -219,7 +217,7 @@ export async function getHistory(
           // Fetch only the missing range
           const newData = await fetchRange(ticker, lastDt, new Date());
           if (newData.length > 0) {
-            const existingDates = new Set(supabaseHit.data.map(d => d.date));
+            const existingDates = new Set(supabaseHit.data.map((d) => d.date));
             for (const entry of newData) {
               if (!existingDates.has(entry.date)) {
                 supabaseHit.data.push(entry);

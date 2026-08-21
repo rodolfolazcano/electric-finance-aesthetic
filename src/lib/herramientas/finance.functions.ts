@@ -40,7 +40,12 @@ type RangoHistorico = "1M" | "3M" | "6M" | "1A" | "2A" | "5A";
 
 function rangoADias(rango?: string): number {
   const map: Record<string, number> = {
-    "1M": 30, "3M": 90, "6M": 182, "1A": 365, "2A": 730, "5A": 1825,
+    "1M": 30,
+    "3M": 90,
+    "6M": 182,
+    "1A": 365,
+    "2A": 730,
+    "5A": 1825,
   };
   return rango ? (map[rango] ?? 730) : 730;
 }
@@ -48,7 +53,13 @@ function rangoADias(rango?: string): number {
 function rawNum(val: unknown): number | null {
   if (val == null) return null;
   if (typeof val === "number") return val;
-  if (typeof val === "object" && val != null && "raw" in val && typeof (val as any).raw === "number") return (val as any).raw;
+  if (
+    typeof val === "object" &&
+    val != null &&
+    "raw" in val &&
+    typeof (val as any).raw === "number"
+  )
+    return (val as any).raw;
   return null;
 }
 
@@ -96,13 +107,7 @@ async function fetchQuote(ticker: string): Promise<any | null> {
   try {
     const yf = await getYF();
     const qs = await yf.quoteSummary(ticker, {
-      modules: [
-        "price",
-        "summaryDetail",
-        "defaultKeyStatistics",
-        "financialData",
-        "assetProfile",
-      ],
+      modules: ["price", "summaryDetail", "defaultKeyStatistics", "financialData", "assetProfile"],
     });
     // Fetch financial statements via fundamentalsTimeSeries (replaces deprecated incomeStatementHistory)
     try {
@@ -128,7 +133,9 @@ async function fetchQuote(ticker: string): Promise<any | null> {
           qs.incomeStatementHistory = { incomeStatementHistory: incomeRows };
         }
       }
-    } catch { /* fallback: income data not available */ }
+    } catch {
+      /* fallback: income data not available */
+    }
 
     try {
       const ftsQ = await yf.fundamentalsTimeSeries(ticker, {
@@ -153,7 +160,9 @@ async function fetchQuote(ticker: string): Promise<any | null> {
           qs.incomeStatementHistoryQuarterly = { incomeStatementHistory: incomeRowsQ };
         }
       }
-    } catch { /* fallback: quarterly income data not available */ }
+    } catch {
+      /* fallback: quarterly income data not available */
+    }
 
     setCache(cacheKey, qs);
     return qs;
@@ -179,8 +188,7 @@ function computePePercentileFromQuote(
 
   const sharesOutstanding = rawNum(quote?.defaultKeyStatistics?.sharesOutstanding);
   const ish = quote?.incomeStatementHistory?.incomeStatementHistory as
-    | Record<string, any>[]
-    | undefined;
+    Record<string, any>[] | undefined;
   if (!sharesOutstanding || sharesOutstanding <= 0 || !ish || ish.length === 0)
     return { value: null, muestraInsuficiente: true };
 
@@ -225,8 +233,7 @@ function computePePercentileFromQuote(
 
   // Also try quarterly data for more years
   const ishQ = quote?.incomeStatementHistoryQuarterly?.incomeStatementHistory as
-    | Record<string, any>[]
-    | undefined;
+    Record<string, any>[] | undefined;
   const quarterRows = ishQ?.length ?? 0;
   if (ishQ && ishQ.length > 0 && ts.length > 0) {
     // Group quarterly data by fiscal year
@@ -235,7 +242,7 @@ function computePePercentileFromQuote(
       const endDateStr = row?.endDate?.fmt as string | undefined;
       if (!endDateStr) continue;
       const endDate = new Date(endDateStr);
-    const netIncome = rawNum(row?.netIncome);
+      const netIncome = rawNum(row?.netIncome);
       if (netIncome == null) continue;
       const yr = endDate.getFullYear();
       // Use TTM: sum last 4 quarters for each year-end
@@ -279,7 +286,8 @@ function computePePercentileFromQuote(
 function computePePercentileReason(currentPe: number | null, quote: any): string {
   if (currentPe == null || currentPe <= 0) return "P/E no disponible";
   const sharesOutstanding = rawNum(quote?.defaultKeyStatistics?.sharesOutstanding);
-  if (!sharesOutstanding || sharesOutstanding <= 0) return "Faltan datos de acciones en circulación";
+  if (!sharesOutstanding || sharesOutstanding <= 0)
+    return "Faltan datos de acciones en circulación";
   const ish = quote?.incomeStatementHistory?.incomeStatementHistory;
   if (!ish || (ish as any[]).length === 0) return "Sin historial de ganancias (income statement)";
   return "Historial insuficiente para percentil (< 2 años)";
@@ -394,18 +402,39 @@ export const getSemaforo = createServerFn({ method: "POST" })
     const sharesOutstanding = rawNum(dks?.sharesOutstanding);
     const { value: pePercentile, muestraInsuficiente: pePercentileMuestraInsuficiente } =
       computePePercentileFromQuote(pe, quote, closes);
-    const pePercentileReason = pePercentile != null ? undefined : computePePercentileReason(pe, quote);
-    const changePeriod = hist.length >= 2 ? ((current - hist[0].close) / hist[0].close) * 100 : null;
+    const pePercentileReason =
+      pePercentile != null ? undefined : computePePercentileReason(pe, quote);
+    const changePeriod =
+      hist.length >= 2 ? ((current - hist[0].close) / hist[0].close) * 100 : null;
 
     // --- Scoring técnico jerárquico (Parte 2) ---
     const sr = analizarSoportesResistencias(hist, 5, 0.02, high52, low52);
     const scoreTecnicoDetalle = calcularScoreTecnico({
-      current, sma50, sma200, rsi: rsiV, macd: macdV, macdSignal: macdS, closes, sr,
+      current,
+      sma50,
+      sma200,
+      rsi: rsiV,
+      macd: macdV,
+      macdSignal: macdS,
+      closes,
+      sr,
     });
 
     // --- Signals con interpretaciones (Parte 3) ---
     const tendencia = scoreTecnicoDetalle.tendencia.direccion;
-    const contexto = { tendencia, scoreTotal: scoreTecnicoDetalle.scoreFinal, sma50, sma200, current, pe, revGrowth, profitMargin, roe, closes, macdSignal: macdS };
+    const contexto = {
+      tendencia,
+      scoreTotal: scoreTecnicoDetalle.scoreFinal,
+      sma50,
+      sma200,
+      current,
+      pe,
+      revGrowth,
+      profitMargin,
+      roe,
+      closes,
+      macdSignal: macdS,
+    };
 
     const interpretaciones = [
       generarInterpretacionSignal("precio-sma50", current, contexto),
@@ -414,8 +443,10 @@ export const getSemaforo = createServerFn({ method: "POST" })
       generarInterpretacionSignal("macd", macdV, contexto),
     ];
     if (pe) interpretaciones.push(generarInterpretacionSignal("pe", pe, contexto));
-    if (revGrowth) interpretaciones.push(generarInterpretacionSignal("rev-growth", revGrowth, contexto));
-    if (profitMargin) interpretaciones.push(generarInterpretacionSignal("profit-margin", profitMargin, contexto));
+    if (revGrowth)
+      interpretaciones.push(generarInterpretacionSignal("rev-growth", revGrowth, contexto));
+    if (profitMargin)
+      interpretaciones.push(generarInterpretacionSignal("profit-margin", profitMargin, contexto));
     if (roe) interpretaciones.push(generarInterpretacionSignal("roe", roe, contexto));
 
     // --- Score legado (mantenido para compatibilidad) ---
@@ -455,7 +486,7 @@ export const getSemaforo = createServerFn({ method: "POST" })
     // totalScore = scoreTecnicoDetalle.scoreFinal (rango ~ -1.65 a +1.25)
     // clasificación desde semaforo-tecnico.ts:225 (5 niveles sobre scoreFinal)
     const scoreTecLegacy = Math.round(scoreTecnicoDetalle.scoreFinal);
-    const total = +((scoreTecnicoDetalle.scoreFinal) + ((fundScoreNum ?? 0) / 7) * 0.3).toFixed(3);
+    const total = +(scoreTecnicoDetalle.scoreFinal + ((fundScoreNum ?? 0) / 7) * 0.3).toFixed(3);
     const clasificacionJerarquica = scoreTecnicoDetalle.clasificacion;
     // 3-level (light) SE DERIVA de clasificacionJerarquica (no recalcula sobre totalScore):
     //   COMPRA / COMPRA CON CAUTELA -> green ; MANTENER -> yellow ; REDUCIR / VENTA -> red
@@ -465,7 +496,8 @@ export const getSemaforo = createServerFn({ method: "POST" })
         : clasificacionJerarquica === "MANTENER"
           ? "yellow"
           : "red";
-    const recommendation: "COMPRA" | "MANTENER" | "VENTA" = light === "green" ? "COMPRA" : light === "yellow" ? "MANTENER" : "VENTA";
+    const recommendation: "COMPRA" | "MANTENER" | "VENTA" =
+      light === "green" ? "COMPRA" : light === "yellow" ? "MANTENER" : "VENTA";
 
     const cierreInterpretacion = generarCierreScore(total, scoreTecLegacy, 0);
 
@@ -474,7 +506,10 @@ export const getSemaforo = createServerFn({ method: "POST" })
       lastUpdated: new Date().toISOString(),
       dataSource: "yahoo" as const,
       esETF,
-      name: (price?.longName as string | undefined) || (price?.shortName as string | undefined) || ticker,
+      name:
+        (price?.longName as string | undefined) ||
+        (price?.shortName as string | undefined) ||
+        ticker,
       sector: (ap?.sector as string | undefined) ?? null,
       currency: inferMoneda(ticker, price?.currency as string | undefined),
       price: current,
@@ -509,13 +544,27 @@ export const getSemaforo = createServerFn({ method: "POST" })
       scoreTecnicoDetalle,
       interpretaciones,
       cierreInterpretacion,
-      soportes: sr.soportes.map((s) => ({ precio: s.precio, fecha: s.fecha, vecesTocado: s.vecesTocado, esEstimado: s.esEstimado })),
-      resistencias: sr.resistencias.map((r) => ({ precio: r.precio, fecha: r.fecha, vecesTocado: r.vecesTocado, esEstimado: r.esEstimado })),
+      soportes: sr.soportes.map((s) => ({
+        precio: s.precio,
+        fecha: s.fecha,
+        vecesTocado: s.vecesTocado,
+        esEstimado: s.esEstimado,
+      })),
+      resistencias: sr.resistencias.map((r) => ({
+        precio: r.precio,
+        fecha: r.fecha,
+        vecesTocado: r.vecesTocado,
+        esEstimado: r.esEstimado,
+      })),
       distanciaSoporte: sr.distanciaSoportePct,
       distanciaResistencia: sr.distanciaResistenciaPct,
       extended: extended ? { ...extended, fcfYield: rawNum(fd?.freeCashflowYield) } : extended,
       // Información de tipo de activo + scoring unificado
-      infoActivo: detectarTipoActivo(ticker, price?.quoteType as string | undefined, ap?.sector as string | undefined),
+      infoActivo: detectarTipoActivo(
+        ticker,
+        price?.quoteType as string | undefined,
+        ap?.sector as string | undefined,
+      ),
       scoreUnificado: calcularScoreUnificado(
         scoreTecnicoDetalle,
         {
@@ -542,14 +591,20 @@ export const getSemaforo = createServerFn({ method: "POST" })
                 extended.consensoAnalistas.strongSell)
             : null,
         },
-        detectarTipoActivo(ticker, price?.quoteType as string | undefined, ap?.sector as string | undefined),
+        detectarTipoActivo(
+          ticker,
+          price?.quoteType as string | undefined,
+          ap?.sector as string | undefined,
+        ),
       ),
     };
   });
 
 export const getSemaforoBatch = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({ tickers: z.array(TickerSchema).min(1).max(20), rango: z.string().optional() }).parse(input),
+    z
+      .object({ tickers: z.array(TickerSchema).min(1).max(20), rango: z.string().optional() })
+      .parse(input),
   )
   .handler(async ({ data }): Promise<SemaforoResult[]> => {
     const { tickers, rango } = data;
@@ -575,9 +630,12 @@ export const getSemaforoBatch = createServerFn({ method: "POST" })
       const batchResults = await Promise.allSettled(
         slice.map(async (ticker) => {
           try {
-            const [hist, quote] = await Promise.all([fetchHistory(ticker, days), fetchQuote(ticker)]);
+            const [hist, quote] = await Promise.all([
+              fetchHistory(ticker, days),
+              fetchQuote(ticker),
+            ]);
             if (hist.length < 30) return null;
-              const closes = hist.map((h) => h.close);
+            const closes = hist.map((h) => h.close);
             const current = closes[closes.length - 1];
             const prev = closes[closes.length - 2] ?? current;
             const change1d = ((current - prev) / prev) * 100;
@@ -585,7 +643,9 @@ export const getSemaforoBatch = createServerFn({ method: "POST" })
             const sma200 = closes.length >= 200 ? sma(closes, 200) : null;
             const rsiV = rsiFn(closes);
             const { macd: macdV, signal: macdS } = macdFn(closes);
-            const cutoff = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+            const cutoff = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .slice(0, 10);
             const win52 = hist.filter((h) => h.date >= cutoff).map((h) => h.close);
             const low52 = win52.length > 0 ? Math.min(...win52) : Math.min(...closes);
             const high52 = win52.length > 0 ? Math.max(...win52) : Math.max(...closes);
@@ -603,17 +663,22 @@ export const getSemaforoBatch = createServerFn({ method: "POST" })
             const roe = rawNum(fd?.returnOnEquity);
             const marketCap = rawNum(price?.marketCap);
             const epsGrowth = rawNum(fd?.earningsGrowth);
-            const peg = pe != null && epsGrowth != null && epsGrowth >= 0.01 ? pe / epsGrowth : null;
+            const peg =
+              pe != null && epsGrowth != null && epsGrowth >= 0.01 ? pe / epsGrowth : null;
             const sharesOutstanding = rawNum(dks?.sharesOutstanding);
             const ish = quote?.incomeStatementHistory;
             const { value: pePercentile, muestraInsuficiente: pePercentileMuestraInsuficiente } =
               computePePercentileFromQuote(pe, quote, closes);
-            const pePercentileReason = pePercentile != null ? undefined : (
-              pe == null || pe <= 0 ? "P/E no disponible" :
-              !sharesOutstanding || sharesOutstanding <= 0 ? "Faltan datos de acciones en circulación" :
-              "Sin historial de ganancias suficiente"
-            );
-            const changePeriod = hist.length >= 2 ? ((current - hist[0].close) / hist[0].close) * 100 : null;
+            const pePercentileReason =
+              pePercentile != null
+                ? undefined
+                : pe == null || pe <= 0
+                  ? "P/E no disponible"
+                  : !sharesOutstanding || sharesOutstanding <= 0
+                    ? "Faltan datos de acciones en circulación"
+                    : "Sin historial de ganancias suficiente";
+            const changePeriod =
+              hist.length >= 2 ? ((current - hist[0].close) / hist[0].close) * 100 : null;
             const signals: SemaforoSignal[] = [];
             let tech = 0;
             if (current > sma50) {
@@ -696,15 +761,21 @@ export const getSemaforoBatch = createServerFn({ method: "POST" })
             const total = tech + fund;
             // Normalizar escala aditiva (~ -10 a +15) a escala canónica (~ -2.5 a +2.5)
             const norm = total / 6;
-            const clasificacionJerarquica: "COMPRA" | "COMPRA CON CAUTELA" | "MANTENER" | "REDUCIR" | "VENTA" =
-              norm > 1.5 ? "COMPRA" :
-              norm > 0.3 ? "COMPRA CON CAUTELA" :
-              norm > -0.3 ? "MANTENER" :
-              norm > -1.5 ? "REDUCIR" :
-              "VENTA";
+            const clasificacionJerarquica:
+              "COMPRA" | "COMPRA CON CAUTELA" | "MANTENER" | "REDUCIR" | "VENTA" =
+              norm > 1.5
+                ? "COMPRA"
+                : norm > 0.3
+                  ? "COMPRA CON CAUTELA"
+                  : norm > -0.3
+                    ? "MANTENER"
+                    : norm > -1.5
+                      ? "REDUCIR"
+                      : "VENTA";
             // 3-level (light) SE DERIVA de clasificacionJerarquica (no recalcula sobre total):
             const light: "green" | "yellow" | "red" =
-              clasificacionJerarquica === "COMPRA" || clasificacionJerarquica === "COMPRA CON CAUTELA"
+              clasificacionJerarquica === "COMPRA" ||
+              clasificacionJerarquica === "COMPRA CON CAUTELA"
                 ? "green"
                 : clasificacionJerarquica === "MANTENER"
                   ? "yellow"
@@ -733,32 +804,46 @@ export const getSemaforoBatch = createServerFn({ method: "POST" })
               macd: macdV,
               macdSignal: macdS,
               pe: esETF ? null : pe,
-               peg: esETF ? null : peg,
-               pePercentile: esETF ? null : pePercentile,
-               pePercentileMuestraInsuficiente: esETF ? undefined : pePercentileMuestraInsuficiente,
-                pePercentileReason: esETF ? undefined : pePercentileReason,
-                pegPercentile: null,
-               revGrowth: esETF ? null : (typeof revGrowth === "number" ? revGrowth * 100 : null),
-               profitMargin: esETF ? null : (typeof profitMargin === "number" ? profitMargin * 100 : null),
-               roe: esETF ? null : (typeof roe === "number" ? roe * 100 : null),
+              peg: esETF ? null : peg,
+              pePercentile: esETF ? null : pePercentile,
+              pePercentileMuestraInsuficiente: esETF ? undefined : pePercentileMuestraInsuficiente,
+              pePercentileReason: esETF ? undefined : pePercentileReason,
+              pegPercentile: null,
+              revGrowth: esETF ? null : typeof revGrowth === "number" ? revGrowth * 100 : null,
+              profitMargin: esETF
+                ? null
+                : typeof profitMargin === "number"
+                  ? profitMargin * 100
+                  : null,
+              roe: esETF ? null : typeof roe === "number" ? roe * 100 : null,
               marketCap,
               techScore: tech,
               fundScore: fund,
-               totalScore: total,
-               clasificacionJerarquica,
-               recommendation,
-               light,
+              totalScore: total,
+              clasificacionJerarquica,
+              recommendation,
+              light,
               signals,
               history: hist.map((h) => ({ date: h.date, close: h.close })),
               // Información de tipo de activo + scoring unificado (batch)
-              infoActivo: detectarTipoActivo(ticker, price?.quoteType as string | undefined, ap?.sector as string | undefined),
+              infoActivo: detectarTipoActivo(
+                ticker,
+                price?.quoteType as string | undefined,
+                ap?.sector as string | undefined,
+              ),
               scoreUnificado: calcularScoreUnificado(
                 calcularScoreTecnico({
-                  current, sma50, sma200, rsi: rsiV, macd: macdV, macdSignal: macdS, closes,
+                  current,
+                  sma50,
+                  sma200,
+                  rsi: rsiV,
+                  macd: macdV,
+                  macdSignal: macdS,
+                  closes,
                   sr: analizarSoportesResistencias(hist, 5, 0.02, high52, low52),
                 }),
                 {
-                  pe: esETF ? null : (typeof pe === "number" ? pe : null),
+                  pe: esETF ? null : typeof pe === "number" ? pe : null,
                   revenueGrowth: esETF ? null : rawNum(fd?.revenueGrowth),
                   profitMargin: esETF ? null : rawNum(fd?.profitMargins),
                   roe: esETF ? null : rawNum(fd?.returnOnEquity),
@@ -770,7 +855,11 @@ export const getSemaforoBatch = createServerFn({ method: "POST" })
                   debtToEquity: null,
                   recommendationMean: null,
                 },
-                detectarTipoActivo(ticker, price?.quoteType as string | undefined, ap?.sector as string | undefined),
+                detectarTipoActivo(
+                  ticker,
+                  price?.quoteType as string | undefined,
+                  ap?.sector as string | undefined,
+                ),
               ),
             } as SemaforoResult;
           } catch {
@@ -913,7 +1002,10 @@ export const optimizePortfolio = createServerFn({ method: "POST" })
       peso: weights[t],
       meanAnnual: meanDaily[i] * 252,
       volAnnual: volDaily[i] * Math.sqrt(252),
-      sharpe: volDaily[i] > 0 ? (meanDaily[i] * 252 - getRiskFreeRateSync("USD")) / (volDaily[i] * Math.sqrt(252)) : 0,
+      sharpe:
+        volDaily[i] > 0
+          ? (meanDaily[i] * 252 - getRiskFreeRateSync("USD")) / (volDaily[i] * Math.sqrt(252))
+          : 0,
     }));
 
     // Efficient frontier: vary target return and minimise variance
@@ -951,9 +1043,10 @@ export const optimizePortfolio = createServerFn({ method: "POST" })
           targetReturn: targetRet / 252,
         });
         // Calculate actual p-volatility for this strategy
-        const pVol = fr.pVariance != null && fr.pVariance > 0
-          ? Math.pow(fr.pVariance, 1 / pValue) * Math.pow(252, 1 / pValue)
-          : fr.volatility;
+        const pVol =
+          fr.pVariance != null && fr.pVariance > 0
+            ? Math.pow(fr.pVariance, 1 / pValue) * Math.pow(252, 1 / pValue)
+            : fr.volatility;
         if (pVol > 0) frontierPVar.push({ ret: fr.expectedReturn, vol: pVol });
       } catch {
         /* skip */
@@ -1105,263 +1198,277 @@ export const optimizeAllPortfolios = createServerFn({ method: "POST" })
       for (let i = 0; i < tickers.length; i++) {
         if (histories[i].length >= 60) valid.push({ ticker: tickers[i], rows: histories[i] });
       }
-      if (valid.length < 2) throw new Error(`Se necesitan al menos 2 tickers con datos suficientes (${valid.length} válidos de ${tickers.length})`);
-      if (!valid[0].rows || valid[0].rows.length < 60) throw new Error(`Datos insuficientes para ${valid[0].ticker}`);
+      if (valid.length < 2)
+        throw new Error(
+          `Se necesitan al menos 2 tickers con datos suficientes (${valid.length} válidos de ${tickers.length})`,
+        );
+      if (!valid[0].rows || valid[0].rows.length < 60)
+        throw new Error(`Datos insuficientes para ${valid[0].ticker}`);
 
       const dateSets = valid.map((v) => new Set(v.rows.map((r) => r.date)));
       const commonDates = valid[0].rows
         .map((r) => r.date)
         .filter((d) => dateSets.every((s) => s.has(d)));
-      if (commonDates.length < 40) throw new Error(`Series con muy poca intersección histórica (${commonDates.length} fechas comunes de ${valid[0].rows.length} disponibles)`);
+      if (commonDates.length < 40)
+        throw new Error(
+          `Series con muy poca intersección histórica (${commonDates.length} fechas comunes de ${valid[0].rows.length} disponibles)`,
+        );
 
-    const closesByTicker: Record<string, number[]> = {};
-    for (const v of valid) {
-      const map: Record<string, number> = {};
-      for (const r of v.rows) map[r.date] = r.close;
-      closesByTicker[v.ticker] = commonDates.map((d) => map[d]);
-    }
-
-    const usedTickers = valid.map((v) => v.ticker);
-    const retsByTicker = usedTickers.map((t) => logReturns(closesByTicker[t]));
-    const T = retsByTicker[0].length;
-    const returnsRows: number[][] = [];
-    for (let t = 0; t < T; t++) {
-      const row: number[] = [];
-      for (let i = 0; i < usedTickers.length; i++) row.push(retsByTicker[i][t]);
-      returnsRows.push(row);
-    }
-    const meanDaily = retsByTicker.map((r) => mean(r));
-    const volDaily = retsByTicker.map((r) => std(r));
-    const cov = covMatrix(returnsRows);
-    const allStrategies: Strategy[] = [
-      "min-variance",
-      "max-sharpe",
-      "equal-weight",
-      "inverse-vol",
-      "markowitz",
-      "min-pvar",
-      "max-psharpe",
-    ];
-
-    const pVal = data.pValue ?? 2;
-    const optInputs = { meanDaily, volDaily, cov, returnsRows, pValue: pVal };
-
-    const strategies: StrategyResult[] = allStrategies.map((strategy) => {
-      const result = optimize(strategy, optInputs);
-      const weights: Record<string, number> = {};
-      usedTickers.forEach((t, i) => (weights[t] = result.weights[i]));
-      const histogram = computeHistogram(result.weights, returnsRows);
-      return {
-        strategy,
-        label: STRATEGY_LABELS[strategy],
-        weights,
-        expectedReturn: result.expectedReturn,
-        volatility: result.volatility,
-        sharpe: result.sharpe,
-        histogram,
-        pSharpe: result.pSharpe,
-        pVariance: result.pVariance,
-      };
-    });
-
-    // Correlation matrix
-    const N = usedTickers.length;
-    const correlation: number[][] = Array.from({ length: N }, () => new Array(N).fill(0));
-    for (let i = 0; i < N; i++) {
-      for (let j = 0; j < N; j++) {
-        const denom = volDaily[i] * volDaily[j];
-        correlation[i][j] = denom > 0 ? cov[i][j] / denom : 0;
+      const closesByTicker: Record<string, number[]> = {};
+      for (const v of valid) {
+        const map: Record<string, number> = {};
+        for (const r of v.rows) map[r.date] = r.close;
+        closesByTicker[v.ticker] = commonDates.map((d) => map[d]);
       }
-    }
 
-    // Equity curve (average of all strategies or use max-sharpe as reference)
-    const refResult = optimize("max-sharpe", { meanDaily, volDaily, cov });
-    const equityCurve: { date: string; value: number }[] = [];
-    let val = 100;
-    equityCurve.push({ date: commonDates[1] ?? commonDates[0], value: val });
-    for (let t = 0; t < T; t++) {
-      let r = 0;
-      for (let i = 0; i < N; i++) r += refResult.weights[i] * returnsRows[t][i];
-      val = val * Math.exp(r);
-      equityCurve.push({ date: commonDates[t + 1] ?? commonDates[t], value: val });
-    }
-
-    // Efficient frontier
-    const frontier: EfficientFrontierPoint[] = [];
-    const minR = Math.min(...meanDaily) * 252;
-    const maxR = Math.max(...meanDaily) * 252;
-    for (let step = 0; step <= 30; step++) {
-      const targetRet = minR + (maxR - minR) * (step / 30);
-      try {
-        const fr = optimize("markowitz", {
-          meanDaily,
-          volDaily,
-          cov,
-          targetReturn: targetRet / 252,
-        });
-        if (fr.volatility > 0) frontier.push({ ret: fr.expectedReturn, vol: fr.volatility });
-      } catch {
-        /* skip */
+      const usedTickers = valid.map((v) => v.ticker);
+      const retsByTicker = usedTickers.map((t) => logReturns(closesByTicker[t]));
+      const T = retsByTicker[0].length;
+      const returnsRows: number[][] = [];
+      for (let t = 0; t < T; t++) {
+        const row: number[] = [];
+        for (let i = 0; i < usedTickers.length; i++) row.push(retsByTicker[i][t]);
+        returnsRows.push(row);
       }
-    }
-    frontier.sort((a, b) => a.vol - b.vol);
+      const meanDaily = retsByTicker.map((r) => mean(r));
+      const volDaily = retsByTicker.map((r) => std(r));
+      const cov = covMatrix(returnsRows);
+      const allStrategies: Strategy[] = [
+        "min-variance",
+        "max-sharpe",
+        "equal-weight",
+        "inverse-vol",
+        "markowitz",
+        "min-pvar",
+        "max-psharpe",
+      ];
 
-    // Monte Carlo simulations — Labadie §3.2: con scaling self-similar (fBm)
-    const hurstVal = data.hurst ?? 0.5;
-    const annFactor = 252;
-    const mcVolScale = hurstVal !== 0.5 ? Math.pow(annFactor, hurstVal) : Math.sqrt(annFactor);
-    const simulations: MonteCarloSim[] = [];
-    for (let s = 0; s < numSimulations; s++) {
-      let w = new Array(N).fill(0).map(() => Math.random());
-      const sum = w.reduce((a, b) => a + b, 0);
-      if (sum > 0) w = w.map((x) => x / sum);
-      else w = new Array(N).fill(1 / N);
-      const ret = meanDaily.reduce((s, mu, i) => s + mu * w[i], 0) * 252;
-      let varP = 0;
-      for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) varP += w[i] * w[j] * cov[i][j];
-      // Si H≠0.5, usar scaling self-similar: σ × 252^H en vez de σ × √252
-      const vol = Math.sqrt(Math.max(varP, 0)) * mcVolScale;
-      const sharpe = vol > 0 ? (ret - getRiskFreeRateSync("USD")) / vol : 0;
-      simulations.push({ ret, vol, sharpe, weights: w });
-    }
-    // Keep best sharpe / worst / median for reference
-    simulations.sort((a, b) => b.sharpe - a.sharpe);
+      const pVal = data.pValue ?? 2;
+      const optInputs = { meanDaily, volDaily, cov, returnsRows, pValue: pVal };
 
-    const individual = usedTickers.map((t, i) => ({
-      ticker: t,
-      meanAnnual: meanDaily[i] * 252,
-      volAnnual: volDaily[i] * Math.sqrt(252),
-      sharpe: volDaily[i] > 0 ? (meanDaily[i] * 252 - getRiskFreeRateSync("USD")) / (volDaily[i] * Math.sqrt(252)) : 0,
-    }));
+      const strategies: StrategyResult[] = allStrategies.map((strategy) => {
+        const result = optimize(strategy, optInputs);
+        const weights: Record<string, number> = {};
+        usedTickers.forEach((t, i) => (weights[t] = result.weights[i]));
+        const histogram = computeHistogram(result.weights, returnsRows);
+        return {
+          strategy,
+          label: STRATEGY_LABELS[strategy],
+          weights,
+          expectedReturn: result.expectedReturn,
+          volatility: result.volatility,
+          sharpe: result.sharpe,
+          histogram,
+          pSharpe: result.pSharpe,
+          pVariance: result.pVariance,
+        };
+      });
 
-    // Scenario analysis per ticker (based on daily returns percentiles)
-    const scenarios: ScenarioRow[] = usedTickers.map((t, i) => {
-      const rets = retsByTicker[i].slice();
-      rets.sort((a, b) => a - b);
-      const p5 = rets[Math.floor(rets.length * 0.05)] * 252;
-      const p25 = rets[Math.floor(rets.length * 0.25)] * 252;
-      const p75 = rets[Math.floor(rets.length * 0.75)] * 252;
-      const p95 = rets[Math.floor(rets.length * 0.95)] * 252;
-      const median = rets[Math.floor(rets.length * 0.5)] * 252;
-      return {
+      // Correlation matrix
+      const N = usedTickers.length;
+      const correlation: number[][] = Array.from({ length: N }, () => new Array(N).fill(0));
+      for (let i = 0; i < N; i++) {
+        for (let j = 0; j < N; j++) {
+          const denom = volDaily[i] * volDaily[j];
+          correlation[i][j] = denom > 0 ? cov[i][j] / denom : 0;
+        }
+      }
+
+      // Equity curve (average of all strategies or use max-sharpe as reference)
+      const refResult = optimize("max-sharpe", { meanDaily, volDaily, cov });
+      const equityCurve: { date: string; value: number }[] = [];
+      let val = 100;
+      equityCurve.push({ date: commonDates[1] ?? commonDates[0], value: val });
+      for (let t = 0; t < T; t++) {
+        let r = 0;
+        for (let i = 0; i < N; i++) r += refResult.weights[i] * returnsRows[t][i];
+        val = val * Math.exp(r);
+        equityCurve.push({ date: commonDates[t + 1] ?? commonDates[t], value: val });
+      }
+
+      // Efficient frontier
+      const frontier: EfficientFrontierPoint[] = [];
+      const minR = Math.min(...meanDaily) * 252;
+      const maxR = Math.max(...meanDaily) * 252;
+      for (let step = 0; step <= 30; step++) {
+        const targetRet = minR + (maxR - minR) * (step / 30);
+        try {
+          const fr = optimize("markowitz", {
+            meanDaily,
+            volDaily,
+            cov,
+            targetReturn: targetRet / 252,
+          });
+          if (fr.volatility > 0) frontier.push({ ret: fr.expectedReturn, vol: fr.volatility });
+        } catch {
+          /* skip */
+        }
+      }
+      frontier.sort((a, b) => a.vol - b.vol);
+
+      // Monte Carlo simulations — Labadie §3.2: con scaling self-similar (fBm)
+      const hurstVal = data.hurst ?? 0.5;
+      const annFactor = 252;
+      const mcVolScale = hurstVal !== 0.5 ? Math.pow(annFactor, hurstVal) : Math.sqrt(annFactor);
+      const simulations: MonteCarloSim[] = [];
+      for (let s = 0; s < numSimulations; s++) {
+        let w = new Array(N).fill(0).map(() => Math.random());
+        const sum = w.reduce((a, b) => a + b, 0);
+        if (sum > 0) w = w.map((x) => x / sum);
+        else w = new Array(N).fill(1 / N);
+        const ret = meanDaily.reduce((s, mu, i) => s + mu * w[i], 0) * 252;
+        let varP = 0;
+        for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) varP += w[i] * w[j] * cov[i][j];
+        // Si H≠0.5, usar scaling self-similar: σ × 252^H en vez de σ × √252
+        const vol = Math.sqrt(Math.max(varP, 0)) * mcVolScale;
+        const sharpe = vol > 0 ? (ret - getRiskFreeRateSync("USD")) / vol : 0;
+        simulations.push({ ret, vol, sharpe, weights: w });
+      }
+      // Keep best sharpe / worst / median for reference
+      simulations.sort((a, b) => b.sharpe - a.sharpe);
+
+      const individual = usedTickers.map((t, i) => ({
         ticker: t,
-        maxLoss: Math.round(p5 * 100) / 100,
-        expectedLoss: Math.round(p25 * 100) / 100,
-        expectedGain: Math.round(p75 * 100) / 100,
-        maxGain: Math.round(p95 * 100) / 100,
-        mostLikely: Math.round(median * 100) / 100,
-      };
-    });
+        meanAnnual: meanDaily[i] * 252,
+        volAnnual: volDaily[i] * Math.sqrt(252),
+        sharpe:
+          volDaily[i] > 0
+            ? (meanDaily[i] * 252 - getRiskFreeRateSync("USD")) / (volDaily[i] * Math.sqrt(252))
+            : 0,
+      }));
 
-    // CAPM per strategy vs benchmarks
-    // Auto-detect: find benchmarks with highest avg R² across all strategies
-    const capmBenchmarks: Array<{ benchmark: string; entries: PortfolioCAPMEntry[] }> = [];
-    const tickerClosesByDate: Record<string, Record<string, number>> = {};
-    for (const v of valid) {
-      for (const r of v.rows) {
-        if (!tickerClosesByDate[r.date]) tickerClosesByDate[r.date] = {};
-        tickerClosesByDate[r.date][v.ticker] = r.close;
+      // Scenario analysis per ticker (based on daily returns percentiles)
+      const scenarios: ScenarioRow[] = usedTickers.map((t, i) => {
+        const rets = retsByTicker[i].slice();
+        rets.sort((a, b) => a - b);
+        const p5 = rets[Math.floor(rets.length * 0.05)] * 252;
+        const p25 = rets[Math.floor(rets.length * 0.25)] * 252;
+        const p75 = rets[Math.floor(rets.length * 0.75)] * 252;
+        const p95 = rets[Math.floor(rets.length * 0.95)] * 252;
+        const median = rets[Math.floor(rets.length * 0.5)] * 252;
+        return {
+          ticker: t,
+          maxLoss: Math.round(p5 * 100) / 100,
+          expectedLoss: Math.round(p25 * 100) / 100,
+          expectedGain: Math.round(p75 * 100) / 100,
+          maxGain: Math.round(p95 * 100) / 100,
+          mostLikely: Math.round(median * 100) / 100,
+        };
+      });
+
+      // CAPM per strategy vs benchmarks
+      // Auto-detect: find benchmarks with highest avg R² across all strategies
+      const capmBenchmarks: Array<{ benchmark: string; entries: PortfolioCAPMEntry[] }> = [];
+      const tickerClosesByDate: Record<string, Record<string, number>> = {};
+      for (const v of valid) {
+        for (const r of v.rows) {
+          if (!tickerClosesByDate[r.date]) tickerClosesByDate[r.date] = {};
+          tickerClosesByDate[r.date][v.ticker] = r.close;
+        }
       }
-    }
-    const benchList: string[] =
-      autoDetectBenchmarks || benchmarks.length === 0 ? AUTO_BENCHMARKS : benchmarks;
-    const benchHistories = await Promise.all(
-      benchList.map((b) => fetchHistory(b, days).catch(() => [])),
-    );
-    interface BenchEntry {
-      bm: string;
-      entries: PortfolioCAPMEntry[];
-      avgR2: number;
-    }
-    const benchResults: BenchEntry[] = [];
-    for (let bi = 0; bi < benchList.length; bi++) {
-      const bm = benchList[bi];
-      const bmRows = benchHistories[bi];
-      if (bmRows.length < 60) continue;
-      const bmMap = new Map(bmRows.map((r) => [r.date, r.close]));
-      const alignedDates = commonDates.filter((d) => bmMap.has(d) && tickerClosesByDate[d]);
-      if (alignedDates.length < 40) continue;
-      const bmPrices = alignedDates.map((d) => bmMap.get(d)!);
-      const bmRets: number[] = [];
-      for (let i = 1; i < bmPrices.length; i++)
-        bmRets.push((bmPrices[i] - bmPrices[i - 1]) / bmPrices[i - 1]);
-      const entries: PortfolioCAPMEntry[] = strategies.map((s) => {
-        const wMap = s.weights;
-        const portPrices = alignedDates.map((d) => {
-          const closes = tickerClosesByDate[d];
-          let p = 0;
-          for (const t of usedTickers) p += (wMap[t] ?? 0) * (closes[t] ?? 0);
-          return p;
-        });
-        const portRets: number[] = [];
-        for (let i = 1; i < portPrices.length; i++)
-          portRets.push((portPrices[i] - portPrices[i - 1]) / portPrices[i - 1]);
-        if (portRets.length < 30) {
+      const benchList: string[] =
+        autoDetectBenchmarks || benchmarks.length === 0 ? AUTO_BENCHMARKS : benchmarks;
+      const benchHistories = await Promise.all(
+        benchList.map((b) => fetchHistory(b, days).catch(() => [])),
+      );
+      interface BenchEntry {
+        bm: string;
+        entries: PortfolioCAPMEntry[];
+        avgR2: number;
+      }
+      const benchResults: BenchEntry[] = [];
+      for (let bi = 0; bi < benchList.length; bi++) {
+        const bm = benchList[bi];
+        const bmRows = benchHistories[bi];
+        if (bmRows.length < 60) continue;
+        const bmMap = new Map(bmRows.map((r) => [r.date, r.close]));
+        const alignedDates = commonDates.filter((d) => bmMap.has(d) && tickerClosesByDate[d]);
+        if (alignedDates.length < 40) continue;
+        const bmPrices = alignedDates.map((d) => bmMap.get(d)!);
+        const bmRets: number[] = [];
+        for (let i = 1; i < bmPrices.length; i++)
+          bmRets.push((bmPrices[i] - bmPrices[i - 1]) / bmPrices[i - 1]);
+        const entries: PortfolioCAPMEntry[] = strategies.map((s) => {
+          const wMap = s.weights;
+          const portPrices = alignedDates.map((d) => {
+            const closes = tickerClosesByDate[d];
+            let p = 0;
+            for (const t of usedTickers) p += (wMap[t] ?? 0) * (closes[t] ?? 0);
+            return p;
+          });
+          const portRets: number[] = [];
+          for (let i = 1; i < portPrices.length; i++)
+            portRets.push((portPrices[i] - portPrices[i - 1]) / portPrices[i - 1]);
+          if (portRets.length < 30) {
+            return {
+              strategy: s.strategy,
+              label: s.label,
+              alpha: 0,
+              annualizedAlpha: 0,
+              beta: 0,
+              correlation: 0,
+              rSquared: 0,
+              pValue: 0,
+              stdErr: 0,
+              observations: 0,
+            };
+          }
+          const reg = linregress(bmRets, portRets);
+          const factor = 252;
           return {
             strategy: s.strategy,
             label: s.label,
-            alpha: 0,
-            annualizedAlpha: 0,
-            beta: 0,
-            correlation: 0,
-            rSquared: 0,
-            pValue: 0,
-            stdErr: 0,
-            observations: 0,
+            alpha: Math.round(reg.intercept * 10000) / 10000,
+            annualizedAlpha: Math.round(reg.intercept * factor * 10000) / 10000,
+            beta: Math.round(reg.slope * 10000) / 10000,
+            correlation: Math.round(Math.sign(reg.slope) * Math.sqrt(reg.r2) * 10000) / 10000,
+            rSquared: Math.round(reg.r2 * 10000) / 10000,
+            pValue: Math.round(reg.pValue * 10000) / 10000,
+            stdErr: Math.round(reg.stdErr * 10000) / 10000,
+            observations: portRets.length,
           };
-        }
-        const reg = linregress(bmRets, portRets);
-        const factor = 252;
-        return {
-          strategy: s.strategy,
-          label: s.label,
-          alpha: Math.round(reg.intercept * 10000) / 10000,
-          annualizedAlpha: Math.round(reg.intercept * factor * 10000) / 10000,
-          beta: Math.round(reg.slope * 10000) / 10000,
-          correlation: Math.round(Math.sign(reg.slope) * Math.sqrt(reg.r2) * 10000) / 10000,
-          rSquared: Math.round(reg.r2 * 10000) / 10000,
-          pValue: Math.round(reg.pValue * 10000) / 10000,
-          stdErr: Math.round(reg.stdErr * 10000) / 10000,
-          observations: portRets.length,
-        };
-      });
-      const avgR2 = entries.reduce((s, e) => s + e.rSquared, 0) / entries.length;
-      benchResults.push({ bm, entries, avgR2 });
-    }
-    benchResults.sort((a, b) => b.avgR2 - a.avgR2);
-    for (const br of benchResults) {
-      capmBenchmarks.push({ benchmark: br.bm, entries: br.entries });
-    }
-
-    // ─── Labadie §3.2: Portfolio Hurst ───
-    const refWeights = strategies.length > 0
-      ? strategies[0].weights
-      : Object.fromEntries(usedTickers.map((t, i) => [t, 1 / usedTickers.length]));
-    const portfolioPrices: number[] = commonDates.map((d, idx) => {
-      let val = 0;
-      for (let i = 0; i < usedTickers.length; i++) {
-        const close = closesByTicker[usedTickers[i]][idx];
-        val += (refWeights[usedTickers[i]] ?? 1 / usedTickers.length) * close;
+        });
+        const avgR2 = entries.reduce((s, e) => s + e.rSquared, 0) / entries.length;
+        benchResults.push({ bm, entries, avgR2 });
       }
-      return val;
-    });
-    const portfolioHurstVal = portfolioPrices.length >= 100 ? computeHurst(portfolioPrices) : undefined;
+      benchResults.sort((a, b) => b.avgR2 - a.avgR2);
+      for (const br of benchResults) {
+        capmBenchmarks.push({ benchmark: br.bm, entries: br.entries });
+      }
 
-    return {
-      tickers: usedTickers,
-      notional,
-      strategies,
-      correlation: { tickers: usedTickers, matrix: correlation },
-      equityCurve,
-      frontier,
-      simulations,
-      individual,
-      capmBenchmarks,
-      scenarios,
-      portfolioHurst: portfolioHurstVal,
-    };
+      // ─── Labadie §3.2: Portfolio Hurst ───
+      const refWeights =
+        strategies.length > 0
+          ? strategies[0].weights
+          : Object.fromEntries(usedTickers.map((t, i) => [t, 1 / usedTickers.length]));
+      const portfolioPrices: number[] = commonDates.map((d, idx) => {
+        let val = 0;
+        for (let i = 0; i < usedTickers.length; i++) {
+          const close = closesByTicker[usedTickers[i]][idx];
+          val += (refWeights[usedTickers[i]] ?? 1 / usedTickers.length) * close;
+        }
+        return val;
+      });
+      const portfolioHurstVal =
+        portfolioPrices.length >= 100 ? computeHurst(portfolioPrices) : undefined;
+
+      return {
+        tickers: usedTickers,
+        notional,
+        strategies,
+        correlation: { tickers: usedTickers, matrix: correlation },
+        equityCurve,
+        frontier,
+        simulations,
+        individual,
+        capmBenchmarks,
+        scenarios,
+        portfolioHurst: portfolioHurstVal,
+      };
     } catch (e: any) {
-      throw new Error(`Error en optimización: ${e?.message ?? e}. ${e?.stack ? `Stack: ${e.stack.split("\n").slice(0, 3).join(" → ")}` : ""}`);
+      throw new Error(
+        `Error en optimización: ${e?.message ?? e}. ${e?.stack ? `Stack: ${e.stack.split("\n").slice(0, 3).join(" → ")}` : ""}`,
+      );
     }
   });
 
@@ -1427,12 +1534,14 @@ export interface BacktestOptimizationResult {
 
 export const backtestOptimization = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      tickers: z.array(TickerSchema).min(2),
-      cutoffDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      years: z.number().min(0.5).max(10).default(2),
-      numSimulations: z.number().min(0).max(10000).default(2000),
-    }).parse(input),
+    z
+      .object({
+        tickers: z.array(TickerSchema).min(2),
+        cutoffDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        years: z.number().min(0.5).max(10).default(2),
+        numSimulations: z.number().min(0).max(10000).default(2000),
+      })
+      .parse(input),
   )
   .handler(async ({ data }): Promise<BacktestOptimizationResult> => {
     const { tickers, cutoffDate: cutoffStr, years, numSimulations } = data;
@@ -1447,13 +1556,17 @@ export const backtestOptimization = createServerFn({ method: "POST" })
     for (let i = 0; i < tickers.length; i++) {
       if (histories[i].length >= 60) valid.push({ ticker: tickers[i], rows: histories[i] });
     }
-    if (valid.length < 2) throw new Error("Se necesitan al menos 2 tickers con datos históricos suficientes antes de la fecha de corte.");
+    if (valid.length < 2)
+      throw new Error(
+        "Se necesitan al menos 2 tickers con datos históricos suficientes antes de la fecha de corte.",
+      );
 
     const dateSets = valid.map((v) => new Set(v.rows.map((r) => r.date)));
     const commonDates = valid[0].rows
       .map((r) => r.date)
       .filter((d) => dateSets.every((s) => s.has(d)));
-    if (commonDates.length < 40) throw new Error("Series con muy poca intersección histórica en el período de entrenamiento.");
+    if (commonDates.length < 40)
+      throw new Error("Series con muy poca intersección histórica en el período de entrenamiento.");
 
     const closesByTicker: Record<string, number[]> = {};
     for (const v of valid) {
@@ -1476,7 +1589,13 @@ export const backtestOptimization = createServerFn({ method: "POST" })
     const cov = covMatrix(returnsRows);
 
     // ── 2. Run optimization on training data ──
-    const allStrategies: Strategy[] = ["min-variance", "max-sharpe", "equal-weight", "inverse-vol", "markowitz"];
+    const allStrategies: Strategy[] = [
+      "min-variance",
+      "max-sharpe",
+      "equal-weight",
+      "inverse-vol",
+      "markowitz",
+    ];
     const strategies: StrategyResult[] = allStrategies.map((strategy) => {
       const result = optimize(strategy, { meanDaily, volDaily, cov });
       const weights: Record<string, number> = {};
@@ -1522,9 +1641,16 @@ export const backtestOptimization = createServerFn({ method: "POST" })
     for (let step = 0; step <= 30; step++) {
       const targetRet = minR + (maxR - minR) * (step / 30);
       try {
-        const fr = optimize("markowitz", { meanDaily, volDaily, cov, targetReturn: targetRet / 252 });
+        const fr = optimize("markowitz", {
+          meanDaily,
+          volDaily,
+          cov,
+          targetReturn: targetRet / 252,
+        });
         if (fr.volatility > 0) frontier.push({ ret: fr.expectedReturn, vol: fr.volatility });
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
     frontier.sort((a, b) => a.vol - b.vol);
 
@@ -1548,7 +1674,10 @@ export const backtestOptimization = createServerFn({ method: "POST" })
       ticker: t,
       meanAnnual: meanDaily[i] * 252,
       volAnnual: volDaily[i] * Math.sqrt(252),
-      sharpe: volDaily[i] > 0 ? (meanDaily[i] * 252 - getRiskFreeRateSync("USD")) / (volDaily[i] * Math.sqrt(252)) : 0,
+      sharpe:
+        volDaily[i] > 0
+          ? (meanDaily[i] * 252 - getRiskFreeRateSync("USD")) / (volDaily[i] * Math.sqrt(252))
+          : 0,
     }));
 
     // ── 3. Fetch forward data (cutoff → now) ──
@@ -1561,12 +1690,14 @@ export const backtestOptimization = createServerFn({ method: "POST" })
     // Build forward closes aligned by date
     const fwdSets = forwardHistories.map((h) => new Set(h.map((r) => r.date)));
     const fwdCutoffStr = cutoffStr;
-    const fwdCommonDates = forwardHistories[0]
-      ?.map((r) => r.date)
-      .filter((d) => d >= fwdCutoffStr && fwdSets.every((s) => s.has(d)))
-      ?? [];
+    const fwdCommonDates =
+      forwardHistories[0]
+        ?.map((r) => r.date)
+        .filter((d) => d >= fwdCutoffStr && fwdSets.every((s) => s.has(d))) ?? [];
     if (fwdCommonDates.length < 5) {
-      throw new Error("No hay suficientes datos históricos después de la fecha de corte para evaluar el rendimiento.");
+      throw new Error(
+        "No hay suficientes datos históricos después de la fecha de corte para evaluar el rendimiento.",
+      );
     }
 
     const fwdClosesByTicker: Record<string, number[]> = {};
@@ -1586,7 +1717,7 @@ export const backtestOptimization = createServerFn({ method: "POST" })
       for (let i = 0; i < usedTickers.length; i++) {
         const prev = fwdClosesByTicker[usedTickers[i]][t - 1];
         const curr = fwdClosesByTicker[usedTickers[i]][t];
-        if (prev > 0) r += maxSharpeWeights[i] * (curr - prev) / prev;
+        if (prev > 0) r += (maxSharpeWeights[i] * (curr - prev)) / prev;
       }
       fwdVal = fwdVal * (1 + r);
       fwdEquity.push({ date: fwdCommonDates[t], value: fwdVal });
@@ -1599,22 +1730,22 @@ export const backtestOptimization = createServerFn({ method: "POST" })
       for (let i = 0; i < usedTickers.length; i++) {
         const prev = fwdClosesByTicker[usedTickers[i]][t - 1];
         const curr = fwdClosesByTicker[usedTickers[i]][t];
-        if (prev > 0) r += maxSharpeWeights[i] * (curr - prev) / prev;
+        if (prev > 0) r += (maxSharpeWeights[i] * (curr - prev)) / prev;
       }
       fwdRets.push(r);
     }
 
-    const actualReturn = fwdRets.length > 0
-      ? (fwdEquity[fwdEquity.length - 1].value / 100 - 1)
-      : 0;
+    const actualReturn = fwdRets.length > 0 ? fwdEquity[fwdEquity.length - 1].value / 100 - 1 : 0;
     const fwdMean = fwdRets.length > 0 ? mean(fwdRets) : 0;
     const fwdStd = fwdRets.length > 0 ? std(fwdRets) : 0;
     const annFactor = Math.sqrt(252);
     const fwdVol = fwdStd * annFactor;
-    const fwdSharpe = fwdStd > 0 ? (fwdMean * 252 - getRiskFreeRateSync("USD")) / (fwdStd * annFactor) : 0;
-    const fwdCagr = fwdRets.length > 0
-      ? Math.pow(fwdEquity[fwdEquity.length - 1].value / 100, 252 / fwdRets.length) - 1
-      : 0;
+    const fwdSharpe =
+      fwdStd > 0 ? (fwdMean * 252 - getRiskFreeRateSync("USD")) / (fwdStd * annFactor) : 0;
+    const fwdCagr =
+      fwdRets.length > 0
+        ? Math.pow(fwdEquity[fwdEquity.length - 1].value / 100, 252 / fwdRets.length) - 1
+        : 0;
 
     let maxVal = 100;
     let maxDrawdown = 0;
@@ -1706,11 +1837,13 @@ export interface BacktestMarkowitzMultidateResult {
 
 export const backtestMarkowitzMultidate = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      tickers: z.array(TickerSchema).min(2),
-      cutoffDates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).min(1),
-      years: z.number().min(0.5).max(10).default(2),
-    }).parse(input),
+    z
+      .object({
+        tickers: z.array(TickerSchema).min(2),
+        cutoffDates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).min(1),
+        years: z.number().min(0.5).max(10).default(2),
+      })
+      .parse(input),
   )
   .handler(async ({ data }): Promise<BacktestMarkowitzMultidateResult> => {
     const { tickers, cutoffDates, years } = data;
@@ -1766,16 +1899,17 @@ export const backtestMarkowitzMultidate = createServerFn({ method: "POST" })
 
         // ── 2. Fetch forward data (cutoff → now) ──
         const now = new Date();
-        const forwardDays = Math.round((now.getTime() - cutoff.getTime()) / (24 * 60 * 60 * 1000)) + 30;
+        const forwardDays =
+          Math.round((now.getTime() - cutoff.getTime()) / (24 * 60 * 60 * 1000)) + 30;
         const forwardHistories = await Promise.all(
           usedTickers.map((t) => fetchHistoryUpTo(t, now, forwardDays).catch(() => [])),
         );
 
         const fwdSets = forwardHistories.map((h) => new Set(h.map((r) => r.date)));
-        const fwdCommonDates = forwardHistories[0]
-          ?.map((r) => r.date)
-          .filter((d) => d >= cutoffStr && fwdSets.every((s) => s.has(d)))
-          ?? [];
+        const fwdCommonDates =
+          forwardHistories[0]
+            ?.map((r) => r.date)
+            .filter((d) => d >= cutoffStr && fwdSets.every((s) => s.has(d))) ?? [];
         if (fwdCommonDates.length < 5) continue;
 
         const fwdClosesByTicker: Record<string, number[]> = {};
@@ -1795,7 +1929,7 @@ export const backtestMarkowitzMultidate = createServerFn({ method: "POST" })
           for (let i = 0; i < usedTickers.length; i++) {
             const prev = fwdClosesByTicker[usedTickers[i]][t - 1];
             const curr = fwdClosesByTicker[usedTickers[i]][t];
-            if (prev > 0) r += msWeights[i] * (curr - prev) / prev;
+            if (prev > 0) r += (msWeights[i] * (curr - prev)) / prev;
           }
           fwdVal = fwdVal * (1 + r);
           fwdEquity.push({ date: fwdCommonDates[t], value: fwdVal });
@@ -1808,22 +1942,22 @@ export const backtestMarkowitzMultidate = createServerFn({ method: "POST" })
           for (let i = 0; i < usedTickers.length; i++) {
             const prev = fwdClosesByTicker[usedTickers[i]][t - 1];
             const curr = fwdClosesByTicker[usedTickers[i]][t];
-            if (prev > 0) r += msWeights[i] * (curr - prev) / prev;
+            if (prev > 0) r += (msWeights[i] * (curr - prev)) / prev;
           }
           fwdRets.push(r);
         }
 
-        const actualReturn = fwdRets.length > 0
-          ? (fwdEquity[fwdEquity.length - 1].value / 100 - 1)
-          : 0;
+        const actualReturn =
+          fwdRets.length > 0 ? fwdEquity[fwdEquity.length - 1].value / 100 - 1 : 0;
         const fwdMean = fwdRets.length > 0 ? mean(fwdRets) : 0;
         const fwdStd = fwdRets.length > 0 ? std(fwdRets) : 0;
         const annFactor = Math.sqrt(252);
         const fwdVol = fwdStd * annFactor;
         const fwdSharpe = fwdStd > 0 ? (fwdMean * 252 - getRiskFreeRateSync("USD")) / fwdVol : 0;
-        const fwdCagr = fwdRets.length > 0
-          ? Math.pow(fwdEquity[fwdEquity.length - 1].value / 100, 252 / fwdRets.length) - 1
-          : 0;
+        const fwdCagr =
+          fwdRets.length > 0
+            ? Math.pow(fwdEquity[fwdEquity.length - 1].value / 100, 252 / fwdRets.length) - 1
+            : 0;
 
         let maxVal = 100;
         let maxDrawdown = 0;
@@ -1863,7 +1997,8 @@ export const backtestMarkowitzMultidate = createServerFn({ method: "POST" })
     const totalDates = entries.length;
     const positiveCount = entries.filter((e) => e.success).length;
     const beatCount = entries.filter((e) => e.diff >= 0).length;
-    const avgExpectedReturn = entries.reduce((s, e) => s + e.markowitzExpectedReturn, 0) / totalDates;
+    const avgExpectedReturn =
+      entries.reduce((s, e) => s + e.markowitzExpectedReturn, 0) / totalDates;
     const avgActualReturn = entries.reduce((s, e) => s + e.actualReturn, 0) / totalDates;
     const avgDiff = entries.reduce((s, e) => s + e.diff, 0) / totalDates;
     const avgCagr = entries.reduce((s, e) => s + e.cagr, 0) / totalDates;

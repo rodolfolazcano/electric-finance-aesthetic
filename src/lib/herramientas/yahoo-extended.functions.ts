@@ -5,7 +5,13 @@ import { z } from "zod";
 function rawNum(val: unknown): number | null {
   if (val == null) return null;
   if (typeof val === "number") return val;
-  if (typeof val === "object" && val != null && "raw" in val && typeof (val as any).raw === "number") return (val as any).raw;
+  if (
+    typeof val === "object" &&
+    val != null &&
+    "raw" in val &&
+    typeof (val as any).raw === "number"
+  )
+    return (val as any).raw;
   return null;
 }
 
@@ -21,7 +27,9 @@ async function getYF(): Promise<any> {
   }
   try {
     _yf.suppressNotices?.(["yahooSurvey", "ripHistorical"]);
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
   return _yf;
 }
 
@@ -83,7 +91,15 @@ export const getExtendedSemaforoData = createServerFn({ method: "POST" })
 
     try {
       const qs = await yf.quoteSummary(ticker, {
-        modules: ["earningsHistory", "earningsTrend", "recommendationTrend", "institutionOwnership", "majorHoldersBreakdown", "insiderTransactions", "calendarEvents"],
+        modules: [
+          "earningsHistory",
+          "earningsTrend",
+          "recommendationTrend",
+          "institutionOwnership",
+          "majorHoldersBreakdown",
+          "insiderTransactions",
+          "calendarEvents",
+        ],
       });
 
       if (qs?.earningsHistory?.history) {
@@ -95,9 +111,8 @@ export const getExtendedSemaforoData = createServerFn({ method: "POST" })
             estimado,
             real,
             sorpresa: real - estimado,
-            sorpresaPct: estimado !== 0
-              ? +(((real - estimado) / Math.abs(estimado)) * 100).toFixed(2)
-              : 0,
+            sorpresaPct:
+              estimado !== 0 ? +(((real - estimado) / Math.abs(estimado)) * 100).toFixed(2) : 0,
           };
         });
         const sorpresas = (earningsHistory ?? []).filter((e) => e.estimado !== 0);
@@ -126,7 +141,12 @@ export const getExtendedSemaforoData = createServerFn({ method: "POST" })
             hold: last.hold ?? 0,
             sell: last.sell ?? 0,
             strongSell: last.strongSell ?? 0,
-            total: (last.strongBuy ?? 0) + (last.buy ?? 0) + (last.hold ?? 0) + (last.sell ?? 0) + (last.strongSell ?? 0),
+            total:
+              (last.strongBuy ?? 0) +
+              (last.buy ?? 0) +
+              (last.hold ?? 0) +
+              (last.sell ?? 0) +
+              (last.strongSell ?? 0),
             fechaActualizacion: new Date().toISOString().slice(0, 10),
           };
         }
@@ -142,14 +162,18 @@ export const getExtendedSemaforoData = createServerFn({ method: "POST" })
             porcentajeInstitucional: instPct != null ? instPct * 100 : null,
             porcentajeInsiders: insiderPct != null ? insiderPct * 100 : null,
             totalInstituciones: rawNum(mhb.institutionsCount) ?? null,
-            comprasRecientesInsiders: qs?.insiderTransactions?.transactions?.filter(
-              (t: any) => t.transactionDescription?.includes("Purchase") ||
-                            t.transactionDescription?.includes("Buy"),
-            ).length ?? null,
-            ventasRecientesInsiders: qs?.insiderTransactions?.transactions?.filter(
-              (t: any) => t.transactionDescription?.includes("Sale") ||
-                            t.transactionDescription?.includes("Sell"),
-            ).length ?? null,
+            comprasRecientesInsiders:
+              qs?.insiderTransactions?.transactions?.filter(
+                (t: any) =>
+                  t.transactionDescription?.includes("Purchase") ||
+                  t.transactionDescription?.includes("Buy"),
+              ).length ?? null,
+            ventasRecientesInsiders:
+              qs?.insiderTransactions?.transactions?.filter(
+                (t: any) =>
+                  t.transactionDescription?.includes("Sale") ||
+                  t.transactionDescription?.includes("Sell"),
+              ).length ?? null,
           };
         }
       }
@@ -157,11 +181,11 @@ export const getExtendedSemaforoData = createServerFn({ method: "POST" })
       if (qs?.calendarEvents?.earnings) {
         const e = qs.calendarEvents.earnings;
         fechaProximoEarnings =
-          e.earningsDate?.[0]?.fmt ??
-          e.earningsDate?.raw?.toString() ??
-          undefined;
+          e.earningsDate?.[0]?.fmt ?? e.earningsDate?.raw?.toString() ?? undefined;
       }
-    } catch { /* extended data is optional; silent fail */ }
+    } catch {
+      /* extended data is optional; silent fail */
+    }
 
     return {
       earningsHistory,

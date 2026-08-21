@@ -1,0 +1,883 @@
+﻿Escuela de 
+Formación 
+AFC 
+Asesor 
+Financiero Certificado 
+CF 
+Certificaciones Financieras Internacionales 
+CÁLCULO FINANCIERO 
+Uso de la Calculadora Financiera 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF. Prohibida su reproducción sin la autorización expresa 
+-1- 
+Escuela de Formación 
+Algunos comentarios preliminares 
+Las calculadoras financieras de referencia para el curso son: 
+CASIO FC-100V/FC-200V 
+HP 12C. 
+¿Cuál es la diferencia? 
+Las soluciones a los ejercicios se abordan, paso a paso, facilitando el estudio autónomo. 
+Se integran en los ejercicios temas estudiados previamente (Matemática, Cálculo Financiero y Estadística). 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-2- 
+Escuela de Formación 
+Índice 
+1. Cálculo de porcentajes y Cálculo de Fechas. 
+2. Capitalización y actualización simple y compuesta. 
+1.1. Capitalización a interés simple vencido. 1.2. Interés compuesto. 
+1.3. Tasas efectivas y Tasas nominales. 
+2. Valoración de conjuntos de capitales financieros. 
+2.1. Rentas financieras. 
+2.2. Valor Actual Neto y Tasa Interna de Retorno. 2.3. Bonos. (HP 12c y FC 200V) 
+3. Conceptos estadísticos básicos. 
+3.1. Media y media ponderada. 3.2. Varianza y desvío estándar. 
+3.3. Covarianza y coeficiente de correlación. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+-3- 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+Escuela de Formación 
+PORCENTAJES 
+Cálculo de porcentajes 
+Una entidad financiera le cobra el 1,3% de comisión, sobre un monto operado de $ 57.000. 
+Estime el monto total de la comisión. 
+CALCULADORA FC 100V / FC 200V 
+CALCULADORA HP12c 
+Pulse 
+Pantalla 
+Pulse 
+Pantalla 
+57000 
+57000 
+57000 
+57000 
+X 
+57000X 
+ENTER 
+57.000,00 
+1,3 
+57000X1,3 
+1,3 
+1,3 
+% 
+57000X1,3% 
+% 
+741,00 
+EXE 
+741 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+-4- 
+Escuela de Formación 
+IMPORTE NETO 
+Cálculo de porcentajes 
+Va a adquirir un nuevo automóvil cuyo precio es $ 200.000 (incluido los opcionales). El vendedor le ofrece un descuento del 8%, y el impuesto sobre la venta es del 10%. Calcule la cantidad que le va a cobrar el vendedor y, a continuación, calcule el costo total para usted, impuestos incluidos. 
+CALCULADORA FC 100V / FC 200V 
+CALCULADORA HP12c 
+Pulse 
+Pantalla 
+Pulse 
+Pantalla 
+200000 
+200000 
+200000 
+200000 
+ENTER 
+200000,00 
+EXE 
+200000 
+8% 
+16000,00 
+Ans- Ans* 8% 
+Ans- Ans* 8% 
+EXE 
+184000 
+184000,00 
+Ans + Ans* 6% 
+Ans + Ans * 6% 
+6% 
+11040,00 
+EXE 
+195040 
++ 
+195040,00 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-5- 
+Escuela de Formación 
+DIFERENCIA PORCENTUAL 
+El valor de sus acciones cayó ayer de 58,50 a 53,25 por acción. 
+¿Cuál es el cambio porcentual? 
+CALCULADORA FC 100V / FC 200V 
+Pulse 
+Pantalla 
+53,25-58,54% 
+EXE 
+53,25-58,54% 
+-8,9743 
+Cálculo de porcentajes 
+CALCULADORA HP12c 
+Pulse 
+Pantalla 
+58,5 
+58,5 
+ENTER 
+58,50 
+53,25 
+53,25 
+4% 
+-8,97 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-6- 
+Escuela de Formación 
+FECHAS FUTURAS O PASADAS 
+Funciones de Calendario 
+Para determinar la fecha y el día que corresponde a un determinado número de días a partir de una fecha dada. 
+Ejercicio: Si efectuó una inversión a 119 días el 14 de mayo de 2004, ¿cuál será la fecha de vencimiento? 
+CALCULADORA FC 100V / FC 200V 
+Función DAYS 
+Set 
+365 
+d1 
+14052004 
+Days 
+d2 
+119 
+Presionar SOLVE: 10092004 
+CALCULADORA HP12c 
+Pulse 
+Pantalla 
+GD.MY 
+Se activa D.MY 
+14,052004 
+ENTER 
+119 g DATE 
+* 10/09/2005 Viernes 
+14,052004 
+14,05 
+10,09,2004 5 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-7- 
+Escuela de Formación 
+NÚMERO DE DÍAS ENTRE FECHAS 
+Funciones de Calendario 
+¿Cuál sería el número de días, contados según cada uno de los métodos, que se utilizaría para calcular el interés simple acumulado desde el 3 de junio de 2004 hasta el 14 de octubre de 2005? 
+Set 
+CALCULADORA FC 100V / FC 200V 
+Función DAYS 
+365 
+CALCULADORA HP12c 
+Pulse 
+Pantalla 
+G D.MY 
+Se activa D.MY 
+3,062004 
+3,062004 
+d1 
+d2 
+03062004 
+ENTER 
+3,06 
+14102005 
+14,102005 
+14,102005 
+Dys 
+Presionar SOLVE: 498 
+g ADYS 
+498 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-8- 
+Escuela de Formación 
+CAPITALIZACIÓN A INTERÉS SIMPLE VENCIDO 
+Capitalización y Actualización Simple y Compuesta 
+Un cliente coloca $ 38.000 en una inversión a tres meses (exactamente 92 días), que ofrece una TNA de 25%. 
+Estime los intereses que percibirá al finalizar el plazo y el capital final. 
+CALCULADORA FC 100V / FC 200V 
+Set 
+Función SMPL 
+365 
+Dys 
+92 
+1% 
+25 
+PV 
+-38000 
+SI 
+Solve - 2.394,52 
+SVF 
+Solve 40.394,52 
+CALCULADORA HP12c 
+Pulse 
+92 n 
+Pantalla 
+92,00 
+25 i 
+25,00 
+38000 CHS PV 
+-38.000,00 
+f INT 
+2.427,78 (Base 360) 
+R↓ X><Y 
++ 
+2.394,52 (Base 365) 
+40.394,52 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-9- 
+Escuela de Formación 
+Capitalización y Actualización Simple y Compuesta 
+Un amigo necesita un préstamo para poner en marcha una empresa y le pide que le preste $ 130.000 por un plazo de 60 días. Le presta esta cantidad a un interés del 28% anual, que se calculará sobre una base de 360 días. 
+¿Cuál es el importe del interés acumulado que le deberá en 60 días, y cuál es el importe total adeudado? 
+CALCULADORA FC 100V / FC 200V 
+Set 
+Función SMPL 
+CALCULADORA HP12c 
+Pulse 
+Pantalla 
+360 
+60 n 
+92,00 
+Dys 
+60 
+28 i 
+25,00 
+1% 
+28 
+130000 CHS PV 
+-38.000,00 
+PV 
+-130.000 
+f INT 
+6.066,67 (Base 360) 
+SI 
+SVF 
+6.066,67 
+136.066,67 
++ 
+136.066,67 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+-10- 
+Escuela de Formación 
+INTERES COMPUESTO 
+Capitalización y Actualización Simple y Compuesta 
+Se realiza el depósito de $ 35.000 por un plazo de 10 años. Devenga y acumula intereses mensualmente, a una TNA del 18% 
+Estimar el Capital Final acumulado. 
+CALCULADORA FC 100V / FC 200V 
+CALCULADORA HP12c 
+Función CMPD 
+g BEG 
+Se Activa BEGIN 
+Set 
+Begin 
+120 n 
+120,00 
+n 
+120 
+18 g 12÷ 
+1,50 
+1% 
+18 
+35000 CHS PV 
+-35.000,00 
+PV 
+-35.000 
+FV 
+208.926,30 
+P/Y 
+12 
+C/Y 
+12 
+FV 
+Solve 
+208.926,30 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-11- 
+Escuela de Formación 
+TASA EFECTIVA ANUAL 
+Tasas Efectivas y Tasas Nominales 
+Estime la Tasa Efectiva Anual (TEA) partiendo de una Tasa Nominal Anual (TNA) con capitalización trimestral de 5,25%: 
+CALCULADORA FC 100V / FC 200V 
+Función CNVR 
+4 
+CALCULADORA HP12c 
+g END 
+Se Activa END 
+f CLEAR FIN 
+Borrar variables financieras 
+n 
+1% 
+5,25 
+guardadas 
+EFF 
+Solve 5,354% 
+5,25 ENTER 
+4n+ i 
+5,25 
+1,3125 
+100 CHS ENTER 
+PV FV + 
+5,354 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-12- 
+Escuela de Formación 
+TASA NOMINAL ANUAL 
+Tasas Efectivas y Tasas Nominales 
+Estime la Tasa Nominal Anual (TNA) con capitalización trimestral, partiendo de una Tasa Efectiva Anual (TEA) 5,354%: 
+CALCULADORA FC 100V / FC 200V 
+CALCULADORA HP12c 
+Función CNVR 
+f CLEAR FIN 
+Borra variables. 
+n 
+1% 
+4 
+4 n 100 ENTER PV 
+100,00 
+5,354 
+5,354 + CHS 
+-105,35 
+APR 
+Solve 5,249 
+FV i 
+1,31 
+RCL nx 
+5,249 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-13- 
+Escuela de Formación 
+RENTAS: Número de pagos 
+Rentas Financieras 
+Está planeando construir una casa de verano en Pinamar para las vacaciones. Un amigo le ofrece un préstamo de U$S 135.000 al 10,5% de TNA. Si hace pagos de U$S 2800 al final de cada mes, ¿Cuántos pagos serán necesarios para liquidar el préstamo, y cuántos años necesitará? 
+CALCULADORA FC 100V / FC 200V 
+Función CMPD 
+CALCULADORA HP12c 
+10,5 g 12÷ 
+0,88 
+Set 
+End 
+135000 PV 
+135.000,00 
+1% 
+10,5 
+2800 CHS PMT 
+-2.800,00 
+PV 
+135.000 
+g END 
+Activa END 
+PMT 
+-2.800 
+PAY 
+12 
+n 
+C/Y 
+N 
+12 
+12÷ 
+63,00 
+5,25 
+Solve 62,8981 *ver STO 
+* Ver pago fraccionario 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-14- 
+Escuela de Formación 
+RENTAS: Valor Actual 
+Rentas Financieras 
+Va a financiar la adquisición de un automóvil nuevo con un préstamo que requiere un 15% de interés capitalizado mensualmente durante los 4 años de plazo del mismo. Si puede hacer pagos de $150 al final de cada mes. ¿cuál es el precio máximo que puede pagar por el automóvil? (Asuma que la fecha de adquisición es un mes anterior a la fecha del primer pago.) 
+CALCULADORA FC 100V / FC 200V 
+Función CMPD 
+CALCULADORA HP12c 
+f CLEAR FIN 
+Borra variables. 
+Set 
+End 
+4 g 12x 
+48 
+n 
+48 
+15 g÷12 
+1,25 
+1% 
+15 
+150 CHS PMT 
+-150,00 
+PMT 
+-150 
+P/Y 
+12 
+C/Y 
+12 
+g END 
+PV 
+Modo de pago END. 
+5.389,72 
+PV 
+Solve 
+5389,72 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-15- 
+Escuela de Formación 
+RENTAS: Pago: 
+Rentas Financieras 
+Se solicita un préstamo de monto $18.000 durante 5 años a devolver en cuotas mensuales constantes y vencidas al 8,65% nominal pagadero mensualmente. La cuota se calcula: 
+CALCULADORA FC 100V / FC 200V 
+Función CMPD 
+Set 
+End 
+n 
+60 
+1% 
+8,65 
+PV 
+18000 
+P/Y 
+12 
+C/Y 
+12 
+PMT 
+Solve -370,60 
+CALCULADORA HP12c 
+f CLEAR FIN 
+Borra variables. 
+60 
+5 g 12x 
+8,65 g +12 
+18000 PV 
+g END 
+0,7208 
+18.000,00 
+Modo de pago END. 
+PMT 
+-370,60 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-16- 
+Escuela de Formación 
+RENTAS: Pago: 
+Rentas Financieras 
+Esperando el momento de jubilarse, desea acumular $ 60.000 después de 15 
+años haciendo depósitos en una cuenta que paga un interés del 9,75% capitalizado semestralmente. Usted abre la cuenta con un depósito de $ 3.200 y piensa hacer depósitos semestrales, empezando seis meses después, procedentes de sus cheques de pago laborales. Calcule de qué valor deben ser estos depósitos. 
+Set 
+n 
+CALCULADORA FC 100V / FC 200V 
+Función CMPD 
+End 
+CALCULADORA HP12c 
+f CLEAR FIN 
+Borra variables. 
+15 ENTER 2X n 
+30 
+30 
+9,75 ENTER 2÷i 
+4,88 
+1% 
+9,75 
+3200 CHS PV 
+-3.200,00 
+PV 
+-3200 
+FV 
+60000 
+60000 VF 
+60.000,00 
+P/Y 
+2 
+C/Y 
+2 
+g END 
+PMT 
+Modo END. 
+-717,44 
+PMT 
+Solve -717,44 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+-17- 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+Escuela de Formación 
+VAN v TIR: 
+VAN Y TIR 
+Un inversor tiene la oportunidad de comprar un dúplex por USD 80.000 y desea un rendimiento de, al menos, el 13%. Espera conservar el dúplex durante 5 años y después venderlo por USD 130.000, y prevé los flujos de caja del diagrama siguiente. 
+130.000 
+CF5 
+4.500 
+5.500 
+4.500 
+CF2 
+CF 3 
+CFA 
+CF1 CFO -500 -80.000 
+2 
+3 
+4 
+5 
+Calcule el Valor Actual Neto y la Tasa Interna de Retorno. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+-18- 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+Escuela de Formación 
+VAN Y TIR 
+CALCULADORA FC 100V / FC 200V 
+Función CASH 
+f CLEAR REG 
+CALCULADORA HP12c 
+Borra registros. 
+1% 
+13 
+80000 CHS g CFo 
+-80.000,00 
+Csh EXE 
+-80000 EXE 
+Ingresamos al editor 
+de ff. 
+1-80000 
+500 CHS g CFj 
+-500,00 
+4500 g CFj 
+4.500,00 
+-500 EXE 
+2-500 
+5500 g CFj 
+5.500,00 
+4500 EXE 
+3.4500 
+4500 g CFj 
+4.500,00 
+5500 EXE 
+4 5500 
+130000 g CFj 
+130.000,00 
+4500 EXE 
+5 4500 
+RCL n 
+5 (Compruebo n de 
+130000 EXE 
+6 130000 
+flujos) 
+CASH 
+Vuelve al menú 
+131 
+13,00 
+contextual 
+f NPV 
+212,184 
+NPV 
+Solve 212,184 
+f IRR 
+13,0628 
+IRR 
+Solve 13,0628 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+-19- 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+Escuela de Formación 
+VAN Y TIR: 
+VAN Y TIR 
+Un inversor tiene la oportunidad de adquirir una propiedad por USD 79.000, demandando un rendimiento del 13,50%. Espera poder venderla después de 10 años por USD 100.000 y prevé los siguientes flujos de caja anuales: 
+Año 
+Flujo de caja 
+Año 
+Flujo de caja 
+123 45 
+14.000 
+11.000 
+10.000 
+10.000 
+9 
+10.000 
+10 
+67880 
+9.100 
+9.000 
+9.000 
+4.500 
+100.000 
+Calcule el Valor Actual Neto y Tasa Interna de Retorno. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+-20- 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+Escuela de Formación 
+CALCULADORA FC 100V / FC 200V 
+Función CASH 
+1% 
+Csh EXE 
+-79000 EXE 
+VAN Y TIR 
+f CLEAR REG 
+CALCULADORA HP12c 
+Borra registros. 
+13,5 
+79000 CHS g CFo 
+-79.000,00 
+Ingresamos al editor de ff. 
+14000 g CFj 
+14.000,00 
+1-79000 
+11000 g CFj 
+11.000,00 
+10000 g CFj 
+10.000,00 
+3 g Nj 
+3,00 
+9100 g CFj 
+9.100,00 
+9.000,00 
+14000 EXE 
+2 14000 
+11000 EXE 
+3 11000 
+10000 EXE 
+4 10000 
+10000 EXE 
+5 10000 
+10000 EXE 
+6 10000 
+9100 EXE 
+7 9100 
+9000 EXE 
+8 9000 
+9000 EXE 
+9 9000 
+4500 EXE 
+10 4500 
+100000 EXE 
+CASH 
+11 100000 
+13,5 i 
+f NPV 
+Vuelve al menú contextual 
+NPV 
+Solve 907,77 
+fIRR 
+9000 g CFj 
+2 g Nj 
+4500 g CFj 
+100000 g CFj 
+RCL n 
+2,00 
+4.500,00 
+100.000,00 
+7,00 (ff distintos) 
+13,50 
+907,77 
+13,719 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-21- 
+Escuela de 
+Formación 
+BONOS: 
+¿Qué precio debería pagar el 28 de abril de 2004 por un bono del Tesoro de 
+BONOS 
+EE.UU. con cupón de 6,75% que vence el 4 de junio de 2018, si desea un rendimiento del 8,25%? 
+CALCULADORA FC 200V 
+CALCULADORA HP12c 
+Función BOND 
+8,25 i 
+8,25 
+Set 
+Semi 
+6,75 PMT 
+6,75 
+d1 
+28042004 
+g D.MY 
+Modo D.MY 
+d2 
+04062018 
+28,042004 ENTER 
+28,042004 
+RDV 
+100 
+CPN 
+4,062018 
+4,062018 
+6.75 
+YLD 
+8.25 
+f PRICE 
+87,62 
+PRC 
+Solve -87,62 
++ 
+90,32 
+INT 
+CST 
+-2,7 
+-90,32 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-22- 
+Escuela de Formación 
+Conceptos Estadísticos Básicos 
+Media Aritmética: 
+Cantidad 
+Precio 
+Un inversor efectuó las siguientes compras de acciones de YPF: 
+100 
+$468 
+100 
+$349 
+100 
+$287 
+100 
+$290 
+Determine el precio promedio de entrada. 
+CALCULADORA FC 100V / FC 200V 
+Función STAT 
+CALCULADORA HP12c 
+468 Σ+ 
+1,00 
+1-VAR EXE 
+Una variable 
+349 Σ+ 
+2,00 
+468 EXE 
+1 468 
+287 Σ+ 
+3,00 
+349 EXE 
+2 349 
+290 Σ+ 
+4,00 
+287 EXE 
+3287 
+gx 
+348,50 
+290 EXE 
+4 290 
+AC 
+Modo cálculo STAT 
+Shift S-Menu 5 2 EXE 348,5 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-23- 
+Escuela de Formación 
+Conceptos Estadísticos Básicos 
+Media Ponderada: 
+Cantidad 
+Precio 
+Un inversor efectuó las siguientes compras de acciones de YPF: 
+150 
+$468 
+100 
+$349 
+140 
+$287 
+150 EXE 
+Determine el precio promedio de entrada. 
+CALCULADORA FC 100V / FC 200V 
+A+BX EXE 
+Función STAT 
+Dos variables 
+1 150 0 
+600 
+$290 
+CALCULADORA HP12c 
+468 ENTER 150 Σ+ 
+1,00 
+349 ENTER 100 Σ+ 
+2,00 
+287 ENTER 140 E+ 
+3,00 
+c/flechas ↑ 468 
+1 150 468 
+290 ENTER 600 Σ+ 
+4,00 
+Completar toda la tabla 
+AC 
+Modo cálculo STAT 
+g xw 
+322,50 
+Shift S-Menu 45 
+Exy 
++ Shift S-Menu 4 2 
+EXE 
+Exy + Ex 
+322,50 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-24- 
+Escuela de Formación 
+Conceptos Estadísticos Básicos 
+Varianza, Desvío Estándar, Covarianza y Coeficiente de Correlación: Utilizando la siguiente información relevada del mercado, complete la tabla: 
+Fecha 
+Merval 
+YPF 
+12/2014 
+-12,50% 
+-20,50% 
+01/2015 
+-1,00% 
+-8,30% 
+02/2015 
+13,10% 
+6,60% 
+03/2015 
+12,90% 
+7,50% 
+04/2015 
+14,40% 
+8,20% 
+Media 
+Varianza* 
+Desvío Estándar* 
+Covarianza 
+Correlación 
+* Poblacional 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+IAEF Finanzas, IAEF. Prohibida su reproducción sin la autorización expresa 
+-25- 
+Escuela de Formación 
+CALCULADORA FC 100V / FC 200V 
+Función STAT 
+Conceptos Estadísticos Básicos 
+CALCULADORA HP12c 
+0,2050 CHS ENTER 0.1250 CHS Σ+ 
+1 
+A+BX EXE 
+Dos Variables. 
+Ingresar toda la información 
+-0,1250 EXE 
+1 -0,1250 0 
+c/flechas 
+gx 
+1-0,2050 
+Media Merval (x) 5,36% 
+1 -0,1250-0,2050 
+Completar toda la tabla 
+x><y 
+Media YPF (y)-1,30% 
+AC 
+Modo cálculo STAT 
+Para estimar desvío poblacional 
+Shift S-Menu 
+9x2+ 
+5 (Var) 2(x) 5(y) 
+5 (Var) 3(xon) 6(yon)* (tomo poblacional) 
+Media Merval (x) 5,36% Media YPF (y) -1,30% 
+Desvío Merval 10,56% Desvío YPF 11,38% 
+Varianza Merval 0,0111 Varianza YPF 0,0128 * Ans^2 
+gs 
+x><y 
+Desvio Merval 10,56% 
+gx.r x><y 
+7 (Reg) 5(r) 
+Correlación 0,99943 
+Covarianza r*xan*yon 0,0120 
+Desvio YPF 11,38% 
+Varianza Merval 0,0111 
+Varianza YPF 0,0128 * Desvio^2 
+Correlación 0,9994 
+Covarianza r*desviom*desvioy 0,0120 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y 
+-26- 
+IAEF Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa

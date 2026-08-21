@@ -18,7 +18,9 @@ export default function PriceCard({ quote }: { quote: QuoteData }) {
     <div className="space-y-3 p-3 rounded-md bg-background/40 border border-border/60">
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-muted-foreground text-xs uppercase tracking-wide font-mono">{quote.ticker}</p>
+          <p className="text-muted-foreground text-xs uppercase tracking-wide font-mono">
+            {quote.ticker}
+          </p>
           <p className="text-foreground text-3xl font-mono font-semibold">
             {formatPrecio(quote.precio)}
           </p>

@@ -12,7 +12,11 @@ export const CHART_TOOLTIP_STYLE_LG: CSSProperties = {
   ...CHART_TOOLTIP_STYLE,
   fontSize: 12,
 };
-export const AXIS_TICK = { fill: "var(--color-muted-foreground)", fontSize: 11, fontFamily: "monospace" };
+export const AXIS_TICK = {
+  fill: "var(--color-muted-foreground)",
+  fontSize: 11,
+  fontFamily: "monospace",
+};
 export const AXIS_TICK_SM = { ...AXIS_TICK, fontSize: 10 };
 export const AXIS_TICK_LG = { ...AXIS_TICK, fontSize: 13 };
 export const GRID_STROKE = "var(--color-border)";

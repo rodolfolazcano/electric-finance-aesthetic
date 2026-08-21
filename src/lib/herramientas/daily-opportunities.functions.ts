@@ -25,7 +25,9 @@ async function getYF(): Promise<any> {
   }
   try {
     _yf.suppressNotices?.(["yahooSurvey", "ripHistorical"]);
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
   return _yf;
 }
 
@@ -98,53 +100,67 @@ export interface MacroContextAR {
 
 // ─── 1. getMarketScreeners ────────────────────────────────────
 
-export const getMarketScreeners = createServerFn({ method: "POST" })
-  .handler(async (): Promise<MarketScreenersResult> => {
+export const getMarketScreeners = createServerFn({ method: "POST" }).handler(
+  async (): Promise<MarketScreenersResult> => {
     const cacheKey = "mq-screeners";
     const cached = getCached<MarketScreenersResult>(cacheKey, 15 * 60 * 1000);
     if (cached) return cached;
 
     const yf = await getYF();
     const result: MarketScreenersResult = {
-      day_gainers: [], day_losers: [], most_actives: [],
-      most_shorted: [], undervalued: [], generatedAt: new Date().toISOString(),
+      day_gainers: [],
+      day_losers: [],
+      most_actives: [],
+      most_shorted: [],
+      undervalued: [],
+      generatedAt: new Date().toISOString(),
     };
 
     try {
       const screenResult = await yf.screen({
-        scrIds: ["day_gainers", "day_losers", "most_actives", "most_shorted_stocks", "undervalued_large_caps"],
+        scrIds: [
+          "day_gainers",
+          "day_losers",
+          "most_actives",
+          "most_shorted_stocks",
+          "undervalued_large_caps",
+        ],
         count: 10,
       });
       const categories = screenResult?.finance?.result ?? [];
       for (const cat of categories) {
         const id: string = cat.id ?? "";
         const quotes = cat.quotes ?? [];
-        const items: ScreenerItem[] = quotes.map((q: any) => ({
-          symbol: q.symbol ?? "",
-          price: num(q.regularMarketPrice),
-          percentChange: num(q.regularMarketChangePercent),
-          volume: num(q.regularMarketVolume),
-          avgVolume: num(q.averageDailyVolume3Month) ?? num(q.averageDailyVolume10Day),
-          marketCap: num(q.marketCap),
-        })).filter((i: ScreenerItem) => i.symbol);
+        const items: ScreenerItem[] = quotes
+          .map((q: any) => ({
+            symbol: q.symbol ?? "",
+            price: num(q.regularMarketPrice),
+            percentChange: num(q.regularMarketChangePercent),
+            volume: num(q.regularMarketVolume),
+            avgVolume: num(q.averageDailyVolume3Month) ?? num(q.averageDailyVolume10Day),
+            marketCap: num(q.marketCap),
+          }))
+          .filter((i: ScreenerItem) => i.symbol);
         if (id.includes("gainers")) result.day_gainers = items;
         else if (id.includes("losers")) result.day_losers = items;
         else if (id.includes("actives")) result.most_actives = items;
         else if (id.includes("shorted")) result.most_shorted = items;
         else if (id.includes("undervalued")) result.undervalued = items;
       }
-    } catch { /* screeners son best-effort */ }
+    } catch {
+      /* screeners son best-effort */
+    }
 
     setCache(cacheKey, result);
     return result;
-  });
+  },
+);
 
 // ─── 2. getTickerDailySignal ──────────────────────────────────
 
 export const getTickerDailySignal = createServerFn({ method: "POST" })
-  .inputValidator(
-    (d: { tickers: string[] }) =>
-      z.object({ tickers: z.array(z.string().min(1)).min(1).max(50) }).parse(d),
+  .inputValidator((d: { tickers: string[] }) =>
+    z.object({ tickers: z.array(z.string().min(1)).min(1).max(50) }).parse(d),
   )
   .handler(async ({ data }): Promise<{ signals: TickerDailySignal[]; errors: string[] }> => {
     const errors: string[] = [];
@@ -155,25 +171,31 @@ export const getTickerDailySignal = createServerFn({ method: "POST" })
       const slice = data.tickers.slice(i, i + BATCH);
       const batchResults = await Promise.all(
         slice.map(async (ticker) => {
-            try {
-              const [qsResult, udResult] = await Promise.allSettled([
-                getOrFetch(`yahoo:price:${ticker}`, "yahoo", TTL_POR_TIPO.precioVivo, () => {
-                  const yf = getYF();
-                  return yf.then((y) =>
-                    y.quoteSummary(ticker, {
-                      modules: ["price", "summaryDetail", "defaultKeyStatistics", "financialData", "calendarEvents"],
-                    }),
-                  );
-                }),
-                getOrFetch(`yahoo:upgrades:${ticker}`, "yahoo", TTL_POR_TIPO.fundamentals, () => {
-                  const yf = getYF();
-                  return yf.then((y) =>
-                    y.quoteSummary(ticker, {
-                      modules: ["upgradeDowngradeHistory"],
-                    }),
-                  );
-                }),
-              ]);
+          try {
+            const [qsResult, udResult] = await Promise.allSettled([
+              getOrFetch(`yahoo:price:${ticker}`, "yahoo", TTL_POR_TIPO.precioVivo, () => {
+                const yf = getYF();
+                return yf.then((y) =>
+                  y.quoteSummary(ticker, {
+                    modules: [
+                      "price",
+                      "summaryDetail",
+                      "defaultKeyStatistics",
+                      "financialData",
+                      "calendarEvents",
+                    ],
+                  }),
+                );
+              }),
+              getOrFetch(`yahoo:upgrades:${ticker}`, "yahoo", TTL_POR_TIPO.fundamentals, () => {
+                const yf = getYF();
+                return yf.then((y) =>
+                  y.quoteSummary(ticker, {
+                    modules: ["upgradeDowngradeHistory"],
+                  }),
+                );
+              }),
+            ]);
 
             const qs = qsResult.status === "fulfilled" ? qsResult.value : {};
             const ud = udResult.status === "fulfilled" ? udResult.value : {};
@@ -185,7 +207,8 @@ export const getTickerDailySignal = createServerFn({ method: "POST" })
             const cal = qs.calendarEvents ?? {};
 
             const currentPrice = num(fd.currentPrice) ?? num(pr.regularMarketPrice);
-            const previousClose = num(sd.regularMarketPreviousClose) ?? num(pr.regularMarketPreviousClose);
+            const previousClose =
+              num(sd.regularMarketPreviousClose) ?? num(pr.regularMarketPreviousClose);
             const open = num(pr.regularMarketOpen);
             const dayHigh = num(sd.regularMarketDayHigh) ?? num(pr.regularMarketDayHigh);
             const dayLow = num(sd.regularMarketDayLow) ?? num(pr.regularMarketDayLow);
@@ -193,12 +216,18 @@ export const getTickerDailySignal = createServerFn({ method: "POST" })
             const avgVolume10d = num(sd.averageDailyVolume10Day);
             const beta = num(ks.beta) ?? num(sd.beta);
 
-            const changePct = currentPrice != null && previousClose != null && previousClose > 0
-              ? ((currentPrice - previousClose) / previousClose) * 100 : null;
-            const gap = open != null && previousClose != null && previousClose > 0
-              ? ((open - previousClose) / previousClose) * 100 : null;
-            const rvol = volume != null && avgVolume10d != null && avgVolume10d > 0
-              ? volume / avgVolume10d : null;
+            const changePct =
+              currentPrice != null && previousClose != null && previousClose > 0
+                ? ((currentPrice - previousClose) / previousClose) * 100
+                : null;
+            const gap =
+              open != null && previousClose != null && previousClose > 0
+                ? ((open - previousClose) / previousClose) * 100
+                : null;
+            const rvol =
+              volume != null && avgVolume10d != null && avgVolume10d > 0
+                ? volume / avgVolume10d
+                : null;
 
             // Upgrades/downgrades recientes (últimos 3 días)
             const recentUpgrades: { firm: string; toGrade: string; action: string }[] = [];
@@ -210,9 +239,17 @@ export const getTickerDailySignal = createServerFn({ method: "POST" })
               if (epoch * 1000 < threeDaysAgo) continue;
               const action = String(entry.action ?? "");
               if (action.toLowerCase().includes("up")) {
-                recentUpgrades.push({ firm: String(entry.firm ?? ""), toGrade: String(entry.toGrade ?? ""), action });
+                recentUpgrades.push({
+                  firm: String(entry.firm ?? ""),
+                  toGrade: String(entry.toGrade ?? ""),
+                  action,
+                });
               } else if (action.toLowerCase().includes("down")) {
-                recentDowngrades.push({ firm: String(entry.firm ?? ""), toGrade: String(entry.toGrade ?? ""), action });
+                recentDowngrades.push({
+                  firm: String(entry.firm ?? ""),
+                  toGrade: String(entry.toGrade ?? ""),
+                  action,
+                });
               }
             }
 
@@ -231,12 +268,23 @@ export const getTickerDailySignal = createServerFn({ method: "POST" })
                   earningsWithin10d = diffMs > 0 && diffMs < 10 * 24 * 60 * 60 * 1000;
                 }
               }
-            } catch { /* earnings date optional */ }
+            } catch {
+              /* earnings date optional */
+            }
 
             // Scores parciales — mismo criterio que calcularOportunidadScore
-            const scoreVolumen = rvol != null
-              ? rvol >= 3 ? 25 : rvol >= 2 ? 20 : rvol >= 1.5 ? 15 : rvol >= 1.2 ? 10 : 5
-              : null;
+            const scoreVolumen =
+              rvol != null
+                ? rvol >= 3
+                  ? 25
+                  : rvol >= 2
+                    ? 20
+                    : rvol >= 1.5
+                      ? 15
+                      : rvol >= 1.2
+                        ? 10
+                        : 5
+                : null;
 
             const scoreCatalizador = (() => {
               if (recentUpgrades.length > 0) return Math.max(0, 25 - (earningsWithin10d ? 8 : 0));
@@ -245,26 +293,45 @@ export const getTickerDailySignal = createServerFn({ method: "POST" })
               return null; // sin catalizador
             })();
 
-            const scoreMomentum = beta != null
-              ? beta < 0.8 ? 25 : beta < 1.2 ? 20 : beta < 1.5 ? 15 : 10
-              : null;
+            const scoreMomentum =
+              beta != null ? (beta < 0.8 ? 25 : beta < 1.2 ? 20 : beta < 1.5 ? 15 : 10) : null;
 
             // pePercentile requiere incomeStatementHistory — no se fetchea aquí por performance
             const scoreValuacion: number | null = null;
 
-            const partesScore = [scoreVolumen, scoreValuacion, scoreCatalizador, scoreMomentum].filter((v): v is number => v != null);
-            const oportunidadScore = partesScore.length >= 2
-              ? Math.min(100, Math.round(partesScore.reduce((s, v) => s + v, 0) / partesScore.length))
-              : null;
+            const partesScore = [
+              scoreVolumen,
+              scoreValuacion,
+              scoreCatalizador,
+              scoreMomentum,
+            ].filter((v): v is number => v != null);
+            const oportunidadScore =
+              partesScore.length >= 2
+                ? Math.min(
+                    100,
+                    Math.round(partesScore.reduce((s, v) => s + v, 0) / partesScore.length),
+                  )
+                : null;
 
             return {
               ticker,
-              currentPrice, changePct, open, previousClose, dayHigh, dayLow,
-              volume, avgVolume10d, rvol, gap,
+              currentPrice,
+              changePct,
+              open,
+              previousClose,
+              dayHigh,
+              dayLow,
+              volume,
+              avgVolume10d,
+              rvol,
+              gap,
               pePercentile: null,
               peExtreme: null,
-              recentUpgrades, recentDowngrades,
-              nextEarningsDate, earningsWithin10d, beta,
+              recentUpgrades,
+              recentDowngrades,
+              nextEarningsDate,
+              earningsWithin10d,
+              beta,
               scoreVolumen,
               scoreValuacion,
               scoreCatalizador,
@@ -291,15 +358,18 @@ export const getTickerDailySignal = createServerFn({ method: "POST" })
 
 // ─── 3. getMacroContextAR ─────────────────────────────────────
 
-export const getMacroContextAR = createServerFn({ method: "POST" })
-  .handler(async (): Promise<MacroContextAR> => {
+export const getMacroContextAR = createServerFn({ method: "POST" }).handler(
+  async (): Promise<MacroContextAR> => {
     const cacheKey = "mq-macro-ar";
     const cached = getCached<MacroContextAR>(cacheKey, 15 * 60 * 1000);
     if (cached) return cached;
 
     const result: MacroContextAR = {
-      dolarCCL: null, dolarMEP: null, dolarBlue: null,
-      riesgoPais: null, generatedAt: new Date().toISOString(),
+      dolarCCL: null,
+      dolarMEP: null,
+      dolarBlue: null,
+      riesgoPais: null,
+      generatedAt: new Date().toISOString(),
     };
 
     try {
@@ -315,7 +385,7 @@ export const getMacroContextAR = createServerFn({ method: "POST" })
             const casa = String(item.casa ?? "").toLowerCase();
             const compra = num(item.compra);
             const venta = num(item.venta);
-            const avg = compra != null && venta != null ? (compra + venta) / 2 : compra ?? venta;
+            const avg = compra != null && venta != null ? (compra + venta) / 2 : (compra ?? venta);
             if (casa.includes("ccl")) result.dolarCCL = avg;
             else if (casa.includes("mep")) result.dolarMEP = avg;
             else if (casa.includes("blue")) result.dolarBlue = avg;
@@ -327,11 +397,14 @@ export const getMacroContextAR = createServerFn({ method: "POST" })
         const rpJson = await rpRes.value.json();
         result.riesgoPais = num(rpJson.valor) ?? num(rpJson.ultimo);
       }
-    } catch { /* macro AR best-effort */ }
+    } catch {
+      /* macro AR best-effort */
+    }
 
     setCache(cacheKey, result);
     return result;
-  });
+  },
+);
 
 // ─── 4. calcularOportunidadScore ──────────────────────────────
 
@@ -393,49 +466,76 @@ export interface OportunidadScoreInput {
  */
 export function calcularOportunidadScore(input: OportunidadScoreInput): {
   total: number | null;
-  detalle: { volumen: number | null; valuacion: number | null; catalizador: number | null; momentum: number | null };
+  detalle: {
+    volumen: number | null;
+    valuacion: number | null;
+    catalizador: number | null;
+    momentum: number | null;
+  };
 } {
   // Volumen relativo (peso 25)
-  const volumen = input.rvol != null
-    ? input.rvol >= 3 ? 25 : input.rvol >= 2 ? 20 : input.rvol >= 1.5 ? 15 : input.rvol >= 1.2 ? 10 : 5
-    : null;
+  const volumen =
+    input.rvol != null
+      ? input.rvol >= 3
+        ? 25
+        : input.rvol >= 2
+          ? 20
+          : input.rvol >= 1.5
+            ? 15
+            : input.rvol >= 1.2
+              ? 10
+              : 5
+      : null;
 
   // Percentil de valuación extremo (peso 25) — null si no hay dato
-  const valuacion = input.pePercentile != null
-    ? input.pePercentile <= 5 ? 25
-      : input.pePercentile <= 10 ? 20
-        : input.pePercentile <= 25 ? 15
-          : input.pePercentile >= 95 ? 20
-            : input.pePercentile >= 90 ? 15
-              : 10
-    : null;
+  const valuacion =
+    input.pePercentile != null
+      ? input.pePercentile <= 5
+        ? 25
+        : input.pePercentile <= 10
+          ? 20
+          : input.pePercentile <= 25
+            ? 15
+            : input.pePercentile >= 95
+              ? 20
+              : input.pePercentile >= 90
+                ? 15
+                : 10
+      : null;
 
   // Catalizador reciente (peso 25) — null si no hay información de catalizadores
   let catalizadorBase: number | null = null;
   if (input.hasRecentUpgrade) catalizadorBase = 25;
   else if (input.hasRecentDowngrade) catalizadorBase = 5;
-  else if (!input.hasRecentUpgrade && !input.hasRecentDowngrade && input.earningsWithin10d) catalizadorBase = 0;
+  else if (!input.hasRecentUpgrade && !input.hasRecentDowngrade && input.earningsWithin10d)
+    catalizadorBase = 0;
   // Si no hay upgrades, downgrades ni earnings próximos, no hay catalizador → null
-  const catalizador = catalizadorBase != null
-    ? Math.max(0, catalizadorBase - (input.earningsWithin10d ? 8 : 0))
-    : null;
+  const catalizador =
+    catalizadorBase != null
+      ? Math.max(0, catalizadorBase - (input.earningsWithin10d ? 8 : 0))
+      : null;
 
   // Momentum vs benchmark (peso 25) — null si no hay beta
-  const momentum = input.betaVsBenchmark != null
-    ? input.betaVsBenchmark < 0.8 ? 25
-      : input.betaVsBenchmark < 1.2 ? 20
-        : input.betaVsBenchmark < 1.5 ? 15
-          : 10
-    : null;
+  const momentum =
+    input.betaVsBenchmark != null
+      ? input.betaVsBenchmark < 0.8
+        ? 25
+        : input.betaVsBenchmark < 1.2
+          ? 20
+          : input.betaVsBenchmark < 1.5
+            ? 15
+            : 10
+      : null;
 
   // Cada componente pesa máx 25 pts.
   // Vol: volumen relativo vs histórico
   // Val: percentil de valuación (P/E histórico)
   // Cat: catalizadores recientes (upgrades/downgrades/earnings)
   // Mom: beta vs mercado (menor beta = mayor puntaje defensivo)
-  const total = Math.min(100, Math.round(
-    (volumen ?? 0) + (valuacion ?? 0) + (catalizador ?? 0) + (momentum ?? 0)
-  ));
+  const total = Math.min(
+    100,
+    Math.round((volumen ?? 0) + (valuacion ?? 0) + (catalizador ?? 0) + (momentum ?? 0)),
+  );
 
   return { total, detalle: { volumen, valuacion, catalizador, momentum } };
 }
@@ -502,7 +602,12 @@ export interface DailyOportunidadRow {
   rvol: number | null;
   beta: number | null;
   score: number | null;
-  detalleScore: { volumen: number | null; valuacion: number | null; catalizador: number | null; momentum: number | null };
+  detalleScore: {
+    volumen: number | null;
+    valuacion: number | null;
+    catalizador: number | null;
+    momentum: number | null;
+  };
   catalizadorLabel: string;
   proximoEarnings: string | null;
   fetchedAt: string;
@@ -529,15 +634,22 @@ export interface DailyOportunidadesResult {
 
 function detectarFallbackSospechoso(rows: DailyOportunidadRow[]): string[] {
   const warnings: string[] = [];
-  const campos: (keyof DailyOportunidadRow["detalleScore"])[] = ["volumen", "valuacion", "catalizador", "momentum"];
+  const campos: (keyof DailyOportunidadRow["detalleScore"])[] = [
+    "volumen",
+    "valuacion",
+    "catalizador",
+    "momentum",
+  ];
   for (const campo of campos) {
-    const valores = rows.map(r => r.detalleScore[campo]).filter((v): v is number => v != null);
+    const valores = rows.map((r) => r.detalleScore[campo]).filter((v): v is number => v != null);
     if (valores.length < 5) continue;
     const frecuencias = new Map<number, number>();
     for (const v of valores) frecuencias.set(v, (frecuencias.get(v) ?? 0) + 1);
     const masFrecuente = Math.max(...frecuencias.values(), 0);
     if (masFrecuente / valores.length > 0.6) {
-      warnings.push(`Campo "${campo}": ${masFrecuente}/${valores.length} filas comparten el mismo valor — posible fallback activo`);
+      warnings.push(
+        `Campo "${campo}": ${masFrecuente}/${valores.length} filas comparten el mismo valor — posible fallback activo`,
+      );
     }
   }
   return warnings;
@@ -554,8 +666,8 @@ export interface ContextoMacroUnificado {
   errores: string[];
 }
 
-export const fetchContextoMacroUnificado = createServerFn({ method: "GET" })
-  .handler(async (): Promise<ContextoMacroUnificado> => {
+export const fetchContextoMacroUnificado = createServerFn({ method: "GET" }).handler(
+  async (): Promise<ContextoMacroUnificado> => {
     const cacheKey = "mq-macro-unificado";
     const cached = getCached<ContextoMacroUnificado>(cacheKey, 15 * 60 * 1000);
     if (cached) return cached;
@@ -578,26 +690,36 @@ export const fetchContextoMacroUnificado = createServerFn({ method: "GET" })
             const casa = String(item.casa ?? "").toLowerCase();
             const compra = typeof item.compra === "number" ? item.compra : null;
             const venta = typeof item.venta === "number" ? item.venta : null;
-            const avg = compra != null && venta != null ? (compra + venta) / 2 : compra ?? venta;
+            const avg = compra != null && venta != null ? (compra + venta) / 2 : (compra ?? venta);
             if (casa.includes("ccl")) dolarCCL = avg;
             else if (casa.includes("mep")) dolarMEP = avg;
             else if (casa.includes("blue")) dolarBlue = avg;
           }
         }
-      } catch { /* parse error */ }
+      } catch {
+        /* parse error */
+      }
     }
 
     if (rpRes.status === "fulfilled") {
       try {
         const rpJson = await rpRes.value.json();
-        riesgoPais = typeof rpJson.valor === "number" ? rpJson.valor
-          : typeof rpJson.ultimo === "number" ? rpJson.ultimo
-          : null;
-      } catch { /* parse error */ }
+        riesgoPais =
+          typeof rpJson.valor === "number"
+            ? rpJson.valor
+            : typeof rpJson.ultimo === "number"
+              ? rpJson.ultimo
+              : null;
+      } catch {
+        /* parse error */
+      }
     }
 
     const result: ContextoMacroUnificado = {
-      riesgoPais, dolarCCL, dolarMEP, dolarBlue,
+      riesgoPais,
+      dolarCCL,
+      dolarMEP,
+      dolarBlue,
       fetchedAt: new Date().toISOString(),
       errores: [
         !dolarCCL && !dolarMEP && !dolarBlue && "dolares no disponible",
@@ -606,12 +728,12 @@ export const fetchContextoMacroUnificado = createServerFn({ method: "GET" })
     };
     setCache(cacheKey, result);
     return result;
-  });
+  },
+);
 
 export const getDailyOportunidades = createServerFn({ method: "POST" })
-  .inputValidator(
-    (d: { tickers: string[] }) =>
-      z.object({ tickers: z.array(z.string().min(1)).min(1).max(50) }).parse(d),
+  .inputValidator((d: { tickers: string[] }) =>
+    z.object({ tickers: z.array(z.string().min(1)).min(1).max(50) }).parse(d),
   )
   .handler(async ({ data }): Promise<DailyOportunidadesResult> => {
     const [screeners, macro, signalResult] = await Promise.all([
@@ -620,7 +742,8 @@ export const getDailyOportunidades = createServerFn({ method: "POST" })
       getTickerDailySignal({ data: { tickers: data.tickers } }),
     ]);
 
-    const commonEndpoint = "yahoo-finance2 /quoteSummary (price,summaryDetail,defaultKeyStatistics,financialData,calendarEvents)";
+    const commonEndpoint =
+      "yahoo-finance2 /quoteSummary (price,summaryDetail,defaultKeyStatistics,financialData,calendarEvents)";
     const now = new Date().toISOString();
 
     const rows: DailyOportunidadRow[] = signalResult.signals.map((s) => {
@@ -663,14 +786,16 @@ export const getDailyOportunidades = createServerFn({ method: "POST" })
       };
       const scored =
         sectorScore.score != null && sectorScore.missing.length === 0
-          ? { total: sectorScore.score, detalle: { volumen: null, valuacion: null, catalizador: null, momentum: null } }
+          ? {
+              total: sectorScore.score,
+              detalle: { volumen: null, valuacion: null, catalizador: null, momentum: null },
+            }
           : calcularOportunidadScore(input);
 
       if (sectorScore.score == null && sectorScore.missing.length > 0) {
-        // eslint-disable-next-line no-console
         console.warn(
           `[getDailyOportunidades] ${s.ticker} (${sectorScore.sector}) — score sectorial null por ${sectorScore.missing.length} campos faltantes. ` +
-          `Fallback a calcularOportunidadScore. Missing: ${sectorScore.missing.join(", ")}`
+            `Fallback a calcularOportunidadScore. Missing: ${sectorScore.missing.join(", ")}`,
         );
       }
 
@@ -700,10 +825,20 @@ export const getDailyOportunidades = createServerFn({ method: "POST" })
         cellSources: {
           precio: { endpoint: commonEndpoint, fetchedAt: now },
           volumen: s.rvol != null ? { endpoint: commonEndpoint, fetchedAt: now } : null,
-          valuacion: s.pePercentile != null ? { endpoint: "yahoo-finance2 /quoteSummary (incomeStatementHistory)", fetchedAt: now } : null,
-          catalizador: s.recentUpgrades.length > 0 || s.recentDowngrades.length > 0
-            ? { endpoint: "yahoo-finance2 /quoteSummary (upgradeDowngradeHistory)", fetchedAt: now }
-            : null,
+          valuacion:
+            s.pePercentile != null
+              ? {
+                  endpoint: "yahoo-finance2 /quoteSummary (incomeStatementHistory)",
+                  fetchedAt: now,
+                }
+              : null,
+          catalizador:
+            s.recentUpgrades.length > 0 || s.recentDowngrades.length > 0
+              ? {
+                  endpoint: "yahoo-finance2 /quoteSummary (upgradeDowngradeHistory)",
+                  fetchedAt: now,
+                }
+              : null,
           momentum: s.beta != null ? { endpoint: commonEndpoint, fetchedAt: now } : null,
           beta: s.beta != null ? { endpoint: commonEndpoint, fetchedAt: now } : null,
         },

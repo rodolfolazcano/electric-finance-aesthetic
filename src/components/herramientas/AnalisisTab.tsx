@@ -36,7 +36,8 @@ function fmtPctS(v: number | null | undefined, dec = 1): string {
 }
 
 function decisionColor(decision: string): string {
-  if (decision.startsWith("COMPRAR")) return "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
+  if (decision.startsWith("COMPRAR"))
+    return "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
   if (decision.includes("MANTENER") || decision.includes("ESPERAR"))
     return "border-amber-500/40 bg-amber-500/10 text-amber-400";
   if (decision.includes("NO ") || decision.startsWith("VENDER"))
@@ -84,13 +85,16 @@ function FichaCard({ ticker }: { ticker: string }) {
             </div>
             <div className="mt-1 font-mono text-2xl font-bold">{d.decision_final}</div>
             <div className="mt-1 text-xs text-muted-foreground">
-              Precio {fmtUSD(d.precio_actual)} · Valor central {fmtUSD(d.valuacion.vi_central)} · Upside{" "}
-              {fmtPctS(ms.upside_pct)}
+              Precio {fmtUSD(d.precio_actual)} · Valor central {fmtUSD(d.valuacion.vi_central)} ·
+              Upside {fmtPctS(ms.upside_pct)}
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4 text-center">
             <Mini label="Score cuali" value={`${d.cualitativo.score_total.toFixed(1)}/10`} />
-            <Mini label="WACC" value={d.wacc.wacc_usd != null ? `${d.wacc.wacc_usd.toFixed(1)}%` : "s/d"} />
+            <Mini
+              label="WACC"
+              value={d.wacc.wacc_usd != null ? `${d.wacc.wacc_usd.toFixed(1)}%` : "s/d"}
+            />
             <Mini label="MOS" value={`${ms.mos_aplicado_pct.toFixed(0)}%`} />
           </div>
         </CardContent>
@@ -140,11 +144,20 @@ function FichaCard({ ticker }: { ticker: string }) {
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             {Object.entries(d.cualitativo.dimensiones).map(([k, dim]) => (
-              <Fila key={k} k={k.replace(/_/g, " ")} v={`${dim.score.toFixed(1)} · ${(dim.peso * 100).toFixed(0)}%`} />
+              <Fila
+                key={k}
+                k={k.replace(/_/g, " ")}
+                v={`${dim.score.toFixed(1)} · ${(dim.peso * 100).toFixed(0)}%`}
+              />
             ))}
             <div className="pt-1">
-              <Badge variant="outline" className={cn(d.cualitativo.continuar ? "text-emerald-400" : "text-amber-400")}>
-                {d.cualitativo.continuar ? "Círculo de competencia: habilitado" : "Fuera del círculo"}
+              <Badge
+                variant="outline"
+                className={cn(d.cualitativo.continuar ? "text-emerald-400" : "text-amber-400")}
+              >
+                {d.cualitativo.continuar
+                  ? "Círculo de competencia: habilitado"
+                  : "Fuera del círculo"}
               </Badge>
             </div>
           </CardContent>
@@ -214,7 +227,9 @@ function Fila({ k, v, destacado }: { k: string; v: string; destacado?: boolean }
   return (
     <div className="flex items-baseline justify-between gap-2">
       <span className="text-xs text-muted-foreground capitalize">{k}</span>
-      <span className={cn("font-mono text-xs", destacado && "text-base font-bold text-primary")}>{v}</span>
+      <span className={cn("font-mono text-xs", destacado && "text-base font-bold text-primary")}>
+        {v}
+      </span>
     </div>
   );
 }
@@ -249,7 +264,9 @@ function SemaforoPanel({ ticker }: { ticker: string }) {
   if (q.isError || !q.data)
     return (
       <Card>
-        <CardContent className="p-6 text-sm text-muted-foreground">Semáforo no disponible.</CardContent>
+        <CardContent className="p-6 text-sm text-muted-foreground">
+          Semáforo no disponible.
+        </CardContent>
       </Card>
     );
 
@@ -279,10 +296,23 @@ function SemaforoPanel({ ticker }: { ticker: string }) {
             <Dato etiqueta="SMA200" valor={d.history.sma200?.toFixed(2) ?? "s/d"} />
             <Dato etiqueta="Máx. 52s" valor={d.history.high52?.toFixed(2) ?? "s/d"} />
             <Dato etiqueta="Mín. 52s" valor={d.history.low52?.toFixed(2) ?? "s/d"} />
-            <Dato etiqueta="Soportes" valor={d.soportes.slice(0, 2).map((s) => s.toFixed(2)).join(" · ") || "—"} />
+            <Dato
+              etiqueta="Soportes"
+              valor={
+                d.soportes
+                  .slice(0, 2)
+                  .map((s) => s.toFixed(2))
+                  .join(" · ") || "—"
+              }
+            />
             <Dato
               etiqueta="Resistencias"
-              valor={d.resistencias.slice(0, 2).map((s) => s.toFixed(2)).join(" · ") || "—"}
+              valor={
+                d.resistencias
+                  .slice(0, 2)
+                  .map((s) => s.toFixed(2))
+                  .join(" · ") || "—"
+              }
             />
           </div>
         )}
@@ -364,7 +394,8 @@ export function AnalisisTab() {
         <h2 className="text-lg font-semibold">Análisis de decisión</h2>
         <p className="text-sm text-muted-foreground">
           Pipeline completo estilo Buffett/Graham: macro → cualitativo → cuantitativo → WACC → DCF →
-          múltiplos → triangulación → margen de seguridad. Educativo, no es recomendación de inversión.
+          múltiplos → triangulación → margen de seguridad. Educativo, no es recomendación de
+          inversión.
         </p>
       </div>
 
@@ -382,7 +413,11 @@ export function AnalisisTab() {
           className="max-w-xs font-mono uppercase"
         />
         <Button type="submit" disabled={analizar.isPending || !input.trim()}>
-          {analizar.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+          {analizar.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Search className="h-4 w-4" />
+          )}
           Analizar
         </Button>
         <div className="hidden items-center gap-1 sm:flex">

@@ -180,7 +180,18 @@ export function classifyIOLAsset(iolTitulo: IOLTitulo): ClassifiedIOLAsset {
   }
 
   return {
-    asset: { cantidad: 0, comprometido: 0, puntosVariacion: 0, variacionDiaria: 0, ultimoPrecio: 0, ppc: 0, gananciaPorcentaje: 0, gananciaDinero: 0, valorizado: 0, titulo: iolTitulo },
+    asset: {
+      cantidad: 0,
+      comprometido: 0,
+      puntosVariacion: 0,
+      variacionDiaria: 0,
+      ultimoPrecio: 0,
+      ppc: 0,
+      gananciaPorcentaje: 0,
+      gananciaDinero: 0,
+      valorizado: 0,
+      titulo: iolTitulo,
+    },
     category,
     yahooPriceSymbol,
     yahooAnalysisSymbol,
@@ -205,9 +216,10 @@ export function classifyIOLActivo(activo: IOLActivo): ClassifiedIOLAsset {
  * - yahooGroup: assets that can be analyzed via Yahoo Finance
  * - iolGroup: assets that must be analyzed via IOL API
  */
-export function splitByAPI(
-  activos: IOLActivo[],
-): { yahooGroup: ClassifiedIOLAsset[]; iolGroup: ClassifiedIOLAsset[] } {
+export function splitByAPI(activos: IOLActivo[]): {
+  yahooGroup: ClassifiedIOLAsset[];
+  iolGroup: ClassifiedIOLAsset[];
+} {
   const yahooGroup: ClassifiedIOLAsset[] = [];
   const iolGroup: ClassifiedIOLAsset[] = [];
   for (const a of activos) {

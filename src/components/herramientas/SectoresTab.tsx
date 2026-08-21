@@ -1,14 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  Layers,
-  Loader2,
-  Search,
-  Sparkles,
-} from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Layers, Loader2, Search, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,7 +52,11 @@ function PerformancePanel() {
 
   if (q.isPending) return <Skeleton className="h-64 w-full" />;
   if (q.isError || !q.data)
-    return <CardContent className="p-6 text-sm text-muted-foreground">Performance no disponible.</CardContent>;
+    return (
+      <CardContent className="p-6 text-sm text-muted-foreground">
+        Performance no disponible.
+      </CardContent>
+    );
 
   const items = (q.data as { items: SectorDailyPerf[] }).items;
   const max = Math.max(...items.map((i) => Math.abs(i.changePercent ?? 0)), 0.01);
@@ -79,7 +76,10 @@ function PerformancePanel() {
               <div className="w-44 shrink-0 truncate text-muted-foreground">{it.label}</div>
               <div className="relative h-4 flex-1 overflow-hidden rounded bg-accent/40">
                 <div
-                  className={cn("absolute inset-y-0 left-0 rounded", positivo ? "bg-emerald-500/30" : "bg-red-500/30")}
+                  className={cn(
+                    "absolute inset-y-0 left-0 rounded",
+                    positivo ? "bg-emerald-500/30" : "bg-red-500/30",
+                  )}
                   style={{ width: `${Math.max(4, (Math.abs(v) / max) * 100)}%` }}
                 />
               </div>
@@ -89,7 +89,11 @@ function PerformancePanel() {
                   positivo ? "text-emerald-400" : "text-red-400",
                 )}
               >
-                {positivo ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                {positivo ? (
+                  <ArrowUpRight className="h-3 w-3" />
+                ) : (
+                  <ArrowDownRight className="h-3 w-3" />
+                )}
                 {fmtPct(it.changePercent)}
               </div>
             </div>
@@ -112,13 +116,19 @@ function ValuacionRankingPanel() {
 
   if (q.isPending) return <Skeleton className="h-64 w-full" />;
   if (q.isError || !q.data)
-    return <CardContent className="p-6 text-sm text-muted-foreground">Ranking no disponible.</CardContent>;
+    return (
+      <CardContent className="p-6 text-sm text-muted-foreground">
+        Ranking no disponible.
+      </CardContent>
+    );
 
   const rows = (q.data as { rows: SectorValuationRow[] }).rows;
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm">Valuación relativa por sector (P/E forward vs percentil histórico)</CardTitle>
+        <CardTitle className="text-sm">
+          Valuación relativa por sector (P/E forward vs percentil histórico)
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -136,8 +146,12 @@ function ValuacionRankingPanel() {
               <TableRow key={r.sector}>
                 <TableCell className="font-medium">{r.sector}</TableCell>
                 <TableCell className="text-right font-mono">{r.tickerCount}</TableCell>
-                <TableCell className="text-right font-mono">{r.avgForwardPE?.toFixed(1) ?? "s/d"}</TableCell>
-                <TableCell className="text-right font-mono">{r.avgTrailingPE?.toFixed(1) ?? "s/d"}</TableCell>
+                <TableCell className="text-right font-mono">
+                  {r.avgForwardPE?.toFixed(1) ?? "s/d"}
+                </TableCell>
+                <TableCell className="text-right font-mono">
+                  {r.avgTrailingPE?.toFixed(1) ?? "s/d"}
+                </TableCell>
                 <TableCell className="text-right font-mono">
                   {r.medianPEPercentile != null ? r.medianPEPercentile.toFixed(0) : "s/d"}
                 </TableCell>
@@ -158,15 +172,15 @@ const SECTORES_DATA = sectoresData as unknown as SectoresJson;
 const SECTORES = Object.keys(SECTORES_DATA).sort();
 
 function tickersDe(sector: string, industria: string): TickerJson[] {
-  return (SECTORES_DATA[sector]?.[industria] ?? []).map((t) => ({ ticker: t.ticker, nombre: t.nombre }));
+  return (SECTORES_DATA[sector]?.[industria] ?? []).map((t) => ({
+    ticker: t.ticker,
+    nombre: t.nombre,
+  }));
 }
 
 function AnalisisSectorPanel() {
   const [sector, setSector] = useState(SECTORES[0] ?? "Technology");
-  const industrias = useMemo(
-    () => Object.keys(SECTORES_DATA[sector] ?? {}).sort(),
-    [sector],
-  );
+  const industrias = useMemo(() => Object.keys(SECTORES_DATA[sector] ?? {}).sort(), [sector]);
   const [industria, setIndustria] = useState(industrias[0] ?? "");
   const fn = useServerFn(getSectorAnalysis);
   const m = useMutation({
@@ -198,7 +212,9 @@ function AnalisisSectorPanel() {
               aria-label="Sector"
             >
               {SECTORES.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
             <select
@@ -208,15 +224,26 @@ function AnalisisSectorPanel() {
               aria-label="Industria"
             >
               {industrias.map((i) => (
-                <option key={i} value={i}>{i}</option>
+                <option key={i} value={i}>
+                  {i}
+                </option>
               ))}
             </select>
-            <Button onClick={() => industria && m.mutate({ sector, industry: industria })} disabled={m.isPending}>
-              {m.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            <Button
+              onClick={() => industria && m.mutate({ sector, industry: industria })}
+              disabled={m.isPending}
+            >
+              {m.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="h-4 w-4" />
+              )}
               Analizar
             </Button>
           </div>
-          {m.isError && <p className="text-sm text-red-400">{(m.error as Error)?.message ?? "Error."}</p>}
+          {m.isError && (
+            <p className="text-sm text-red-400">{(m.error as Error)?.message ?? "Error."}</p>
+          )}
         </CardContent>
       </Card>
 
@@ -245,15 +272,21 @@ function AnalisisSectorPanel() {
                 {(res.tickers ?? []).map((t) => (
                   <TableRow key={t.ticker}>
                     <TableCell className="font-mono font-medium">{t.ticker}</TableCell>
-                    <TableCell className="text-right font-mono">{t.price?.toFixed(2) ?? "s/d"}</TableCell>
-                    <TableCell className="text-right font-mono">{t.trailingPE?.toFixed(1) ?? "s/d"}</TableCell>
+                    <TableCell className="text-right font-mono">
+                      {t.price?.toFixed(2) ?? "s/d"}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {t.trailingPE?.toFixed(1) ?? "s/d"}
+                    </TableCell>
                     <TableCell className="text-right font-mono">
                       {t.returnOnEquity != null ? `${(t.returnOnEquity * 100).toFixed(1)}%` : "s/d"}
                     </TableCell>
                     <TableCell className="text-right font-mono">
                       {t.profitMargin != null ? `${(t.profitMargin * 100).toFixed(1)}%` : "s/d"}
                     </TableCell>
-                    <TableCell className="text-right font-mono">{t.fundScore?.toFixed(1) ?? "s/d"}</TableCell>
+                    <TableCell className="text-right font-mono">
+                      {t.fundScore?.toFixed(1) ?? "s/d"}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -277,7 +310,11 @@ function OportunidadesPanel() {
 
   if (q.isPending) return <Skeleton className="h-64 w-full" />;
   if (q.isError || !q.data)
-    return <CardContent className="p-6 text-sm text-muted-foreground">Screener no disponible.</CardContent>;
+    return (
+      <CardContent className="p-6 text-sm text-muted-foreground">
+        Screener no disponible.
+      </CardContent>
+    );
 
   const d = q.data as MarketScreenersResult;
   const grupos = [

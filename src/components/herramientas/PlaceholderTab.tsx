@@ -12,8 +12,8 @@ export function PlaceholderTab({ titulo, descripcion }: { titulo: string; descri
         <CardContent className="flex flex-col items-center gap-3 p-10 text-center">
           <Construction className="h-8 w-8 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">
-            Este tab está en migración desde el dashboard de análisis. El núcleo (Contexto, Análisis,
-            Cuantitativo y Sectores) ya está operativo.
+            Este tab está en migración desde el dashboard de análisis. El núcleo (Contexto,
+            Análisis, Cuantitativo y Sectores) ya está operativo.
           </p>
           <p className="text-xs text-muted-foreground">
             Mientras tanto, podés pedirle estos análisis al asistente IA del sitio: entiende

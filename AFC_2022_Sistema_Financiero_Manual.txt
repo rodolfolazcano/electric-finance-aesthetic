@@ -1,0 +1,1070 @@
+﻿Sistema Financiero  
+Manual 2022  
+  
+  
+ 
+  
+  
+
+  
+  
+
+Sistema  
+Financiero
+  
+  
+
+Dirigido por:  
+Jesús M. López Zaballos 
+Director Gerente de la Escuela FEF 
+Presidente de European Federation of Financial Analyst Societies, EFFAS 
+Editado por:  
+FUNDACIÓN DE ESTUDIOS FINANCIEROS (FEF), 2022 Basílica, 17-Oficinas-1ª Planta. 28020 Madrid, España 
+ISBN: 978-84-695-7525-3
+Sistema Financiero  
+Índice  
+0.NIVEL DE CERTIFICACIÓN ......................................................................................... 5 1.COMPONENTES DE UN SISTEMA FINANCIERO ............................................................... 7 
+2.INTERMEDIARIOS FINANCIEROS ................................................................................ 8 2.1. Descripción y funciones ..................................................................................... 8 2.2. Tipos de intermediarios financieros...................................................................... 8 
+2.2.1. Empresas de Servicios de Inversión .......................................................10 2.2.2. Empresas de Asesoramiento Financiero (EAF) .........................................12 
+3.ACTIVOS FINANCIEROS .......................................................................................... 14 3.1. Concepto y funciones........................................................................................14 3.2. Características principales .................................................................................14 3.3. Clasificación ....................................................................................................15 
+4.MERCADOS FINANCIEROS ....................................................................................... 18 4.1. Concepto y funciones........................................................................................18 4.2. Características .................................................................................................19 4.3. Clasificación ....................................................................................................20 
+4.3.1. Estructura actual de los mercados de valores en España...........................22 4.3.2. Bolsas y Mercados Españoles (BME).......................................................29 4.3.3. Estructura institucional del Sistema Financiero Español ............................34 
+5.EL BCE Y LA POLÍTICA MONETARIA ........................................................................... 40 5.1. El Sistema Europeo de Bancos Centrales.............................................................41 5.1.1. Órganos rectores del BCE .....................................................................41 5.1.2. Objetivos y Funciones básicas del SEBC-BCE...........................................43 5.1.3. Política Monetaria Única .......................................................................44 5.2. Estrategias de Política Monetaria........................................................................45 5.3. Principales Instrumentos...................................................................................50 5.3.1. Operaciones de Mercado Abierto............................................................51 5.3.2. Facilidades Permanentes ......................................................................59 5.3.3. Coeficiente de caja ..............................................................................60 5.3.4. Programas de compras de activos..........................................................61 5.4. El Sistema TARGET 2........................................................................................65 
+5.5. Diferencias entre la política monetaria del BCE y de la FED americana ....................66  
+Fundación de Estudios Financieros© 3  
+Sistema Financiero  
+6.TIPOS DE INTERÉS DE REFERENCIA .......................................................................... 70 6.1. Características y Sistema de Cálculos .................................................................70 6.2. El EONIA y el EURIBOR.....................................................................................71 
+6.2.1. EONIA................................................................................................71 6.2.2. EURIBOR............................................................................................73 6.3. €STR, el nuevo índice interbancario....................................................................79 6.4. Tipos de referencia oficiales del mercado hipotecario ............................................84 6.5. Curvas de tipos de interés y tipos implícitos ........................................................86 6.5.1. La Estructura Temporal de los tipos de interés (ETTI) ..............................86 6.5.2. Tipos implícitos o forward .....................................................................88 
+7.MERCADOS MONETARIOS........................................................................................ 90 7.1. Características generales ..................................................................................90 7.2. Activos Negociados...........................................................................................92 
+7.2.1. Depósitos no Transferibles....................................................................93 7.2.2. Depósitos Transferibles ........................................................................94 7.3. Agentes Participantes .......................................................................................94 
+8.BIBLIOGRAFÍA Y WEBS CONSULTADAS Y DE INTERÉS ................................................. 96  
+4 Fundación de Estudios Financieros© 
+Sistema Financiero  
+0. NIVEL DE CERTIFICACIÓN  
+La Escuela FEF prepara para la superación de los exámenes de los distintos niveles de  certificación profesional que otorgan el Instituto Español de Analistas Financieros (IEAF) y la  European Financial Planning Association (EFPA) en el ámbito del asesoramiento financiero y la  gestión patrimonial: 
+
+
+	Nivel Básico 
+	IEAF 
+	Asesor en Servicios Financieros (ASF)
+	EFPA 
+	European Investment Assistant (EIA)
+	
+
+
+
+  
+
+
+	Nivel I 
+	IEAF 
+	Asesor Financiero (AF)
+	EFPA 
+	European Investment Practitioner (EIP)
+	
+
+
+
+  
+
+
+	Nivel I+II 
+	IEAF 
+	Gestor Patrimonial (GP)
+	EFPA 
+	European Financial Advisor (EFA)
+	
+
+
+
+Estas certificaciones profesionales supondrán para sus titulares un reconocimiento externo de  sus conocimientos y competencias para realizar una labor de asesoramiento e información  acorde con las recomendaciones recogidas en la normativa MiFID II y en el marco europeo de  ESMA de cualificaciones profesionales en los servicios financieros.  
+Las certificadoras fijan para cada nivel de acreditación, un programa de contenidos acorde  basado en el ejercicio profesional. 
+El presente manual desarrolla con un lenguaje claro, sencillo y didáctico los contenidos fijados  para la materia de la que versa, la cual está enmarcada en el siguiente nivel/es de certificación: 
+  
+Contenidos  
+  
+  
+  
+  
+  
+Nivel  
+  
+Básico  
+  
+  
+  
+  
+Nivel I    
+  
+  
+Nivel II  
+NOTA:  
+Estos contenidos son por tanto  objeto de examen en las  certificaciones de: 
+▪ Nivel Básico 
+▪ Nivel I 
+▪ Nivel I+II
+Fundación de Estudios Financieros© 5  
+Sistema Financiero  
+ 
+6 Fundación de Estudios Financieros© 
+Sistema Financiero  
+1. COMPONENTES DE UN SISTEMA FINANCIERO  
+Ampliamente considerado, el sistema financiero de un país es el conjunto de instituciones,  medios (activos) y mercados cuyo fin primordial es canalizar el ahorro que generan las unidades  de gasto con superávit hacia las unidades de gasto con déficit. En este sentido, el sistema  financiero es un gran entramado institucional que permite realizar la gran labor de  intermediación entre prestamistas y prestatarios, dadores y receptores de flujos monetarios,  ahorradores e inversores. 
+Otros autores también señalan que, desde el punto de vista institucional, se puede definir el  sistema financiero como el conjunto de entidades que generan, recogen, administran y dirigen  tanto el ahorro como la inversión, en un sistema político-económico. 
+En definitiva, esta función que se realiza en el sistema financiero es fundamental en un sistema  capitalista, ya que hace coincidir ahorradores e inversores, acopla las intenciones de unos y otros  en grado de liquidez, seguridad y rentabilidad, y crea instrumentos apropiados para ello (activos,  que serán negociados posteriormente en los mercados financieros). Viene a ser el engranaje que  “engrasa” la economía, siendo ésta mejor o peor según el sistema financiero presente mayores  o menores desajustes. 
+En general, los objetivos básicos de todo sistema financiero son: 
+✔ Garantizar una asignación eficiente de recursos financieros.  
+✔ Facilitar la estabilidad económica-financiera que permita a las autoridades monetarias el  desarrollo de una política monetaria activa siendo 3 sus elementos básicos: 
+▪ Los Intermediarios Financieros. 
+▪ Los Activos Financieros.  
+▪ Los Mercados Financieros. 
+A continuación, vamos a presentar una breve definición y descripción básica de estos elementos  que serán objeto de un desarrollo más profundo a lo largo de este curso.
+Fundación de Estudios Financieros© 7  
+Sistema Financiero  
+2. INTERMEDIARIOS FINANCIEROS  
+2.1. Descripción y funciones  
+Son las instituciones especializadas profesionalmente en la labor de intermediación entre los  prestamistas (ofrecen dinero) y prestatarios (reciben ese dinero). Los intermediarios financieros  se dedican, fundamentalmente, a la compra de activos financieros y a la venta de pasivos, es  decir, captan recursos a través de la venta de sus pasivos y conceden créditos mediante la  compra de los activos emitidos por otras unidades. Los intermediarios obtienen, en su mediación,  una diferencia de rentabilidad entre los activos comprados (créditos) y pasivos vendidos  (depósitos), que se denomina coste de intermediación. 
+2.2. Tipos de intermediarios financieros  
+Entre las distintas clasificaciones que existen, la más genérica (del sistema europeo) es aquella  que los clasifica en instituciones financieras monetarias y otras, distinguiendo entre: 
+a. Entidades de crédito: se incluye en este epígrafe al Banco Central (en nuestro país el Banco  de España), el Instituto de Crédito Oficial (el ICO) y a las entidades de crédito y depósito  (bancos, cajas de ahorro y cooperativas de crédito). En general los intermediarios  financieros bancarios realizan operaciones pasivas, captando dinero del público (cuentas  corrientes, depósitos a la vista, a plazo, etc.) y operaciones activas, entregando ese dinero  a empresas o unidades con déficit (préstamos personales, hipotecario, etc.). Por su parte,  el Banco de España realiza operaciones activas y pasivas con estos intermediarios, entre  otras por razones de política monetaria, y regula la actividad de la operativa que bancos,  cajas y cooperativas realizan entre sí. 
+b. Los Establecimientos Financieros de Crédito: son instituciones autorizadas para realizar  determinadas operaciones crediticias como factoring, leasing, concesión de créditos al  consumo, etc. 
+c. Las Entidades de Dinero Electrónico: son empresas dedicadas a la emisión de dinero  electrónico admitido como medio de pago por empresas distintas a la entidad emisora. 
+d. Las Entidades de Pago: son empresas que prestan y ejecutan determinados servicios de  pago tales como: transferencias, adeudos domiciliados, ejecución de operaciones de pago  a través de tarjeta, etc. 
+e. Fondos del Mercado Monetario: son fondos de inversión que invierten en valores de renta  fija admitidos a negociación en mercados secundarios oficiales y otros activos que gozan  de elevada liquidez, cuyo plazo de amortización sea igual o inferior a dieciocho meses.  
+8 Fundación de Estudios Financieros© 
+Sistema Financiero  
+f. Otros intermediarios financieros: en esta categoría pueden encuadrarse las Instituciones  de Inversión Colectiva, las Sociedades de Valores, los Fondos de Titulización de Activos,  las Sociedades y Fondos de Capital Riesgo, las Instituciones de Inversión Colectiva  Inmobiliaria y las Sociedades de Garantía Recíproca. 
+g. Auxiliares financieros: sirven de complemento a los intermediarios financieros. Entre ellos  destacan las sociedades de tasación (certifican el valor de los bienes inmuebles) y las  agencias de rating (califican la solvencia de los emisores de activos financieros). 
+h. Empresas de seguros y fondos de pensiones: las empresas de seguro son aquellas que  tienen como objetivo asegurar determinadas coberturas, resarciendo al asegurado de los  perjuicios económicos que se puedan producir en su persona o bienes por acontecimientos  desfavorables. Por su parte, los fondos de pensiones tienen como objetivo complementar  el sistema de pensiones público mediante el abono de prestaciones económicas a la fecha  de jubilación. 
+Por otro lado, es frecuente que los especialistas utilicen los términos de “dealer” y “broker” al  referirse a la actividad de los intermediarios financieros. La expresión “dealer” es un término  anglosajón que se refiere a los intermediarios que además de comprar activos financieros para  sus clientes, lo hacen para ellos mismos, en algunas ocasiones como imposición normativa para  reafirmar el compromiso de la entidad con su gestión (conocido como Commitment). Compran  por cuenta propia y ajena. En el mercado bursátil español esta función la hacen las Sociedades  de Valores y Bolsa.  
+Por su parte la expresión “broker” designa a los intermediarios bursátiles o de los mercados  financieros que actúan exclusivamente por cuenta de sus clientes. Esta actividad es la que  realizan las Agencias de Valores y Bolsa. 
+En cuanto a las funciones básicas de los intermediarios financieros la mayoría de los autores coinciden al señalar que su actuación permite reducir el riesgo de las inversiones al diversificar  la cartera; además, pueden obtener, a medio y largo plazo un rendimiento superior al obtenido  por cualquier inversor individual al aprovechar las economías de escala que se derivan de la  gestión de las mismas. Estas economías de escala aparecen por tres razones fundamentales: 
+▪ Indivisibilidades: el intermediario podrá adquirir activos de alto importe nominal, activos  vedados al inversor individual cuyos recursos sean menores a esos importes nominales.  
+▪ Economía de Gestión: es evidente que el intermediario podrá invertir más recursos en  disponer de profesionales y equipos que garanticen una gestión más eficiente. 
+▪ Economía de Transacción: al realizar transacciones de mayor volumen incurrirán en menores  costes ya que estos, generalmente, se establecen de forma decreciente al valor de la  operación.
+Fundación de Estudios Financieros© 9  
+Sistema Financiero  
+En segundo lugar, la actuación de los intermediarios permite adecuar las necesidades de  prestamistas y prestatarios, y en tercer lugar, no por ello menos importante, los intermediarios  realizan la denominada gestión del mecanismo de pagos de la economía a través del abono o  cargo de los diferentes medios de pago en las cuentas de los agentes económicos. 
+En epígrafes posteriores de esta lectura abordaremos la actual estructura del sistema financiero  español, analizando el papel de los principales supervisores: el Banco de España, la Comisión  Nacional del Mercado de Valores (CNMV) y la Dirección General de Seguros (DGS). 
+2.2.1. Empresas de Servicios de Inversión  
+Por su importancia relativa, en la labor del asesoramiento financiero, pasamos a detallar el  concepto, objetivo, su clasificación y principales actividades de las ESI. 
+Las ESI son entidades de ámbito de actividad y objeto social circunscrito a la prestación de  servicios de inversión sobre instrumentos financieros. Tienen por tanto objeto social exclusivo si  bien la Ley reconoce la posibilidad de prestar servicios de inversión sobre otros instrumentos o  de realizar otras actividades siempre que se resuelvan adecuadamente los conflictos de interés.  Se reconocen cuatro tipos de entidades: 
+ Sociedades de Valores (SV). 
+ Agencias de Valores (AV). 
+ Sociedades Gestoras de Cartera (SGC). 
+ Empresas de asesoramiento financiero (EAF). 
+Como contrapartida al objeto social exclusivo, la Ley1 otorga a estas entidades la reserva de  actividad (nadie puede realizar esta actividad sin haber sido previamente autorizado y  registrado) y de denominación (ninguna entidad puede utilizar la denominación reservada a las  ESI sin registro previo). 
+Las ESI pueden ejercer su actividad mediante sucursales abiertas en el territorio nacional.  También cuentan con la capacidad de actuación transfronteriza, sin necesidad de autorización  previa si se trata de territorio comunitario, bien mediante sucursal o en régimen de libre  prestación de servicios desde otro estado miembro.  
+Igualmente las ESI y entidades de crédito autorizadas en otros estados miembros de la UE  podrán actuar en España sin autorización previa, de acuerdo con las normas de la Directiva sobre  libertad de establecimiento y reparto de competencias (supervisión por el estado de origen con  
+1 La trasposición de la MiFID se ha realizado mediante la modificación de la Ley 24/1988 del Mercado de Valores por la  Ley 47/2007 de 19 de noviembre. Posteriormente el Real Decreto 217/2008 de 15 de febrero sobre régimen jurídico  de las empresas de servicios de inversión ha desarrollado las disposiciones de la Ley en materia de intermediarios  financieros.
+10 Fundación de Estudios Financieros© 
+Sistema Financiero  
+carácter general, y, en el caso de sucursales, supervisión adicional por los supervisores del país  de acogida en lo referente a normas de conducta, principio de mejor ejecución, manejo de  órdenes y normas sobre integridad y transparencia del mercado).  
+Los servicios de inversión y las actividades complementarias que pueden realizar las ESI son los  recogidos en la gráfica 1 que se presenta a continuación2. 
+ESI: servicios y actividades complementarias 
+Gráfica 1 
+  
+Fuente: Elaboración propia 
+▪ Las Sociedades de Valores pueden desarrollar sin límite todos los servicios principales y las  actividades complementarias. Pueden operar tanto por cuenta ajena como por cuenta  propia, y realizar todos los servicios de inversión y los servicios auxiliares. Deberán tener  un capital social no inferior a 730.000 euros. 
+▪ Las Agencias de Valores, de acuerdo con su limitación para desarrollar actividades por  cuenta propia, no pueden prestar los servicios de aseguramiento y la negociación por cuenta  propia y la actividad complementaria de concesión de créditos para la compra de  instrumentos financieros. Su capital social dependerá de las actividades que desarrollen.  Así, carácter general, su capital social no podrá ser inferior a 125.000 euros. No obstante,  las agencias de valores no autorizadas a tener en depósito fondos o valores mobiliarios de  sus clientes podrán tener un capital social de 50.000 euros. 
+▪ Las Sociedades Gestoras de Cartera (SGC) solo pueden prestar los servicios de gestión de  carteras y asesoramiento sobre inversiones y las EAF solo este último. Ambas pueden  
+2 Artículo 63, Anexo 1, Sección A de la Directiva.
+Fundación de Estudios Financieros© 11  
+Sistema Financiero  
+realizar exclusivamente las actividades complementarias de informes y análisis y  asesoramiento corporativo. Deberán tener (i) un capital inicial de 50.000 euros; o (ii) un  seguro de responsabilidad civil profesional, un aval u otra garantía equivalente que permita  hacer frente a la responsabilidad por negligencia en el ejercicio de su actividad profesional  en todo el territorio de la Unión Europea, con una cobertura mínima de 1.000.000 euros por  reclamación de daños, y un total de 1.500.000 euros anuales para todas las reclamaciones;  o (iii) una combinación de capital inicial y de seguro de responsabilidad civil profesional que  dé lugar a un nivel de cobertura equivalente al de los incisos i) e ii) anteriores. 
+▪ Las Empresas de Asesoramiento Financiero (ver epígrafe siguiente).  
+2.2.2. Empresas de Asesoramiento Financiero (EAF)  
+Como se recoge en la Guía de la CNMV3, son aquellas personas físicas o jurídicas que  exclusivamente pueden prestar los servicios de asesoramiento en inversiones y los auxiliares  de asesoramiento a empresas (sobre estructura del capital, estrategia industrial y cuestiones  afines, así como el asesoramiento y demás servicios en relación con fusiones y adquisiciones de  empresas) y la elaboración de informes de inversiones y análisis financieros u otras formas de  recomendación general relativa a las operaciones sobre instrumentos financieros.  
+Tratándose de personas jurídicas, deberán tener (i) un capital inicial de 50.000 euros o (ii) un  seguro de responsabilidad civil que cubra todo el territorio de la Unión Europea, aval u otra  garantía comparable, con una cobertura mínima de 1.000.000 euros por reclamación de daños,  y un total de 1.500.000 euros anuales para todas las reclamaciones, o (iii) una combinación de  capital inicial y de seguro de responsabilidad civil profesional que dé lugar a un nivel de cobertura  equivalente al de los incisos (i) e (ii) anteriores. 
+Sea cual sea su estatuto jurídico, personas físicas o jurídicas, deben estar inscritas en el  correspondiente Registro de la CNMV y están sujetas a su supervisión. 
+En general, según la MiFID II, el asesoramiento en materia de inversión es un servicio de  inversión que consiste en la emisión de una recomendación personalizada a un cliente, ya sea a  petición de este o por iniciativa de la entidad, con respecto a una o más operaciones relativas a  instrumentos financieros concretos o referidas al asesoramiento en materias auxiliares como  estructuración de capital, estrategia industrial y demás servicios en relación con fusiones y  adquisiciones. 
+La recomendación debe presentarse como idónea para el cliente, basándose en sus  circunstancias personales. No se considera asesoramiento en materia de inversión cualquier  recomendación de carácter genérico y no personalizada que se pueda realizar en el ámbito de  
+3 http://www.cnmv.es/DocPortal/Publicaciones/Fichas/EAFI_ESP.pdf
+12 Fundación de Estudios Financieros© 
+Sistema Financiero  
+la comercialización o venta de valores e instrumentos financieros y que se consideran  comunicaciones de carácter comercial. Tampoco aquellas recomendaciones que se divulgan  exclusivamente a través de canales de distribución dirigidos al público en general (prensa, TV,  radio). 
+Las EAF nacen con el objetivo de profundizar en la especialización y profesionalización de la  actividad de asesoramiento. Es una actividad compatible con la de cualquier banca privada pero  exclusiva en lo que se refiere al asesoramiento pues no es posible ni la intermediación ni el  depósito. Dos condiciones que permiten desarrollar la actividad en un entorno de mayor  transparencia en el cobro y procedencia de los ingresos y mayor agilidad y flexibilidad para la  transmisión del conocimiento y por tanto, de valor añadido. 
+ 
+Fundación de Estudios Financieros© 13  
+Sistema Financiero  
+3. ACTIVOS FINANCIEROS  
+3.1. Concepto y funciones  
+Son títulos (anotaciones en cuenta o valores) que emiten las unidades que necesitan recursos y  que son suscritos (primera adquisición en el mercado primario o de subasta) o comprados  (segunda y sucesivas adquisiciones en los mercados secundarios) por aquellos que tienen exceso  de liquidez. Son “activos” para éstos (los inversores que compran) y “pasivos” para aquéllos  (los emisores), movilizando así la riqueza de una economía. 
+Deben reunir al menos una de las siguientes características: 
+✔ En efectivo (emisión limitada a Organismos Públicos). 
+✔ Ser un instrumento de patrimonio neto de otra entidad (Reconocimientos de Deuda). ✔ Representar un derecho contractual a recibir: Efectivo o Patrimonial. 
+✔ Tratarse de un contrato de «liquidación no cierta», que pudiese serlo por medio de  cualquiera de los tipos anteriores (ej.: Derivados). 
+3.2. Características principales  
+Las principales características de todo activo financiero son: 
+▪ El riesgo, 
+▪ La rentabilidad y  
+▪ La liquidez. 
+▪ El riesgo: en sentido amplio, se define como la probabilidad de que un suceso inesperado  nos perjudique. En el ámbito de las finanzas el riesgo se resume como toda aquella situación  inesperada que suponga que no ganemos lo esperado o, incluso, que lleguemos a perder.  En general, en finanzas hablamos de volatilidad, es decir, variabilidad sobre la rentabilidad  media esperada en una inversión. 
+Existen cuatro grandes familias de riesgo en finanzas: 
+✔ Riesgo de Mercado: relacionado en general con el movimiento desfavorable del tipo de  interés, del tipo de cambio, del precio de las acciones. 
+✔ Riesgo de Crédito: o de insolvencia, relacionado con el riesgo emisor y de  contrapartida, incluyendo también el riesgo país.
+14 Fundación de Estudios Financieros© 
+Sistema Financiero  
+✔ Riesgo legal: relacionado con el riesgo normativo y con los posibles cambios en la  fiscalidad de los productos financieros. 
+✔ Riesgo Operacional: relacionado con fallos humanos, de sistemas y de procedimiento. 
+▪ La rentabilidad: entendida como la capacidad del activo de generar riqueza, ya sea de  carácter financiero o de carácter fiscal. Esta rentabilidad (intereses u otros rendimientos)  nace como pago de la cesión temporal del inversor de su capacidad de compra y de asunción,  también temporal, de un riesgo. 
+▪ La liquidez: se mide por la certeza y facilidad de convertir los activos en efectivo sin sufrir grandes pérdidas. 
+Existen diversos criterios de clasificación de los activos financieros (tabla 1), según su grado de  liquidez relativa, en función de la naturaleza económica del emisor, en función del mecanismo  de negociación, por el tipo de rendimiento que generan, etc. 
+3.3. Clasificación  
+Una primera clasificación de productos financieros (muy clásica) podría ser aquella que los  clasifica en: 
+• Productos bancarios de pasivo: son una forma segura de colocar el dinero que no se va  a utilizar de forma inmediata, por ejemplo, cuentas, depósitos, imposiciones, etc.  
+• Productos bancarios de activo: las instituciones financieras financian a las empresas y  particulares a través de estos productos, por ejemplo, descuento de efectos, tarjetas de  crédito o préstamos. 
+• Productos de renta fija: se denominan así porque quienes invierten en ellos perciben, en  concepto de intereses, una cantidad fija, por ejemplo, letras del Tesoro y pagarés de  empresa a corto plazo o bonos y obligaciones a medio y largo plazo. 
+• Productos de renta variable: se caracterizan porque sus propietarios o propietarias cobran  las rentas dependiendo del beneficio de las empresas, por ejemplo, acciones de una  sociedad anónima.  
+• Otros productos financieros: además de los citados grupos de productos, existen otros  muchos que responden a las necesidades de empresas y particulares, como pueden ser  seguros, planes de pensiones y planes de jubilación.
+Fundación de Estudios Financieros© 15  
+Sistema Financiero  
+Al igual que en el caso de los servicios financieros, la Ley del Mercado de Valores (LMV) traslada  literalmente el listado de instrumentos financieros recogido en el Anexo 1, sección C de la  Directiva. Los instrumentos aptos para la prestación de servicios de inversión por las ESI son los  siguientes:  
+▪ Acciones y valores negociables, incluidas participaciones de IIC. 
+▪ Cuotas participativas de las cajas de ahorros. 
+▪ Bonos, obligaciones y otros valores análogos. 
+▪ Cédulas y participaciones hipotecarias y bonos de titulización. 
+▪ Instrumentos del mercado monetario.  
+▪ Participaciones preferentes. 
+▪ Cédulas territoriales. 
+▪ Warrants y demás valores negociables derivados. 
+▪ Los demás a los que las disposiciones legales o reglamentarias atribuyan la condición de  valor negociable. 
+Entre los instrumentos derivados la ley introduce algunas novedades como los derivados de  crédito, los contratos sobre materias primas y los referidos a otras variables no financieras. La  lista de Instrumentos financieros derivados es la siguiente: 
+▪ Contratos financieros a plazo sobre instrumentos financieros y tipos de interés, divisas o  rendimientos que puedan liquidarse en especie o efectivo. 
+▪ Contratos financieros a plazo sobre materias primas que deban liquidarse en efectivo o  en especie siempre que se negocien en un mercado regulado o SMN. 
+▪ Derivados de crédito. 
+▪ Contratos financieros por diferencias. 
+▪ Contratos derivados financieros sobre otras variables (climáticas, transporte, emisión,  inflación…) que se liquiden en efectivo.  
+La tabla 1 presenta la clasificación tradicional de los activos financieros en función del emisor,  el plazo de emisión, el rendimiento, etc.
+16 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Clasificación de los Activos Financieros  
+ Tabla 1 
+En Función de 
+	Tipología 
+	El Emisor
+	• Públicos (Letra del Tesoro) 
+• Privados (Pagaré Telefónica)
+	Plazo de Emisión
+	• Corto plazo (menos 18 meses) 
+• Medio plazo (2 a 7 años) 
+• Largo plazo (7 a 30 años)
+	Por el Rendimiento que pagan
+	• Fijo (Bonos del Estado) 
+• Variable (acciones)
+	Por la forma de pago de los intereses
+	• De rendimiento implícito 
+• De rendimiento explícito (cupones)
+	Por la deuda que reconocen
+	• Obligacionistas (renta fija) 
+• Accionistas (renta variable)
+	Mecanismo de Negociación
+	• Mercados Organizados (Bolsa) 
+• Mercados no Organizados (FRAs)
+	
+
+
+
+Fuente: Elaboración propia 
+ 
+Fundación de Estudios Financieros© 17  
+Sistema Financiero  
+4. MERCADOS FINANCIEROS  
+4.1. Concepto y funciones  
+Es el mecanismo o lugar a través del cual se produce un intercambio de activos financieros y se  determinan sus precios, dando liquidez a los activos financieros. En los mercados financieros se  compra y se vende a través de intermediarios especializados, bajo ciertas reglas. 
+Las principales funciones de un mercado financiero son: 
+▪ Poner en contacto a los agentes económicos. 
+▪ Fijar los precios de los activos financieros. 
+▪ Proporcionar liquidez a los inversores. 
+▪ Reducir los plazos y costes de intermediación. 
+▪ Establecer los procedimientos que garanticen la seguridad y la eficiencia en los procesos  de liquidación y registro. 
+⮚ Poner en contacto a los agentes económicos: solo los intermediarios financieros previamente  autorizados por el organismo rector de cada uno de los mercados (Banco de España,  Sociedades Rectoras de las Bolsas, etc.), pueden negociar en estos directamente. Los  inversores no miembros, ya sean personas físicas o jurídicas, acceden al mercado  indirectamente, transmitiendo sus órdenes al mercado a través de aquéllos. 
+⮚ Fijar los precios de los activos financieros: por el libre juego de oferta y demanda. En la  actualidad, si bien las sociedades rectoras de los diferentes mercados pueden fijar límites a  la variación diaria del precio de los activos cotizados, podemos afirmar que la libertad de fijar  precios es total en España. 
+Por la trascendencia que tiene dicha fijación de precios (liquidación de préstamos, valoración  de fondos de inversión a pensiones, establecimiento de coste de la Deuda pública o  privada…), dicha fijación ha de realizarse con la mayor objetividad posible, y por métodos  dotados de una transparencia probada. De ahí que en muchas ocasiones se dé la participación  de órganos de supervisión y control públicos en su cálculo, o al menos que este quede  garantizado por su participación en el proceso. 
+⮚ Proporcionar liquidez a los inversores: esta cualidad se logra en la actualidad gracias a la  participación activa de los denominados “creadores de mercado”, en la renta fija y derivados,  o “especialistas de mercado” si se trata del mercado bursátil. Estas entidades se obligan, en  cada caso, a otorgar liquidez a un conjunto de activos previamente seleccionados.  
+Esta liquidez se consigue mediante la cotización en firme y en tiempo real de precios/tipos  de compra y venta por volúmenes y diferenciales conforme a las reglas del mercado.
+18 Fundación de Estudios Financieros© 
+Sistema Financiero  
+⮚ Reducir los plazos y costes de intermediación: Tanto desde el punto de vista de las empresas  que necesitan financiación como desde el de los ahorradores que necesitan invertir sus  excedentes. En este sentido, con un mercado financiero crecientemente sofisticado y  globalizado, la posibilidad de ser asesorado por especialistas supone un gran ahorro de costes  de información, transacción, y la capacidad de realizar inversiones de pequeñas cuantías en  activos de gran importe, gracias, en muchas ocasiones a la inversión colectiva.  
+⮚ Establecer los procedimientos que garanticen la seguridad y la eficiencia en los procesos de  liquidación y registro: Hace referencia a la fase de post-trading o posterior a la contratación.  La materialización de los títulos en anotaciones en cuenta crea la necesidad de implementar  sistemas informáticos centralizados que registren la emisión total de los valores por parte de  sus emisores y la correspondiente propiedad de sus inversores, es decir, la llevanza de los  registros contables de los valores. La estrecha vinculación de estos sistemas de registro de  valores con los sistemas de contratación y con los sistemas de pagos utilizados por los  mercados minimizan los riesgos de la liquidación de las operaciones. 
+4.2. Características  
+Siguiendo a los profesores Parejo, Rodríguez Saíz y Calvo, podemos establecer que un mercado  financiero será eficiente y perfecto en la medida que cumpla, en su grado máximo, las siguientes  características: 
+⮚ Transparencia: cuando existe información abundante, pública y gratuita a disposición de los  sujetos económicos. 
+⮚ Libertad: inexistencia de barreras de entrada o de salida a los distintos operadores del  mercado.  
+⮚ Profundidad: un mercado será tanto más profundo cuanto mayor sea la cantidad de órdenes  de compra- venta que se produzcan, dotándole además de una mayor liquidez y eficiencia  en el proceso de asignación de los precios.  
+⮚ Flexibilidad: posibilidad de contratación con diferentes plazos, importes, monedas y  sistemas. Tiempo que tarda el mercado en reaccionar ante nuevas noticias que afectan a la  tendencia del mismo. 
+⮚ Amplitud: medida por el número de activos diferentes que se negocia en el mercado.
+Fundación de Estudios Financieros© 19  
+Sistema Financiero  
+Además, en épocas recientes se han podido apreciar diversas tendencias en estos sistemas  financieros como: 
+La globalización, cada vez hay más similitud y desarrollo en sistemas financieros en  diferentes ámbitos geográficos. La desintermediación, por asunción de funciones en otros  tipos de entidades no estrictamente financieras. La desregulación que elimina trabas a las  transacciones. La desmaterialización puede describirse "como el fenómeno de pérdida del  soporte físico (papel) por parte del valor incorporado, optando por la alternativa de su  documentación por medios contables o informáticos" que elimina inexactitudes derivadas de  procesos manuales y del trasiego físico de títulos, y disminuye una serie de costos asociados  al uso de papel incrementando la agilidad de las transacciones. Y finalmente la innovación,  que amplía las posibilidades de inversión o protección para los inversores. 
+4.3. Clasificación  
+Aunque existen muchas formas de clasificar los mercados financieros, las más conocidas son  las siguientes: 
+⮚ Por la fase de negociación: nos referiremos a mercados primarios o de nueva emisión y  mercados secundarios o de negociación. Hablaremos de mercado “gris” al periodo de  tiempo que se puede negociar entre intermediarios previo a la fecha de emisión del activo  en cuestión. 
+⮚ Por la divisa y residencia del agente: hablamos de mercados domésticos, internacionales y  del euromercado. Esta clasificación depende tanto de la divisa en la que se denomine el  activo como de la nacionalidad y/o residencia de los participantes en la operación.  
+⮚ Por la naturaleza de los activos negociados: sin lugar a duda la clasificación más relevante.  Así hablaremos de mercados monetarios cuando los activos negociados son a corto plazo  y de mercados de capitales cuando el activo permite financiaciones a medio y largo plazo.  
+⮚ Por el grado de intervención de las autoridades: hablaremos de mercados libres o de  mercados regulados u oficiales. En estos mercados regulados se altera administrativamente  el precio o la cantidad de títulos negociados. 
+⮚ Por el tipo de recursos que el emisor vaya a captar: nos referiremos a mercados de renta  fija o de renta variable dependiendo de que los recursos captados sean ajenos o propios. 
+⮚ Por el grado de formalización: los clasificamos en Organizados y no organizados (también  denominados mercados Over The Counter –OTC-). Esta clasificación tiene especial  relevancia en el caso de los mercados organizados de productos derivados, debido a la  figura de la Cámara de Compensación.
+20 Fundación de Estudios Financieros© 
+Sistema Financiero  
+A continuación, señalamos las principales diferencias entre mercados organizados y no  organizados (tabla 2). 
+Diferencias entre mercados organizados y no organizados de Derivados  
+Tabla 2 
+  
+ 
+	MERCADO ORGANIZADO  
+(electrónico) 
+	MERCADO NO ORGANIZADO  (OTC) 
+	  
+  
+Relación entre  
+las partes  
+ 
+	El comprador y el vendedor no se  conocen, existe anonimato de  contrapartida. 
+La relación es multilateral e indirecta  y la operación se tiene que hacer a  través de una Bolsa o Cámara de  Compensación.
+	La operación se hace sin cámaras,  es decir, las partes se conocen.  
+Es una relación bilateral y directa.
+	Riesgo de  
+contrapartida
+	Lo asume la Cámara de  
+Compensación.
+	Lo asumen las partes  
+directamente.
+	Garantías 
+	La Cámara exige unas garantías a  modo de fianza.
+	No se exigen garantías porque es  un acuerdo privado.
+	Pérdidas y  
+ganancias en  
+operaciones 
+	Supone una liquidación diaria de  pérdidas y ganancias, es decir, valorar  siempre las posiciones a precios de  mercado.
+	El beneficio o pérdida solo se  tendrá el día del vencimiento del  contrato.
+	Contratos 
+	Está estandarizado lo siguiente: - El importe. 
+- Las fechas de vencimiento, de  compra y venta. 
+- La variación máxima y mínima del  precio del contrato. 
+- El importe mínimo de contratación. - El horario de la negociación. - El sistema de liquidación. 
+Por tanto, lo único que se puede  negociar es el precio de contratación.
+	Los contratos son distintos cada  vez con las características que  acuerden las partes.
+	
+
+
+
+Fuente: Elaboración propia
+Fundación de Estudios Financieros© 21  
+Sistema Financiero  
+4.3.1. Estructura actual de los mercados de valores en España  
+Tras varios años de aplicación de la normativa MIFID I surge la necesidad de reforzar el marco  regulatorio de los mercados de valores para su adaptación a la nueva realidad del mercado y  para la incorporación de numerosas mejoras cuya necesidad se ha visto evidenciada con la crisis  financiera. Esta reforma normativa pretende contribuir a la creación de un mercado de valores  más competitivo, integrado y eficiente en el seno de la Unión Europea.4 
+MIFID II, que entró en vigor el 3 de enero de 2018, tiene como objetivo reforzar la actual  regulación europea sobre mercados de valores por varias vías: 
+• Persigue que la negociación organizada se desarrolle en plataformas reguladas. • Introduce reglas sobre negociación algorítmica y de alta frecuencia. 
+• Mejora la transparencia y la supervisión de los mercados financieros, incluidos los  mercados de derivados, y aborda determinadas carencias de los mercados de derivados  sobre materias primas. 
+• Refuerza la protección del inversor y las normas de conducta, así como las condiciones  de competencia en la negociación y liquidación de instrumentos financieros. 
+Además, MIFIR, regula la transparencia pre y post negociación en relación con las autoridades  competentes y los inversores, los requisitos y obligaciones de los proveedores de servicios de  datos, establece la obligación de negociación de derivados en centros de negociación y ciertas  acciones supervisoras. 
+En definitiva, como se verá más ampliamente en el módulo dedicado a cumplimiento normativo,  estas reformas persiguen los siguientes objetivos: 
+• Reforzar la protección al inversor, regulando, entre otros, el asesoramiento en la  comercialización de productos financieros y sus incentivos. 
+• Adaptarse a los desarrollos tecnológicos y de los mercados, regulando prácticas como  la negociación algorítmica automatizada. 
+• Impulsar la negociación de instrumentos financieros desde mercados OTC (“over the  counter”) hacia centros de negociación (mercados regulados, sistemas multilaterales  de negociación o sistemas organizados de contratación). 
+• Aumentar la transparencia en los mercados, no solo en lo relativo a la negociación de  acciones e instrumentos similares sino también en relación con bonos o derivados, para  velar por el correcto funcionamiento de los mismos en la formación de precios. 
+4 Fuente CNMV
+22 Fundación de Estudios Financieros© 
+Sistema Financiero  
+• Mejorar la regulación de algunos productos financieros como los derivados,  especialmente los derivados sobre materias primas. 
+• Facilitar el acceso de las pymes a la financiación, a través de la creación de los  «Mercados PYME en expansión». 
+• Reforzar y armonizar la supervisión y las sanciones a disposición de las autoridades  competentes y evitar el arbitraje regulatorio. 
+La MiFID distingue tres tipos de mercados: los mercados regulados, los sistemas multilaterales  de negociación (SMN) y los sistemas organizados de contratación (SOC u OTF, por sus siglas en  inglés). La LMV se refiere a los primeros como mercados secundarios oficiales continuando con  la terminología anterior.  
+Además, siguiendo los preceptos de la Directiva, la LMV rompe el principio de concentración,  que demandaba que los valores cotizados se negociaran siempre a través de las Bolsas de  Valores, posibilitando que se realicen transmisiones de valores cotizados al margen de las bolsas  mediante la internalización de órdenes en los intermediarios financieros o en los Sistemas  Multilaterales de Negociación. 
+  
+4.3.1.1. Mercados Regulados  
+Son mercados regulados aquellos sistemas multilaterales que permiten reunir los diversos  intereses de compra y venta para dar lugar a contratos con respecto a los instrumentos  financieros admitidos a negociación; requieren autorización previa y deben funcionar de forma  regular con sujeción a condiciones de acceso, admisión a negociación, procedimientos  operativos, información y publicidad. 
+Es decir, su funcionamiento es no discrecional y está sujeto a reglas de funcionamiento que  están recogidas en un Reglamento y en sus estatutos: Deben estar regidos por un operador de  mercado (que puede coincidir con el mercado o no) y están supervisados y obligados a colaborar  con los organismos supervisores para garantizar su buen funcionamiento y evitar el abuso de  mercado. 
+Como ya se ha comentado, los mercados regulados españoles se denominan mercados  secundarios oficiales y son los siguientes (gráfica 2): 
+• Las Bolsas de Valores. 
+• El Mercado de Deuda Pública en Anotaciones. 
+• Los Mercados de Futuros y Opciones, cualquiera que sea el tipo de activo subyacente,  financiero o no financiero.
+Fundación de Estudios Financieros© 23  
+Sistema Financiero  
+• El Mercado de Renta Fija, AIAF. 
+• Cualesquiera otros, de ámbito estatal o autonómico que se autoricen en el marco de las  previsiones de la LMV. 
+Gráfica 2 
+  
+Fuente: BME 
+La admisión de valores a negociación en los mercados secundarios oficiales corresponde a la  Sociedad Rectora del mercado, a solicitud del emisor, con la verificación previa de la CNMV. En  el caso de los valores negociables en varias Bolsas de Valores, la verificación será única y válida  para todas ellas.  
+Los mercados deberán establecer normas claras y transparentes sobre la admisión a negociación  de instrumentos financieros que aseguren que puedan ser negociados de modo correcto,  ordenado y eficiente y, si se trata de valores negociables, que sean libremente transmisibles. En  particular, en el caso de los instrumentos financieros derivados, las normas deben garantizar  que la formulación del contrato objeto de negociación permita una correcta formación de precios,  así como la existencia de condiciones efectivas de liquidación.
+24 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Además, los mercados deberán disponer de mecanismos eficaces para: 
+• Comprobar que los emisores de valores admitidos a negociación cumplan todas sus  obligaciones legales con respecto a la difusión de información. 
+• Facilitar a sus miembros el acceso a la información publicada. 
+• Comprobar periódicamente que los instrumentos financieros admitidos a negociación  cumplen los requisitos de admisión.  
+Podrán ser miembros de los mercados secundarios oficiales las siguientes entidades: 
+• Las ESI que estén autorizadas para ejecutar órdenes de clientes o para negociar por cuenta  propia. 
+• Las entidades de crédito españolas. 
+• Las ESI y las entidades de crédito autorizadas en otros Estados miembros de la UE que  estén autorizadas para ejecutar órdenes de clientes o para negociar por cuenta propia. El  acceso podrá ser (i) directo, estableciendo sucursales en España, o (ii) haciéndose  miembros remotos del mercado secundario oficial, sin necesidad de estar establecidos en  el Estado español. 
+• Las ESI y las entidades de crédito autorizadas en un Estado que no sea miembro de la  Unión Europea, siempre que, además de cumplir los requisitos exigidos para operar en  España, en la autorización dada por las autoridades de su país de origen se les faculte para  ejecutar órdenes de clientes o para negociar por cuenta propia.  
+• La Administración General del Estado, actuando a través de la Dirección General del Tesoro  y Política Financiera, la Tesorería General de la Seguridad Social y el Banco de España. 
+• Aquellas otras personas que, a juicio de la Sociedad Rectora del mercado secundario oficial  correspondiente, (i) sean idóneas, (ii) posean un nivel suficiente de aptitud y competencia  en materia de negociación, (iii) tengan establecidas medidas de organización adecuadas y  (iv) dispongan de recursos suficientes para cumplir su función. 
+A fin de procurar la transparencia del mercado y la eficiencia en la formación de los precios, los  mercados secundarios oficiales están obligados a difundir información de carácter público sobre  las posiciones de compra y venta sobre acciones admitidas a negociación existente en cada  momento y sobre las operaciones ya concluidas. 
+Fundación de Estudios Financieros© 25  
+Sistema Financiero  
+En concreto, los mercados secundarios oficiales deben hacer pública la siguiente información,  con carácter previo a la negociación, con respecto a las acciones admitidas a negociación: 
+• los precios de compra y venta existentes en cada momento, y 
+• la profundidad de las posiciones de negociación a esos precios que se difundan a través de  sus sistemas. 
+Sobre las operaciones ya concluidas sobre acciones admitidas a negociación debe hacerse  pública la siguiente información: 
+• el precio, 
+• el volumen y 
+• la hora de ejecución. 
+Esta información deberá ponerse a disposición del público en condiciones comerciales razonables  y, en la medida de lo posible, en tiempo real. 
+4.3.1.2. Sistemas Multilaterales de Negociación  
+Es un sistema gestionado (i) por una ESI, (ii) por una sociedad rectora de un mercado secundario  oficial, o (iii) por la entidad constituida al efecto por una o varias sociedades rectoras, con objeto  social exclusivo limitado a la gestión del sistema, que permita reunir, dentro del sistema y según  normas no discrecionales, los diversos intereses de compra y de venta sobre instrumentos  financieros de múltiples terceros para dar lugar a contratos. 
+Por tanto, se trata de un sistema de contratación donde se pueden casar operaciones de compra  y venta de instrumentos financieros. 
+Es un concepto similar al de mercado regulado si bien los sistemas multilaterales no cuentan  con la facultad de admisión a negociación de valores. 
+26 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Su creación es libre, con sujeción al régimen de verificación previa y supervisión por la CNMV y  deben estar regidos por una entidad rectora, responsable de su organización, funcionamiento  interno y de los medios necesarios para la gestión del sistema multilateral, que deberá ser  autorizado por la CNMV, y debe regular las siguientes materias: 
+i) Aspectos generales del reglamento interno de funcionamiento (debe ser aprobado por  la CNMV). 
+o Instrumentos financieros que pueden negociarse. 
+o Información pública, a facilitar a los inversores, que deberá estar  
+disponible respecto a los valores admitidos a negociación. 
+o Tipos de miembros. 
+o Régimen de garantías exigidas. 
+ii) Negociación. 
+o Acceso a la condición de miembro. 
+o Modalidades de transacciones. 
+o Supuestos de interrupción, suspensión y exclusión de negociación de los  valores negociados. 
+o Contenido y reglas de difusión de información previa a la efectiva  
+negociación de transacciones.  
+o Contenido y reglas de difusión de información sobre las transacciones  efectivamente negociadas. 
+iii) Registro, compensación y liquidación de transacciones. 
+iv) Supervisión y disciplina de mercado. 
+o Métodos de supervisión y control especialmente en lo que atañe a las  normas sobre abuso de mercado. 
+o Régimen disciplinario aplicable a sus miembros. 
+o Procedimiento de comunicación a la CNMV de incidencias o conductas  infractoras de la LMV a del Reglamento.  
+A fin de procurar la transparencia del sistema y la eficiencia en la formación de los precios, los  SMN están obligados a difundir información de carácter público en relación con las operaciones  sobre acciones admitidas a negociación en el sistema que a su vez se negocien en mercados  regulados, sobre las posiciones de compra y venta existentes en cada momento. 
+Fundación de Estudios Financieros© 27  
+Sistema Financiero  
+En particular deben hacer pública la misma información exigida a los mercados secundarios  oficiales, tanto con carácter previo a la negociación como la exigida para las operaciones ya  concluidas, con respecto a las acciones admitidas a negociación en ellos que a su vez se negocien  en mercados regulados. 
+Al igual que para los mercados oficiales, la información debe ponerse a disposición del público  en condiciones comerciales razonables y de forma continua en el horario normal de negociación. 
+Los SMN cuando actúen por cuenta de sus clientes deberán cumplir las normas relativas a  las obligaciones de información (servicios prestados, estrategias de inversión, centros de  ejecución de órdenes, gastos y costes asociados, etc.), a registro de contratos en los que consten  los derechos y obligaciones de las partes y las obligaciones relativas a la existencia de una 
+política de ejecución de órdenes que defina la importancia relativa atribuida al precio, a los  costes, a la rapidez y eficiencia en la ejecución y liquidación, y a cualquier otro elemento que  juzguen relevante para la ejecución de la orden. No obstante, estas obligaciones no serán  exigibles para las operaciones entre sus miembros. 
+4.3.1.3. Sistemas Organizados de Contratación  
+A través de MiFID II se regula una nueva categoría de plataforma de negociación, los sistemas  organizados de contratación (“Organised Trading Facilities”) para la negociación de operaciones  con bonos, productos financieros estructurados, derechos de emisión y productos derivados no  sujetos a la obligación de compensación de acuerdo con el Reglamento sobre derivados OTC  (conocido como EMIR). 
+En los SOC, a diferencia de lo que ocurre en los mercados regulados y los SMN, la negociación  se podrá efectuar a través de reglas discrecionales. Asimismo, se permite que, en determinadas  circunstancias, el gestor del SOC opere a través de interposición de su cuenta propia sin riesgo  (matched principal trading) en valores de renta fija e instrumentos derivados y negocie por  cuenta propia en aquellos instrumentos de deuda soberana para los que no existe mercado  líquido. 
+Al igual que sucede en los mercados regulados y en los SMN los sistemas organizados de  contratación deben facilitar a las autoridades competentes toda la información referente a los  instrumentos financieros que en él se negocian. 
+Dado que los SOC se distinguen de los SMN en que el proceso de negociación puede comportar  el recurso a normas discrecionales por parte del organismo rector, y puesto que el organismo  rector de un SOC será responsable frente a los usuarios del sistema, los SOC deben facilitar  información adicional.
+28 Fundación de Estudios Financieros© 
+Sistema Financiero  
+4.3.1.4. Internalizadores Sistemáticos (IS)  
+A diferencia del régimen previsto en MiFID I, en virtud del cual las ESI podían optar  voluntariamente por la consideración de las mismas como internalizadores sistemáticos, MiFID  II prevé la posibilidad de que bajo determinadas circunstancias la calificación como  internalizador sistemático devenga obligatoria. 
+Son internalizadores sistemáticos aquellas ESI que de forma organizada, frecuente y sustancial  negocian por cuenta propia al ejecutar órdenes de clientes al margen de la negociación  realizada en los centros de negociación (OTC). Esta forma de negociación requiere que la  misma se notifique a la autoridad competente. 
+La categorización de una ESI como internalizador sistemático se rige por criterios  cuantitativos, que tienen en cuenta el volumen y la frecuencia de las operaciones OTC por  cuenta propia llevadas a cabo. No obstante, una ESI podrá optar voluntariamente por  someterse al régimen de internalización sistemática. 
+MiFID II-MiFIR amplía el régimen de transparencia aplicable a los internalizadores  sistemáticos, de modo que éstos deberán hacer públicas cotizaciones en firme no solo respecto  de acciones, sino también respecto de otros instrumentos financieros para los que sean  internalizadores sistemáticos y exista un mercado líquido. 
+Todos los centros de negociación, como los mercados regulados, los sistemas multilaterales de  negociación (SMN) y los sistemas organizados de contratación (SOC), deben establecer unas  normas transparentes y no discriminatorias que rijan el acceso al sistema. Sin embargo,  mientras que los mercados regulados, los SMN y los SOC deben seguir ajustándose a unos  requisitos similares respecto a quiénes pueden admitir como miembros o participantes, los  internalizadores sistemáticos deben poder determinar o restringir el acceso en función, entre  otras cosas, del cometido y las obligaciones que tienen para con sus clientes. A este respecto,  las plataformas de negociación deben estar en condiciones de especificar parámetros que rijan  el sistema tales como una latencia mínima, en la medida en que se haga de forma abierta y  transparente y no implique discriminación por parte del operador de la plataforma. 
+4.3.2. Bolsas y Mercados Españoles (BME)  
+El Grupo Bolsas Mercados Españoles (BME) es el operador de todos los mercados de valores y  sistemas financieros de nuestro país. Desde sus inicios, BME ha sido una referencia en el sector  tanto en términos de solvencia, como de eficiencia y rentabilidad. 
+Fundación de Estudios Financieros© 29  
+Sistema Financiero  
+BME5 fue la respuesta de los mercados españoles al nuevo entorno financiero internacional donde  los inversores, intermediarios y empresas demandan una creciente gama de servicios y  productos en un marco de seguridad, transparencia, flexibilidad y competitividad. Agrupa, bajo  la misma unidad de acción, decisión y coordinación, al conjunto de mercados secundarios  oficiales6 españoles (renta variable, renta fija y derivados) y a los sistemas de compensación y  liquidación españoles. 
+Esta integración de nuestros mercados nacionales, que se venía solicitando por el conjunto de  las grandes entidades financieras y los grandes emisores privados del país, permitirá conseguir  mejoras significativas en la eficiencia de cada uno de los mercados, entre otras: 
+▪ Mayor eficacia en la toma de decisiones al existir una gestión unificada.  ▪ Aglutinar los recursos de todas las empresas. 
+▪ Total desarrollo de oportunidades de negocio.  
+▪ Desarrollo exponencial de la tecnología creando valor y ganando tamaño. 
+Una de las fortalezas de BME se basa en su diversificación, que se plasma en su organización en  torno a siete áreas de negocio que ofrecen gran variedad de servicios al más alto nivel. Las áreas  son: Renta Variable, Renta Fija, Derivados, Clearing, Liquidación, Market Data y Servicios de  Valor Añadido.  
+En el año 2020, BME pasa a formar parte del del Grupo SIX y deja de cotizar en la Bolsa Española. A modo de resumen, avanzamos las características básicas de los mismos: 
+⮚ Las Bolsas de Valores (Madrid, Bilbao, Barcelona y Valencia) son los mercados secundarios  oficiales destinados a la negociación en exclusiva de las acciones y valores convertibles o que  otorguen derecho de adquisición o suscripción. En la práctica, los emisores de renta variable  acuden a la Bolsa también como mercado primario donde formalizar sus ofertas de venta de  acciones o ampliaciones de capital. También se contrata en Bolsa la renta fija, tanto deuda  pública como privada. La organización y funcionamiento de cada Bolsa depende de su  correspondiente Sociedad Rectora, pudiendo ser miembros del mercado las sociedades y  agencias de valores y bolsa y las entidades financieras que lo soliciten. 
+En el funcionamiento del mercado de renta variable español hay que destacar la constitución  de la Sociedad de Bolsas en 1989, participada en un 25 % por cada una de las cuatro Bolsas,  como entidad responsable de la gestión técnica del Sistema de Interconexión Bursátil Español  
+5 http://www.bolsasymercados.es/ 
+6 Según la Ley del Mercado de Valores (LMV): "Son mercados secundarios oficiales de valores aquellos que funcionen  regularmente, conforme a lo prevenido en esta Ley y en sus normas de desarrollo, y, en especial, en lo referente a las  condiciones de acceso, admisión a negociación, procedimientos operativos, información y publicidad”.
+30 Fundación de Estudios Financieros© 
+Sistema Financiero  
+(SIBE) y que permite la integración en un solo mercado, mercado continuo, de la negociación  en las cuatro bolsas. 
+⮚ Mercado de Derivados Financieros: Hasta el 9 de septiembre de 2013, MEFF Sociedad Rectora  de Productos Derivados S. A. (MEFF) reunía la condición tanto de mercado secundario oficial  como de entidad de contrapartida central (CCP) respecto de los instrumentos comprendidos  en el segmento denominado Derivados Financieros (futuros y opciones IBEX 35, futuros y  opciones sobre acciones, futuros sobre el índice de dividendos, futuros sobre dividendos de  acciones y futuros sobre el Bono Nocional 10 años) y para instrumentos derivados sobre  electricidad (MEFF Power). Además, MEFF ha sido CCP para repos sobre Deuda Pública  (MEFFREPO). Esta actividad la asume la nueva sociedad BME Clearing. 
+Para cumplir los requisitos de la normativa de EMIR (European Market Infrastructure  Regulation, Reglamento (UE) 648/2012), ha sido necesario separar las actividades de  mercado de las de CCP. Dicha separación se ha hecho trasladando la actividad de mercado  de la antigua sociedad MEFF (entidad vigente hasta el 9 de septiembre de 2013) a una nueva  sociedad. De esta manera hay dos sociedades, una nueva con el mercado, y la ya existente  previamente, únicamente como CCP. La sociedad nueva que ha asumido las actividades de  mercado se denomina MEFF Sociedad Rectora del Mercado de Productos Derivados (de forma  abreviada, MEFF Exchange); y la hasta ahora MEFF, que continúa con la actividad de CCP,  ha cambiado su denominación a BME Clearing. 
+⮚ El Mercado de Deuda Pública: Los valores negociados en este mercado son los bonos y  obligaciones del Estado, letras del Tesoro, y deuda emitida por otras Administraciones y  Organismos Públicos. Estos valores también se negocian simultáneamente en las Bolsas de  Valores, que tienen establecido un régimen específico para su contratación. El Banco de  España es el organismo rector de este mercado.  
+⮚ Liquidación de valores: Iberclear es la Sociedad de Gestión de los Sistemas de Registro,  Compensación y Liquidación de Valores, S.A.; es el Depositario Central de Valores Español.  Sus principales funciones son: 
+a. Llevar el registro contable correspondiente a los valores admitidos a negociación en  el Mercado de Deuda Pública en Anotaciones, a los valores admitidos a negociación  en las Bolsas de Valores, así como a los valores admitidos a negociación en otros  mercados secundarios oficiales y sistemas multilaterales de negociación. 
+b. Llevar el registro contable de otros valores no admitidos a negociación en mercados  secundarios oficiales, mercados regulados o sistemas multilaterales de negociación. c. Gestionar la liquidación de las operaciones realizadas sobre valores.
+Fundación de Estudios Financieros© 31  
+Sistema Financiero  
+⮚ Compensación de valores: BME Clearing es la Entidad de Contrapartida Central (ECC) del  Grupo BME para los siguientes segmentos de actividad en derivados: 
+• Derivados Financieros negociados en MEFF (futuros y opciones IBEX 35, futuros y  opciones sobre acciones, futuros sobre el índice de dividendos, futuros sobre  dividendos de acciones y futuros sobre el Bono Nocional 10 años). 
+• Repos sobre Deuda Pública. 
+• Energía. 
+• Derivados de Tipos de Interés. 
+• Renta Variable. 
+BME Clearing tiene su origen con motivo de los cambios en la normativa europea, a través  del Reglamento EMIR, que ha obligado a separar las actividades de contratación en los  mercados (trading – MEFF Exchange) de las de compensación (clearing). 
+⮚ Supervisión: Como ya hemos comentado, la Ley 24/1988 del Mercado de Valores (LMV)  encomienda a la C.N.M.V. la supervisión e inspección de los mercados secundarios oficiales  de valores y de la actividad de cuantas personas físicas y jurídicas se relacionan en el tráfico  de los mismos, el ejercicio sobre ellos de la potestad sancionadora y otras funciones.  
+En cuanto al mercado de Deuda Pública, es supervisado directamente por el propio Banco de  España. 
+BME:Mercados Regulados y SMN  
+Renta variable  
+El mercado regulado de Renta Variable español opera fundamentalmente sobre la plataforma  electrónica de negociación SIBE, totalmente desarrollada por BME, y que garantiza la  interconexión de las cuatro Bolsas españolas. 
+El mercado se basa en un modelo dirigido por órdenes, un único libro electrónico y un sistema  de casamiento que opera sobre la base de prioridad precio-tiempo. Además de acciones, se  negocian también warrants, certificados y fondos cotizados (ETFs). En algunos de sus segmentos  el mercado cuenta con especialistas que proveen liquidez. 
+Futuros y opciones  
+En el mercado regulado de Productos Derivados, MEFF, se negocian futuros y opciones cuyos  subyacentes están referenciados a acciones individuales, al índice IBEX35 y a diferentes índices  bursátiles europeos. Los inversores tienen en los derivados de MEFF unas herramientas para la  gestión del riesgo y para la construcción y cobertura de carteras adaptables a cada perfil.
+32 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Renta Fija  
+El mercado regulado de Renta Fija y Deuda Corporativa, AIAF, es una sólida fuente de  financiación del sector privado y de organismos públicos autonómicos y locales en España. En  este mercado se admiten a cotización y se negocian toda una amplia gama de activos y productos  adaptados a las necesidades de los emisores e inversores de Deuda Corporativa, con todas las  posibilidades en cuanto a plazos y atendiendo a sus estrategias de captación de recursos, en  caso de los emisores, y de gestión de su patrimonio, en caso de los inversores. 
+A través del sistema electrónico SIBE también se negocia renta fija del sector privado y de  organismos públicos admitida a negociación en las cuatro Bolsas españolas. BME gestiona  además un sistema multilateral de negociación de Deuda Anotada que funciona a través de una  plataforma electrónica de negociación. 
+Sistemas Multilaterales de Negociación en BME: 
+El MAB (Mercado Alternativo Bursátil), un mercado orientado a empresas de reducida  capitalización que buscan expandirse, con una regulación a medida, diseñada específicamente  para ellas y unos costes y procesos adaptados a sus características. De esta manera, las  empresas se benefician de las ventajas de un mercado: financiación, visibilidad, liquidez,  valoraciones. Además de las empresas en expansión, en el MAB cotizan, en segmentos  diferenciados, otro tipo de compañías como las SICAV (Sociedades de Inversión de Capital  Variable), las SOCIMI (Sociedades de Inversión en el Mercado Inmobiliario), las ECR (Entidades  de Capital Riesgo) y las SIL (Sociedades de Inversión Libre). Este mercado se creó en el año  2006 con el objetivo de dar entrada a empresas de una dimensión reducida cuyo acceso no  hubiera sido posible a mercados de otra envergadura. 
+El MARF (Mercado Alternativo de Renta Fija), que se puso en marcha en 2013, es un mercado  dirigido fundamentalmente a inversores institucionales, que pone a su disposición valores de  renta fija de compañías de mediana dimensión, y habitualmente no cotizadas en el mercado de  acciones. 
+Latibex, constituido en 1999, es el único mercado internacional solo para valores  latinoamericanos. Los valores cotizan en euros en el sistema electrónico de la Bolsa española  (SIBE) y las empresas suministran al mercado la misma información que a las instituciones  supervisoras de sus mercados de origen. 
+ 
+Fundación de Estudios Financieros© 33  
+Sistema Financiero  
+4.3.3. Estructura institucional del Sistema Financiero Español  
+El Sistema Financiero Español presenta, en la actualidad, las características propias de un  modelo de sistema financiero occidental o capitalista. Su estructura institucional (gráfica 3) se  apoya en los tres pilares básicos institucionales referidos a los tres sectores o actividades  financieras básicas: 
+▪ La actividad de Crédito y Depósito. 
+▪ La actividad de compra/venta en los Mercados de Valores (procesos de inversión financiación).  
+▪ La actividad de Previsión donde incluimos, básicamente, las de Seguros y Jubilación. 
+Que se enlazan con las correspondientes tres autoridades reguladoras y supervisoras (son los  órganos ejecutivos del sistema financiero español): 
+▪ El Banco de España (BE).  
+▪ La Comisión Nacional del Mercado de Valores (CNMV).  
+▪ La Dirección General de Seguros (DGS). 
+Todos ellos dependientes del Ministerio de Economía que, a estos efectos, tiene además en su  organigrama la Dirección General del Tesoro y Política Financiera. 
+Junto al Ministerio de Economía aparecen las Comunidades Autónomas, con responsabilidad  sobre las Cajas de Ahorro y Bolsas de Valores de su comunidad. 
+34 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Estructura Actual del Sistema Financiero Español  
+ Gráfica 3    Fuente: Manual Sistema Financiero Español. Ariel Economía  
+Como se refleja en la gráfica anterior, el Ministerio y las Comunidades Autónomas son los  órganos político-decisorios del sistema financiero español. 
+En cuanto a los órganos ejecutivos: 
+a) Del Banco de España dependen las entidades de crédito, cuya actividad típica es captar  fondos del público en forma de depósito o títulos similares con obligación de su retribución,  aplicándolos por cuenta propia a la concesión de créditos u operaciones de naturaleza similar. 
+Pueden ser de ámbito operativo ilimitado, también denominadas Entidades de depósito, en  donde se incluyen los bancos privados, nacionales o extranjeros, las cajas de ahorro, las  cooperativas de crédito, el Instituto de Crédito Oficial (ICO) y la Confederación Española de  Cajas de Ahorro (CECA), o bien de ámbito operativo limitado (antiguas ECAOL), ahora 
+Fundación de Estudios Financieros© 35  
+Sistema Financiero  
+denominados Establecimientos Financieros de Crédito (EFC), en donde se incluyen las  entidades de arrendamiento financiero o “leasing”, las entidades de crédito hipotecario, las  entidades de financiación (“las financieras”) y las entidades de “factoring”, si bien hoy no es  tan rígida esa limitación operativa. También dependen del Banco de España las sociedades  gestoras de riesgo y las entidades de segundo aval.  
+Podemos justificar la actividad supervisora ejercida sobre las entidades de crédito desde un  punto de vista macroeconómico y desde un punto de vista microeconómico: 
+1.- Desde una perspectiva macroeconómica, al tener las entidades de crédito un papel  preponderante como intermediadoras en el sistema financiero, se hace necesario su  control con el fin de alcanzar su estabilidad y para evitar situaciones con efectos  perjudiciales en el sistema y, por ende, en la economía en general. 
+2.- Desde un punto de vista microeconómico se persigue fundamentalmente la protección  del inversor o depositante, situado en una posición de desventaja frente a las entidades. 
+En concreto, la función supervisora que ejerce el Banco de España sobre estas entidades  debe considerarse como el cumplimiento de una ineludible obligación que le permita  hacer frente a su trascendental responsabilidad: conseguir una estabilidad en el sistema  financiero. Esto es así al ser las entidades de crédito aquéllas que tienen una mayor  importancia relativa en el sistema Financiero Español. 
+Debemos recordar, además, que El Banco de España se integró dentro del Mecanismo Único de  Supervisión (MUS) en su condición de autoridad nacional competente, por lo cual el Banco de  España ejercerá sus competencias en materia de ordenación y supervisión, sin perjuicio de las  funciones atribuidas al BCE en el contexto del MUS y en cooperación con esta institución7. 
+Los principales objetivos del MUS son velar por la seguridad y la solidez del sistema bancario  europeo y aumentar la integración y la estabilidad financieras en Europa. Asimismo, el MUS  cumple una función crucial para garantizar una aplicación coherente y eficaz de las políticas de  la Unión en materia de supervisión prudencial de las entidades de crédito. 
+Por otra parte, el Banco de España tiene asignada la responsabilidad de supervisión y gestión,  del Fondo de Garantía de Depósitos, que constituido por las entidades financieras que se  adhieren al mismo, y pudiéndose por tanto considerar un participante más del Sistema  Financiero, tiene por cometido aportar estabilidad al mismo. Se trata de una entidad cuya  
+7 El Reglamento (UE) nº 1024/2013, del Consejo, de 15 de octubre de 2013 ha creado un Mecanismo Único de  Supervisión (MUS), el cual instaura un nuevo sistema de supervisión financiera formado por el Banco Central Europeo  (BCE) y las Autoridades Nacionales Competentes (ANC) de los países de la Unión Europea participantes, entre los que  se encuentra el Banco de España. El Reglamento (UE) 468/2014 del BCE, de 16 de abril de 2014, establece el marco de  cooperación en el MUS entre el BCE y las ANC y con las autoridades nacionales designadas.
+36 Fundación de Estudios Financieros© 
+Sistema Financiero  
+presencia en el sistema solo se materializa en casos de crisis de entidades y a propuesta de  Banco de España. 
+La propia entidad define su cometido como: 
+“El Fondo tiene por objeto garantizar los depósitos en dinero y en valores u otros  instrumentos financieros constituidos en las entidades de crédito, con el límite de 100.000  euros para los depósitos en dinero o, en el caso de depósitos nominados en otra divisa, su  equivalente aplicando los tipos de cambio correspondientes, y de 100.000 euros para los  inversores que hayan confiado a una entidad de crédito valores u otros instrumentos  financieros. Estas dos garantías que ofrece el Fondo son distintas y compatibles entre sí. 
+Para el cumplimiento de su función de garantía de depósitos y en defensa de los depositantes  cuyos fondos están garantizados y del propio Fondo de Garantía de Depósitos de Entidades  de Crédito, el Fondo podrá adoptar medidas de apoyo a la resolución de una entidad de  crédito.” 8 
+Los importes garantizados, así como los instrumentos que se benefician de la garantía, han  sufrido diversas modificaciones y adaptado a nivel nacional directrices de la UE. Dichos  cambios han sido especialmente significativos con motivo de la crisis financiera a partir de  2008. Todo encaminado a la protección de los inversores depositarios en las entidades  financieras ante crisis de las mismas.  
+Las propias entidades adheridas contribuyen a la dotación del fondo, con un porcentaje sobre  el conjunto de sus compromisos por depósitos u otros instrumentos cubiertos por la garantía.  Dicha garantía en su forma y cuantía viene determinada por normativa pública9. 
+En definitiva, la normativa reguladora del Fondo de Garantía de Depósitos tiene como  objetivo el reforzamiento de la solvencia y funcionamiento de las entidades, contribuyendo  al principio esencial que tanto las instancias financieras internacionales como el Gobierno de  la nación han situado en la base de la intervención pública ante la crisis financiera: que sea  el propio sector financiero quien asuma los costes ocasionados por su saneamiento y  recapitalización, con el fin de que el conjunto de reformas no suponga costes para el erario  público y, en definitiva, para el contribuyente. 
+8 http://www.fgd.es/es/index.html 
+9 http://www.fgd.es/es/legislacion.html.
+Fundación de Estudios Financieros© 37  
+Sistema Financiero  
+b) De la CNMV, como ya señalamos en el epígrafe anterior, dependen los mercados de valores  (Bolsas, MEFF, etc.) y las entidades e instituciones que en ellos intervienen: sociedades y  agencias de valores, sociedades gestoras de carteras - hoy empresas de servicios de  inversión -, instituciones de inversión colectiva (SIM, SINCAV, FIM, FIAM y Gestoras), las  sociedades y fondos de capital riesgo, y finalmente, las instituciones de inversión  inmobiliaria. 
+La CNMV fue creada por la Ley 24/1988, del Mercado de Valores y se ha ido adaptando a las  exigencias de la Unión Europea para el desarrollo de los mercados de valores españoles en  el entorno europeo. En términos generales, sus funciones pueden resumirse en las  siguientes: 
+• Supervisión e inspección de los mercados de valores españoles y de la actividad de  cuantos intervienen en los mismos. 
+• Ejercicio de la potestad sancionadora. 
+• Asesoramiento al Gobierno en materias relacionadas con los mercados de valores. 
+• Potestad normativa (a través de circulares) para el correcto funcionamiento de los  mercados. 
+La CNMV, en el ejercicio de sus competencias, recibe un importante volumen de información  de y sobre los intervinientes en los mercados, gran parte de la cual está contenida en sus  registros oficiales y tiene carácter público. 
+Por otro lado, al referirnos a los mercados de valores, conviene señalar la importancia del  Fondo de Garantía de Inversiones (FOGAIN)10. La finalidad del FOGAIN es ofrecer a los  clientes de las sociedades de valores, agencias de valores y sociedades gestoras de carteras  la cobertura de una indemnización en caso de que alguna de estas entidades entre en una  situación de concurso de acreedores o declaración de insolvencia por parte de la CNMV. 
+Si se da uno de estos supuestos, y como consecuencia de ello, algún cliente no puede obtener  la devolución o entrega del efectivo y valores confiados a dicha entidad, el FOGAIN despliega  su cobertura e indemniza a tales clientes con un importe máximo de 100.000 euros para los  clientes de aquellas entidades que devengan en alguna de estas situaciones con posterioridad  al 11 de octubre de 2008. 
+10 El FOGAIN se creó como exigencia de la Directiva 97/9/CE, del Parlamento Europeo y del Consejo, de 3 de marzo  de 1997, relativa a los sistemas de indemnización de inversores, y está regulada en el artículo 198 de la Ley del  Mercado de Valores10.
+38 Fundación de Estudios Financieros© 
+Sistema Financiero  
+El FOGAIN también cubre a los clientes de las SGIIC que hayan confiado a una de estas  entidades valores y efectivo para la gestión de carteras, siempre que respecto de una de  estas entidades se dé una de las situaciones de insolvencia referidas. 
+c) De la Dirección General de Seguros dependen las entidades de seguros y las gestoras de  fondos y planes de pensiones. Estas entidades tienen dos facetas: las de asunción de riesgos  y cálculos actuariales, propias del contrato de seguro (de daños, de vida, para caso de vida  y para caso de muerte, etc.) y la de intermediarios financieros en cuanto captadores de  fondos del público y su inversión en activos financieros, que es la faceta que aquí más  interesa.  
+d) A modo de excepciones, la Dirección General de Comercio e Inversiones del Mª de Economía,  mantiene una responsabilidad sobre determinadas transacciones de cambios, cuando están  afectan a algunos aspectos especialmente sensibles, como las inversiones en paraísos  fiscales o aquellas que por su naturaleza afectasen de modo directo a aspectos de Seguridad  Nacional. De igual modo, las Comunidades Autónomas, en virtud de los poderes transferidos  en cada caso, pueden mantener alguna competencia sobre determinadas emisiones y sus  transacciones.
+Fundación de Estudios Financieros© 39  
+Sistema Financiero  
+5. EL BCE Y LA POLÍTICA MONETARIA  
+Ampliamente definida, la Política Monetaria es el proceso continuado de control de las variables  monetarias con el fin de alcanzar determinados objetivos económicos, a saber: 
+✔ Crecimiento y pleno empleo. 
+✔ Controlar la evolución de los precios. 
+✔ Moderar los ciclos económicos. 
+Su establecimiento requiere la selección de una variable estratégica instrumental para alcanzar  un objetivo monetario concreto que debe ser susceptible de control con un cierto grado de  seguridad, y mostrar una alta correlación con el objetivo monetario final. 
+Con respecto a dicho objetivo, la elección teórica se encuentra entre la oferta monetaria y el tipo  de interés, es decir, la variable cuantitativa o el precio. 
+Tradicionalmente, y aun cuando el Tratado de la Unión Europea no establece nítidamente una  división de las competencias, las acciones encaminadas al logro del crecimiento y el pleno empleo  se han asignado la Comisión Europea, inmersas en sus acciones de Política Económica en general  y Fiscal en particular. En cambio, ha sido el BCE quien ha asumido las acciones sobre la Política  Monetaria, dado que es la entidad con capacidad para manejar la variable instrumental de la  misma. La conjunción de ambas es la que deberá contribuir a la suavización de los ciclos  económicos, y por ello podemos considerarla conjunta a ambos organismos.  
+Se trata por tanto de buscar un indicador relacionado con el objetivo final de la política monetaria  y de establecer objetivos cuantitativos y periódicos de esta variable coherentes con el  cumplimiento del objetivo final deseado. Es importante que el objetivo intermedio: 
+✔ Tenga una relación estable con el objetivo final. 
+✔ Proporcione información adelantada sobre el objetivo final. 
+✔ Controlable por la autoridad monetaria con los instrumentos disponibles. 
+Ampliamente definida, la Política Monetaria es el proceso continuado de control de las variables  monetarias con el fin de alcanzar determinados objetivos económicos, a saber: 
+✔ Crecimiento y pleno empleo. 
+✔ Controlar la evolución de los precios. 
+✔ Moderar los ciclos económicos.
+40 Fundación de Estudios Financieros© 
+Sistema Financiero  
+5.1. El Sistema Europeo de Bancos Centrales  
+El Tratado de la Unión Europea (TUE) atribuye al Sistema Europeo de Bancos Centrales (SEBC)  las funciones de diseño y ejecución de la política monetaria de los países que conformen el área  del euro. En la actualidad la autoridad monetaria de los Estados miembros de la Unión Económica  y Monetaria (UEM) la constituye el Banco Central Europeo (BCE) y los bancos centrales  nacionales (BCN) de los países miembros de la UEM. 
+Es importante no confundir el SEBC con el “eurosistema”.  
+• SEBC: compuesto por el Banco Central Europeo y los bancos centrales nacionales de los  Estados miembros de la UE. 
+• Eurosistema: formado por el BCE y los BCN de los Estados miembros que han adoptado  el euro.  
+Por tanto, mientras sigan existiendo estados miembros que no hayan adoptado esta moneda,  será necesario mantener la distinción entre Eurosistema y SEBC.  
+El BCE tiene personalidad jurídica propia de acuerdo con el derecho público internacional y  constituye el núcleo del Eurosistema. Al adoptar sus decisiones sobre la forma en que han de  llevarse a cabo sus funciones, el BCE está sujeto al principio de descentralización, en  concordancia con los Estatutos del SEBC. 
+Cada uno de los BCN tiene personalidad jurídica propia de conformidad con la legislación nacional  de sus respectivos países. A pesar de ello, los BCN de la zona del euro forman parte integrante  del Eurosistema y, como tales, ejecutan las funciones a ellos encomendadas con arreglo a las  normas establecidas por el BCE.  
+Los BCN pueden ejercer funciones ajenas al Eurosistema bajo su propia responsabilidad, a menos  que el Consejo de Gobierno considere que tales funciones interfieren en los objetivos y tareas  del Eurosistema.  
+5.1.1. Órganos rectores del BCE  
+El Eurosistema y el SEBC están regidos por los órganos rectores del BCE: el Consejo de Gobierno  y el Comité Ejecutivo. Sin perjuicio de ello, el Consejo General se constituye como tercer órgano  rector del BCE, siempre y cuando existan Estados miembros que no hayan adoptado aún el euro  como moneda. A continuación, presentamos su composición y funciones (tabla 3).
+Fundación de Estudios Financieros© 41  
+Sistema Financiero  
+Órganos Rectores del BCE  
+Tabla 3 
+Órgano 
+	Composición 
+	Funciones 
+	Consejo de  Gobierno
+	Miembros del Comité Ejecutivo y  
+Los gobernadores de los BCN de  los Estados miembros que han  adoptado el euro.
+	1. Adoptar las orientaciones y las decisiones  necesarias para garantizar el  cumplimiento de las funciones asignadas  al SEBC.  
+2. Formular la política monetaria de la zona  del euro, incluidas decisiones relativas a: 
+• objetivos monetarios intermedios,  • tipos de interés básicos,  
+• suministro de liquidez al Eurosistema y 
+• establecer las orientaciones necesarias  para su cumplimiento.
+	Comité  
+Ejecutivo
+	El presidente,  
+el vicepresidente y  
+Cuatro miembros nombrados de  común acuerdo por los  Gobiernos de los Estados  miembros participantes,  representados por sus jefes de  Estado o Gobierno.
+	1. Preparar las reuniones del Consejo de  Gobierno.  
+2. Poner en práctica la política monetaria.  
+3. Impartir las instrucciones necesarias a  los BCN del Eurosistema. 
+4. Supervisar la actividad diaria del BCE.  
+5. Asumir poderes delegados en él por el  Consejo de Gobierno, incluidos algunos  de carácter normativo. 
+	Consejo  
+General
+	El presidente, 
+el vicepresidente del BCE y  los gobernadores de los BCN.
+	1. Informar sobre los progresos realizados  hacia la convergencia por los Estados  miembros no participantes y 
+2. Asesorar sobre los preparativos  necesarios para fijar irrevocablemente  los tipos de cambio de sus monedas  funciones consultivas y la recopilación de  la información estadística.
+	
+
+
+
+Fuente: Banco de España
+42 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Cada miembro de los distintos órganos que se han descrito cuenta con un voto para la toma de  decisiones, que, casi siempre se adoptan por mayoría simple. La excepción a este respecto la  constituyen las decisiones relativas al patrimonio, capital, transferencia de reservas de divisas u  otras que requieren mayoría cualificada, en las cuales se ponderan los votos de los  representantes de los bancos centrales nacionales en función de su participación en el capital  del BCE. 
+Existen dos cuestiones importantes de los Estatutos del SEBC y del BCE: 
+1. El requisito de absoluta independencia de los miembros de sus órganos de gobierno en  el ejercicio de sus funciones respecto a cualquier otro organismo nacional o comunitario. 
+2. La necesidad de que cada Estado miembro garantice la compatibilidad de sus  legislaciones nacionales, incluidos los Estatutos de los bancos centrales nacionales, con  los correspondientes del SEBC y BCE. 
+5.1.2. Objetivos y Funciones básicas del SEBC-BCE  
+El objetivo primordial que el Tratado asigna al SEBC es el de mantener la estabilidad de precios,  sin perjuicio de lo cual "apoyará las políticas económicas generales de la Comunidad". Partiendo  de este objetivo, las funciones básicas que lleva a cabo son las siguientes (tabla 4). 
+Funciones del SEBC-BE  
+Tabla 4 
+• Definir y ejecutar la política monetaria  única. 
+	• Poseer y gestionar las reservas oficiales  de divisas de los Estados miembros. 
+	• Realizar operaciones en divisas. 
+	• Promover el buen funcionamiento de los  sistemas de pagos en la zona del euro. 
+	• Autorizar la emisión de billetes de banco  en el área del euro.
+	• Contribuir a la buena gestión de las  políticas de supervisión prudencial de las  entidades de crédito y a la estabilidad del  sistema financiero.
+	
+
+
+
+Fuente: Banco de España
+Fundación de Estudios Financieros© 43  
+Sistema Financiero  
+5.1.3. Política Monetaria Única  
+La característica que define a toda unión monetaria es la de compartir una misma moneda, lo  que exige que la política monetaria sea única en el conjunto del área y que exista un órgano  responsable (el banco central) para la toma de decisiones relativas a la inyección y drenaje de  liquidez.  
+Así, la política monetaria única puede definirse como una política en la que las operaciones de  regulación de la liquidez tienen condiciones iguales para entidades localizadas en cualquier parte  del área de aplicación de aquella. 
+Las decisiones de la política monetaria única se adoptan por el Consejo de Gobierno del Banco  Central Europeo (BCE). La ejecución, es decir, el ejercicio efectivo de suministro o la retirada de  liquidez, se lleva a cabo por los bancos centrales nacionales (BCN) de los países integrados en  la zona del euro.  
+La instrumentación de la política monetaria se realiza con criterios uniformes y válidos para  todos, y se ejecuta mediante mecanismos accesibles en igualdad de condiciones por las  instituciones financieras de cualquier parte del área. Además, se ha establecido un sistema de  pagos (TARGET) para liquidar las operaciones de política monetaria en las cuentas que las  entidades de contrapartida mantienen en los BCN. 
+En los meses de octubre y diciembre de 1998, el Consejo de Gobierno del BCE especificó las  características de la estrategia de política monetaria que desarrollaría el Sistema Europeo de  Bancos Centrales (SEBC) a partir del 1 de enero de 1999. Esta estrategia fue diseñada para  alcanzar su objetivo último, señalado por el propio Tratado de la Unión Europea (TUE): el  mantenimiento de la estabilidad de precios. 
+En resumen, las principales características de la política monetaria única así definida son: o Objetivo: la estabilidad de los precios. 
+o Diseño: centralizado. 
+o Ejecución: descentralizado. 
+o Sistema de Pagos transfronterizo: TARGET. 
+Este proceso ha supuesto cambios en las funciones que venían realizando los Bancos Centrales  Nacionales (BCN) cuyos estados se han incorporado a la moneda única, siendo en la actualidad  las siguientes: 
+• Supervisión bancaria (los que tengan esta competencia). 
+• Descentralización: Ejecutar la política monetaria. 
+• Control de los Sistemas de liquidación brutos en tiempo real.
+44 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Por otro lado, merece destacarse que la independencia de la autoridad monetaria genera:  → Menores y más estables tasas de inflación.  
+→ Mayor crecimiento económico. 
+→ Menores déficits fiscales. 
+5.2. Estrategias de Política Monetaria  
+Podemos definir la estrategia como el conjunto de indicadores, procedimientos y reglas que  utiliza un banco central para decidir cómo y cuándo utilizar sus instrumentos para conseguir  mejor sus objetivos. Así definida, la estrategia de política monetaria tiene dos funciones básicas: 
+1. Contribuir al proceso interno de toma de decisiones por parte de la autoridad  monetaria. 
+2. Comunicar a los agentes económicos sus propósitos y actuaciones. 
+Los principios generales que deben respetarse en la elección de la estrategia por el BCE son: a. Eficacia: el más general, engloba al resto de principios considerados. b. Rendición de cuentas: la estrategia debe ser anunciada al público. 
+c. Transparencia: objetivos y decisiones deben ser claras para el público. d. Orientación a medio plazo. 
+e. Continuidad: se debe partir de las experiencias anteriores de los BCN.  
+f. Independencia: el BCE no debe verse afectado por consideraciones ajenas a su propio  objetivo.  
+La estrategia diseñada consta de 3 elementos principales (gráfica 4):  
+1. Una definición cuantitativa del objetivo de estabilidad de los precios.  2. Un papel destacado para el dinero.  
+3. Una evaluación de las previsiones de evolución futura de los precios.  
+Respecto al primer elemento el BCE considera conseguido el objetivo si el incremento interanual  de los precios se sitúa por debajo del 2 %, el cual deberá mantenerse a medio plazo. En cuanto  al segundo, establece un agregado monetario (M3), para el cual fija un valor de referencia,  realizando, ante cualquier desvío de ese valor, no intervenciones que lo aproximen de nuevo,  sino análisis adicionales con objeto de identificar e interpretar la perturbación económica que  causó esa desviación. 
+Fundación de Estudios Financieros© 45  
+Sistema Financiero  
+Finalmente, para analizar la evolución futura utiliza una batería de indicadores adelantados:  salarios, precio de los activos de renta fija, curva de rendimientos, encuestas de consumidores,  etc. 
+Elementos principales de la estrategia de la política monetaria única  
+Gráfica 4 
+  
+Fuente: Banco de España 
+En resumen, en cuanto al objetivo de la estabilidad de los precios, el Consejo de Gobierno del  SEBC combinará sistemáticamente toda la información para adoptar las decisiones de política  monetaria. Por un lado, otorgará (como primer pilar) un papel destacado al dinero, en concreto  las señales que puede ofrecer al sistema mediante el Valor de referencia de M3 (disponibilidades  líquidas) y por otro lado el que ofrezcan una amplia gama de indicadores económicos y  financieros (segundo pilar). 
+Además, es evidente que la transparencia en las decisiones de política monetaria reduce la  incertidumbre y la volatilidad de los tipos de interés, ex-ante y ex-post: 
+→ Ex–ante porque un entendimiento adecuado de la estrategia de política monetaria hará  que los tipos de mercado reaccionen únicamente a la información que señala la necesidad  de que la política monetaria cambie con objeto de salvaguardar la estabilidad de precios.
+46 Fundación de Estudios Financieros© 
+Sistema Financiero  
+→ Ex–post porque la transparencia reduce la probabilidad de que los mercados se vean  sorprendidos a causa de una interpretación incorrecta de una decisión de política  monetaria. Sin embargo, siendo conocido el objetivo de la actuación de un partícipe del  mercado y más si se trata de uno tan destacado como el BC, es de suponer que el mercado  actuará con lógica.  
+Es decir, los participantes del mercado tomarán decisiones que o bien eviten que la  actuación les resulte adversa, o incluso les permitan obtener una ganancia de ella. Por lo  tanto, la acción del BC será, cuando menos, efectiva, o incluso se verá reforzada por el  propio mercado.  
+DECLARACIÓN SOBRE LA ESTRATEGIA DE POLÍTICA MONETARIA DEL BCE11  NOTA DE PRENSA  
+1) Desde la anterior revisión de la estrategia, en 2003, la economía de la zona del euro y la  economía mundial han experimentado profundos cambios estructurales. La disminución del  crecimiento tendencial, que puede asociarse al menor crecimiento de la productividad y a  factores demográficos, y el legado de la crisis financiera global han empujado a la baja los  tipos de interés reales de equilibrio. En consecuencia, se ha reducido el margen que tienen el  Banco Central Europeo (BCE) y otros bancos centrales para lograr sus objetivos basándose  exclusivamente en las variaciones de los tipos de interés oficiales. Además, la globalización,  la digitalización, la amenaza para la sostenibilidad ambiental y los cambios del sistema  financiero plantean retos para la ejecución de la política monetaria. 
+2) La estrategia de política monetaria del BCE se guía y se rige por el mandato que le  encomiendan el Tratado de la Unión Europea y el Tratado de Funcionamiento de la Unión  Europea. El objetivo principal del BCE es mantener la estabilidad de precios en la zona del  euro. Sin perjuicio de este objetivo, el Eurosistema apoyará las políticas económicas generales  de la UE con el fin de contribuir a la realización de los objetivos de la Unión establecidos en  el artículo 3 del Tratado de la Unión Europea. Estos objetivos incluyen un crecimiento  económico equilibrado, una economía social de mercado altamente competitiva tendente al  pleno empleo y al progreso social, y un nivel elevado de protección y mejora de la calidad del  medio ambiente. El Eurosistema también contribuirá a la buena gestión de las políticas que  lleven a cabo las autoridades competentes con respecto a la supervisión prudencial de las  entidades de crédito y a la estabilidad del sistema financiero. 
+11 Banco Central Europeo Dirección General de Comunicación, División de Relaciones con los Medios de Comunicación  Globales Sonnemannstrasse 20, 60314 Frankfurt am Main, Alemania
+Fundación de Estudios Financieros© 47  
+Sistema Financiero  
+3) El Consejo de Gobierno confirma que el Índice Armonizado de Precios de Consumo (IAPC)  continúa siendo el indicador de precios adecuado para evaluar la consecución del objetivo de  estabilidad de precios. Sin embargo, reconoce que la inclusión en el IAPC de los costes  relacionados con la vivienda en régimen de propiedad representaría mejor la tasa de inflación  relevante para los hogares. El Consejo de Gobierno admite que su plena inclusión en el IAPC  es un proyecto de varios años y, hasta entonces, en sus evaluaciones de la política monetaria  tendrá en cuenta medidas de inflación que incorporen estimaciones iniciales del coste de la  vivienda en régimen de propiedad para complementar su conjunto más amplio de medidas  de inflación. 
+4) Un margen de inflación por encima del 0 % proporciona espacio a la política monetaria para  reducir los tipos de interés en caso de acontecimientos adversos, así como un margen de  seguridad frente al riesgo de deflación a través de su impacto positivo en el nivel tendencial  de los tipos de interés nominales. La experiencia adquirida desde 2003 ha reforzado la  importancia macroeconómica de dicho margen de inflación. En concreto, si persiste el acusado  descenso tendencial del tipo de interés real de equilibrio, el límite inferior efectivo de los tipos  de interés nominales constreñirá con mayor frecuencia la ejecución de la política monetaria.  La facilitación de ajustes macroeconómicos entre países dentro de la zona del euro, la  existencia de rigideces a la baja de los salarios nominales y los sesgos de medición también  justifican un margen de inflación. 
+5) El Consejo de Gobierno considera que la mejor forma de mantener la estabilidad de precios  es teniendo un objetivo de inflación del 2 % a medio plazo. Su compromiso con este objetivo  es simétrico, en el sentido de que considera que las desviaciones positivas y negativas de  este objetivo son igualmente indeseables. El objetivo de inflación del 2 % proporciona un  ancla clara para las expectativas de inflación, que es fundamental para mantener la  estabilidad de precios. 
+6) Para mantener la simetría de su objetivo de inflación, el Consejo de Gobierno reconoce la  importancia de tener en cuenta las implicaciones del límite inferior efectivo. En particular,  cuando la economía se aproxima al límite inferior, son necesarias medidas de política  monetaria especialmente contundentes o persistentes para evitar que se afiancen las  desviaciones negativas del objetivo de inflación. Esto también puede implicar un período  transitorio en el que la inflación se sitúe moderadamente por encima del objetivo. 
+7) El Consejo de Gobierno confirma la orientación a medio plazo de su estrategia de política  monetaria. De esta forma se da cabida a las inevitables desviaciones a corto plazo de la  inflación con respecto a su objetivo, así como a los retrasos y a la incertidumbre en la  transmisión de la política monetaria a la economía y a la inflación. La flexibilidad de la  orientación a medio plazo tiene en cuenta que la respuesta de política monetaria adecuada  ante una desviación de la inflación con respecto al objetivo es específica para cada contexto
+48 Fundación de Estudios Financieros© 
+Sistema Financiero  
+y depende del origen, la magnitud y la persistencia de la desviación. También permite al  Consejo de Gobierno, en sus decisiones de política monetaria, tener en cuenta otras  consideraciones relevantes para lograr la estabilidad de precios. 
+8) El BCE se ha comprometido a fijar su política monetaria para asegurar que la inflación se  estabilice en su objetivo del 2 % a medio plazo. El instrumento de política monetaria principal  es el conjunto de tipos de interés oficiales del BCE. En reconocimiento del límite inferior  efectivo de los tipos oficiales, el Consejo de Gobierno también utilizará, en especial,  indicaciones sobre la orientación futura de la política monetaria (forward guidance), compras  de activos y operaciones de financiación a más largo plazo, según proceda. El Consejo de  Gobierno seguirá respondiendo con flexibilidad a los nuevos retos a medida que se presenten  y considerará, conforme sea necesario, nuevos instrumentos de política para lograr su  objetivo de estabilidad de precios. 
+9) El Consejo de Gobierno basa sus decisiones de política monetaria, incluida la evaluación de la  proporcionalidad de sus decisiones y de los posibles efectos indirectos, en una evaluación  integral de todos los factores relevantes. Esta evaluación se apoya en dos análisis  interdependientes: el análisis económico y el análisis monetario y financiero. En este marco,  el análisis económico se centra en la evolución económica real y nominal, mientras que el  monetario y financiero examina los indicadores monetarios y financieros, poniendo el foco en  el funcionamiento del mecanismo de transmisión de la política monetaria y en los posibles  riesgos para la estabilidad de precios a medio plazo derivados de los desequilibrios financieros  y de factores monetarios. La presencia generalizada de relaciones macrofinancieras en los  desarrollos económicos, monetarios y financieros exige que se incorporen plenamente las  interdependencias entre los dos análisis. Este marco refleja los cambios que han  experimentado los análisis económico y monetario del BCE desde 2003, la importancia de  vigilar el mecanismo de transmisión a la hora de calibrar los instrumentos de política  monetaria y el reconocimiento de que la estabilidad financiera es una condición indispensable  para la estabilidad de precios. 
+10)El cambio climático tiene profundas implicaciones para la estabilidad de precios a través de  su impacto en la estructura y en la dinámica cíclica de la economía y del sistema financiero.  Hacer frente al cambio climático es un reto mundial y una prioridad política de la UE. En el  marco de su mandato, el Consejo de Gobierno se ha comprometido a asegurar que el  Eurosistema tenga plenamente en cuenta, en línea con las metas y objetivos climáticos de la  UE, las implicaciones del cambio climático y de la transición hacia una economía baja en  carbono para la política monetaria y la actividad de banca central. Por tanto, el Consejo de  Gobierno se ha comprometido con un ambicioso plan de actuación climática. Además de la  incorporación completa de factores climáticos en sus evaluaciones de la política monetaria, el  Consejo de Gobierno adaptará el diseño de su marco operativo de la política monetaria en lo
+Fundación de Estudios Financieros© 49  
+Sistema Financiero  
+referente a la divulgación de información, la evaluación de riesgos, las compras de activos del  sector empresarial y el sistema de activos de garantía. 
+11)La comunicación de las decisiones de política monetaria a través del comunicado sobre política  monetaria, la conferencia de prensa, el Boletín Económico y las reseñas de política monetaria  se adaptarán para reflejar la estrategia de política monetaria revisada. Estos productos se  complementarán con versiones en varios niveles y con elementos visuales de la comunicación  de la política monetaria dirigidas al público en general, una iniciativa esencial para asegurar  que los ciudadanos entiendan y confíen en las actuaciones del BCE. Tras el éxito de los  encuentros con el público celebrados durante la revisión de la estrategia, el Consejo de  Gobierno tiene la intención de hacer que las actividades de divulgación se conviertan en una  característica estructural de la interacción del Eurosistema con los ciudadanos. 
+12)El Consejo de Gobierno tiene previsto evaluar periódicamente la idoneidad de su estrategia  de política monetaria, y prevé realizar la siguiente evaluación en 2025. 
+5.3. Principales Instrumentos  
+Como ya hemos señalado, el BCE se constituye con el mandato de ser el garante de la estabilidad  de precios en el área euro, a la que define como un incremento interanual del Índice de Precios  al Consumo Armonizado (IPCA) del área euro inferior al 2 %. Para la consecución de dicho  objetivo final, utilizará como herramienta principal los tipos de interés de referencia en el  mercado interbancario, es decir, aquellos a los que suministra liquidez a las entidades  financieras.  
+Las condiciones de este suministro de liquidez de base al sistema y, sobre todo, las expectativas  que tenga el mercado sobre su evolución posterior determinarán la política de tipos de interés  del sector financiero con su clientela, trasladando así los efectos de la ejecución de la política  monetaria al sector real de la economía y por tanto, a precios. 
+En este sentido, las operaciones de regulación monetaria se configuran como intervenciones del  Banco Emisor en los mercados monetarios, en concreto en el interbancario de depósitos y en el  de deuda del Estado anotada a corto plazo, con el objetivo básico de evitar tensiones en el tipo  de interés o en la cantidad de dinero que pusieran en peligro la eficiente consecución de los  objetivos de la Política Monetaria.  
+Para regular la estabilidad de precios, el BCE fija el tipo de interés de referencia básico, que  denominamos TIPO OFICIAL DEL EURO. Cuando el BCE considera que no hay riesgo de inflación,  o que está por debajo de los niveles deseados, lo que hace es prestar dinero al mercado, es  decir, inyectar liquidez. Así, al haber más dinero en circulación, bajará el tipo de interés. Si su  objetivo es elevar el nivel de los tipos de interés tomará dinero del mercado (drenar liquidez). 
+50 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Este mecanismo de ajuste de los niveles del tipo de interés se realiza a través de los diferentes  Instrumentos de Política Monetaria: 
+1. Las Operaciones de Mercado Abierto.  
+2. Las Facilidades Permanentes.  
+3. El Coeficiente de Reservas mínimas (Caja).  
+4. Programas de Compras de activos.  
+Antes de analizar cada uno de ellos, interesa resaltar el funcionamiento descentralizado del  Eurosistema. Como sabemos, el Eurosistema o Sistema Europeo de Bancos Centrales está  compuesto por el BCE y el conjunto de Bancos Centrales Nacionales. 
+La toma de decisiones de política monetaria se produce en el BCE pero la ejecución de las  acciones en las que se materializan dichas decisiones se realiza de manera descentralizada, a  través de los Bancos Centrales Nacionales.  
+5.3.1. Operaciones de Mercado Abierto  
+Son operaciones derivadas de decisiones de Política Monetaria tomadas por el BCE y cuya  ejecución corresponde a los Bancos Centrales Nacionales, en nuestro caso, al Banco de España.  
+Las operaciones temporales (aplicables mediante cesiones temporales o préstamos  garantizados) constituyen el instrumento más importante. Asimismo, el Eurosistema puede  utilizar operaciones simples, la emisión de certificados de deuda, swaps de divisas y la captación  de depósitos a plazo fijo.  
+Las operaciones de mercado abierto se inician a instancias del BCE, que también decide el  instrumento a utilizar y las condiciones para su ejecución. Se pueden realizar mediante subastas  estándar, subastas rápidas o procedimientos bilaterales (tabla 5).
+Fundación de Estudios Financieros© 51  
+Sistema Financiero  
+Se clasifican en: 
+1. Operaciones principales de financiación. 
+2. Operaciones de financiación a más largo plazo. 
+3. Operaciones de ajuste. 
+4. Operaciones estructurales. 
+Y tienen como objetivos principales los siguientes: 
+▪ El control de los tipos de interés. 
+▪ La gestión y control de la liquidez del mercado. 
+▪ Informar a los agentes económicos sobre la orientación de la política monetaria.   
+Operaciones de política monetaria del Eurosistema  
+Tabla 5 
+  
+Fuente: Banco Central Europeo
+52 Fundación de Estudios Financieros© 
+Sistema Financiero  
+PRINCIPALES DE FINANCIACIÓN  
+Son las operaciones de mercado abierto más importantes realizadas por el Eurosistema en la  consecución de sus objetivos y además constituyen la principal fuente de financiación del sector  financiero.  
+Las características operativas de estas operaciones son: 
+▪ Son operaciones temporales de inyección de liquidez, que se ejecutan mediante subastas  estándar, con una frecuencia semanal y con vencimiento semanal (Tabla 5).  
+▪ El tipo de interés marginal (tipo más bajo aceptado en la subasta, que será el tipo oficial  central) al que el SEBC concede los créditos en estas subastas; es el que indica la línea de  acción de la Política Monetaria. 
+▪ Con esta subasta pretende otorgar una cantidad de dinero al sistema financiero europeo, de  tal manera que cubra las necesidades del sistema, garantizando así una estabilidad en el  tipo de interés día a día del euro (presta suficiente dinero a las entidades para que ni sobre  ni falte dinero). 
+En el contexto del marco operativo del Eurosistema, las subastas estándar son operaciones que  se realizan de conformidad con un calendario anunciado previamente por el SEBC y que se  ejecutan dentro de las 24 horas que transcurren entre el anuncio de la subasta y la notificación  del resultado. 
+Las fases de toda subasta son: 
+1. Anuncio de la subasta: a cargo del BCE a los BCN, a través de sistemas electrónicos de  información. Posteriormente los BCN informan bien al conjunto de entidades nacionales  por medio de estos sistemas bien directamente a entidades concretas. 
+2. Preparación y presentación de pujas por parte de las entidades autorizadas. 3. Recopilación de las pujas por parte del Eurosistema. 
+4. Adjudicación y anuncio de los resultados (decisión del BCE). 
+5. Notificación de los resultados individuales de la adjudicación. 
+6. Liquidación de las operaciones.
+Fundación de Estudios Financieros© 53  
+Sistema Financiero  
+Como queda reflejado las entidades de cada país de la UME llevan a cabo sus peticiones a través  de los terminales que las conectan a su Banco Central Nacional, siendo el volumen mínimo de la  puja de un millón de euros y, para importes superiores, múltiplo de cien mil euros. La secuencia  temporal habitual para la utilización de estas subastas estándar se muestra en la gráfica 5. 
+Cronograma de la subasta estándar  
+Gráfica 5 
+  
+  Fuente: Banco de España 
+Existen también las subastas rápidas; se ejecutan en el plazo de una hora entre el anuncio de  la subasta y la notificación de la adjudicación. En la gráfica 6 se presenta la secuencia temporal  en que habitualmente se realiza una subasta rápida. Si lo considera conveniente, el BCE puede  ajustar esta secuencia en operaciones concretas. Las subastas rápidas solo se utilizan para  efectuar operaciones de ajuste. El Eurosistema puede seleccionar un número limitado de  entidades de contrapartida para participar en las subastas rápidas. 
+Cronograma de la subasta rápida  
+Gráfica 6 
+  
+  Fuente: Banco de España
+54 Fundación de Estudios Financieros© 
+Sistema Financiero  
+En función del tipo de interés negociado, las subastas pueden ser: 
+a) A tipo fijo, se suman las pujas recibidas y, si la demanda supera la oferta, entonces se  realiza un prorrateo entre las peticiones, o a tipo variable y, en este caso, la asignación  puede ser a tipo único o a tipo múltiple.  
+b) A tipo variable, el anuncio de un tipo mínimo por parte del BCE permite discriminar los  cambios en el tipo marginal de la subasta a tipo variable que responden a cambios en las  demandas de liquidez de las entidades y las modificaciones genuinas del tono de la política  monetaria. De este modo, se refuerza la capacidad de señalización de las subastas a tipo  variable tradicionales. 
+En las operaciones de financiación principal, en la actualidad, la subasta se realiza mediante una  subasta competitiva donde cada entidad puede hacer hasta diez peticiones a diferente tipo de  interés. A cada una se le va a dar el tipo de interés al que lo solicitó (asignación a precio múltiple),  y no al tipo de interés medio, como ocurre en la Deuda Pública. El BCE europeo solo pone un  límite: no admite peticiones inferiores al tipo oficial del euro, es decir, no da dinero por debajo  del tipo oficial.  
+Es importante aclarar que el tipo oficial no es el tipo marginal (cuadro 1): 
+▪ Si tipo marginal > tipo oficial = hay un sentimiento en el mercado de que el tipo de  interés va a subir y se está dispuesto a pagar más del tipo oficial. 
+▪ Si tipo marginal = tipo oficial = se presiona para que bajen los tipos de interés.  
+Fundación de Estudios Financieros© 55  
+Sistema Financiero  
+TIPOS DE INTERES DE LAS OPERACIONES DE POLITICA MONETARIA  
+Cuadro 1 
+  
+Fuente: Banco de España
+56 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Plazo = 14 días. Se hace mediante un repo (compra con compromiso de venta a  plazo fijo) con entrega de un colateral (activo en garantía) 
+Peticiones: 
+Entidad Importe Tipo 
+ A 1000 2, 80 % 
+ B 2000 2, 77 % 
+ C 1500 2, 90 % 
+Se ordenan los tipos ofertados de mayor a menor:  
+2, 90 % 1500 
+2, 80 % 1000 
+2, 77 % 2000 
+Supuesto que el BCE adjudique todas las peticiones tendríamos: 
+• Tipo marginal: 2,77 %. Es el tipo de interés más bajo al que el BCE ha prestado  EJEMPLO  
+dinero en esta subasta.  
+• Importe adjudicado al marginal: 2000. Es el importe que se ha adjudicado a ese  tipo de interés marginal. 
+• Importe solicitado: 4500. Es la suma de todas las cantidades solicitadas, de todas  las peticiones. 
+• Importe adjudicado: 4500. El BCE puede adjudicar una cantidad igual al importe  total solicitado, o solo una parte, en función de las necesidades de liquidez que  haya estimado previamente. Así, si adjudica un importe inferior, lo hace para  aumentar los tipos de interés, ya que deja al mercado corto de dinero. 
+• Tipo medio: media aritmética de los tipos de interés de las peticiones  adjudicadas: 
+(Σimporte x tipo interés) / Σimportes 
+(1000x0,0280 + 2000x0,0277 + 1500x0,0290) / 4500 = 0, 0282 = 2,82 % 
+Las entidades financieras que acuden a la subasta y se quedan fuera tienen que  acudir al mercado interbancario. Si el BCE ha dejado corto al mercado de dinero, lo  lógico es que el tipo de interés suba. 
+Fundación de Estudios Financieros© 57  
+Sistema Financiero  
+DE FINANCIACIÓN A MÁS LARGO PLAZO  
+También son operaciones temporales de inyección de liquidez, pero en este caso con una  frecuencia mensual y con vencimiento a tres meses, realizándose mediante subasta estándar.  Suelen ejecutarse a tipo de interés variable y lo que se pretende con estas operaciones es dotar  a las entidades del mercado de una liquidez adicional. En circunstancias excepcionales, el  Eurosistema puede llevar a cabo también operaciones de financiación a plazo más largo mediante  subastas a tipo de interés fijo. 
+Al igual que las anteriores, el periodo que transcurre desde su anuncio hasta la certificación del  resultado de la adjudicación es de un día y las subastas también siguen un calendario fijado  previamente, comunicándose el resultado de las mismas a través de los servicios de información  electrónicos. 
+Si la forma de adjudicación de las subastas es a tipo variable, las peticiones se clasifican de  mayor a menor tipo de interés, empezando por adjudicar aquéllas de mayor tipo, hasta que se  agota la cantidad total que se iba a adjudicar en dicha subasta. 
+DE AJUSTE FINO  
+Estas operaciones tienen como objetivo gestionar la liquidez del mercado. Pueden ser de  inyección o de drenaje (absorción de liquidez) y tratan de controlar los tipos de interés, para  suavizar los posibles movimientos al alza o a la baja, derivados de fluctuaciones inesperadas de  la propia liquidez del mercado.  
+Pueden realizarse bien mediante operaciones temporales o por operaciones en firme, swaps de  divisas (si lo que se pretende es inyectar liquidez al sistema, las peticiones se ordenan de menor  a mayor, adjudicándose aquéllas que sean más bajas) y captación de depósitos a plazo fijo (si  lo que se pretende es drenar liquidez, las peticiones se ordenan de menor a mayor tipo,  adjudicándose aquéllas que sean de menor tipo). 
+Su ejecución tiene lugar a través de subastas rápidas (hay un número reducido de participantes,  el periodo de ejecución es de una hora desde el anuncio hasta la adjudicación definitiva y no son  regulares) o mediante procedimientos bilaterales (el Banco de España, en nuestro caso, realiza  una transacción con una o varias entidades sin necesidad de subasta, bien a través de un acuerdo  directo o de las Bolsas de Valores y de los agentes del mercado). 
+58 Fundación de Estudios Financieros© 
+Sistema Financiero  
+ESTRUCTURALES  
+Se ejecutan para ajustar la posición estructural del SEBC frente al sector financiero, de forma  que pueden ser regulares o no, a través de la colocación de certificados de depósito (subasta  estándar), operaciones temporales (subasta estándar) o compraventas simples (procedimientos  bilaterales). 
+TLTRO O PRÉSTAMOS A LARGO  
+  
+TLTRO significa Targeted longer-term refinancing operations, es decir, operaciones de  refinanciación a largo plazo. Mediante este instrumento financiero, el BCE presta dinero a la  banca a un tipo de interés muy reducido.  
+El objetivo de un TLTRO es sustituir al mercado interbancario. Desde el inicio de la crisis  financiera, el mercado interbancario en el que se prestan dinero los bancos no ha tenido  actividad, y ha servido como excusa a los bancos para no prestar dinero a las pymes y las  familias. Los TLTRO es la llamada "barra libre" de liquidez, y gracias a ellas, se ha podido realizar  el carry-trade de deuda española. 
+¿Cuál es la diferencia entre una Quantitive Easing (QE) y los TLTROs? Una QE es la compra  directa y masiva de bonos públicos y privados en el mercado secundario, es decir, el Banco  Central se pone a comprar deuda de manera directa. En cambio, los TLTROs son préstamos a  largo plazo a los bancos con objetivo específico para promover concesión de crédito a las  empresas y a los consumidores en la zona del euro. La primera serie de TLTRO se inició en 2014.  La segunda, denominada TLTRO-II, se introdujo en marzo de 2016 y la tercera TLTRO-III en  2019. 
+Los bancos que participan en estas operaciones pueden obtener financiación por un importe de  hasta el 30 % de sus préstamos vivos a empresas y consumidores. Esto significa que las  entidades que concedan más préstamos a la economía real podrán obtener más financiación y a  un tipo de interés más bajo del que habitualmente ofrece el BCE. 
+5.3.2. Facilidades Permanentes  
+Tiene como objetivo inyectar o drenar liquidez del sistema a un día, controlando los tipos de  interés de este periodo, y señalando a los agentes económicos la orientación general de la  política monetaria. 
+Se establecen dos tipos:  
+1. Facilidades permanentes de crédito: fija el límite máximo para los tipos de interés del  mercado interbancario a un día.
+Fundación de Estudios Financieros© 59  
+Sistema Financiero  
+2. Facilidades Permanentes de Depósitos: establece el límite inferior del tipo de interés del  mercado interbancario a un día. 
+Como vimos anteriormente el tipo oficial se sitúa más o menos entre esos dos valores, y cuando  se mueve este tipo también cambian los tipos de interés de las facilidades permanentes. 
+DE CRÉDITO  
+Permite a las entidades obtener liquidez de su Banco Central Nacional a un día y a un tipo de  interés especificado, aportando activos en garantía. La liquidez se adjudica mediante operaciones  de compraventa de activos con pacto de recompra, estando el tipo de interés anunciado  previamente por el SEBC, con efectos el día hábil siguiente. La petición de crédito se realiza de  forma automática cuando una entidad termine el día con una posición deudora. Este tipo de  interés será el TIPO DE INTERÉS MÁS ALTO A UN DÍA; ningún banco se financiará más caro en  el interbancario que al tipo de interés que puede obtener del BCE (siempre que disponga de  colaterales suficientes).  
+DE DEPÓSITO  
+Cada Banco Central Nacional acepta depósitos a un día a un tipo de interés predeterminado,  siendo estos depósitos no transferibles. Ese tipo de interés concreto al que las entidades prestan  al BCE se convierte en el TIPO DE INTERÉS MÁS BAJO A UN DÍA, es decir, nunca prestará un  banco ese dinero a otro banco en el mercado por debajo de ese tipo de interés.  
+5.3.3. Coeficiente de caja  
+Es un coeficiente de liquidez obligatorio que implica el depósito obligatorio de “activos de caja”  en el BCE en función del pasivo computable (básicamente depósitos y renta fija a menos de dos  años, de terceros). 
+Las reservas mínimas se calculan aplicando un coeficiente, actualmente el 1 %, a los saldos, a  fin de mes, de determinados pasivos de las entidades de crédito, generalmente a plazos  inferiores a dos años que, en conjunto, forman lo que se denomina base de reservas. 
+Las reservas así determinadas se deben mantener durante un período de un mes y se remuneran  al tipo de interés de las operaciones principales de financiación del Eurosistema. El período de  mantenimiento de reservas se inicia a partir del día de la liquidación de la primera operación  principal de financiación posterior a la reunión del Consejo en la que tomen decisiones de política  monetaria. Una entidad cumple las exigencias de mantenimiento de reservas durante ese mes 
+60 Fundación de Estudios Financieros© 
+Sistema Financiero  
+si la media de los saldos diarios en su cuenta en el banco central no es inferior a la cantidad  exigida. 
+Así definido, el coeficiente de caja se considera un instrumento de acción discontinua porque,  aunque es un instrumento de política monetaria, no se puede modificar todos los días, sino que  se mantiene en el tiempo. Por el contrario, las operaciones de mercado abierto y las facilidades  permanentes son un instrumento de acción continua. 
+5.3.4. Programas de compras de activos  
+Como se señala en la propia web del BCE, el Programa de Compra de Activos (APP) del BCE es  parte de un paquete de medidas de política monetaria no estándar que también incluye  operaciones de refinanciamiento focalizadas a más largo plazo, y que se inició a mediados de  2014 para respaldar el mecanismo de transmisión de la política monetaria y proporcionar el  monto de los ajustes de política necesarios para garantizar la estabilidad de precios. 
+El APP consiste en el CSPP, el PSPP, el ABSPP, el CBPP y tras la crisis del coronavirus el PEPP. 
+o programa de compras del sector empresarial (CSPP). 
+o programa de compras del sector público (PSPP). 
+o programa de compra de valores respaldados por activos (ABSPP). 
+o tercer programa de compra de bonos garantizados (CBPP3). 
+o Pandemic emergency purchase programme (PEPP). 
+Entre octubre de 2014 y diciembre de 2018, el Eurosistema realizó compras netas de valores en  el marco de uno o más de los programas de compra de activos. Durante la fase de compra de  activos netos, el ritmo de compra mensual promedió: 
+o 60.000 millones de euros desde marzo de 2015 hasta marzo de 2016. o 80.000 millones de euros desde abril de 2016 hasta marzo de 2017. 
+o 60.000 millones de euros desde abril de 2017 hasta diciembre de 2017. o 30.000 millones de euros desde enero de 2018 hasta septiembre de 2018. o 15.000 millones de euros de octubre de 2018 a diciembre de 2018. 
+Entre enero de 2019 y octubre de 2019, el Eurosistema reinvirtió íntegramente los pagos de  principal de los valores con vencimiento mantenidos en las carteras de APP. El Consejo de  Gobierno tenía como objetivo mantener el tamaño de sus compras netas acumuladas en cada  programa constitutivo de la APP en sus respectivos niveles a finales de diciembre de 2018. 
+El 12 de septiembre de 2019, el Consejo de Gobierno del BCE decidió que “las compras netas se  reiniciarán en el marco del programa de compra de activos (APP) del Consejo de Gobierno a un  ritmo mensual de 20.000 millones de euros a partir del 1 de noviembre de 2019. según sea 
+Fundación de Estudios Financieros© 61  
+Sistema Financiero  
+necesario para reforzar el impacto acomodaticio de sus tipos de interés oficiales y terminar poco  antes de que comience a subir los tipos de interés clave del BCE ". El 12 de marzo de 2020, el  Consejo de Gobierno del BCE decidió añadir “una dotación temporal de compras netas de activos  adicionales de 120 000 millones de euros” hasta finales de 2020. 
+En circunstancias económicas normales, el BCE guía las condiciones financieras generales y, por  ende, la evolución macroeconómica y la inflación, mediante la fijación de los tipos de interés  oficiales. Sin embargo, debido a la crisis financiera mundial, los tipos de interés oficiales se han  acercado a su límite inferior efectivo, que es el punto en el que reducirlos aún más apenas  tendría ningún efecto. En consecuencia, el BCE ha adoptado medidas no convencionales para  hacer frente a los riesgos de un período de baja inflación demasiado prolongado y devolver la  inflación a niveles inferiores, aunque próximos, al 2 % a medio plazo, de acuerdo con la  definición de estabilidad de precios del Consejo de Gobierno. Las compras de activos son una de  las medidas no convencionales que el BCE está utilizando con ese objetivo. 
+Cuando el BCE compra activos del sector privado, como los bonos de titulización de activos o los  bonos garantizados, que están vinculados a préstamos que los bancos conceden a las empresas  y a los hogares en la economía real, el aumento de la demanda de esos activos hace que sus  precios suban. Esto anima a los bancos a conceder nuevos préstamos, que pueden utilizar para  crear y vender más bonos de titulización de activos o bonos garantizados. El aumento de la  oferta de préstamos tiende a reducir los tipos de interés que las entidades aplican a las empresas  y a los hogares, lo que mejora las condiciones financieras generales. 
+Además, El BCE compra activos de los sectores público y privado de inversores como fondos de  pensiones, entidades de crédito y hogares. Estos inversores pueden utilizar los fondos que  reciben por los activos vendidos al BCE para invertirlos en otros activos. Al aumentar de forma  más general la demanda de activos, este mecanismo de reequilibrio de carteras hace que los  precios suban y que los rendimientos se reduzcan, incluso en el caso de los activos no incluidos  directamente en el programa de compras del BCE. Esto da lugar a una reducción de los costes  (el tipo de interés efectivo del mercado) para las empresas que tratan de obtener financiación  en los mercados de capitales.  
+Al mismo tiempo, la contracción de los rendimientos de los valores anima a los bancos a prestar  a las empresas y a los hogares. Una mayor oferta de crédito bancario a la economía real tiende  a rebajar los costes de endeudamiento de las empresas y de los hogares. Si, por otro lado, los  inversores utilizan los fondos extraordinarios para comprar activos de rentabilidad más elevada  fuera de la zona del euro, el tipo de cambio del euro podría depreciarse, lo que suele ejercer  presión al alza sobre la inflación. 
+Los canales de transmisión directa y de reequilibrio de carteras mejoran las condiciones  financieras generales que se aplican a las empresas y a los hogares en la zona del euro. Al  reducir los costes de financiación, las compras de activos pueden estimular la inversión y el 
+62 Fundación de Estudios Financieros© 
+Sistema Financiero  
+consumo. Un mayor dinamismo de la demanda de las empresas y de los consumidores  contribuirá ulteriormente al retorno de la inflación a niveles inferiores, aunque próximos, al 2 %  a medio plazo. 
+Por último, las compras de activos envían señales a los mercados de que el banco central  mantendrá los tipos de interés oficiales en niveles bajos durante un período prologando. Este  efecto de señalización reduce la volatilidad y la incertidumbre en los mercados respecto a la  evolución de los tipos de interés en el futuro, lo que es importante a la hora de adoptar decisiones  de inversión. Por ejemplo, los tipos de interés aplicados a los préstamos a largo plazo seguirán  siendo bajos porque los bancos prevén un período prolongado de tipos de interés reducidos. 
+DECISIONES DE POLÍTICA MONETARIA12 
+NOTA DE PRENSA 16 de diciembre de 2021 
+En su reunión de hoy, el Consejo de Gobierno del BCE ha adoptado las siguientes decisiones de  política monetaria:  
+El Consejo de Gobierno estima que el avance en la recuperación económica y hacia su objetivo  de inflación a medio plazo permite una reducción escalonada del ritmo de sus compras de activos  durante los próximos trimestres. Sin embargo, la acomodación monetaria sigue siendo necesaria  para que la inflación se estabilice en el objetivo del 2 % a medio plazo. En vista de la actual  incertidumbre, el Consejo de Gobierno necesita mantener la flexibilidad y las opciones abiertas  en la ejecución de la política monetaria. Teniendo esto en cuenta, el Consejo de Gobierno ha  adoptado las siguientes decisiones: 
+1) Programa de compras de emergencia frente a la pandemia (PEPP) 
+En el primer trimestre de 2022, el Consejo de Gobierno espera realizar compras netas de activos  en el marco del PEPP a un ritmo significativamente inferior al del trimestre anterior. Pondrá fin  a las compras netas de activos en el marco del PEPP a final de marzo de 2022. 
+El Consejo de Gobierno ha decidido ampliar el horizonte de reinversión para el PEPP. Ahora prevé  reinvertir el principal de los valores adquiridos en el marco del PEPP que vayan venciendo al  menos hasta el final de 2024. En todo caso, la futura extinción de la cartera del PEPP se  gestionará de forma que se eviten interferencias con la orientación adecuada de la política  monetaria. 
+La pandemia ha mostrado que, en condiciones de estrés, la flexibilidad en el diseño y en la  realización de las compras de activos ha contribuido a contrarrestar las dificultades en la  
+12 Banco Central Europeo Dirección General de Comunicación, División de Relaciones con los Medios de Comunicación  Globales Sonnemannstrasse 20, 60314 Frankfurt am Main, Alemania
+Fundación de Estudios Financieros© 63  
+Sistema Financiero  
+transmisión de la política monetaria y ha hecho que los esfuerzos para lograr el objetivo del  Consejo de Gobierno sean más eficaces. En el marco de nuestro mandato, en condiciones de  estrés, la flexibilidad seguirá siendo un elemento de la política monetaria cuando las amenazas  para la transmisión de la política monetaria pongan en peligro el logro de la estabilidad de  precios. En, particular, en caso de una nueva fragmentación del mercado relacionada con la  pandemia, las reinversiones en el marco del PEPP pueden ajustarse en cualquier momento de  manera flexible en el tiempo, entre clases de activos y entre jurisdicciones. Ello podría incluir la  compra de bonos emitidos por la República Helénica además de la reinversión de los importes  vencidos a fin de evitar una interrupción de las compras en esa jurisdicción que pudiera  obstaculizar la transmisión de la política monetaria a la economía griega mientras sigue  recuperándose de los efectos de la pandemia. Las compras netas en el marco del PEPP también  podrían reactivarse, si fuera necesario, para contrarrestar las perturbaciones negativas  relacionadas con la pandemia. 
+2) Programa de compras de activos (APP) 
+En línea con una reducción escalonada de las compras de activos y para asegurar que la  orientación de la política monetaria siga siendo coherente con la estabilización de la inflación en  su objetivo a medio plazo, el Consejo de Gobierno ha decidido un ritmo de compras netas  mensuales de 40.000 millones de euros en el segundo trimestre y de 30.000 millones de euros  en el tercer trimestre en el marco del APP. A partir de octubre de 2022, el Consejo de Gobierno  mantendrá las compras netas de activos en el marco del APP a un ritmo mensual de 20.000  millones de euros durante el tiempo que sea necesario para reforzar el impacto acomodaticio de  sus tipos de interés oficiales. El Consejo de Gobierno espera que las compras netas finalicen  poco antes de que comience a subir los tipos de interés oficiales del BCE. 
+El Consejo de Gobierno también prevé seguir reinvirtiendo íntegramente el principal de los  valores adquiridos en el marco del APP que vayan venciendo durante un período prolongado tras  la fecha en la que comience a subir los tipos de interés oficiales del BCE y, en todo caso, durante  el tiempo que sea necesario para mantener unas condiciones de liquidez favorables y un amplio  grado de acomodación monetaria. 
+3) Tipos de interés oficiales del BCE 
+El tipo de interés de las operaciones principales de financiación y los tipos de interés de la  facilidad marginal de crédito y de la facilidad de depósito se mantendrán sin variación en el 0,00  %, 0,25 % y −0,50 %, respectivamente. 
+Para apoyar su objetivo simétrico de inflación del 2 % y en línea con su estrategia de política  monetaria, el Consejo de Gobierno espera que los tipos de interés oficiales del BCE continúen  en sus niveles actuales, o en niveles inferiores, hasta que observe que la inflación se sitúa en el  2 % bastante antes del final de su horizonte de proyección y de forma duradera en el resto de 
+64 Fundación de Estudios Financieros© 
+Sistema Financiero  
+dicho horizonte, y considere que el progreso observado en la inflación subyacente está  suficientemente avanzado para ser compatible con una estabilización de la inflación en el 2 % a  medio plazo. Ello también podría implicar un período transitorio en el que la inflación sea  moderadamente superior al objetivo. 
+4) Operaciones de financiación 
+El Consejo de Gobierno seguirá vigilando las condiciones de financiación de las entidades de  crédito y asegurando que el vencimiento de las operaciones de la tercera serie de operaciones  de financiación a plazo más largo con objetivo específico (TLTRO III) no obstaculice la  transmisión fluida de su política monetaria. El Consejo de Gobierno evaluará también  periódicamente la forma en que las operaciones de financiación con objetivo específico están  contribuyendo a la orientación de su política monetaria. Como se anunció, espera que las  condiciones especiales aplicables a las TLTRO III terminen en junio del año próximo. El Consejo  de Gobierno evaluará asimismo la calibración adecuada de su sistema de dos tramos para la  remuneración de reservas, de forma que el tipo de interés oficial negativo no limite la capacidad  de intermediación de las entidades de crédito en un entorno de amplio exceso de liquidez. 
+5.4. El Sistema TARGET 2  
+El TARGET 2 es un sistema de liquidación bruta en tiempo real descentralizado para el euro,  compuesto por sistemas de liquidación bruta en tiempo real nacionales, el mecanismo de pagos  del Banco Central Europeo y el mecanismo de interlinking. 
+Ajustándose al principio de subsidiariedad establecido en el Tratado de la Unión Europea (UE),  es un sistema descentralizado, basado en la interconexión de los sistemas de pago de cada país.  Su característica principal es que se trata de un sistema de liquidación bruta en tiempo real, por  lo que los pagos son liquidados de uno en uno, sin compensación previa (liquidación bruta),  según van llegando las órdenes de pago (en tiempo real) y con firmeza inmediata, una vez que  han sido liquidados. Para ello es necesario que la entidad pagadora cuente con saldo previo en  su cuenta con el banco central correspondiente, o bien que este último le otorgue el crédito  necesario, debidamente respaldado por las garantías correspondientes.  
+El sistema TARGET fue desarrollado con el triple objetivo de: facilitar un mecanismo seguro y  fiable para la liquidación bruta en tiempo real de operaciones en euros, aumentar la eficiencia  de los pagos transfronterizos en el área del euro, y, sobre todo, ofrecer un vehículo ágil y seguro  para la ejecución de la política monetaria única. Por tanto, todas las operaciones de política  monetaria realizadas por los bancos centrales de los Estados integrados en la Unión Económica  y Monetaria (UEM) se canalizan a través de TARGET. 
+Fundación de Estudios Financieros© 65  
+Sistema Financiero  
+Este sistema está abierto, por otra parte, a cualquier tipo de pago denominado en euros, ya sea  relacionado con los mercados monetarios o con operaciones comerciales, incluyendo también la  parte en euros de las operaciones de divisas, fundamentalmente euro/dólar y euro/yen.  
+Es importante añadir que, en principio, todos los bancos centrales de los países de la UE, y no  solo aquellos integrados en la UEM, pueden conectarse al sistema TARGET para la liquidación de  operaciones denominadas en euros.  
+Según el esquema descentralizado de TARGET, los participantes en el sistema, que, por regla  general, han de ser entidades de crédito, siguen manteniendo sus cuentas en los bancos  centrales nacionales. Las operaciones domésticas se siguen liquidando en el banco central  correspondiente.  
+En cuanto a los pagos transfronterizos entre países de la UE, se canalizan a través de los bancos  centrales correspondientes a la entidad pagadora y a la entidad receptora del pago. Para ello,  todos los bancos centrales están conectados entre sí, y con el Banco Central Europeo, formando  lo que se ha denominado la red o mecanismo de interlinking (que designa tanto la infraestructura  como los procedimientos de conexión).  
+El Consejo de Gobierno aprobó, el 24 de octubre de 2002, el desarrollo de TARGET2, que empezó  a operar en noviembre de 2007. Los servicios básicos del sistema son más amplios y  homogéneos y hay una estructura de precios única para dichos servicios, tanto nacionales como  transfronterizos.  
+Los objetivos de TARGET2 son: satisfacer mejor las necesidades de los usuarios al facilitar un  servicio ampliamente armonizado, mejorar la eficiencia desde el punto de vista de los costes y  ser capaz de adaptarse a futuros desarrollos, incluyendo la ampliación de la UE y el Eurosistema. 
+5.5. Diferencias entre la política monetaria del BCE y de la FED americana  
+El Banco Central Europeo (BCE) y la Reserva Federal (FED) son los dos bancos centrales más  grandes del mundo, las políticas que llevan a cabo influyen a cerca de 700 millones de  personas de las naciones más desarrolladas del planeta y sus monedas son referencia mundial.  Las funciones de ambos bancos son similares. Sin embargo, sus diferencias son gigantescas,  comenzando por los objetivos de la política monetaria de cada banco. 
+Como institución monetaria ambos bancos centrales están estructurados de forma similar,  aunque la instrumentación este descentralizada en los Bancos Centrales Nacionales (BCNs) para  el caso del BCE y centralizada en la Junta de Gobernadores y el Federal Open Market Comitte  (FOMC) para el caso de la FED. 
+La diferencia más apreciable en torno a la comparación de ambas políticas monetarias reside en los objetivos que hasta ahora cada banco central persigue y que realmente definen su forma de 
+66 Fundación de Estudios Financieros© 
+Sistema Financiero  
+actuar. El Banco Central Europeo tiene un solo objetivo, y es la estabilidad de precios, fijándolo  cuantitativamente en un 2 por ciento. Es un objetivo de carácter primordial frente a los objetivos  compartidos del Sistema de Reserva Federal. Muy ligado con lo anterior, la estrategia de política  monetaria también tiene claras diferencias. Mientras que el BCE la tiene claramente definida  mediante la definición del objetivo último en términos cuantitativos y basada en dos pilares, la  Reserva Federal se apoya en una gran cantidad de indicadores que definen su estrategia,  visiblemente no delimitada. 
+Sin embargo, como señalan Adriá Morron Salmeron y Ricard Murillo Gili, economistas de  Caixabank, distintas transformaciones estructurales han modificado el entorno y la capacidad de  actuación de los bancos centrales.  
+En primer lugar, la caída del tipo de interés de equilibrio en las principales economías avanzadas aumenta la probabilidad de encontrarse el tipo mínimo factible (effective lower bound) y reduce  el margen de maniobra de los bancos centrales para estimular la economía en futuras recesiones. 
+En segundo lugar, la relación entre el desempeño de la actividad y la inflación se ha debilitado.  Las razones son múltiples y, entre ellas, destacan:  
+▪ la disminución de los márgenes empresariales,  
+▪ el impacto de la globalización (que aumenta la proporción de bienes y servicios im portados) y  
+▪ la incertidumbre alrededor del grado de saturación del mercado laboral.  
+De hecho, sobre este último punto distintos estudios muestran que las dinámicas de la inflación  en la eurozona se explican mejor cuando consideramos medidas más amplias del desempleo. Además, en este contexto, las expectativas de inflación han pasado a ser mucho más  importantes para la determinación de la inflación. 
+Estas transformaciones contribuyen a explicar el incumplimiento reiterado de los objetivos de  inflación de la Fed y el BCE durante los últimos años (en la eurozona, no se ha alcanzado el  objetivo desde 2012) y han provocado una caída de las expectativas de inflación, reforzando la  necesidad de revisar las estrategias de política monetaria una vez superadas las turbulencias  económicas de la última década. 
+Y así ha sucedido recientemente, cuando, por ejemplo, la Reserva Federal de los Estados  Unidos13 ha aprovechado el encuentro anual de banqueros centrales en Jackson Hole en 2020  
+13 https://www.elconfidencial.com/tags/organismos/reserva-federal-8920/
+Fundación de Estudios Financieros© 67  
+Sistema Financiero  
+para certificar un giro histórico14 en su estrategia para garantizar la estabilidad de precios. A  partir de ahora, en lugar de buscar un objetivo de inflación del 2 % a secas, intentará que la  inflación media durante un determinado periodo de tiempo sea del 2 %. Además, en lo que  respecta al mercado laboral, la Fed va a tener en cuenta "análisis de las deficiencias de empleo  desde su nivel máximo" en lugar de "desviaciones desde su nivel máximo". 
+Powell explicó que en gran medida la Fed pretende adaptarse a la nueva realidad de la economía  mundial, marcada por el bajo crecimiento, la baja productividad y la baja inflación. «La economía  evoluciona constantemente», afirmó el presidente del banco central. «Nuestra política revisada  refleja nuestro aprecio por los beneficios de un mercado laboral fuerte, particularmente entre  las comunidades con ingresos bajos o moderados y la idea de que se puede sostener un mercado  laboral robusto sin que provoque aumentos indeseados de la inflación». 
+«La persistente inflación por debajo del 2 % ambicionado a largo plazo es un motivo de  preocupación», reconoció el presidente de la Reserva Federal en su intervención. 
+A continuación, presentamos sus principales diferencias15.  
+
+14 https://www.elconfidencial.com/economia/2020-08-27/fed-flexibiliza-objetivo-inflacion-mayor-margen-politica monetaria_2727499/ 
+15 Fuente: conomipedia.com/definiciones/diferencia-entre-el-banco-central-europeo-y-la-reserva-federal.html 
+68 Fundación de Estudios Financieros© 
+Sistema Financiero  
+
+Fundación de Estudios Financieros© 69 
+Sistema Financiero  
+6. TIPOS DE INTERÉS DE REFERENCIA  
+6.1. Características y Sistema de Cálculos  
+Como señala el BCE16, los tipos de interés de referencia, también conocidos simplemente como  tipos o índices de referencia, son tipos de interés de acceso público que se actualizan  regularmente y que sirven de base para todo tipo de contratos financieros como hipotecas,  descubiertos en cuenta u otras operaciones más complejas. 
+Son calculados por un órgano independiente y suelen reflejar el coste de obtener financiación en  distintos mercados, por ejemplo, cuánto les cuesta a los bancos obtener préstamos de otros  bancos o de otras fuentes como fondos de pensiones, compañías de seguros o fondos del  mercado monetario. 
+Es el motivo por el que estos tipos de referencia son fundamentales para el sistema financiero,  el sistema bancario y la economía en general. ¿Qué es exactamente lo que los hace tan  importantes? ¿Y por qué son objeto de reforma actualmente? 
+Por ejemplo, los bancos los utilizan cuando prestan dinero a particulares o empresas. 
+Un banco puede conceder un préstamo a una empresa a un tipo de interés que se acuerda en  relación con un determinado tipo de referencia más un 2 %, lo que significa que la empresa  deberá pagar un interés del 2 % más el tipo de referencia. De este modo, si el tipo de referencia  aumenta también lo hace el coste del préstamo e, inversamente, si el tipo de referencia se  reduce, el coste del préstamo también disminuirá. En este caso, el índice de que se trate puede  ser una referencia fiable, independiente y relativamente simple para todas las partes. 
+Empresas, bancos y otras entidades también utilizan los tipos de referencia para valorar las  partidas de sus balances, es decir, estos índices facilitan a los contables el cálculo del valor de  sus entidades (más concretamente, de los activos financieros que poseen). 
+Los tipos de referencia también se emplean en operaciones financieras más complejas, como las  emisiones de valores a tipo de interés variable, las opciones, los contratos forward y los swaps. 
+Por ejemplo, en los swaps de tipos de interés, que en general son contratos en los que dos partes  acuerdan cubrir los pagos por intereses de la otra, el índice de referencia puede determinar al  menos uno de los tipos de interés que se permutan, lo que crea transparencia para todas las  partes, introduce cierta estandarización en el acuerdo y, en consecuencia, hace más fácil la  negociación para todas las partes. 
+Los tipos de referencia también se utilizan, entre otras cosas, para calcular las penalizaciones  por descubiertos en cuenta y los intereses de determinados depósitos minoristas y para los  acuerdos sobre el interés aplicable a los préstamos e hipotecas minoristas. 
+16 https://www.ecb.europa.eu/explainers/tell-me-more/html/benchmark_rates_qa.es.html
+70 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Los tipos de referencia también pueden aportar información importante para la labor de los  bancos centrales. En el BCE, por ejemplo, se tiene en cuenta los tipos de referencia para  mantener los precios estables en la zona del euro. Conocer el nivel actual de los tipos de  referencia permite llevar a cabo un seguimiento del impacto real de las decisiones de política  monetaria. Por ejemplo, si el BCE decide elevar o reducir sus tipos de interés, se puede estudiar  los efectos de esa medida observando las variaciones de los tipos de referencia para el euro. 
+¿Por qué se están reformando los tipos de referencia y qué implica esa  reforma?  
+Los tipos de referencia serán útiles si se consideren fiables e imparciales; idealmente deberían  calcularse de manera transparente y el público debería poder acceder a ellos fácilmente. Si un  contrato se basa en un tipo de referencia fiable, ninguna de las partes podrá influir en el tipo de  interés acordado, lo que significa que el valor del contrato seguirá siendo imparcial e indiscutible. 
+Dada la importancia económica de los tipos de referencia, es esencial asegurar su viabilidad  mediante estructuras de gobernanza claras y metodologías transparentes. 
+Por este motivo, los tipos de referencia europeos son actualmente objeto de profundas reformas.  Gran parte de estas reformas son resultado de la adopción del Reglamento sobre Índices de  Referencia de la UE, publicado en 2016 y en vigor desde enero de 2018. 
+En 2017, el BCE decidió desarrollar el tipo de interés a corto plazo del euro (€STR), que comenzó  a publicarse el 2 de octubre de 2019, con el objetivo de que pueda servir como alternativa en  caso de que el sector privado deje de producir su propio índice de referencia a un día, el EONIA. 
+En 2018, un grupo de trabajo del sector privado sobre tipos de interés libres de riesgo para la  zona del euro recomendó sustituir el EONIA por el €STR, teniendo en cuenta los comentarios del  mercado. Este grupo de trabajo está apoyando al mercado en la transición al €STR y el BCE le  proporciona servicios de secretaría y asiste como observador a sus reuniones junto al resto  instituciones que lo crearon (la Autoridad Europea de Valores y Mercados (ESMA), la Autoridad  belga de Mercados y Servicios Financieros (FSMA) y la Comisión Europea). 
+Veamos a continuación las características del EONIA, del EURIBOR y del nuevo €STR. 
+6.2. El EONIA y el EURIBOR  
+6.2.1. EONIA  
+Eonia (Euro OverNight Index Average) es el tipo efectivo de referencia para las operaciones  overnight -día a día- en el mercado interbancario del euro. Se calculaba como la media  ponderada de los tipos de interés de las operaciones de depósitos overnight realizadas en el  mercado interbancario por el panel de bancos contribuyentes.
+Fundación de Estudios Financieros© 71  
+Sistema Financiero  
+Dicha media era calculada y publicada diariamente, al cierre de mercado, por el Banco Central  Europeo en nombre del Instituto Europeo de Mercados Monetarios (EMMI, por sus siglas en  inglés), organización sin fines de lucro con sede en Bruselas. Sus principales características eran: 
+• Es el tipo medio overnight (día a día) de la zona EURO. Es decir, la media ponderada de los  tipos de interés de los préstamos a un día sin garantías en el mercado interbancario. 
+• Tiene idéntico panel de entidades cotizantes que el EURIBOR. 
+• Su publicación tiene lugar entre 6:45 y 7:00 p.m. 
+• Se publica con dos decimales y se calcula en base Actual / 360. 
+• Se publica en la página “EONIA” de Reuters y Telerate.  
+• Se viene utilizando como tipo de penalización en los potenciales descubiertos a un día del  mercado interbancario. 
+El EMMI ha indicado que para dar al mercado tiempo suficiente para llevar a cabo la transición  al €STR, una vez que esté disponible y hasta el 3 de enero de 2022, el EONIA se calculará  aplicando un diferencial al €STR. En concreto, desde octubre de 2019 se modifica la metodología  de cálculo del EONIA para convertirse en el nuevo tipo de interés €STR (Euro Short Term Rate)  más un diferencial fijo de 8,5 puntos básicos. 
+La transición del EONIA al €STR  
+
+Fuente: 
+https://www.bde.es/f/webbde/GAP/Secciones/Publicaciones/InformesBoletinesRevistas/RevistaEstabilidadFinanciera/2 0/mayo/es/Tipos_interes.pdf
+72 Fundación de Estudios Financieros© 
+Sistema Financiero  
+6.2.2. EURIBOR  
+Euribor (Euro Interbank Offered Rate) es el tipo de interés de referencia del mercado  interbancario del euro nacido en enero de 1999. 
+Hasta su reforma, que entró en vigor a principios del 2020, se calculaba como un fixing -en base  a cotizaciones de especialistas- y era el tipo de interés representativo de la oferta de depósitos  interbancarios sin garantías en euros por entidades de primera calidad crediticia a otras  entidades de su misma calidad crediticia. Se publicaba diariamente, a las 11.00 a.m. CET para  fecha valor (T+2). Al igual que el mercado interbancario, la convención para su base de cálculo  es Act/360. 
+Sus principales características eran: 
+• Es el tipo de interés de referencia del euro en la zona Euro. 
+• Los periodos en los que se calcula son: a 1 semana y periodos mensuales de 1, 3, 6 y 12  meses. 
+• Publicación diaria, excepto festivos del Target (ver cuadro 2). 
+• El panel de entidades contribuidoras está formado por un grupo de Entidades  representativas del sector crediticio pertenecientes a FBE, European Banking Federation,  y a ACI, Financial Markets Association. 
+• Tiene como fecha de valor dos días hábiles después (Valor t+2) y se calcula en base Actual  / 360, mediante la media aritmética de las cotizaciones, excluyendo el 15 % de las colas. 
+• Es el tipo de oferta representativo, para cada uno de los plazos, del mercado interbancario  del euro. 
+Todas las entidades que formen parte del panel de cotizantes debían cumplir los siguientes  requisitos: 
+• Ser miembros de FBE o ACI. 
+• Que sean entidades activas en el mercado monetario. 
+• Que tengan capacidad de gestión en momentos de turbulencia de los mercados. • Que posean una calificación crediticia de primera clase. 
+• Deberán remitir información relevante a los Bancos Centrales Nacionales y al Banco Central  Europeo, con periodicidad trimestral. 
+• Tendrán como obligaciones: Cotizar tipos diarios y transmitir datos diarios al BCE para el  cálculo del EONIA. 
+Fundación de Estudios Financieros© 73  
+Sistema Financiero  
+LA REFORMA DEL EURIBOR17  
+Como señala Alfredo Jimenez, director de Estudios de FEF, esta reforma busca mejorar la  metodología de determinación de los índices de referencia exigiendo que su cálculo se base, en  mayor medida, en transacciones reales que se ajusten mejor a las condiciones del mercado que  pretenden medir y que, a su vez, sean menos manipulables. 
+Esta modificación tiene consecuencias importantes porque el EURIBOR ha sido considerado como  un indicador de referencia crítico por la normativa europea. Esta decisión se adoptó al estimarse  que el EURIBOR se utiliza en más de 180.000 millones de euros en contratos, incluyendo  productos derivados y más de 1.000 millones de euros de hipotecas minoristas. 
+Conviene recordar que la regulación europea de benchmarks surge como consecuencia de las  decisiones adoptadas en el G-20 y en el Foro de Estabilidad Financiera (FSB) que mostraron su  preocupación por la falta de vigilancia y supervisión en la producción de ciertos índices. 
+Una vez publicado el Reglamento BMR, durante los años 2016-2017, EMMI realizó un ejercicio  de comprobación sobre la viabilidad de una metodología para el cálculo del índice EURIBOR que  estuviera completamente basada en transacciones reales. La conclusión de este ejercicio de  evaluación fue que, en las condiciones actuales del mercado, no era posible modificar la  metodología actual del EURIBOR hacia una nueva exclusivamente basada en transacciones  reales. A esta situación del mercado, han contribuido varias cuestiones que se han producido y  que han hecho que los bancos tengan una menor actividad de operaciones de préstamos  interbancarios. Por ejemplo, la reevaluación del riesgo que se conceden los bancos entre sí, que  dio lugar a una reducción de las líneas de crédito, y la propia regulación de Basilea III que hace  poco viable, desde el punto de vista de la exigencia de recursos propios, los préstamos  interbancarios. Esta menor actividad ha hecho que el ejercicio de cálculo que se efectuaba hasta  ahora se basara más en el juicio experto de los bancos que contribuyen que en transacciones  reales. También hay que mencionar la reducción del número de bancos que participan con sus  datos en la determinación del EURIBOR, en la actualidad 18 frente a las 42 que hubo en el  pasado. 
+Como consecuencia de ello, EMMI comenzó a trabajar en el desarrollo de un nuevo sistema de  cálculo que considerara las transacciones de mercado, cuando estuvieran disponibles, y acudiera  a otras fuentes de datos cuando fuera necesario. A este sistema se le denomina “metodología  híbrida” y ha sido desarrollada por EMMI en los últimos años gracias a las aportaciones de un  grupo de trabajo compuesto por participantes del mercado y expertos independientes.  
+Hay que remarcar que no se trata de un nuevo índice (una especie de nuevo EURIBOR) sino de  una modificación de su sistema de cálculo que lo aproxime al tipo de interés que se pretende  
+17 La Reforma de los índices e tipos de interés: EONIA y Euribor (2ª parte). Alfredo Jiménez. Revista Análisis Financiero  del IEAF.
+74 Fundación de Estudios Financieros© 
+Sistema Financiero  
+medir, haciendo más robusta, consistente y trasparente su fijación, cumpliendo con la normativa  europea de benchmarks. 
+La metodología híbrida se probó con éxito durante un período de tres meses en el verano de  2018. El diseño final y los parámetros de esta metodología se establecieron después de dos  consultas públicas a lo largo de 2018, y fueron aprobados por el Comité Directivo de EURIBOR  y los órganos rectores de EMMI para una implementación gradual en 2019. 
+Estos trabajos han avanzado positivamente y el pasado 2 de julio de 2019, EMMI ha sido  autorizado por la Autoridad Belga de Servicios Financieros y Mercados como el Administrador de  la referencia EURIBOR. A su vez, ha sido incluido en el Registro de administradores de referencia  de ESMA el 4 de julio de 2019. Este hecho, confirma que el EURIBOR cumple los requisitos  contenidos en la normativa BMR y, en consecuencia, este índice también podrá utilizarse después  del 1 de enero de 2022, ya que el Reglamento BMR establece esta fecha a partir de la cual, en  las nuevas operaciones, solo pueden utilizarse índices de referencia que cumplan con los  requisitos de seguridad, representatividad y que no sean manipulables. Por ello, se ha dado un  paso muy importante hacia la permanencia de este importante índice de referencia que es tan  utilizado en el sistema financiero europeo. 
+Los responsables de otros indicadores de referencia de los tipos de interés, como por ejemplo el  LIBOR, han decidido no continuar con este indicador, por lo que desaparecerá a partir de la fecha  anteriormente citada. 
+En qué consiste el nuevo método de cálculo  
+De acuerdo con la definición que da su Administrador, EMMI, el EURIBOR: 
+• Es la tasa a la que las entidades de crédito de la UE y de los países de la EFTA pueden  obtener fondos mayoristas en euros en el mercado monetario no garantizado  (unsecured).  
+• Este último requisito, significa que las operaciones que se consideran no incluyen  colaterales o garantías y que, por lo tanto, incorporan en su cálculo el riesgo de crédito. 
+• El EURIBOR se publica todos los días del calendario Target, a las 11:00 horas de  Bruselas, para cada uno de los plazos siguientes: 1 semana, 1 mes, 3 meses, 6 meses  y 12 meses. 
+• El nuevo sistema de cálculo del EURIBOR se basará, en la medida de lo posible, en  transacciones reales del mercado monetario en euros que reflejen el nivel de los tipos  de interés a los periodos correspondientes.
+Fundación de Estudios Financieros© 75  
+Sistema Financiero  
+• Para garantizar la solidez del índice en ausencia de transacciones reales, la nueva  metodología de cálculo sigue un enfoque que consta de tres niveles, que deben  emplearse paulatinamente y en el siguiente orden: 
+▪ El Nivel 1 consiste en contribuciones basadas únicamente en transacciones  reales realizadas en el día anterior en el plazo correspondiente, de acuerdo  con unos criterios establecidos por EMMI. Se trata de contribuciones del panel  de bancos obtenidas a partir de los datos de operativa del día anterior a la  publicación del índice. 
+▪ El Nivel 2 consiste en contribuciones basadas en transacciones reales en  diversos vencimientos del mercado monetario efectuadas en los últimos días,  utilizando un rango definido de técnicas de cálculo proporcionadas por EMMI.  Aquí se establecen 3 opciones: (i) las contribuciones efectuadas en plazos  adyacentes que se asignan con un ajuste de diferencial al plazo más cercano  mediante interpolación lineal; (ii) la incorporación de operaciones con plazos  no estándar; y (iii) las contribuciones realizadas en días anteriores, ajustadas  a partir de indicadores de mercado. 
+▪ El Nivel 3 consiste en contribuciones obtenidas a partir de operaciones que  reflejen la realidad económica del índice, pero que no cumplan todos los  criterios exigidos para el nivel 1 o 2, así como indicaciones y/o datos de  mercados próximos al mercado sin garantía en euros, combinados a partir de  técnicas de modelización y/o el juicio experto del contribuidor. Como parte del  proceso diario, cada contribución de Nivel 3 debe ir acompañada de una  justificación que explique las fuentes de datos y la discreción utilizada para  determinar su inclusión. 
+• El cálculo del EURIBOR en un día determinado, partiendo de la información aportada en  los tres niveles anteriores, requiere que, al menos, 12 de los 18 bancos contribuidores  actuales, que actúen en, como mínimo, en 3 países diferentes, hayan aportado una  contribución al índice de referencia. 
+• De igual manera que con la metodología actual, se eliminan del cálculo de referencia el  15 % más alto y más bajo de las tasas de contribución final de todos los bancos. Las  tasas resultantes se promedian aritméticamente y se redondean a tres decimales. Cada  contribución tiene el mismo peso en el cálculo. 
+A su vez, el nuevo sistema cuenta con un mecanismo de control para detectar posibles errores  en los registros de entrada de los datos contribuidos por los bancos antes de la publicación del  EURIBOR y un sistema de reparación inmediato para corregir dichos errores, minimizando su  impacto en los usuarios finales.
+76 Fundación de Estudios Financieros© 
+Sistema Financiero  
+Para garantizar la robustez del índice EURIBOR en ausencia de transacciones, es esencial la  inclusión del Nivel 3 anteriormente descrito en la metodología híbrida. Por ello, los bancos  contribuidores pueden elegir y diseñar sus metodologías de nivel 3, dentro de la orientación  general proporcionada por EMMI. A estos efectos, los bancos del panel pueden excluir  transacciones individuales o clases de transacciones de sus cálculos si las consideran  razonablemente realizadas a tasas que no reflejan los niveles de financiación mayoristas,  dejando constancia de ello. EMMI se apoya en el Artículo 11 de la regulación BMR, que indica  que “si los datos de operaciones no bastan o no resultan apropiados para reflejar con exactitud  y fiabilidad el mercado o la realidad económica a cuya medición se destina el índice de referencia,  podrán utilizarse datos de cálculo distintos de los datos de operaciones, incluidas las  estimaciones de precios, cotizaciones y cotizaciones firmes, u otros valores.” 
+El enfoque específico adoptado por cada banco para su contribución en el Nivel 3 debe estar  completamente documentado. El enfoque debe ser revisado y aprobado al menos anualmente  por un experto independiente. A su vez, EMMI revisará las metodologías documentadas de Nivel  3 de cada banco contribuidor y realizará encuestas periódicas de las metodologías empleadas. 
+La clave para el correcto funcionamiento de esta nueva metodología es el papel que juegan los  bancos contribuidores. Estos se sujetan a un riguroso código de conducta establecido por EMMI  como Administrador del índice de referencia, con la exigencia de requisitos de gobernanza y de  control aplicables a los contribuidores que incorporen, entre otros: (i) la gestión de conflictos de  interés, (ii) el sistema de control de los datos de cálculo aportados que garanticen su integridad  y fiabilidad; (iii) la gestión de controles a realizar a las personas que participen en la aportación  de datos y su adecuada formación; (iv) la gestión de posibles conflictos de interés e incentivos;  y (v) la cooperación con el Administrador del índice y las autoridades de supervisión. 
+Para adaptar este índice al Reglamento sobre Índices de Referencia de la UE, el EMMI  ha precisado la definición del euríbor como el tipo de interés al que los bancos de la UE  y de la Asociación Europea de Libre Comercio pueden financiarse en el mercado  mayorista sin garantías. El EMMI también está introduciendo gradualmente un nuevo  método de cálculo del euríbor, denominado «híbrido». Este método de cálculo se basa,  en la medida de lo posible, en transacciones reales, aunque también utiliza juicio experto  en los casos en los que las transacciones reales no están disponibles. 
+ 
+Fundación de Estudios Financieros© 77  
+Sistema Financiero  
+  
+ÍNDICES DE REFERENCIA  
+Cuadro 2  
+ Fuente: Banco de España 
+ 
+78 Fundación de Estudios Financieros© 
+Sistema Financiero  
+6.3. €STR, el nuevo índice interbancario  
+El €STR se ha diseñado para reflejar el coste para los bancos de tomar fondos prestados a plazos  muy cortos (overnight) de diferentes contrapartes sin aportar garantías. Estas contrapartes  pueden ser bancos, fondos del mercado monetario, fondos de inversión o de pensiones y otros  actores financieros como los bancos centrales. 
+Por tanto, su alcance es más amplio que el del EONIA, que solo se basa en las transacciones  entre bancos. Asimismo, si se compara con el EONIA, un mayor número de bancos aportan los  datos sobre transacciones reales que utiliza el BCE para calcular el €STR. Este mayor alcance  protege al €STR de la manipulación y hace que sea un reflejo fiable del precio de los préstamos  sin garantías en la zona del euro. 
+Como señala Alfredo Jimenez, director de Estudios de la FEF, los índices de tipos de interés  EONIA y EURIBOR desempeñan un papel muy importante en la economía y en el sistema  financiero. La trascendencia de estos indicadores es muy grande hoy en día, tanto para la fijación  del tipo de interés de operaciones de préstamo que concede la banca a sus clientes como para  la liquidación de productos derivados negociados en los mercados organizados y en los OTC. 
+En el cuadro siguiente se puede apreciar la relevancia actual de estos índices: Estimación de la exposición en la zona euro (en MM euros)  
+Cuadro 3  
+Fuente: Estimación del Grupo sobre euro RFR 
+Estas estimaciones es probable que se sitúen por debajo de la realidad. Solamente en España  los préstamos hipotecarios referidos al EURIBOR a 12 meses suponen entre 500 y 600 MM de  euros, lo que le convierte en un indicador crítico para las familias españolas. Además, el  vencimiento de estos préstamos hipotecarios es a largo plazo (17 años de media) y la posibilidad  de modificar los contratos es muy reducida por lo que la sustitución del indicador de referencia  utilizado para determinar el coste de la hipoteca es un tema especialmente delicado en nuestro  país.
+Fundación de Estudios Financieros© 79

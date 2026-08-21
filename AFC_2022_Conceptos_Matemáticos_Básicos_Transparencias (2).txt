@@ -1,0 +1,941 @@
+﻿FUNDAMENTOS DE INVERSIÓN Conceptos Matemáticos Básicos   
+Transparencias 2022 
+-1-   
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+Índice 
+1. INTRODUCCIÓN - VALOR TEMPORAL DEL DINERO 
+2. CAPITALIZACIÓN 
+2.1. Simple 
+2.2. Compuesta 
+3. DESCUENTO 
+3.1. Simple Comercial 
+3.2. Simple Racional 
+3.3. Compuesto 
+4. TASAS DE INTERÉS SPOT Y FORWARD 
+5. RENTABILIDAD 
+5.1. Nominal y real 
+5.2. Rentabilidad simple 
+5.3. Tasa Anual Equivalente (TAE) 
+5.4. Tasa Interna de Rentabilidad/Retorno (TIR) 
+5.5. Tasa de rentabilidad efectiva (TRE) 
+5.6. Tasa geométrica de rentabilidad (TGR) 
+EJERCICIOS
+-2-   
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+Introducción  
+VALOR TEMPORAL DEL DINERO
+MATEMÁTICA FINANCIERA 
+• Estudia y analiza las formas en que se producen cambios cuantitativos en  sumas de dinero que, financieramente, reciben el nombre de capitales.  
+• Estos capitales financieros pueden ser usados por personas o empresas con  liquidez excesiva o faltante. 
+• El problema básico es el “juego” entre el sobrante y el faltante de dinero. 
+- El acreedor cobra “interés” 
+- El deudor pagará “interés” 
+El interés es la compensación por disponer de liquidez inmediata. 
+-3-   
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+Introducción 
+VALOR TEMPORAL DEL DINERO 
+Interpretación de Tasa de Interés 
+Tasa de interés: tasa que corresponde a la ganancia que se obtiene por cada  peso colocado durante cada período de tiempo en que se acreditan intereses. 
+Si Ud. Colocó USD 100 durante 1 mes y retiró al final de ese mes USD 101, se  dice que ha ganado USD 1.  
+Pero la tasa de interés es 1%; o sea, USD 1 de cada USD 100, ó 0,01 pues  ganó 1 céntimo por cada dólar colocado. 
+Una clasificación de tasas de interés: 
+Activas: cobradas por el que  presta (prestamista), el que  tiene exceso de liquidez  
+(dependen del monto solicitado,  del tipo de garantía, etc.). 
+Pasivas: pagadas por el que pide  prestado (prestatario), pagadas  por los bancos sobre sus  depósitos (dependen del plazo  de colocación, la cantidad de  dinero depositado, etc.). 
+-4-   
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+Introducción  
+VALOR TEMPORAL DEL DINERO 
+Interés Nominal vs Interés Real 
+¿Qué elementos determinan las tasas de interés? 
+❑ Variables macro: (Inflación esperada, emisión, riesgo país, etc.).  ❑ Plazo del crédito. 
+❑ Riesgo del crédito (calidad crediticia del prestatario). 
+Interés nominal es el que permite saber cuál será el valor futuro de una unidad monetaria transcurrido un tiempo, que generalmente se considera anual. Mide el aumento de capital en términos monetarios. 
+Interés real mide el rendimiento de un capital prestado, en términos de la cantidad de bienes y servicios que se pueden adquirir, en vez de considerarlo en términos monetarios. Mide el aumento de capital en términos de poder adquisitivo. 
+-5-   
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+VALOR TEMPORAL DEL DINERO 
+Concepto de capital financiero
+Lo que motiva a los individuos a tener preferencia por la liquidez, que  lleva a los inversores a preferir estar líquidos (en dinero) a menos que sean  compensados (por un cobro de intereses), es dinero tiene dos  funcionalidades esenciales: 
+• Unidad de cuenta: que permite cuantificar homogéneamente los bienes. • Medio de pago: que permite una gran velocidad en las transacciones.  
+Como consecuencia de la preferencia por la liquidez: No es lo mismo una  cantidad de dinero hoy que en un momento anterior o posterior. Con una misma cantidad de dinero es posible que los bienes que puedan ser  intercambiados no sean los mismos en distintos momentos del tiempo por  ejemplo, por inflación, riesgo de crédito, y/u otros. 
+-6-   
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+VALOR TEMPORAL DEL DINERO 
+Concepto de capital financiero
+En otras palabras: 
+• Los sujetos económicos deben elegir entre consumo actual y consumo futuro. – De tal forma, nos encontramos frente a un problema de asignación  temporal de los recursos, realizados en base a una tasa de intercambio. 
+• Para ello se basan en la Ley de subestimación de las necesidades  futuras que dice: 
+– “La apreciación de los bienes económicos disminuye a medida que el  momento de su disponibilidad se aleja en el tiempo”. 
+• En consecuencia pues, parece evidente que el bien dinero tiene una doble  dimensión: cuantitativa y temporal. 
+Es el capital financiero 
+-7-   
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+VALOR TEMPORAL DEL DINERO 
+Concepto de capital financiero
+• Capital financiero: 
+– La medida de un bien económico referida al momento de su disponibilidad  o vencimiento 
+– Es una magnitud de dos dimensiones (Ci,ti) 
+• C ≥0 (cuantía del bien) 
+• t ≥ 0 (fecha de disponibilidad o vencimiento) 
+• El sujeto económico tiene ante sí la decisión de elegir la determinación de dos  variables: 
+– La cuantía del capital 
+– El momento de su disponibilidad 
+-8-   
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+VALOR TEMPORAL DEL DINERO 
+Concepto de capital financiero
+• Dos capitales financieros de distinta cuantía y vencimientos se dicen  intercambiables o equivalentes, si ambos satisfacen la misma  necesidad. 
+(C1,t1) ~ (C2,t2) 
+• Para poder elegir entre ambas alternativas (consumo presente o  consumo futuro) se necesita algún criterio de comparación entre el  capital financiero actual y el futuro. Ese criterio lo proporciona la Ley  Financiera. 
+• La Ley Financiera es una función matemática que refleja el principio  de subestimación de las necesidades futuras respecto de las del  presente, y el principio de sustitución o proyección financiera. Es una  fórmula que permite establecer a qué capital actual equivale otro capital  futuro o viceversa. 
+• Generalmente estos capitales financieros se intercambian entre ellos  mediante las denominadas operaciones financieras. 
+-9-   
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+VALOR TEMPORAL DEL DINERO 
+Concepto de operación financiera
+Operación financiera: Toda acción que intercambia o sustituye unos  capitales financieros por otros de distinto vencimiento. 
+En otras palabras, se trata de un intercambio de capitales entre dos o  más agentes, que pactan además de la Ley Financiera o tasa de interés a  aplicar en la operación, el plazo y las condiciones de liquidez. 
+Ejemplos: depósitos a plazo fijo, cuenta corriente, préstamos otorgados por  los bancos, compra de bonos, compra de letras del Tesoro, etc. 
+En síntesis, en toda operación financiera existe: 
+i) un capital financiero,  
+ii) una tasa de interés de la operación y  
+iii) un tiempo transcurrido entre el momento inicial de 
+entrega del capital y la recuperación del mismo. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa    
+-10- 
+VALOR TEMPORAL DEL DINERO 
+Concepto de operación financiera
+• En toda operación financiera se cumplen los siguientes principios  matemáticos. 
+❑ El principio de productividad nominal: 
+Todo capital sometido a una operación financiera produce rédito financiero (interés) positivo, al menos nominalmente. 
+❑ El principio de equivalencia financiera: 
+Dos capitales Co y Cn, obtenidos uno del otro por efecto de una operación financiera, se consideran equivalentes respecto a dicha operación. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa    
+-11- 
+VALOR TEMPORAL DEL DINERO 
+Concepto de operación financiera
+ELEMENTOS BÁSICOS 
+	NOTACIÓN
+	Intervalo o período de colocación: tiempo durante el cual el  capital está en movimiento, puede ser expresado en años, meses o  en días.
+	0 < t < n
+	Capital Inicial: capital financiero en el inicio de la operación 
+	C0
+	Capital Final: capital financiero al final de la operación 
+	Cn
+	Ganancia o Interés: rendimiento o aumento que ha sufrido el  capital sometido a una operación financiera. El interés que gana un  peso en la unidad de tiempo es la tasa de interés (i)
+	I=Cn–C0
+	Prestatario: contratante que recibe el capital y abonará el rédito  de la operación (los intereses).
+	
+
+	Prestamista: contratante que cede el capital a la espera de recibir  el rédito de la operación (los intereses).
+	
+
+	
+
+
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa    
+-12- 
+Operaciones financieras  
+De Capitalización o Descuento
+DOS CONCEPTOS BÁSICOS 
+Teniendo en cuenta que los capitales financieros varían cuantitativamente  con el transcurso del tiempo, resulta lógico considerarlos como una función  del tiempo transcurrido. A su vez, el cambio cuantitativo se debe a la  incidencia del interés. 
+• Desde el punto de vista financiero, un capital tiene sólo dos  posibilidades de desplazamiento en el tiempo. 
+1) Hacia el futuro: partiendo desde un valor presente o capital inicial  para obtener un valor futuro o monto. 
+2) Hacia el presente o hacia atrás: partiendo desde un valor futuro o  monto para obtener un valor presente o actual (capital inicial). 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa    
+-13- 
+Operaciones Financieras 
+De Capitalización o Descuento
+En consecuencia, según la ley financiera, hay operaciones de  Capitalización y de Actualización (o Descuento). 
+• La ley financiera de capitalización proyecta el capital financiero hacia el  futuro. El capital financiero final será mayor, en los intereses  ganados, que el capital financiero inicial. 
+• La ley financiera de actualización o descuento proyecta los capitales  conocidos futuros hacia atrás, a períodos anteriores, con lo que se  obtendrá un capital financiero de menor cuantía que los  capitales futuros conocidos.  
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa    
+-14- 
+CAPITALIZACIÓN 
+Operaciones de Capitalización
+Capitalización: Es el proceso por medio del cual un capital, en el momento presente, se traslada en el tiempo a un momento futuro considerando un plus como rentabilidad. 
+Capitalización Simple: los intereses de un período cualquiera son proporcionales a la  duración del período y a la cuantía del capital inicial Los intereses no se acumulan, se  trata de operaciones a corto plazo. 
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-15- 
+CAPITALIZACIÓN 
+Operaciones de Capitalización 
+Capitalización Simple: los intereses de un período cualquiera son proporcionales a la  duración del período y a la cuantía del capital inicial Los intereses no se acumulan, se  trata de operaciones a corto plazo.
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-16- 
+CAPITALIZACIÓN 
+Operaciones de Capitalización
+Capitalización Compuesta: los intereses de un período se acumulan al capital en  el período siguiente y siguen generando nuevos intereses a  
+largo plazo.  
+Cuando las tasas de interés (i) son constantes. 
+Cn= C0 
+(1+i) n 
+Cuando las tasas de interés son i(1) … i(n) 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-17- 
+CAPITALIZACIÓN 
+Operaciones de Capitalización
+Capitalización Continua: (a tasa constante) cuando el interés i se compone “infinitas” veces al año. 
+Cn= C0 e  
+i.n 
+Siendo: 
+C0= valor inicial o capital inicial,  
+Cn = valor futuro o capital final,  
+i = es el tanto de interés efectivo periódico y 
+n = los períodos de capitalización. 
+e = 2,718281 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-18- 
+CAPITALIZACIÓN 
+Operaciones de Capitalización
+En las operaciones financieras puede ocurrir que los pagos de intereses  se produzcan al inicio o al final de un período, entonces existe: 
+Interés Vencido vs Interés Anticipado 
+• Interés vencido (iv) 
+– Tipo de interés liquidado al final del período (momento en el que  recibiremos o entregaremos el dinero). 
+i 
+= 
+i 
+a 
+v 
+(1 ) 
+− 
+• Interés anticipado (ia) 
+i t a 
+– Liquidado al comienzo del período. 
+i 
+= 
+i 
+v 
+a 
+(1 ) 
++ 
+i t v 
+• Muchas negociaciones son establecidas en términos de interés  anticipado y es deseable conocer cuál es el equivalente en tasas de  interés vencido (se aplicará más adelante). 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-19- 
+Capitalización simple 
+CAPITALIZACIÓN 
+Operaciones de Capitalización 
+• Son aquellas en las que los intereses se calculan siempre sobre el capital  inicial. Por eso, son una cantidad constante durante el lapso de la inversión. 
+• Los intereses son proporcionales al capital, al interés y al tiempo. 
+Cn=C0.(1+i.n)
+n 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-20- 
+Ejercicios  
+Operaciones de capitalización simple
+Ejercicios: 
+• 1) Un capital de $ 2300 se ha colocado durante 3 meses al 1% mensual de  interés. Calcular los intereses ganados. Rta. $ 69 
+• 2) ¿Qué interés puedo percibir en un semestre, si efectúo una inversión de $  3.000 al 1,1% mensual? Rta. $198 
+• 3) ¿A qué tasa mensual de interés se hizo una colocación de $ 2.700 que, luego  de permanecer depositado durante 4 meses, permitió obtener una ganancia de $  162? Rta. 1,5% mensual 
+• 4) Durante cuánto tiempo fue necesario dejar depositado $3.600 para obtener  una ganancia de $ 225 con una tasa de interés de 1,25%? Rta. 5 meses • 5) Una persona efectúa una colocación de $ 4000 durante 35 días, obteniendo  por ella una tasa anual de interés del 13%. Calcular los intereses ganados en la  operación en año de 365 días. Rta. 49,86 
+• 6) ¿A qué tasa de interés anual se colocó un capital de $ 3000, si en 21 días se  pudo retirar un monto de $ 3.022,44 en año de 365 días? Rta. 13% anual • 7) ¿A cuánto asciende los intereses ganados por un capital de $10.000 colocados  a 30 días a una tasa nominal anual de 15,81% en año de 365 días? Rta. $129,95 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-21- 
+CAPITALIZACIÓN 
+Operaciones de Capitalización 
+Capitalización en el régimen compuesto 
+• El primer período es igual a la capitalización simple. 
+• En el segundo período los intereses obtenidos en el primero pasan a formar parte del capital, por lo que los nuevos intereses se calculan sobre un capital mayor.
+
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-22- 
+CAPITALIZACIÓN 
+Operaciones de Capitalización
+CÁLCULO DEL TIPO DE INTERÉS APLICADO EN UNA OPERACIÓN  PACTADA A INTERÉS COMPUESTO A TANTO CONSTANTE  
+De la expresión general --🡪 
+Cn= C0 
+(1+i) n 
+Se puede despejar tanto el tipo de interés como el plazo temporal, una en  función de la otra, de cada operación. 
+Ejemplo: 
+Habiendo prestado 250.000 euros, al cabo de 3 años se retiran 332.750  euros. ¿Cuál ha sido el tipo de interés anual aplicado en la operación? 
+332.750 = 250.000 (1+i)3 (332.750/250.000)^(1/3) - 1 = i (anual) i (anual) = 10% 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-23- 
+Ejercicios  
+Operaciones de capitalización compuesta
+Ejercicios 
+1) Calcular el valor inicial de una inversión que, en el plazo de 5 meses al 1%  mensual de interés, permitió retirar un monto de $6.306,06. Rta. $ 6000 
+2) ¿En cuánto tiempo un capital de $10.000 produce un monto final de $24.000,  sabiendo que ha sido colocado al 4% bimestral de interés? Rta. 22,32 bimestres  o 2 bimestres y 19 días 
+3) Calcular la tasa de interés a la cual se colocó un capital de $ 10.000, sabiendo  que en 20 meses se produjo un monto de $ 22000. Rta. 4,02% mensual 
+4) Calcular el monto que puede obtenerse al cabo de 1 año con la colocación de un  capital de $ 7.000 que gana el 1,5% mensual de interés. Rta. $ 8369,33 
+5) Hace un año y medio se efectuó una inversión que rindió el 4% trimestral de  interés, pudiendo retirar hoy un monto global de $ 12.653,19. ¿Cuál es el valor  inicial de la inversión? Rta.$ 10.000 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-24- 
+CAPITALIZACIÓN 
+Operaciones de Capitalización
+Fraccionamiento del período de capitalización 
+Tasa nominal anual (jm): es la que se acuerda en una operación financiera (con  capitalización m veces al año). 
+Tasa efectiva anual (i): es la que realmente actúa sobre el capital de la operación j j j 
+m m n m m n m m n 
+. 
+(1 ) (1 ) (1 ) [(1 ) ] (1 ) + = + ⇒ + = + = + 
+i i 
+m m m 
+Tasas equivalentes: son las que en condiciones diferentes, producen la misma tasa efectiva anual. Son las que aplicadas a un mismo 
+capital inicial y durante un mismo período producen  
+idéntico capital final. 
+j 
+n m m n 
+. 
+C C i C 
+= + = + 
+(1 ) (1 ) n 
+0 0 
+m 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-25- 
+Tasa efectiva  
+Operaciones de capitalización compuesta
+Tasa efectiva es la tasa que capitalizada una sola vez en el período nos da un  monto igual al que se obtiene capitalizando subperiódicamente con la tasa  proporcional. 
+Ejemplo: Calcular el monto de $1 en un año al 6% anual, capitalizando  anualmente y capitalizando semestralmente con tasa proporcional.  – Anualmente Cn = 1*(1+0,06)1= 1,060 
+– Semestralmente Cn= 1*(1+0,06/2)2 = 1,03 2 = 1,0609 
+Si se desea capitalizar una sola vez en el año pero obteniendo el mismo  monto que al capitalizar semestralmente, deberá usarse una tasa de  interés algo mayor al 6%. Esta es la tasa efectiva y es aquella que,  capitalizada una sola vez en el año, nos da el monto 1,0609. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-26- 
+Tasa equivalente  
+Operaciones de capitalización compuesta 
+• Tasas equivalentes: capitalizadas en distintas unidades de tiempo, producen igual  monto al final del período considerado. Esto significa que teniendo una frecuencia  distinta de capitalización, al final del período de capitalización producen el  mismo monto, por ejemplo una tasa anual y una mensual. 
+Supongamos que usted puede ganar 8% de interés anual haciendo una colocación  en dólares y desea conocer el valor de una tasa de interés trimestral que,  capitalizando durante todo el año, le permite obtener un monto igual al que  obtiene con el 8% anual. Es evidente que esa tasa trimestral no puede ser 8/4 pues  2% es la tasa trimestral proporcional de interés del 8% anual. En consecuencia, si  usted toma un 2% trimestral de interés, obtendrá al final del año un monto mayor que  el que obtendría de capitalizar una sola vez en el año al 8%. Entonces, la “tasa  trimestral que usted desea calcular debe ser algo menor al 2%” que es la tasa  proporcional. 
+De esta forma, esa nueva tasa se capitalizará cuatro veces en el año y permitirá  obtener al cabo de ese año un monto igual al que se obtiene con la tasa anual del 8%.  La “tasa trimestral que reúne esa condición será una tasa equivalente al 8% anual”. Es  lo que se había presentado anteriormente: 
+j 
+n m m n 
+. 
+C C i C 
+= + = +
+(1 ) (1 ) n 
+0 0 
+m 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-27- 
+Tasa equivalente  
+Operaciones de capitalización compuesta
+Obtengamos la tasa equivalente (im) como im= (1+i)1/m -1 Supongamos Co=1, n=1, i=0,08, m=4 (capitalización trimestral): Por definición (1+i) = (1+i4)4; entonces: (1+0,08)=(1+i4)4) despejando: i4 = 0,019427 es la tasa equivalente pues: (1+0,019427)4 = (1+0,08) 
+Las tasas 1,9427% trimestral y 8% anual son equivalentes pues  producen un mismo monto al capitalizar en distintas unidades de  tiempo.  
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-28- 
+Tasa proporcional y Tasa equivalente  
+Operaciones de capitalización compuesta
+Doble juego de las tasas 
+• Dada una tasa nominal anual de 12%, cuya tasa proporcional  semestral (j2/2) es 6%. Si se calcula la tasa efectiva anual de esta  inversión resulta de 12,36%. 
+• Se desea calcular la tasa equivalente semestral al 12,36% anual  efectiva. 
+(1+0,1236) = (1+i2)2; entonces i2: 6% semestral 
+El 6% es una tasa proporcional respecto al 12% nominal anual ((jm/m)=12/2) y equivalente al 12,36% efectiva anual  (capitalizada semestralmente da igual capital que 12,36 efectiva  anual). 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-29- 
+OPERACIONES DE CAPITALIZACIÓN 
+Fraccionamiento del período de capitalización Tasa Efectiva (T.A.E) Tasa nominal Nº capitalizaciones 
+Obtener la tasa efectiva  anual (i) dada una cierta  tasa nominal anual (j) y  un número de  
+capitalizaciones (m) i = ( 1 + j/m) m - 1 
+i j m 5,00% 4,89 12 
+5,09% 5 4 7,12% 7 2 8,27% 8 6 8,30% 8 12 
+10,25% 10 2 10,38% 10 4 10,43% 10 6 10,47% 10 12 
+Valor final Valor inicial Tasa nominal Nº capitalizaciones Nº de años 
+Vf Vo j % m n 13,097.25 6,000.00 10.00% 2 8 
+142,531.26 4,000.00 9.00% 6 40 244,863.27 100,000.00 6.00% 6 15 122,861.07 25,200.00 8.00% 4 20 330,692.15 100,000.00 8.00% 12 15 165,831.11 62,500.00 10.00% 2 10 104,017.39 52,100.00 10.00% 4 7 23,340.03 9,560.00 10.00% 6 9 22,901.69 12,600.00 10.00% 12 6 Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+Obtener el monto  
+(Cn/Vf), dados Co/Vo,  una TNA (j), m períodos  de capitalización y n  años.
+Cn = c0*(1+j/m)m*n -30- 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  
+CAPITALIZACIÓN 
+Ejercicios
+Ejercicio 1:  
+Necesitado de liquidez un empresario solicita a su banco un préstamo  personal 200.000 pesos a 180 días, concertando cancelarlo de una sola  vez a razón del 80% de interés nominal anual. ¿Qué monto pagará a  vencimiento utilizando régimen simple? 
+Ejercicio 2: 
+Se colocó un capital a un interés compuesto de 1,5% mensual, retirando un  monto de 6.000 pesos en 3 años. ¿Cuál fue el capital que se colocó? 
+Ejercicio 3:  
+Habiendo prestado 15.000 pesos, se retiran al cabo de 4 años 42.841,50  pesos.  
+¿Cuál ha sido la tasa de interés aplicado en la operación?. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-31- 
+CAPITALIZACIÓN 
+Ejercicios
+Ejercicio 1:  
+Necesitado de liquidez un empresario solicita a su banco un préstamo personal 200.000  pesos a 180 días, concertando cancelarlo de una sola vez a razón del 80% de interés  nominal anual. ¿Qué monto pagará a vencimiento utilizando régimen simple? 
+Cn = C0(1+i*días/base) = 200000.(1+80%*180/365) = 278.904,11 
+Ejercicio 2: 
+Se colocó un capital a un interés compuesto de 1,5% mensual, retirando un monto de  6.000 pesos en 3 años. ¿Cuál fue el capital impuesto? 
+Cn = Co(1+i)n ;6000 = Co(1+1,5%)36 Ejercicio 3:  
+;Co = 6000/(1+1,5%)36 =3510,54 
+Habiendo prestado 15.000 pesos, se retiran al cabo de 4 años 42.841,50 pesos.  ¿Cuál ha sido la tasa de interés aplicado en la operación?. 
+Cn = C0(1+i)n 42.841,50 = 15000(1+i)4 
+i = (42.841,50 / 15.000) (1/4) -1 = 30%  
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-32- 
+DESCUENTO 
+Simple: Comercial y Racional 
+Operación de descuento: Tienen un objetivo opuesto al de las de capitalización. Se persigue conocer cuál es el valor equivalente a un capital que obtendríamos en el futuro. 
+Se trata de saber el valor presente de un capital futuro. Dado que el capital se anticipa a su vencimiento futuro, este sufre una disminución. 
+Si n > 12 meses: 
+C 
+= 
+C 
+n 
+0 
+(1 ) 
+n 
++ 
+i 
+Si, n < 12 meses: 
+Va Vf 
+Tipología: 
+Descuento Comercial: C0 = Cn ( 1 – n .d ) = Cn – Dc;  Dc = Cn.d.n 
+Descuento Racional:  
+C 
+C 
+0 
+= 
+n 
+1 n . i + 
+Dr = Cn.n.i (1+n.i)
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-33- 
+Descuento Bancario o Comercial 
+DESCUENTO 
+Simple: Comercial y Racional 
+▪ Es el utilizado en las operaciones comerciales. 
+▪ En las operaciones de descuento se cobran los intereses por adelantado sobre el valor nominal del documento (pagaré, etc.). 
+▪ Salvo que se indique expresamente, el descuento se entiendo que es el bancario. 
+Dc = Cn 
+. n . dsiendo Dc el descuento, Cn el  
+valor nominal del pagaré, n el  
+tiempo y d la tasa de descuento. 
+C0 = Cn  
+. (1-n.d) = Cn 
+- Dc siendo C0 el  
+valor actual  
+del pagaré  
+descontado.
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-34- 
+Ejercicios 
+Simple: comercial y racional
+Ejercicios 
+1. ¿Qué valor actual tiene un documento de $5.000 que se descuenta 2 meses  antes de vencer al 2,2% mensual? Rta. $4.780 
+2. Calcular el valor actual de un documento de $10.000 que se descuenta 40  días antes de su vencimiento, al 90% anual en año de 365 días. Rta.  $9.013,70 
+3. Calcular el descuento comercial de un capital de $3000 que estaré disponible  dentro de 3 meses y al cual se le aplica una tasa mensual de 8%. Rta. $ 720 4. Un documento de $6.250 se descontó 45 días antes de su vencimiento  habiéndose pagado $115,58 en concepto de intereses. Calcular la tasa anual  a la que se realizó la operación. Rta. 15% anual  
+5. Si existe un costo a los débitos y créditos bancarios del 0,6% por cada  operación y se debe realizar ventas para cancelar proveedores por una  deuda de $1000. ¿En cuanto habría que realizar una única venta (como  mínimo) para no tener pérdidas luego de los costos?. Rta. $1012,108 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-35- 
+Tasas de interés y descuento 
+Simple: comercial y racional 
+Repaso: Tasa de interés y tasa de descuento 
+Existe una relación entre la tasa de interés (vencida), i o iv, y la de  descuento (adelantada), d o ia, muy importante porque permite comparar  costos financieros reales con tasas de interés adelantadas, las que contienen  implícitamente un beneficio adicional para el prestamista debido a que, a  través de ellas, se aplican intereses sobre sumas de dinero que no se  reciben en su totalidad. 
+i 
+= 
+i 
+a 
+i 
+= 
+i 
+v 
+Vimos que: , y que 
+− (1 ) 
+v 
+(1 ) 
+i t 
+a 
+a 
++
+i t v 
+Dado un préstamo por $10.000 por 1 año en el que el acreedor ofrece cobrar  el 20%; en consecuencia, entrega $8000. Al cobrar un 20% adelantado, el  acreedor utiliza una tasa de descuento que es una tasa de interés cobrada  por adelantado. Entonces el verdadero costo financiero es  iv=0,20/(1-0,20)=0,25: 25% anual. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-36- 
+DESCUENTO 
+Simple: Comercial y Racional
+Descuento Racional 
+▪ Su valor se obtiene a partir de las fórmulas del capitalización simple. ▪ Se utiliza si expresamente se indica. 
+▪ El valor actual se obtiene dividiendo el valor nominal o final del activo por el 
+término (1+n.i): 
+C 
+C 
+= 
+n 
+0 
+1 n . i + 
+▪ El descuento racional Dr, es la diferencia entre el Cny el valor inicial C0 1 C .n.i 
+n 
+D ( 1 ) = C −C = C − = 
+r n 0 n 
+1 n.i 1 n.i + + 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-37- 
+DESCUENTO 
+Simple: Comercial y Racional
+Descuento Comercial y Racional 
+• En el descuento comercial (Dc=Cn*n*i) los intereses se cobran sobre el valor nominal y en el racional (Dr=[Cn/(1+n*i)]*n*i), los intereses se cobran sobre lo que debería cobrarse (valor actual). Esta diferencia la cobra de más quien recibe el documento en descuento. 
+Ejemplo: Suponga que se necesita descontar un documento que vence dentro de 45 días, el cual fue firmado por $5.000 (la tasa anual vigente es del 20%). Calcular su valor actual usando: a) descuento comercial y b) descuento racional (comprobar que el primero es mayor) 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-38- 
+DESCUENTO 
+Simple: Comercial y Racional
+⮚La Sra. Marín desea saber cuál sería el efectivo a percibir si se descontara a  interés compuesto del 8% un bono de 12.000 pesos nominales que vence  dentro de 6 años.  
+Usted, como asesor personal, le indicará que el efectivo a percibir sería de:  
+⮚ Descontamos un pagaré dos meses al 6% de descuento comercial simple  anual. Si el nominal es de 1.000 pesos, su valor descontado es:  
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-39- 
+DESCUENTO 
+Simple: Comercial y Racional
+⮚La Sra. Marín desea saber cuál sería el efectivo a percibir si se descontara a  interés compuesto del 8% una letra de 12.000 pesos nominales que vence  dentro de 6 años.  
+Usted, como asesor personal, le indicará que el efectivo a percibir sería de:  
+12.000 = Co * (1+8%)6 ; Co = 12.000 / (1+8%)6 = 7.562,03  
+⮚ Descontamos un pagaré dos meses al 6% de descuento comercial simple  anual. Si el nominal es de 1.000 pesos, su valor descontado es:  
+Co=Cn *(1-nd) =1000 x (1- 2/12 x 0,06) = 990 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-40- 
+DESCUENTO 
+Compuesto
+Factor de capitalización y factor de descuento 
+▪ Al término (1+i)n se le denomina factor de capitalización. 
+Dicho factor indica el Vf de un 1 $ de hoy, dentro de n unidades de tiempo. 
+▪ De manera similar al término 
+(1 ) 
+− 
+n 
+1 
+n 
++ = 
+i = 
+v 
+(1 ) 
+n 
++ 
+i 
+se le denomina factor de descuento. 
+Dicho factor indica el valor de 1 $ futuro, en el momento presente. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-41- 
+DESCUENTO 
+Compuesto
+Factor de capitalización y factor de descuento 
+¿Valor de 1 peso dentro de …. años si capitalizamos al 5% de interés? 
+1 año = 1*(1+5%)1 = 1,05 
+3 años = 1*(1+5%)3 = 1,1576 
+¿Valor actual de 1 peso dentro de …. años si actualizamos al 5% de interés? 
+1 año = 1*(1+5%)-1 = 1 / (1+5%)1 = 0,9523 
+3 años = 1*(1+5%)-3 = 1 / (1+5%)3 = 0,8638 
+-42- 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+TIPOS DE INTERÉS SPOT Y FORWARD 
+Se llama tasa de interés contado o spot a las tasas actuales, las que se encuentran vigentes hoy para las operaciones que iniciemos ahora. 
+Cuando hablemos de las tasas de interés que tendremos en un futuro hablaremos de tasas de interés a plazo o forward (en el tema de mercados de derivados se obtendrá la relación entre tasas de contado y tasas a plazo o forward)
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-43- 
+TIPOS DE INTERÉS SPOT Y FORWARD 
+Relación entre ellos 
+Si el plazo de una operación es n años, los intereses devengados contratando un único tipo de interés al contado para todo el período han de ser iguales a los intereses devengados si dividiéramos la operación en varios subperíodos y contratamos tasas a plazo para cada uno de ellos 
+Siendo i el tipo de interés al contado y f1...n las tasas forward para los  respectivos subperíodos
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-44- 
+TIPOS DE INTERÉS SPOT Y FORWARD 
+Curva de Tasas de Interés
+Es la representación gráfica que relaciona los tipos de interés  (precio del dinero) a los diferentes plazos que se negocian en el mercado y los plazos de los mismos. 
+▪Del Mercado Monetario: desde 1 día hasta 12 meses.  
+▪De la Renta Fija sin riesgo: desde 2 a 30 años. Tipología 
+Curva Normal: tc < tl 
+Curva Plana: tc = tl 
+Curva Invertida: tc > tl 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-45- 
+TIPOS DE INTERÉS SPOT Y FORWARD 
+Curva de Tasas de Interés
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-46- 
+TIPOS DE INTERÉS SPOT Y FORWARD 
+Curva de Tasas de Interés
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-47- 
+TIPOS DE INTERÉS SPOT Y FORWARD 
+Curva de Tasas de Interés
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-48- 
+TIPOS DE INTERÉS SPOT Y FORWARD 
+Curva de Tasas de Interés
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-49- 
+RENTABILIDAD 
+Nominal y real 
+Rentabilidad simple 
+Tasa Anual Equivalente (TAE) 
+Tasa Interna de Rentabilidad (TIR) 
+Tasa de rentabilidad efectiva (TRE) 
+Tasa geométrica de rentabilidad (TGR)
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-50- 
+RENTABILIDAD 
+Nominal y Real 
+La tasa de interés nominal es la que permite saber cuál será el valor futuro de una unidad monetaria transcurrido un tiempo, que generalmente se considera anual. 
+
+Así por ejemplo, si un capital se invierte al 7% anual por un único período indica que dentro de un año un capital de 100$ se habrá incrementado en 7$, por lo que el capital resultante será de 107$. Ahora bien ese rendimiento nominal o monetario no asegura la capacidad de compra de dicho importe. Sería posible que con los 107$ obtenidos transcurridos un año, no fuese posible comprar la misma cantidad de bienes y servicios que se podían comprar con los 100$ del año de partida.
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-51- 
+RENTABILIDAD 
+Nominal y Real 
+La tasa de interés real mide el rendimiento de un capital prestado, en términos de la cantidad de bienes y servicios que se pueden adquirir, en vez de considerarlo en términos monetarios o nominales. 
+Cálculos de la tasa de interés real 
+Si conocemos la tasa de interés nominal, la tasa de inflación y el número de  períodos de la siguiente forma: el capital inicial se capitaliza al tipo de interés  nominal i, y se actualiza a la tasa de inflación (π) 
+1+ i 
+= ( 
+1+ i 
+r )( 
+1+ i 
+1+ π ) −1
+n 
+i 
+r 
+= 
+n 
+1+ π 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-52- 
+RENTABILIDAD 
+Nominal y Real 
+Determinar la tasa de interés real en España, Argentina y EE.UU 
+En cada uno de esos países nos ofrecen retribuir las cuentas bancarias que mantenemos en dichos países a un interés nominal de 3 % anual y la inflación esperada durante el próximo año es la que aparece más abajo: 
+Dado que: 
+1+ in= 1+ i ( r )(1+ π ) 
+in= ir+ π + πir 
+i 
+Sólo cuando las tasas son pequeñas se verifica que r 
+Siendo In= interés nominal 
+Ir = interés real 
+π = inflación esperada 
+≅ i 
+n 
+− π 
+Ejemplo: 
+i 
+Para EEUU se verifica que r 
+≅ i 
+n 
+− π
+
+
+	Argentina 
+	España 
+	EEUU
+	tasa nominal (in) 
+	26,80% 
+	2,10% 
+	0,70%
+	tasa de inflación (π) 
+	32,80% 
+	0,30% 
+	0,20%
+	tasa real (ir) 
+	-4,52% 
+	1,79% 
+	0,50%
+	
+
+
+
+Para España también, pero en menor medida 
+Para Argentina no, ya que las tasas son 
+muy elevadas. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-53- 
+RENTABILIDAD 
+Tasa Anual Equivalente (TAE) 
+Tasa Anual Equivalente (costo financiero total) 
+Supongamos que se realiza una consulta en tres bancos buscando acceder a un préstamo hipotecario. 
+•El primer banco dice que la tasa de interés nominal que puede aplicar es de un 4,44%, y que la capitalización será mensual, además cobrará una comisión de estudio del 2 por mil sobre el valor nominal. 
+•El siguiente banco indica que su tasa es de un 0,37% efectivo mensual, pero con una comisión de apertura del 2%, y 
+•El tercero puede aplicar un 4,53% de TAE. 
+Tengo tres bancos con tres tasas de interés: ¿Cuál es el banco que me ofrece una mejor financiación? ¿Existe una medida por la cual se puedan comparar todos estos datos? 
+Sí, se pueden comparar a través del cálculo de la tasa anual equivalente. Esta tasa anual efectiva- expresada en porcentual anual- se define como la equivalencia entre la suma de intereses y gastos a cargo del cliente y una tasa de interés efectiva anual pagadera al vencimiento. Es aquel valor que iguala el valor actual de los montos recibidos y entregados incluyendo las comisiones a favor de la entidad. Es el equivalente al CFT en Argentina. 
+Nótese que la tasa equivalente es a la vez efectiva pues equivalente es la tasa que al capitalizar subperiódicamente  genera el mismo rendimiento que la tasa efectiva en un solo período (como ya se ha comentado).
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-54- 
+RENTABILIDAD 
+Tasa Anual Equivalente (TAE) 
+Tasa Anual Efectiva 
+O sea, es la tasa que hace que el valor presente de los Desembolsos coincide  con el VP de los Reembolsos. 
+Intentando formalizar lo expresados podemos plantear:  
+n 
+Dj 
+m 
+∑Rj 
+Donde: 
+D = desembolsos 
+1+ i ( k )tj= j=1 
+∑ j=1 
+1+ i ( k )tj 
+R = reembolsos: amortización, intereses u otros gastos incluidos en el costo o rendimiento efectivo de la operación 
+n = número de desembolsos 
+m = número de reembolsos 
+tj = tiempo transcurrido desde la fecha de la equivalencia hasta el desembolso Dj o reembolso Rj ik = tanto por uno efectivo referido al período de tiempo elegido para expresar las tm y los tn en números enteros.
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-55- 
+RENTABILIDAD 
+Tasa Anual Equivalente (TAE) 
+La TAE es la tasa de interés anual que iguala financieramente capitales entregados y recibidos; siendo k el número de veces que el año contiene el período elegido (número de capitalizaciones en el año). 
+La Tasa Anual Equivalente se obtendrá de la expresión general de las tasas de interés equivalentes, de acuerdo con la ley de capitalización compuesta: 
+TAE = 1+ i ( k ) 
+k 
+−1
+Recuerde que la tasa equivalente es la tasa que al capitalizar subperiódicamente genera el mismo  rendimiento que la tasa efectiva en un solo período ya habíamos definido: 
+Im = Raíz m de (1+j(m)/m)m – 1 (siendo m=k=número de períodos de capitalización en el año). 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-56- 
+RENTABILIDAD 
+Tasa anual equivalente
+Costo financiero: es el costo (rendimiento) de una operación  financiera que contempla todas las erogaciones que debemos  afrontar para iniciar, mantener y finalizar dicha operación. Todas  las operaciones tienen costos asociados, por lo que la tasa de  interés es insuficiente como indicador de rendimiento.  Efectivamente, es conveniente calcular el costo financiero total. 
+El cálculo del CFT también puede encontrarse en el contexto de la  evaluación de proyectos, es decir se plantea una serie de flujos de  fondos con todos los costos asociados, en donde, se imputa como  costo todas aquellas erogaciones que se deben afrontar para realizar  
+la operación para luego poder determinar la tasa implícita de la serie  conocida como tasa interna de retorno (TIR). 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-57- 
+RENTABILIDAD 
+Tasa anual equivalente
+Costo financiero: Teniendo en cuenta las características  comerciales, la descripción de la expresión del Banco de España  nos vendría a decir lo siguiente: el coste efectivo o real, en este  caso para el prestatario, es aquella tasa anual equivalente, que  iguala en cualquier fecha los efectivos recibidos y entregados por  el prestatario a lo largo de la operación. 
+Para el caso de prestamos hipotecarios no se deben dejar de  considerar las expresiones detalladas en la Norma que entro en  vigor en Marzo de 2019 (Ley 5/2019) para España la cual indica lo  siguiente :  
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-58- 
+RENTABILIDAD 
+Tasa anual equivalente 
+“sólo podrán repercutirse gastos o percibirse comisiones por servicios relacionados con los  préstamos que hayan sido solicitados en firme o aceptados expresamente por un prestatario o  prestatario potencial y siempre que respondan a servicios efectivamente prestados o gastos habidos  que puedan acreditarse” 
+“Tasa Anual Equivalente (TAE): el coste total del préstamo para el prestatario, expresado como  porcentaje anual del importe total del préstamo concedido, más los costes aparejados, si ha lugar, y  que corresponde, sobre una base anual, al valor actual de todos los compromisos futuros o  existentes, tales como disposiciones de fondos, reembolsos y gastos, convenidos por el prestamista  y el prestatario.” 
+Los gastos que paga el prestatario con la nueva Ley son: 
+• Comisión de apertura al pedir la hipoteca 
+• Los gastos de tasación del inmueble 
+• Los gastos notariales por solicitar una copia de la escritura
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-59- 
+RENTABILIDAD 
+Tasa anual equivalente 
+Ejercicio: 
+Préstamo por un monto de 105.000€ a devolver en cuotas  iguales, vencidas y consecutivas en el plazo de 4 años con un tipo de  interés nominal anual del 7% sabiendo que: 
+• Comisión de apertura del 0,3% sobre el nominal prestado • Gastos iniciales de tasación de 200€ 
+• Gastos de gestoría de 300€ 
+• Las cuotas anuales a las que debe hacer frente el prestatario tienen  un valor de 30.998,95€ 
+Con estos datos: ¿Cuál es el coste efectivo o real para el  prestatario?
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-60- 
+RENTABILIDAD 
+Tasa anual equivalente 
+Solución: 
+Lo que el prestatario recibe al firmar el préstamo, descontando  comisiones y gastos no es 105.000€ sino 104.185€: 
+Lo que paga todos los años: 30.998,95€ 
+Entonces si los desembolsos son iguales  a los reembolsos ------------------------🡪 
+n 
+∑ j=1 
+Dj 
+( k 1+ i 
+) 
+t 
+j 
+= 
+m 
+∑j=1 
+Rj 
+( k 1+ i 
+) 
+t 
+j 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-61- 
+RENTABILIDAD 
+Tasa anual equivalente
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-62- 
+Ejemplo:  
+Datos: 
+Préstamo personal con Monto original por $20.000.  Cuota total promedio $600 ($30 por cada $1000) Gastos de otorgamiento (4%) $20.000*0,04=$800 Cálculos: 
+RENTABILIDAD 
+Tasa anual equivalente
+Neto tomado en préstamo: $20000-800=$19.200 (en t=0) Se plantea el flujo de fondos (60 cuotas mensuales) 
+t=0 t=1 a t= 60 
+19.200 (600) 
+y se calcula la tasa resultante (efectiva mensual) ascendiendo a 2,349%.  Si se calcula la efectiva equivalente anual (TAE) es 32,13197%. 
+Costo financiero total (TIR-TEA)= 32,13197% 
+Costos totales pagados $ 600x60 - $19.200= $16.800 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-63- 
+RENTABILIDAD 
+Tasa anual equivalente
+Ejemplo:  
+Datos: 
+Préstamo por $20.000 con tasa 0% sin gastos de otorgamiento TNA=0%; Cuota $20000/60=$333.3 
+Gastos administrativos 0,5%*20.000=$100 
+Cuota seguro de vida=0,28%*20.000=$56;  
+Cálculos: 
+Cuota total=$333.33+$100+$56=$489,33 
+Se plantea el flujo de fondos (60 cuotas mensuales) 
+t=0 t=1 a t= 60 
+20000 (489,3) 
+y se calcula la tasa resultante (efectiva mensual) ascendiendo a 1,3566%. Si  se calcula la equivalente anual (TAE) es 17,551% 
+Costos totales pagados $ 489;3x60 - $20.000= $9.360 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-64- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR) 
+▪ La TIR es tasa de descuento que se debe aplicar a los flujos de fondos recibidos para que su valor actual se igual al precio pagado La TIR es un medida de rentabilidad periódica de la inversión. Es  el porcentaje de rentabilidad que obtenemos por cada peso  invertido en un proyecto. Es la incógnita a resolver en el  proyecto. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-65- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR)
+De otra forma, la TIR es la tasa de interés a la que permanecen invertidos  los fondos en juego. Así, si conocemos el precio de un activo hoy, y el flujo  de compensaciones que recibiremos, la TIR es la tasa única (R) que  hace que los flujos futuros descontados a hoy (Fi), y el valor del  activo hoy (Vo) sean iguales. 
+F F F 
+1 2 n ............ 0 
+Vo− − − − = t t t 
+1 n 
+( ) ( ) ( ) 
+1 R 1 R 1 R 
++ + + 
+2 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa 
+-66- 
+Valor Actual Neto (VAN) 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR)
+Un activo proporciona a su propietario un flujo de rendimientos a lo largo del tiempo. Si  descontamos a una determinada tasa de descuento los flujos esperados por esta  inversión, obtendremos su Valor Actual Neto (VAN).Nota: Para el cálculo del VAN se tiene en  cuenta el capital colocado al inicio del proyecto: 
+F 
+VAN 
+= 
+F 
+1 2 + 
++ + 
+F 
+n 
+(1 r) + 
+... 
+(1 r) 
++ 
+2 
+(1 r) + 
+n 
+▪ La TIR es la tasa única de descuento que, utilizada para descontar todos los flujos de un instrumento hace que la suma de los flujos Fi descontados se iguale al precio de mercado Vo. 
+▪ La TIR es una simplificación que se utiliza para obtener una medida única (tasa equivalente) de la rentabilidad de un instrumento financiero que realiza varios pagos. 
+▪ El precio al que cotiza el mercado cada instrumento financiero es la suma del valor de cada uno de sus flujos descontados a la TIR. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-67- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR) 
+Calculemos, entonces, la suma del valor de cada uno de los flujos  descontados a la TIR para obtener el precio al que cotiza el mercado un  instrumento financiero: 
+amortizando a la par a los 3 años, si queremos una rentabilidad del 4%. 
+Obtener el precio a pagar por un bono que paga cupones anuales del 4%,  Años Flujo Factor Flujo*Fdto 
+Descuento 
+1 4 0,96153846 3,84615385 
+2 4 0,92455621 3,69822485 
+3 104 0,88899636 92,4556213 
+TIR 4% 
+100 
+Si se adquiere el activo el primer día que se inicia el devengamiento de intereses, la TIR coincidirá con el interés anual. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-68- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR)
+¿Qué pasaría si la rentabilidad exigida por el inversor fuese del 5%, siendo el  resto de variables idénticas?  
+
+En este caso se puede observar que el precio de compra o valor actual es sólo del 97,27%. Entonces, al aumentar la rentabilidad exigida se reduce el valor actual que el inversor está dispuesto a pagar. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-69- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR) 
+El bono tiene un precio de mercado que surge de la oferta y  demanda. Pero al hablar de valuar un bono nos referimos a  calcular su “valor intrínseco”, es decir el valor que el bono debería  tener cuando descontamos su flujo de fondos con una tasa de interés  que represente el costo de oportunidad de una alternativa de riesgo  comparable. En tal sentido, el pricing de un bono es un cálculo para  determinar un “valor normativo”. 
+Desde el punto de vista del inversor, cuando se compra un bono se  adquiere el derecho a cobrar una corriente de efectivo compuesta por  intereses y capital, a lo largo de un período de tiempo. 
+Diseñado el flujo de caja del bono, se determina el precio.
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-70- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR) 
+Valuación de un bono con pago del principal al final
+Ejemplo: El 1 de diciembre de 2001 una SA emitió una obligación  por 10 millones con un cupón del 10% anual y vencimiento del  capital al final del quinto año. En ese momento, los inversores de  deuda reclamaban un rendimiento del 11% para inversiones de  riesgo similar. Utilizando el modelo de valuación del bono el precio  de un bono con VN=100, sería: 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-71- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR)
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-72- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR)
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-73- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR)
+Valuación de un bono adquirido entre dos períodos de renta 
+La valuación de un bono adquirido entre dos períodos de renta requiere  que se cuenten con exactitud los días que media entre cada flujo de  caja, desde la inversión inicial (precio) hasta el último cupón.  
+Ejemplo: 
+Se compró una obligación de una empresa XXX con fecha 11/03/01 que  tiene un cupón anual del 10%, con intereses semestrales, y se exige un  rendimiento de 15%, cuál es el valor actual?. Veamos los cupones aún  no vencidos y los días hasta el vencimiento contados desde la fecha de  adquisición: 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-74- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR)
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-75- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR)
+De la misma forma, calcular el valor actual de un bono que paga  cupones anuales al 3% amortiza a la par a los 6 años con valor nominal  de $ 1000 si se adquiere a los 6 meses de su emisión con una TIR de  4%. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-76- 
+RENTABILIDAD 
+Tasa Interna de Retorno (TIR)
+▪ El valor actual de un activo es directamente proporcional al de los pagos que se recibirán en el futuro, e inversamente proporcional a la TIR de la operación. 
+▪ Por tanto, cuanto mayor (menor) es la TIR menor (mayor) es el valor actual del instrumento. 
+▪ Cuanto mayores (menores) son los flujos futuros, mayor (menor) será el valor actual del instrumento. 
+En términos prácticos, lo más eficiente es calcular el valor actual de la inversión o precio de compra del activo que, dado un interés anual, una fecha y un valor de amortización, nos garantiza una rentabilidad o TIR dada. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-77- 
+RENTABILIDAD 
+Tasa de Rentabilidad Efectiva (TRE) 
+Es la tasa efectiva de rentabilidad que CONSIDERA REINVERSIONES EFECTIVAS a  tasas de mercado, y verifica la siguiente ecuación: 
+C0 = 
+C1 
+(1+I 1,t 
+) +C2 
+(1+I 
+2,t 
+) +...+Ct 
+t 
+(1+TER) 
+Siendo Ii,t las tasas efectivas de re-inversión para el plazo [i,t]. El problema es que a priori no se sabe cuales serán las tasas de reinversión efectivas. 
+Usualmente se utilizan las tasas forward como una estimación: 
+C0 = 
+C1 
+(1+ f 1,t 
+) +C2 
+(1+ f 2,t 
+) +...+Ct 
+t
+(1+TER) 
+donde fi,t es la tasa forward que abarca todo el plazo [i,t] (¡¡¡Cuidado que no es una tasa anual!!!). 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-78- 
+RENTABILIDAD 
+Tasa de Rentabilidad Efectiva (TRE) 
+Estructura Temporal de Tasas de Interés (ETTI) 
+La ETTI analiza la relación entre el tiempo que resta hasta el vencimiento de las diversas obligaciones o bonos (su amortización), y sus rendimientos durante dicho plazo siempre que todos ellos tengan el mismo grado de 
+riesgo (también se la denomina curva de rendimientos). 
+TIR 
+(%) 
+Años hasta el vencimiento 
+BBB 
+A 
+AA 
+Tesoro 
+Existen diferentes curvas de rendimiento  para diferentes categorías de riesgo 
+Construida la ETTI del mercado se puede observar: Si rendimiento de un instrumento está por encima (debajo) de la curva, su rendimiento es mayor (menor) al que se debería esta pagando; el precio está por debajo (arriba) del de referencia. Permite calcular las tasas forward para el posterior cálculo de la TRE.
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-79- 
+RENTABILIDAD 
+Tasa de Rentabilidad efectiva (TRE)
+•La estructura temporal busca evaluar el precio puro del tiempo, que  cambia de momento a momento. Es, fundamentalmente, una teoría de  tasas “spot”. 
+•En la práctica, la estructura temporal se investiga principalmente a partir  de los bonos cupón cero (curva de rendimientos de cupones cero) aunque  son posibles otros procedimientos. Bonos cupón cero son bonos sin  intereses, se venden al descuento y pagan capital al vencimiento. 
+• No hay en todas las economías un mercado lo suficientemente profundo  con estos instrumentos financieros, por lo que se hace necesario inferir la  estructura con bonos que pagan cupones. No hay instrumentos para todos  
+los plazos (uso de método Bootstrapping). Se debe construir una curva  continua y suave. Además, es importante la elección de la muestra y el  método de estimación. 
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos y  Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa  
+-80-

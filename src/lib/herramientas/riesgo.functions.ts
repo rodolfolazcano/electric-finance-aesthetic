@@ -24,23 +24,34 @@ async function getYF(): Promise<any> {
   return _yf;
 }
 
-export const INTERVAL_MAP: Record<string, { label: string; maxDays: number; annualFactor: number }> = {
-  "1m":  { label: "1 min",  maxDays: 7,   annualFactor: 252 * 390 },
-  "5m":  { label: "5 min",  maxDays: 60,  annualFactor: 252 * 78 },
-  "15m": { label: "15 min", maxDays: 60,  annualFactor: 252 * 26 },
-  "30m": { label: "30 min", maxDays: 60,  annualFactor: 252 * 13 },
-  "1h":  { label: "1 hour", maxDays: 730, annualFactor: 252 * 6.5 },
-  "1d":  { label: "1 day",  maxDays: 99999, annualFactor: 252 },
+export const INTERVAL_MAP: Record<
+  string,
+  { label: string; maxDays: number; annualFactor: number }
+> = {
+  "1m": { label: "1 min", maxDays: 7, annualFactor: 252 * 390 },
+  "5m": { label: "5 min", maxDays: 60, annualFactor: 252 * 78 },
+  "15m": { label: "15 min", maxDays: 60, annualFactor: 252 * 26 },
+  "30m": { label: "30 min", maxDays: 60, annualFactor: 252 * 13 },
+  "1h": { label: "1 hour", maxDays: 730, annualFactor: 252 * 6.5 },
+  "1d": { label: "1 day", maxDays: 99999, annualFactor: 252 },
   "1wk": { label: "1 week", maxDays: 99999, annualFactor: 52 },
-  "1mo": { label: "1 month",maxDays: 99999, annualFactor: 12 },
+  "1mo": { label: "1 month", maxDays: 99999, annualFactor: 12 },
 };
 
 const PERIOD_OPTIONS = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "max"];
 
 export function periodToDays(period: string): number {
   const m: Record<string, number> = {
-    "1d": 1, "5d": 5, "1mo": 30, "3mo": 90, "6mo": 180,
-    "1y": 365, "2y": 730, "5y": 1825, "10y": 3650, "max": 99999,
+    "1d": 1,
+    "5d": 5,
+    "1mo": 30,
+    "3mo": 90,
+    "6mo": 180,
+    "1y": 365,
+    "2y": 730,
+    "5y": 1825,
+    "10y": 3650,
+    max: 99999,
   };
   return m[period] ?? 730;
 }
@@ -82,7 +93,9 @@ async function fetchHistory(
             close: q.close as number,
           }));
       }
-    } catch { /* try next */ }
+    } catch {
+      /* try next */
+    }
   }
   // Fallback .BA
   if (!ticker.endsWith(".BA") && !ticker.includes(":")) {
@@ -99,7 +112,9 @@ async function fetchHistory(
             close: q.close as number,
           }));
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
   return [];
 }
@@ -189,7 +204,18 @@ export interface PricePoint {
 }
 
 export const VALID_INTERVALS = ["1m", "5m", "15m", "30m", "1h", "1d", "1wk", "1mo"] as const;
-export const VALID_PERIODS = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "max"] as const;
+export const VALID_PERIODS = [
+  "1d",
+  "5d",
+  "1mo",
+  "3mo",
+  "6mo",
+  "1y",
+  "2y",
+  "5y",
+  "10y",
+  "max",
+] as const;
 
 export interface DistribStats {
   ticker: string;
@@ -224,16 +250,16 @@ export interface DistribStats {
   period: string;
   annualFactor: number;
   // ─── Labadie §3.2: p-variance, Hurst, medidas de riesgo avanzadas ───
-  hurstExponent?: number;           // H: 0.5=random, <0.5=mean-rev, >0.5=trending
-  pVariance?: number;               // E[|r-μ|^p]^(1/p)
-  pSharpe?: number;                 // Sharpe con p-variance
-  pValueUsed?: number;              // p usado (default 2)
-  volatilityAnnualH?: number;       // σ × 252^H (scaling self-similar)
-  impliedP?: number;                // p = 1/H (identidad §3.2)
-  impliedPRegression?: number;      // p ≈ 2.35 + 0.14×MI − 1.79×σ (eq.21)
-  impliedPFromReturns?: number;     // p estimado por regresión multi-escala §4.3
-  cvar95?: number;                  // Conditional VaR (Expected Shortfall)
-  maxDrawdown?: number;             // Máxima caída desde pico histórico
+  hurstExponent?: number; // H: 0.5=random, <0.5=mean-rev, >0.5=trending
+  pVariance?: number; // E[|r-μ|^p]^(1/p)
+  pSharpe?: number; // Sharpe con p-variance
+  pValueUsed?: number; // p usado (default 2)
+  volatilityAnnualH?: number; // σ × 252^H (scaling self-similar)
+  impliedP?: number; // p = 1/H (identidad §3.2)
+  impliedPRegression?: number; // p ≈ 2.35 + 0.14×MI − 1.79×σ (eq.21)
+  impliedPFromReturns?: number; // p estimado por regresión multi-escala §4.3
+  cvar95?: number; // Conditional VaR (Expected Shortfall)
+  maxDrawdown?: number; // Máxima caída desde pico histórico
 }
 
 export type RiesgoResult = DistribStats[];
@@ -250,19 +276,30 @@ export const getRiesgoAnalysis = createServerFn({ method: "POST" })
       mercado?: string;
       pValue?: number;
     }) =>
-      z.object({
-        tickers: z.array(z.string().min(1).max(20)).min(1).max(20),
-        interval: z.enum(VALID_INTERVALS).default("1d"),
-        period: z.enum(VALID_PERIODS).default("2y"),
-        source: z.string().optional().default("yahoo"),
-        token: z.string().nullable().optional().default(null),
-        refreshToken: z.string().nullable().optional().default(null),
-        mercado: z.string().optional().default("BCBA"),
-        pValue: z.number().min(1.1).max(4).optional().default(2),
-      }).parse(input),
+      z
+        .object({
+          tickers: z.array(z.string().min(1).max(20)).min(1).max(20),
+          interval: z.enum(VALID_INTERVALS).default("1d"),
+          period: z.enum(VALID_PERIODS).default("2y"),
+          source: z.string().optional().default("yahoo"),
+          token: z.string().nullable().optional().default(null),
+          refreshToken: z.string().nullable().optional().default(null),
+          mercado: z.string().optional().default("BCBA"),
+          pValue: z.number().min(1.1).max(4).optional().default(2),
+        })
+        .parse(input),
   )
   .handler(async ({ data }): Promise<RiesgoResult> => {
-    const { tickers, interval = "1d", period = "2y", source = "yahoo", token, refreshToken, mercado = "BCBA", pValue = 2 } = data;
+    const {
+      tickers,
+      interval = "1d",
+      period = "2y",
+      source = "yahoo",
+      token,
+      refreshToken,
+      mercado = "BCBA",
+      pValue = 2,
+    } = data;
     const intCfg = INTERVAL_MAP[interval] ?? INTERVAL_MAP["1d"];
     const factor = intCfg.annualFactor;
     const results: DistribStats[] = [];
@@ -273,7 +310,9 @@ export const getRiesgoAnalysis = createServerFn({ method: "POST" })
       let hist: { date: string; close: number }[];
       if (isIOL) {
         const iolDays = Math.min(periodToDays(period), 1825);
-        hist = await fetchHistoryIOL(ticker, mercado, token!, refreshToken, iolDays).catch(() => []);
+        hist = await fetchHistoryIOL(ticker, mercado, token!, refreshToken, iolDays).catch(
+          () => [],
+        );
       } else {
         hist = await fetchHistory(ticker, period, interval);
       }
@@ -317,26 +356,33 @@ export const getRiesgoAnalysis = createServerFn({ method: "POST" })
       const pVar = computePVariance(returns, pValue);
       const pStd = pVar > 0 ? Math.pow(pVar, 1 / pValue) : 0;
       const volatilityAnnual_p = pStd * Math.pow(actualFactor, 1 / pValue);
-      const pSharpeRatio = volatilityAnnual_p > 0 ? (meanAnnual - getRiskFreeRateSync("USD")) / volatilityAnnual_p : 0;
+      const pSharpeRatio =
+        volatilityAnnual_p > 0 ? (meanAnnual - getRiskFreeRateSync("USD")) / volatilityAnnual_p : 0;
 
       // ─── Labadie §3.2: implied p = 1/H ───
       const impliedPCalc = hurst > 0 ? Math.min(10, Math.max(1.1, 1 / hurst)) : 2;
-      const impliedPFromReturnsVal = returns.length >= 100 ? impliedPFromReturns(returns) : undefined;
+      const impliedPFromReturnsVal =
+        returns.length >= 100 ? impliedPFromReturns(returns) : undefined;
 
       // ─── Labadie §4 (eq.21): implied p regression ───
       const avgPrice = priceMean;
-      const avgMI = prices.length > 0
-        ? prices.reduce((s, v) => s + Math.abs(v - avgPrice), 0) / prices.length / avgPrice
-        : 0.05;
-      const impliedPReg = Math.min(10, Math.max(1.1, 2.35 + 0.14 * avgMI * 100 - 1.79 * sigma * Math.sqrt(actualFactor)));
+      const avgMI =
+        prices.length > 0
+          ? prices.reduce((s, v) => s + Math.abs(v - avgPrice), 0) / prices.length / avgPrice
+          : 0.05;
+      const impliedPReg = Math.min(
+        10,
+        Math.max(1.1, 2.35 + 0.14 * avgMI * 100 - 1.79 * sigma * Math.sqrt(actualFactor)),
+      );
 
       // ─── CVaR (Expected Shortfall) al 95% — tail mean, not all negative returns ───
       const sortedRets = [...returns].sort((a, b) => a - b);
       const tailIdx = Math.max(1, Math.floor(sortedRets.length * 0.05));
       const tailReturns = sortedRets.slice(0, tailIdx);
-      const cvar95Val = tailReturns.length > 0
-        ? tailReturns.reduce((s, v) => s + v, 0) / tailReturns.length
-        : var95;
+      const cvar95Val =
+        tailReturns.length > 0
+          ? tailReturns.reduce((s, v) => s + v, 0) / tailReturns.length
+          : var95;
 
       // ─── Max Drawdown ───
       let maxDrawdown = 0;
@@ -399,7 +445,10 @@ export const getRiesgoAnalysis = createServerFn({ method: "POST" })
         volatilityAnnualH: volatilityAnnualH !== volatilityAnnual ? volatilityAnnualH : undefined,
         impliedP: impliedPCalc !== 2 ? impliedPCalc : undefined,
         impliedPRegression: impliedPReg !== 2 ? impliedPReg : undefined,
-        impliedPFromReturns: impliedPFromReturnsVal !== undefined && impliedPFromReturnsVal !== 2 ? impliedPFromReturnsVal : undefined,
+        impliedPFromReturns:
+          impliedPFromReturnsVal !== undefined && impliedPFromReturnsVal !== 2
+            ? impliedPFromReturnsVal
+            : undefined,
         cvar95: cvar95Val,
         maxDrawdown,
       });
@@ -429,7 +478,7 @@ function gamma(z: number): number {
     -0.0000002056338416976, 0.0000000061160951045, 0.0000000050020076445, -0.0000000011812745705,
     0.0000000001043426717, 0.0000000000077822634, -0.0000000000036968056,
   ];
-  let xv = z + g.length - 1.5;
+  const xv = z + g.length - 1.5;
   let result = g[g.length - 1];
   for (let i = g.length - 2; i >= 0; i--) result = result * (z + i + 0.5) + g[i];
   return Math.sqrt(2 * Math.PI) * Math.pow(xv, z + 0.5) * Math.exp(-xv) * result;

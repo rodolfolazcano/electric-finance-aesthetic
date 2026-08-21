@@ -1,11 +1,25 @@
 // @ts-nocheck
 import { useMemo, useState } from "react";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import type { SemaforoResult } from "@/lib/herramientas/finance.functions";
 import { GRID_STROKE, Metric, ScorePill, ChartTip } from "./chart-constants";
 import { fmtNum, fmtPct, fmtCap, lightColor } from "./formatters";
 
-export function SemaforoCard({ data, onNavigateToFundamental }: { data: SemaforoResult; onNavigateToFundamental?: (ticker: string) => void }) {
+export function SemaforoCard({
+  data,
+  onNavigateToFundamental,
+}: {
+  data: SemaforoResult;
+  onNavigateToFundamental?: (ticker: string) => void;
+}) {
   const chartData = useMemo(() => data.history.map((h) => ({ d: h.date, p: h.close })), [data]);
   const [expandedSignal, setExpandedSignal] = useState<number | null>(null);
   const scores = data.scoreTecnicoDetalle;
@@ -17,11 +31,16 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
           <div className="flex items-center gap-3">
             <h3 className="mono truncate text-xl font-semibold">{data.ticker}</h3>
             {data.clasificacionJerarquica ? (
-              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${
-                data.clasificacionJerarquica === "COMPRA" || data.clasificacionJerarquica === "COMPRA CON CAUTELA" ? "border-success/40 bg-success/10 text-success" :
-                data.clasificacionJerarquica === "MANTENER" ? "border-warning/40 bg-warning/10 text-warning" :
-                "border-danger/40 bg-danger/10 text-danger"
-              }`}>
+              <span
+                className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${
+                  data.clasificacionJerarquica === "COMPRA" ||
+                  data.clasificacionJerarquica === "COMPRA CON CAUTELA"
+                    ? "border-success/40 bg-success/10 text-success"
+                    : data.clasificacionJerarquica === "MANTENER"
+                      ? "border-warning/40 bg-warning/10 text-warning"
+                      : "border-danger/40 bg-danger/10 text-danger"
+                }`}
+              >
                 {data.clasificacionJerarquica}
               </span>
             ) : (
@@ -36,7 +55,13 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
             {data.name} · {data.sector ?? "\u2014"}
             {data.lastUpdated && (
               <span className="ml-2 text-muted-foreground/60">
-                · Actualizado: {new Date(data.lastUpdated).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                · Actualizado:{" "}
+                {new Date(data.lastUpdated).toLocaleString("es-AR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </span>
             )}
             {data.extended?.fechaProximoEarnings && (
@@ -47,7 +72,9 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
           </p>
           <p className="mt-1 text-[10px] text-muted-foreground/60">
             {data.dataSource === "yahoo" ? "Yahoo Finance (delay 15-20 min)" : "IOL (tiempo real)"}
-            {data.lastUpdated && <> · Actualizado: {new Date(data.lastUpdated).toLocaleString("es-AR")}</>}
+            {data.lastUpdated && (
+              <> · Actualizado: {new Date(data.lastUpdated).toLocaleString("es-AR")}</>
+            )}
           </p>
         </div>
         <div className="shrink-0 text-right">
@@ -97,7 +124,15 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
         <Metric label="52w bajo" value={fmtNum(data.low52)} />
         <Metric label="52w alto" value={fmtNum(data.high52)} />
         <Metric label="P/E" value={data.pe != null ? fmtNum(data.pe, 1) : "\u2014"} />
-        <Metric label="P/E Perc" value={data.pePercentile != null ? `${data.pePercentile.toFixed(0)}/100` : "\u2014"} sub={data.pePercentile == null && data.pePercentileReason ? data.pePercentileReason : undefined} />
+        <Metric
+          label="P/E Perc"
+          value={data.pePercentile != null ? `${data.pePercentile.toFixed(0)}/100` : "\u2014"}
+          sub={
+            data.pePercentile == null && data.pePercentileReason
+              ? data.pePercentileReason
+              : undefined
+          }
+        />
         <Metric label="Market cap" value={fmtCap(data.marketCap)} />
       </div>
 
@@ -106,12 +141,18 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
         <ScorePill label="Score técnico" value={data.techScore} />
         <div className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/30 px-4 py-3">
           <span className="text-xs text-muted-foreground">Score jerárquico</span>
-          <span className={`mono text-base ${
-            data.clasificacionJerarquica === "COMPRA" || data.clasificacionJerarquica === "COMPRA CON CAUTELA" ? "text-success" :
-            data.clasificacionJerarquica === "MANTENER" ? "text-warning" :
-            "text-danger"
-          }`}>
-            {data.totalScore > 0 ? "+" : ""}{data.totalScore.toFixed(2)}
+          <span
+            className={`mono text-base ${
+              data.clasificacionJerarquica === "COMPRA" ||
+              data.clasificacionJerarquica === "COMPRA CON CAUTELA"
+                ? "text-success"
+                : data.clasificacionJerarquica === "MANTENER"
+                  ? "text-warning"
+                  : "text-danger"
+            }`}
+          >
+            {data.totalScore > 0 ? "+" : ""}
+            {data.totalScore.toFixed(2)}
           </span>
         </div>
       </div>
@@ -130,7 +171,8 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
           )}
           {data.resistencias && data.resistencias.length > 0 && (
             <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-[10px] text-muted-foreground">
-              Resistencia ${data.resistencias[0].precio.toFixed(2)} (+{data.distanciaResistencia?.toFixed(1)}%)
+              Resistencia ${data.resistencias[0].precio.toFixed(2)} (+
+              {data.distanciaResistencia?.toFixed(1)}%)
               {data.resistencias[0].esEstimado ? " — estimado por máximo 52 semanas" : ""}
             </span>
           )}
@@ -148,7 +190,9 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
               <div className="flex gap-2 text-[10px] font-mono">
                 <span className="text-success">{data.extended.consensoAnalistas.strongBuy} SB</span>
                 <span className="text-success/70">{data.extended.consensoAnalistas.buy} B</span>
-                <span className="text-muted-foreground">{data.extended.consensoAnalistas.hold} H</span>
+                <span className="text-muted-foreground">
+                  {data.extended.consensoAnalistas.hold} H
+                </span>
                 <span className="text-danger/70">{data.extended.consensoAnalistas.sell} S</span>
                 <span className="text-danger">{data.extended.consensoAnalistas.strongSell} SS</span>
               </div>
@@ -160,26 +204,34 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
                 Quién sostiene esto
               </div>
               {data.extended.ownership.porcentajeInstitucional == null &&
-               data.extended.ownership.porcentajeInsiders == null ? (
+              data.extended.ownership.porcentajeInsiders == null ? (
                 <div className="text-[10px] text-muted-foreground">Dato no disponible</div>
               ) : (
                 <div className="flex gap-3 text-[10px] font-mono">
                   <span className="text-foreground">
-                    Inst: {data.extended.ownership.porcentajeInstitucional != null ? `${data.extended.ownership.porcentajeInstitucional.toFixed(1)}%` : "—"}
+                    Inst:{" "}
+                    {data.extended.ownership.porcentajeInstitucional != null
+                      ? `${data.extended.ownership.porcentajeInstitucional.toFixed(1)}%`
+                      : "—"}
                   </span>
                   <span className="text-foreground">
-                    Insiders: {data.extended.ownership.porcentajeInsiders != null ? `${data.extended.ownership.porcentajeInsiders.toFixed(1)}%` : "—"}
+                    Insiders:{" "}
+                    {data.extended.ownership.porcentajeInsiders != null
+                      ? `${data.extended.ownership.porcentajeInsiders.toFixed(1)}%`
+                      : "—"}
                   </span>
                   {data.extended.ownership.comprasRecientesInsiders != null &&
-                   data.extended.ownership.ventasRecientesInsiders != null && (
-                    <span className="text-muted-foreground">
-                      {data.extended.ownership.comprasRecientesInsiders === 0 &&
-                       data.extended.ownership.ventasRecientesInsiders === 0
-                        ? "Sin actividad registrada"
-                        : data.extended.ownership.comprasRecientesInsiders > data.extended.ownership.ventasRecientesInsiders
-                          ? "Comprando" : "Vendiendo"}
-                    </span>
-                  )}
+                    data.extended.ownership.ventasRecientesInsiders != null && (
+                      <span className="text-muted-foreground">
+                        {data.extended.ownership.comprasRecientesInsiders === 0 &&
+                        data.extended.ownership.ventasRecientesInsiders === 0
+                          ? "Sin actividad registrada"
+                          : data.extended.ownership.comprasRecientesInsiders >
+                              data.extended.ownership.ventasRecientesInsiders
+                            ? "Comprando"
+                            : "Vendiendo"}
+                      </span>
+                    )}
                 </div>
               )}
             </div>
@@ -190,12 +242,18 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
       {/* Sorpresa de earnings */}
       {data.extended?.sorpresaPromedioPct != null && (
         <div className="mt-3">
-          <span className={`rounded-md border px-2 py-1 text-[10px] ${
-            data.extended.sorpresaPromedioPct > 0
-              ? "border-success/40 bg-success/10 text-success"
-              : "border-danger/40 bg-danger/10 text-danger"
-          }`}>
-            Sorpresa earnings promedio: {data.extended.sorpresaPromedioPct > 0 ? "+" : ""}{data.extended.sorpresaPromedioPct.toFixed(2)}%{Math.abs(data.extended.sorpresaPromedioPct) > 100 ? " — valor distorsionado por base baja" : ""}
+          <span
+            className={`rounded-md border px-2 py-1 text-[10px] ${
+              data.extended.sorpresaPromedioPct > 0
+                ? "border-success/40 bg-success/10 text-success"
+                : "border-danger/40 bg-danger/10 text-danger"
+            }`}
+          >
+            Sorpresa earnings promedio: {data.extended.sorpresaPromedioPct > 0 ? "+" : ""}
+            {data.extended.sorpresaPromedioPct.toFixed(2)}%
+            {Math.abs(data.extended.sorpresaPromedioPct) > 100
+              ? " — valor distorsionado por base baja"
+              : ""}
           </span>
         </div>
       )}
@@ -239,9 +297,7 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
       {/* Cierre interpretativo */}
       {data.cierreInterpretacion && (
         <div className="mt-4 rounded-md border border-primary/30 bg-primary/5 p-3">
-          <p className="text-[11px] leading-relaxed text-foreground">
-            {data.cierreInterpretacion}
-          </p>
+          <p className="text-[11px] leading-relaxed text-foreground">{data.cierreInterpretacion}</p>
         </div>
       )}
 
@@ -249,7 +305,10 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
       {data.infoActivo?.soportaFundamental && onNavigateToFundamental && (
         <div className="mt-4 flex items-center justify-between gap-3">
           <div className="text-[10px] text-muted-foreground">
-            {data.infoActivo.descripcion} · {data.infoActivo.soportaFundamental ? "Con análisis fundamental disponible" : "Solo análisis técnico"}
+            {data.infoActivo.descripcion} ·{" "}
+            {data.infoActivo.soportaFundamental
+              ? "Con análisis fundamental disponible"
+              : "Solo análisis técnico"}
           </div>
           <button
             onClick={() => onNavigateToFundamental(data.ticker)}
@@ -265,23 +324,31 @@ export function SemaforoCard({ data, onNavigateToFundamental }: { data: Semaforo
         <div className="mt-4 rounded-md border border-border/40 bg-muted/20 p-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-              Score unificado {data.infoActivo?.soportaFundamental ? "(técnico + fundamental)" : "(técnico)"}
+              Score unificado{" "}
+              {data.infoActivo?.soportaFundamental ? "(técnico + fundamental)" : "(técnico)"}
             </span>
-            <span className={`mono text-base font-semibold ${
-              data.scoreUnificado.total > 1.5 ? "text-success" :
-              data.scoreUnificado.total < -1.5 ? "text-danger" : "text-warning"
-            }`}>
-              {data.scoreUnificado.total >= 0 ? "+" : ""}{data.scoreUnificado.total.toFixed(1)}
+            <span
+              className={`mono text-base font-semibold ${
+                data.scoreUnificado.total > 1.5
+                  ? "text-success"
+                  : data.scoreUnificado.total < -1.5
+                    ? "text-danger"
+                    : "text-warning"
+              }`}
+            >
+              {data.scoreUnificado.total >= 0 ? "+" : ""}
+              {data.scoreUnificado.total.toFixed(1)}
             </span>
           </div>
           {data.scoreUnificado.contradiccion && (
             <div className="mt-2 rounded-md border border-warning/30 bg-warning/10 p-2">
-              <p className="text-[10px] text-warning">{data.scoreUnificado.contradiccion.descripcion}</p>
+              <p className="text-[10px] text-warning">
+                {data.scoreUnificado.contradiccion.descripcion}
+              </p>
             </div>
           )}
         </div>
       )}
-</div>
+    </div>
   );
 }
-

@@ -6,7 +6,13 @@
  */
 
 import { resolveDraftTicker } from "./ticker-resolver";
-import { classifyIOLAsset, classifyIOLActivo, splitByAPI, resolveYahooTicker, categoryLabel } from "./iol-asset-classifier";
+import {
+  classifyIOLAsset,
+  classifyIOLActivo,
+  splitByAPI,
+  resolveYahooTicker,
+  categoryLabel,
+} from "./iol-asset-classifier";
 import type { IOLTitulo, IOLActivo } from "./iol-portfolio.functions";
 
 export interface DraftAssetResolvedFromIOL {
@@ -26,9 +32,7 @@ export interface DraftAssetResolvedFromIOL {
  * Resolve a ticker using IOL API metadata.
  * Uses classifyIOLAsset to determine the asset category and correct symbols.
  */
-export function resolveDraftTickerFromIOL(
-  iolTitulo: IOLTitulo,
-): DraftAssetResolvedFromIOL {
+export function resolveDraftTickerFromIOL(iolTitulo: IOLTitulo): DraftAssetResolvedFromIOL {
   const classified = classifyIOLAsset(iolTitulo);
   const { yahooPriceSymbol, yahooAnalysisSymbol, iolCurrency, canUseYahoo } = classified;
   const mercado = iolTitulo.mercado || null;
@@ -64,18 +68,14 @@ export function resolveDraftTickerFromIOL(
 /**
  * Batch resolve multiple IOL titulo objects.
  */
-export function resolveDraftTickersFromIOL(
-  iolTitulos: IOLTitulo[],
-): DraftAssetResolvedFromIOL[] {
+export function resolveDraftTickersFromIOL(iolTitulos: IOLTitulo[]): DraftAssetResolvedFromIOL[] {
   return iolTitulos.map(resolveDraftTickerFromIOL);
 }
 
 /**
  * Resolve IOL activos (with quantities) and split by API source.
  */
-export function resolveIOLActivos(
-  activos: IOLActivo[],
-): {
+export function resolveIOLActivos(activos: IOLActivo[]): {
   resolved: DraftAssetResolvedFromIOL[];
   yahooOnly: DraftAssetResolvedFromIOL[];
   iolOnly: DraftAssetResolvedFromIOL[];

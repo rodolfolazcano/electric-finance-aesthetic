@@ -1,17 +1,17 @@
 // @ts-nocheck
 /**
  * Ticker resolution module for portfolio draft assets
- * 
+ *
  * Resolves tickers to their correct Yahoo Finance symbols based on:
  * - CEDEARs Universe data (cedears-universe.json): identifies if a ticker is a CEDEAR
  * - Arbitrador data (arbitrador.json): maps BCBA stocks to their NYSE ADRs
  * - User-provided moneda (ARS or USD)
- * 
+ *
  * Key Insight:
  * For CEDEARs and BCBA stocks analyzed in USD, returns TWO symbols:
  * - priceSymbol: where to fetch the current price (local market)
  * - analysisSymbol: where to fetch fundamentals/sector/beta/returns (usually US underlying)
- * 
+ *
  * Example:
  * - CEDEAR ARS "AAPL" → price from AAPL.BA (BCBA), analysis from AAPL (US)
  * - CEDEAR USD "MSFTD" → price from MSFTD.BA (BCBA), analysis from MSFT (US)
@@ -30,25 +30,22 @@ const ARBITRADOR = arbitradorData as {
 };
 
 export interface TickerResolution {
-  priceSymbol: string;    // Symbol to use for fetching current price
+  priceSymbol: string; // Symbol to use for fetching current price
   analysisSymbol: string; // Symbol to use for fundamentals (sector, industry, beta, returns)
-  tipo: string | null;    // Asset type: "cedear", "accion", etc.
-  moneda: string | null;  // Currency: "ARS", "USD"
+  tipo: string | null; // Asset type: "cedear", "accion", etc.
+  moneda: string | null; // Currency: "ARS", "USD"
   mercado: string | null; // Market: "BCBA", "NYSE", "NASDAQ"
-  pais: string | null;    // Country: "Argentina", "EE.UU."
+  pais: string | null; // Country: "Argentina", "EE.UU."
 }
 
 /**
  * Resolve a ticker symbol to correct Yahoo Finance symbol(s) based on moneda.
- * 
+ *
  * @param symbol - The ticker symbol (e.g., "AAPL", "AAPL.BA", "CCJD", "GGAL")
  * @param moneda - Currency selector (ARS = Argentine market, USD = US market)
  * @returns TickerResolution with priceSymbol and analysisSymbol
  */
-export function resolveDraftTicker(
-  symbol: string,
-  moneda: "ARS" | "USD",
-): TickerResolution {
+export function resolveDraftTicker(symbol: string, moneda: "ARS" | "USD"): TickerResolution {
   const s = symbol.toUpperCase().trim();
   const base = s.replace(/\.BA$/, "").replace(/D$/, "");
   const isD = s.endsWith("D") && !s.endsWith(".BA");
@@ -90,9 +87,7 @@ export function resolveDraftTicker(
     };
   }
 
-  const adr = ARBITRADOR.adrs.find(
-    (a) => a.bcba === base || a.nyse === base,
-  );
+  const adr = ARBITRADOR.adrs.find((a) => a.bcba === base || a.nyse === base);
   if (adr) {
     return {
       priceSymbol: adr.nyse,

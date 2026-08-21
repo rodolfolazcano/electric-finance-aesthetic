@@ -107,8 +107,8 @@ export function eigenDecomposition(matrix: Matrix): {
   eigenvectors: Matrix;
 } {
   const n = matrix.length;
-  let A = matrix.map((row) => [...row]);
-  let V = Array.from({ length: n }, (_, i) => {
+  const A = matrix.map((row) => [...row]);
+  const V = Array.from({ length: n }, (_, i) => {
     const v = new Array(n).fill(0);
     v[i] = 1;
     return v;

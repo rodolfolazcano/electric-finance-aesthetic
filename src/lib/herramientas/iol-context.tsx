@@ -28,14 +28,20 @@ const IOLContext = createContext<IOLCtx>({
 
 function ls(key: string): string | null {
   if (typeof window === "undefined") return null;
-  try { return localStorage.getItem(key); } catch { return null; }
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
 }
 function lsSet(key: string, value: string | null) {
   if (typeof window === "undefined") return;
   try {
     if (value) localStorage.setItem(key, value);
     else localStorage.removeItem(key);
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
 }
 
 const EXPIRES_KEY = "iol_expires_at";
@@ -74,13 +80,17 @@ export function IOLProvider({ children }: { children: ReactNode }) {
 
   const isTokenExpired = !accessToken && !isStoredTokenExpired() === false;
 
-  const syncTokenToLS = useCallback((token: string | null, rt: string | null, expiresIn?: number, user?: string) => {
-    lsSet("iol_bearer_token", token);
-    lsSet("iol_refresh_token", rt);
-    if (expiresIn) lsSet(EXPIRES_KEY, String(Date.now() + expiresIn * 1000 - 120_000)); // 2 min margin
-    else if (!token) lsSet(EXPIRES_KEY, null);
-    if (user !== undefined) lsSet("iol_user", user ?? null);
-  }, []);
+  const syncTokenToLS = useCallback(
+    (token: string | null, rt: string | null, expiresIn?: number, user?: string) => {
+      lsSet("iol_bearer_token", token);
+      lsSet("iol_refresh_token", rt);
+      if (expiresIn)
+        lsSet(EXPIRES_KEY, String(Date.now() + expiresIn * 1000 - 120_000)); // 2 min margin
+      else if (!token) lsSet(EXPIRES_KEY, null);
+      if (user !== undefined) lsSet("iol_user", user ?? null);
+    },
+    [],
+  );
 
   const login = useCallback(
     async (user: string, pass: string): Promise<string | null> => {
@@ -120,7 +130,16 @@ export function IOLProvider({ children }: { children: ReactNode }) {
 
   return (
     <IOLContext.Provider
-      value={{ accessToken, refreshToken, username, isLoggingIn, isTokenExpired, login, logout, updateTokens }}
+      value={{
+        accessToken,
+        refreshToken,
+        username,
+        isLoggingIn,
+        isTokenExpired,
+        login,
+        logout,
+        updateTokens,
+      }}
     >
       {children}
     </IOLContext.Provider>
@@ -130,4 +149,3 @@ export function IOLProvider({ children }: { children: ReactNode }) {
 export function useIOLSession() {
   return useContext(IOLContext);
 }
-

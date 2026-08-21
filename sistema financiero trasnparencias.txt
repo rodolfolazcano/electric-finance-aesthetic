@@ -1,0 +1,1678 @@
+INSTRUMENTOS Y MERCADOS
+FINANCIEROS:
+
+Sistema Financiero
+Transparencias 2022
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa.
+
+2
+
+COMPONENTES DE UN SISTEMA FINANCIERO
+
+Instituciones
+especializadas
+en
+intermediación:
+
+Transferencia de
+recursos de
+Depositantes a
+Deudores.
+
+Objetivos
+Básicos:
+
+Garantizar una
+asignación eficiente de
+recursos financieros.
+
+Facilitar la estabilidad económica-
+financiera que permite el desarrollo
+
+de una política monetaria activa.
+
+Elementos
+Básicos
+
+Intermediarios
+financieros
+
+Activos
+financieros
+
+Mercados
+financieros
+
+3
+
+Funciones básicas
+
+Reducción del riesgo de las inversiones al diversificar la cartera;
+Rendimiento superior que el inversor individual basado en economías de
+escalas.
+Economías de escala aparecen por tres razones
+fundamentales:
+Indivisibilidades: el intermediario podrá adquirir activos de alto importe
+nominal, activos vedados al inversor individual cuyos recursos sean
+menores a esos importes nominales.
+Economía de Gestión: es evidente que el intermediario podrá invertir más
+recursos en disponer de profesionales y equipos que garanticen una
+gestión más eficiente.
+Economía de Transacción: Transacciones de mayor volumen incurrirán en
+menores costes.
+INTERMEDIARIOS FINANCIEROS
+
+4
+
+• Banco Central.
+• Bancos.
+• Compañías Financiera.
+• Caja de Crédito.
+
+Entidades de
+crédito:
+
+• Captan dinero del público de forma próxima al
+depósito. Ejemplo: las Mutuales.
+
+Otras
+Instituciones
+Financieras:
+
+• Otros proveedores no financieros - Fintech
+• Empresas de servicios de inversión a las
+Instituciones aseguradoras, Leasing, Factoring,
+etc.
+
+Otros
+
+intermediarios
+financieros:
+
+TIPOS DE INTERMEDIARIOS FINANCIEROS
+
+5
+
+Empresas de Servicios de Inversión (ESI)
+
+En Argentina:
+Mercado de Capitales. El organismo encargado de contralor es la CNV - Comisión
+Nacional de Valores.
+
+En España:
+Entidades de ámbito de actividad y objeto social especifico a la prestación de servicios
+de inversión sobre instrumentos financieros. Tienen objeto social exclusivo.
+La ley otorga a estas entidades la reserva de actividad (nadie puede realizar esta
+actividad sin haber sido previamente autorizado y registrado) y de denominación
+(ninguna entidad puede utilizar la denominación reservada a las ESI sin registro previo).
+INTERMEDIARIOS FINANCIEROS
+
+6
+
+ACTIVOS FINANCIEROS
+
+7
+
+Principales funciones:
+
+• Poner en contacto a los agentes económicos.
+• Fijar los precios de los activos financieros.
+• Reducir los plazos y los costos de intermediación.
+• Establecer procedimientos que garanticen la seguridad y la eficiencia en los
+procesos de liquidación y registro.
+• Poner en contacto a los agentes económicos.
+• Reducir los plazos y costos de intermediación.
+MERCADOS FINANCIEROS
+
+8
+
+Características de un mercado financiero eficiente:
+
+• Transparencia: cuando existe información abundante, pública y gratuita a disposición
+de los sujetos económicos.
+• Libertad: inexistencia de barreras de entrada o de salida.
+• Profundidad: cuanto mayor sea la cantidad de órdenes de compra- venta que se
+produzcan, dotándole una mayor liquidez y eficiencia en el proceso de asignación de
+los precios.
+• Flexibilidad: posibilidad de contratación con diferentes plazos, importes, monedas y
+sistemas. Tiempo que tarda el mercado en reaccionar ante nuevas noticias que
+afectan a la tendencia.
+• Amplitud: número de activos diferentes que se negocia en el mercado.
+MERCADOS FINANCIEROS
+
+9
+
+MERCADOS FINANCIEROS
+
+10
+
+–
+MERCADOS FINANCIEROS
+
+11
+
+Bancos Públicos y Privados:
+Pueden realizar todas las operaciones activas, pasivas y de servicios que no les sean
+prohibidas por la Ley de EF (Entidades Financieras), ni por normas del BCRA (Banco
+Central de la República Argentina).
+
+Compañías Financieras:
+Tienen operaciones limitadas. No pueden recibir depósitos a la vista.
+Pueden otorgar créditos para compra o venta de bienes pagaderos en cuotas o a
+término y otros préstamos personales amortizables.
+
+Cajas de Crédito:
+Tienen operaciones Limitadas: pueden conceder créditos y otras financiaciones a
+PyMEs, incluso unipersonales, profesionales, artesanos, empleados, obreros,
+particulares, cooperativas y entidades de bien público.
+
+Otros proveedores no financieros
+Composición del Sistema Financiero Argentino
+
+12
+
+Ley de Entidades Financieras
+
+Ley 21.526 y modificatorias:
+
+Ámbito de aplicación:
+– Actividad de intermediación financiera.
+– Entidades expresamente comprendidas.
+
+Autoridad de Aplicación:
+– Banco Central de la República Argentina.
+
+13
+
+Autorización y condiciones para funcionar:
+
+• Establece las operaciones permitidas, según el tipo de Entidad
+regulada.
+
+• Establece las operaciones prohibidas y limitadas.
+
+• Regulaciones de Liquidez y Solvencia.
+
+• Regularización y Saneamiento.
+Ley de Entidades Financieras
+
+14
+No podrán desempeñarse como fundadores, administradores,
+directores, síndicos, liquidadores o gerentes de entidades financieras:
+
+• Los inhabilitados.
+• Inhabilitados para ejercer cargos públicos.
+• Los deudores morosos de Entidades Financieras.
+• Cuentas correntistas inhabilitados.
+• Personas con sumarios del BCRA (Banco Central de la República
+Argentina).
+• Por decisión de autoridad competente.
+Ley de Entidades Financieras
+
+15
+
+Operaciones prohibidas:
+a) Explotar por cuenta propia:
+Empresas comerciales, industriales, agropecuarias, o de otra clase (salvo
+autorización del BCRA (Banco Central de la República Argentina).
+b) Constituir gravámenes sobre sus bienes sin previa autorización del BCRA (Banco
+Central de la República Argentina).
+c) Aceptar en garantía sus propias acciones.
+d) Operar con personas vinculadas, en condiciones más favorables que las
+acordadas de ordinario a su clientela.
+Ley de Entidades Financieras
+
+Régimen Informativo, Contable y Control:
+
+• Establece el secreto bancario de las operaciones pasivas.
+
+• Determina las sanciones y recursos.
+
+16
+
+Regulaciones:
+Efectivo Mínimo:
+Las entidades deberán mantener las reservas de efectivo que se
+establezcan con relación a depósitos, otras obligaciones y pasivos
+financieros.
+Capitales Mínimos:
+Exigencia Mínima Básica y Regulatoria.
+Ley de Entidades Financieras
+
+Incumplimientos:
+- De liquidez y solvencia o normas dictadas por el BCRA (Banco Central de la
+República Argentina), tendrán que:
+• Hacer descargo en plazos establecidos
+• Establecer un plan de regulariazcion
+
+17
+
+Articulo 1°: Operaciones Prohibidas
+✓Negociaciones fuera del MUyLC (mercado único y libre de cambios).
+✓Operar sin estar autorizado.
+✓Falsa declaración.
+✓Omisión de rectificar las declaraciones producidas.
+✓Operaciones de cambio que no se realicen según las normas vigentes.
+✓Acto u omisión que infrinja las normas cambiarias.
+
+Articulo 5°: Fiscalización
+✓ A cargo del BCRA (Banco Central de la República Argentina).
+
+Facultades para la fiscalización
+✓ Crear y organizar registros permanentes.
+✓ Citar a las personas a quienes considere pertinente para tomar declaraciones
+como infractores o testigos.
+
+Régimen Penal Cambiario - Ley 19.359
+
+18
+
+Actividad Supervisión
+
+Supervisión del BCRA (Banco Central de la República Argentina):
+Objetivos:
+• Brindar estabilidad en el sistema financiero.
+• Proteger al pequeño depositante.
+
+1.- Desde una perspectiva macroeconómica, al tener las entidades de
+crédito un papel preponderante como intermediadoras en el sistema
+financiero, se hace necesario su control con el fin de alcanzar su estabilidad
+y evitar situaciones con efectos perjudiciales en el sistema y, por ende, en la
+economía en general.
+
+2.- Desde un punto de vista microeconómico se persigue fundamentalmente
+la protección del inversor o en especial al pequeño depositante, situado en
+una posición de desventaja frente a las entidades.
+
+19
+
+Actividad Supervisión
+
+Principales acreedores bancos: Pequeños Depositantes
+
+• El regulador asume la Supervisión y Control del Sistema Financiero,
+con el fin de “proteger los intereses del pequeño depositante”.
+
+• La vulnerabilidad del sistema financiero, se origina en:
+
+1. Descalce de Plazos de la Cartera Activa (largo) y Pasiva (corto)
+2. Posibilidad de contagio entre entidades (corridas bancarias).
+3. Alto Leverage , que genera mayor riesgo de Solvencia.
+
+20
+
+BCRA (Banco Central de la República Argentina): Evolución
+Histórica
+
+El BCRA (Banco Central de la República Argentina) nace en 1935, en
+virtud de un dictamen de una misión británica de los organismos de
+control.
+
+Según su carta orgánica inicial, el BCRA (Banco Central de la
+República Argentina) tendió a:
+
+• Promover la liquidez.
+• Brindar el buen funcionamiento del crédito.
+• Prohibir a los bancos realizar operaciones que comprometieran su
+liquidez.
+
+21
+
+Carta Orgánica del BCRA (Banco Central de la República Argentina)
+
+Naturaleza y Objetivo:
+El BCRA (Banco Central de la República Argentina) es una entidad autárquica
+(institución administrativa estatal descentralizada, con personalidad jurídica) del
+Estado Nacional.
+
+Misión Primaria:
+Promover la estabilidad monetaria, la estabilidad financiera, el empleo y el
+desarrollo económico con equidad social.
+
+Atribuciones:
+- Regular la cantidad de dinero y de crédito de la economía.
+- Dictar normas en materia monetaria, financiera y cambiaria.
+- En la formulación y ejecución de la política monetaria y financiera no estará
+sujeto a órdenes, indicaciones o intrucciones del Poder Ejecutivo.
+
+22
+
+Funciones y facultades del BCRA (Banco Central de la
+República Argentina):
+
+• Regular el funcionamiento del sistema financiero y aplicar la Ley de Entidades
+Financieras y las normas que, en su consecuencia, se dicten.
+
+• Regular la cantidad de dinero y las tasas de interés y regular y orientar el
+crédito.
+
+• Actuar como agente financiero del Estado Nacional, así como desempeñar un
+papel activo en la integración y cooperación internacional.
+
+• Concentrar y administrar sus reservas de oro, divisas y otros activos externos.
+Carta Orgánica del BCRA (Banco Central de la República Argentina)
+
+23
+
+Carta Orgánica del BCRA (Banco Central de la República
+Argentina)
+
+• Contribuir al buen funcionamiento del mercado de capital.
+
+• Ejecutar la política cambiaria en un todo de acuerdo con la legislación que
+sancione el HCN (Honorable Congreso de la Nación).
+
+• Regular, los sistemas de pago, las cámaras liquidadoras y compensadoras, las
+remesadoras de fondos y las empresas transportadoras de caudales, así como
+toda otra actividad que guarde relación con la actividad financiera y
+cambiaria;
+
+• Proveer a la protección de los derechos de los usuarios de servicios
+financieros y a la defensa de la competencia, coordinando su actuación con
+las autoridades públicas competentes en estas cuestiones.
+
+24
+
+Directorio:
+
+Compuesto por personas idóneas en la materia, designados por el
+PEN (Poder Ejecutivo Nacional), con acuerdo del Senado, con
+mandato de 6 años, pudiendo ser designados nuevamente.
+
+- Presidente
+- Vicepresidente
+- 8 directores
+
+Carta Orgánica del BCRA (Banco Central de la República
+Argentina)
+
+25
+
+Superintendencia de Entidades Financieras y Cambiarias (SEFyC):
+Es quien ejerce la supervisión de la actividad financiera y cambiaria (depende
+directamente del Presidente del BCRA (Banco Central de la República Argentina).
+
+La administración de la SEFyC será ejercida por un superintendente y un
+vicesuperintendente, quienes serán asistidos por los subgerentes generales de las
+áreas
+que la integren.
+
+Funciones del Superintendente:
+- Calificar a las Entidades Financieras (CAMELBIG).
+- Cancelar la autorización para operar en Cambios.
+- Aprobar planes de Regularización y Saneamiento.
+- Implementar y aplicar la Ley de Entidades Financieras.
+- Establecer los Requisitos a cumplir por los Auditores.
+Carta Orgánica del BCRA (Banco Central de la República
+Argentina)
+
+26
+
+Facultades principales del Superintendente:
+
+• Vigilar el cumplimiento del régimen informativo y contable.
+
+• Publicar los balances, estados de deudores y demás informaciones necesarias
+para el análisis de la situación del sistema.
+
+• Aplicar sanciones.
+Carta Orgánica del BCRA (Banco Central de la República
+Argentina)
+
+27
+
+Enfoques:
+Disciplina de mercado:
+Basado en la disciplina que ejerce el mercado con una adecuada información.
+Supervisión privada:
+Basado en la auditoria externa realizada por firmas especializadas con poder para
+fiscalizar tanto la situación de las entidades como el cumplimiento de las normas.
+Supervisión estatal:
+Se basa en el control por parte de entes gubernamentales.
+Supervisión Bancaria
+
+28
+
+B: Bonos
+A: Auditoria Externa
+S: Supervisión
+I: Información
+C: Calificación
+Supervisión Bancaria
+
+29
+
+Bonos (B) + Calificación (C)
+
+Bonos (suspendido):
+Los bancos deben emitir y colocar deuda periódicamente (2% de su capital en
+deuda subordinada).
+
+Calificación (suspendido):
+Los bancos deben contar con una calificación trimestral de riesgo de largo plazo,
+elaborada por calificadoras de riesgo admitidas por el BCRA (Banco Central de la
+República Argentina).
+Disciplina de Mercado
+
+30
+
+Información (I) + Auditoría (A)
+
+Auditoria Externa:
+Verifica que todos los procedimientos establecidos para determinar el balance
+hayan sido seguidos (manual de procedimientos). El BCRA (Banco Central de la
+República Argentina) audita a los auditores.
+Información:
+La Superintendencia confecciona un Régimen Informativo que estipula la
+información que debe ser suministrada de modo que sea relevante, confiable y
+oportuna.
+Supervisión privada
+
+31
+
+Calificación CAMELBIG:
+
+Lo realiza la SEFyC (Superintendencia de Entidades Financieras y Cambiarias).
+
+La entidad va a recibir una calificación por cada componente y una general.
+Basada en la evaluación efectuada en relación al grado de cumplimiento de las
+normas y de la adecuación de los criterios y principios financieros aplicados.
+Supervisión Estatal
+
+32
+
+Esta orientada a determinar:
+
+- Si el balance refleja adecuadamente la situación de la entidad.
+
+- La calidad de su management.
+
+- El posicionamiento actual y futuro.
+
+- Las políticas de crédito, de captación de recursos, de servicios, de
+empleo, de remuneraciones, de distribución geográfica, de
+diversificación de riesgos, etc. permiten prever que en el futuro será
+viable o inviable.
+Calificación CAMELBIG
+
+33
+
+C – Capital
+A – Activos
+M – Mercado
+E – Earning (rentabilidad)
+L – Liquidez
+B – Business
+I – Controles Internos
+G – Gerencia (administración)
+Calificación CAMELBIG
+
+34
+
+Notas
+
+1 - Satisfactorio
+
+2 - Adecuado
+
+3 - Necesita mejorar
+
+4 - Deficiente
+
+5 - Severamente deficiente
+Calificación CAMELBIG
+
+35
+
+Calificación CAMELBIG
+
+36
+
+Riesgos asumidos por las EEFF (Entidades Financieras)
+
+Crediticio o de
+contraparte
+
+Insolvencia
+
+Mercado
+
+Operacional Iliquidez
+Regulatorio
+Tasa de interés
+Estratégico Incumplimiento
+
+Reputacional
+
+37
+
+Principales Regulaciones del Sistema Financiero Argentino
+
+Riesgo
+de Crédito
+
+Riesgo
+de Iliquidez
+
+Riesgo
+de Mercado
+
+Riesgo
+Operacional
+
+Riesgo
+de Tasa de Interés
+
+OTROS
+Riesgo Reputacional
+Riesgo Estratégico
+
+BCRA
+
+SISTEMA FINANCIERO
+
+PILAR 1 – Regulación Prudencial
+Obligatorio
+
+RIESGO
+Esperado
+
+RIESGO
+Inesperado
+
+PILAR 2 – Supervisión y Control
+Recomendaciones/Lineamientos
+PILAR 3 – Disciplina de Mercado
+Autorregulación
+
+Capitales mínimos Efectivo mínimo
+
+Con enfoque basado en RIESGOS
+- Mitigar y regular riesgos
+RIESGOS TÍPICOS
+
+Normas Crediticias:
+•Política de Crédito
+•Gestión Crediticia
+•Graduación
+•Clasificación de Deudores
+•Previsiones
+•Garantías
+•Tasa de interés
+
+Regula el
+
+ART. 41 LEF
+
+Exigencia
+
+Integración (RPC)
+LA MAYOR
+Liquidez Solvencia
+
+• BANCOS Comerciales, Inversión,
+Hipotecarios
+• Compañías Financieras
+• Sociedades de Ahorro y Préstamo
+• Cajas de Crédito
+• Otras – cuando el BCRA lo aconseje por
+volumen de operaciones y razones de
+política monetaria y crediticia
+
+Encajes Legal,
+técnico y ampliado
+
+BÁSIC
+A
+
+POR RIESGO
+
+Emite Comunicaciones:
+•A (Normas obligatorias, tratan temas normativos y de
+carácter permanente)
+•B (Aclaratorias)
+•C (Informativa)
+•D (Confidencial)
+•P (Comunicados de Prensa)
+
+Por qué se regula?
+• Alto apalancamiento
+• Fragilidad del SF y riesgoso
+• Para PROTEGER AL AHORRISTA
+• Economías de escala
+• Por POLITICA MONETARIA y
+CAMBIARIA
+• Alto impacto en todos los
+sectores económicos
+
+Ratio de cobertura de liquidez (LCR)
+Política de liquidez
+
+Ratio de fondeo neto estable
+
+Ratio de
+apalancamiento
+
+Grandes
+exposiciones
+
+38
+
+Constituida en 1995 de acuerdo a lo dispuesto por el Decreto N° 540/95, el cual
+creó el Fondo de Garantía de los Depósitos (FGD).
+
+Características:
+
+a) Obligatorio y Oneroso.
+
+b) Preventivo.
+
+c) Limitado.
+SEDESA (Seguro de Depósitos S.A.)
+
+39
+
+Artículo 2 – Conformación:
+El Ministerio de Economía crea:
+
+Fiduciario del fideicomiso
+constituido por las
+Entidades Financieras
+
+BCRA (Banco Central de
+la República Argentina)
+(Socio con una acción)
+SEDESA (Seguro de Depósitos S.A.)
+
+40
+
+Articulo 6°: Aportes:
+
+El fondo de garantía se integrara con los aportes mensuales que realizan las EEFF
+(Entidades Financieras) autorizadas:
+
+✓ Normales: 0,015% del promedio mensual de saldos diarios de los depósitos en
+pesos y en moneda extranjera.
+
+✓ Adicionales: establecidos por el BCRA (Banco Central de la República
+Argentina) en función a indicadores de riesgo que estime apropiados
+
+✓ Excluidos del cálculo: cuentas oficiales nacionales abiertas en el BNA (Banco
+de la Nación Argentina).
+SEDESA (Seguro de Depósitos S.A.)
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa. 41
+
+SEDESA (Seguro de Depósitos S.A.)
+
+B.C.R.A.
+
+Participación en el fideicomiso accionista de
+
+SEDESA
+a diciembre de 2021
+
+Anexo a la
+Com. "B"
+12305
+
+ENTIDADES
+
+Participación de los
+integrantes del
+fideicomiso accionista
+de SEDESA
+-en %-
+
+Integración de
+capital
+-diciembre de
+2021-
+
+BANCO DE LA NACION ARGENTINA 24,0305 % 240.304
+BANCO SANTANDER RIO S.A. 13,4315 % 134.315
+BANCO DE GALICIA Y BUENOS AIRES S.A.U. 12,3130 % 123.130
+BANCO BBVA ARGENTINA S.A. 8,6000 % 86.000
+BANCO MACRO S.A. 7,7330 % 77.330
+BANCO CREDICOOP COOPERATIVO LIMITADO 6,1660 % 61.660
+HSBC BANK ARGENTINA S.A. 5,2540 % 52.540
+INDUSTRIAL AND COMMERCIAL BANK OF
+CHINA (ARGENTINA) S.A.U.
+
+4,2880 % 42.880
+BANCO PATAGONIA S.A. 4,1380 % 41.380
+BANCO DE LA PROVINCIA DE CORDOBA S.A. 4,0320 % 40.320
+BANCO SUPERVIELLE S.A. 3,5530 % 35.530
+BANCO ITAU ARGENTINA S.A. 1,9560 % 19.560
+BANCO COMAFI S.A. 1,7030 % 17.030
+BANCO DE SANTIAGO DEL ESTERO S.A. 1,1920 % 11.920
+BANCO DE CORRIENTES S.A. 0,4530 % 4.530
+BANCO PIANO S.A. 0,3870 % 3.870
+BANCO MARIVA S.A. 0,3660 % 3.660
+BANCO CMF S.A. 0,2720 % 2.720
+JP MORGAN CHASE BANK, NATIONAL
+ASSOCIATION (SUCURSAL BUENOS AIRES)
+
+0,0890 % 890
+BANCO MERIDIAN S.A. 0,0430 % 430
+Total general 100,0000 % 999.999
+
+42
+
+Articulo 10°: Inversión de los Aportes
+
+• Serán invertidos en condiciones similares a las fijadas para la colocación de las
+reservas internacionales de divisas del BCRA (Banco Central de la República
+Argentina).
+
+• El BCRA (Banco Central de la República Argentina) podrá autorizar que hasta
+un 50% de los bienes que componen el Fondo se inviertan en TTPP
+nacionales.
+SEDESA (Seguro de Depósitos S.A.)
+
+43
+
+Articulo: 10 bis: Funciones de SEDESA:
+
+• Hacer efectiva la cobertura a los depositantes.
+
+• Efectuar aportes de capital o préstamos a entidades financieras:
+
+• que estén bajo plan de saneamiento.
+• que adquieran activos y asuman depósitos de otra entidad.
+• que absorban o adquieran entidades financieras en el marco de un plan
+de regularización y saneamiento.
+SEDESA (Seguro de Depósitos S.A.)
+
+44
+
+Depósitos cubiertos:
+Se encuentran alcanzados por la cobertura, los depósitos en pesos y
+moneda extranjera constituidos bajo la forma de:
+
+• Cuenta corriente.
+• Caja de ahorros.
+• Plazo fijo (ver Tasa de referencia)
+• Cuenta sueldo, básica, gratuita universal.
+• Inversiones aPPlazo.
+• Saldos inmovilizados provenientes de los conceptos precedentes.
+• Demás que establezca el BCRA (Banco Central de la República
+• Argentina).
+SEDESA (Seguro de Depósitos S.A.)
+
+45
+
+Depósitos no alcanzados:
+No están alcanzados por la cobertura del sistema de garantía, los siguientes
+depósitos:
+
+• De EEFF (Entidades Financieras) en otros intermediarios.
+• Efectuados por personas vinculadas a la entidad.
+• A plazo fijo transferidos cuya titularidad por endoso.
+• Los que se convengan a tasas de interés superiores a las de referencia.
+• Las imposiciones que ofrezcan incentivos o retribuciones diferenciales.
+• Saldos inmovilizados provenientes de depósitos y operaciones excluidas.
+• Demás que establezca el BCRA (Banco Central de la República Argentina).
+SEDESA (Seguro de Depósitos S.A.)
+
+46
+
+Articulo 13° Cobertura:
+
+• La garantía cubrirá la devolución del capital, los intereses, actualizaciones y
+diferencia de cotización, sin exceder $1,5 MM.
+
+• En cuentas a nombre de dos o mas personas, el limite de la garantía será de
+$1,5 MM, distribuyéndose proporcionalmente entre los titulares.
+
+• El total garantizado a una persona determinada, por acumulación de cuentas
+y depósitos no podrá superar el limite de $1,5 MM.
+SEDESA (Seguro de Depósitos S.A.)
+
+47
+
+Comparativo del FGD (Fondo de Garantía de los Depósitos)
+
+48
+
+Comparativo del FGD (Fondo de Garantía de los Depósitos)
+
+49
+
+EL BCRA (Banco Central de la República Argentina) y la política
+monetaria
+
+La Política Monetaria es el proceso continuado de control de las variables
+monetarias con el fin de alcanzar determinados objetivos económicos, a saber:
+
+• Crecimiento y pleno empleo.
+• Controlar la evolución de los precios.
+• Moderar los ciclos económicos.
+
+Su establecimiento requiere la selección de una variable estratégica
+instrumental para alcanzar un objetivo monetario, susceptible de control con un
+cierto grado de seguridad, y mostrar una alta correlación con el objetivo
+monetario final.
+
+50
+
+Objetivos y Planes para 2022
+En la prosecución de los objetivos de políticas monetaria, cambiaria, financiera y
+crediticia, el BCRA procurará:
+La política monetaria:
+- Administrar la liquidez para evitar desequilibrios que atenten directa o indirectamente con el proceso de
+desinflación.
+- Fijar el sendero de la tasa de interés.
+- Contribuir con el desarrollo del mercado de capitales y resguardar el equilibrio financiero.
+- Recalibrar el esquema de encajes.
+La política cambiaria:
+- Preservar los niveles de competitividad externa.
+- Fortalecer la posición de reservas.
+- Gestionar prudentemente las regulaciones cambiarias con el fin de adaptarlas a las necesidades de la
+coyuntura, favoreciendo la estabilidad monetaria y cambiaria.
+La política crediticia:
+- Estimular una mayor intermediación financiera.
+- Mantener una política crediticia activa y dinámica.
+- Impulsar un crecimiento del crédito al sector privado en pesos en términos del PIB.
+Estrategia de la política monetaria Argentina
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa.
+
+51
+
+La política financiera:
+- Propiciar que las entidades financieras mantengan adecuados niveles de liquidez y solvencia.
+- Implementar acciones de política micro y macro prudencial que estén orientadas a favorecer un escenario de
+estabilidad financiera.
+- Reforzar las medidas destinadas a impulsar el crédito a las MiPyMEs y a los sectores económicos más dañados
+por la pandemia.
+- Fortalecer el “Pago con Transferencia”, instrumento electrónico moderno y de bajo costo, que ofrece ganancias
+de eficiencia para comercios y consumidores, promoviendo la inclusión financiera.
+- Acompañar el desarrollo de las innovaciones tecnológicas sobre el sistema financiero.
+- Ampliar las acciones federales de educación financiera.
+- Continuar avanzando en acciones orientadas a mejorar la ciberresiliencia y la ciberseguridad de las entidades
+financieras, de las IMF, de los PSP, y demás actores del sistema financiero.
+- Evaluar la evolución e implicancias de los criptoactivos para el sistema y para las personas usuarias de servicios
+financieros.
+- Encarar acciones en el marco de los compromisos internacionales y locales respecto del desarrollo de las
+finanzas sostenibles, abordando los riesgos y oportunidades asociados.
+Estrategia de la política monetaria Argentina
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa.
+
+52
+
+Informe de Objetivos y planes 2021
+La evolución sanitaria y los estímulos fiscales y monetarios sin precedentes facilitaron
+una recuperación económica global y local en los últimos meses del año 2020. En
+adelante el accionar del Banco Central contribuirá a seguir normalizando el
+funcionamiento de la economía, en coordinación con la estrategia fiscal del Gobierno
+Nacional, a fin de sentar las bases macroeconómicas de un sendero de desarrollo
+económico con equidad social. A tal efecto, el Banco Central desarrollará su política
+monetaria, cambiaria, crediticia y financiera durante 2021 persiguiendo los siguientes
+objetivos centrales:
+1. Asistir la normalización económica.
+2. Construir un proceso que reestablezca la confianza en la moneda local.
+3. Sostener el proceso gradual de desinflación.
+4. Contribuir con el equilibrio externo.
+5. Profundizar la recuperación del crédito privado.
+6. Preservar la estabilidad financiera.
+7. Promover el desarrollo del mercado de capitales.
+8. Propender a una mayor inclusión financiera.
+Estrategia de la política monetaria Argentina
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa.
+
+53
+
+Definición de Inicios 2020:
+
+La economía argentina enfrenta un crítico cuadro macroeconómico, con coexistencia
+de registros inflacionarios elevados, un persistente proceso recesivo y marcados
+niveles de desocupación, precariedad y pobreza.
+
+Por su parte, la escasez de divisas ha generado una notoria debilidad de su sector
+externo.
+
+Se definió:
+
+Promover la reactivación de la economía, fortaleciendo los ingresos de los sectores
+más vulnerables para que puedan recomponer sus niveles de consumo y aliviando las
+deudas tributarias de las pequeñas y medianas empresas.
+Estrategia de la política monetaria Argentina
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa.
+
+54
+
+Instrumentos de la política monetaria
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa.
+
+55
+
+Características del BCRA (Banco Central de la República
+Argentina)
+
+56
+
+La Unión
+Europea
+comparte una
+misma moneda:
+El Euro
+
+Objetivo: la
+estabilidad de
+los precios.
+
+Diseño:
+centralizado –
+Banco Central
+Europeo (BCE).
+
+Ejecución:
+descentralizad
+o – Cada
+Banco Central
+(BCN)
+
+Sistema de
+Pagos
+transfronterizo:
+TARGET.
+Política Monetaria Única – Unión Europea (UE)
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa.
+Interés %
+
+Base
+Monetaria
+M3
+
+Consumo
+Inversión
+
+Activos
+Líquidos
+en manos
+del
+Público
+
+IPC
+
+57
+El BCE (Banco Central Europeo) y la FED (Sistema de la Reserva Federal de EE.UU.)
+son los dos bancos centrales más grandes del mundo, las políticas que llevan a cabo
+influyen a cerca de 700 millones y sus monedas son referencia mundial.
+
+Ambos bancos centrales están estructurados de forma similar, aunque la
+instrumentación este descentralizada en los Bancos Centrales Nacionales (BCNs) para
+el caso del BCE y centralizada en la Junta de Gobernadores en la FED.
+
+La diferencia más apreciable está en los objetivos que cada banco central persigue y
+que realmente definen su forma de actuar.
+
+BCE tiene un solo objetivo, y es la estabilidad de precios, fijándolos cuantitativamente
+en un 2 por ciento.
+
+FED se apoya en una gran cantidad de indicadores que definen su estrategia,
+visiblemente no delimitada.
+Diferencias entre las políticas monetarias
+
+58
+
+Principales diferencias entre BCE (Banco Central Europeo)
+y FED (Sistema de Reserva Federal)
+
+59
+
+Principales diferencias entre BCE (Banco Central Europeo)
+y FED (Sistema de Reserva Federal)
+
+60
+
+Principales diferencias entre BCE (Banco Central Europeo)
+y FED (Sistema de Reserva Federal)
+
+61
+
+Principales diferencias entre BCE (Banco Central Europeo)
+y FED (Sistema de Reserva Federal)
+
+62
+
+Tipos de interés de referencia
+
+Euro OverNight Index Average: Tasa de referencia de overnight en el mercado interbancario del euro
+La media ponderada de los tipos de interés de las operaciones de depósitos overnight
+Es calculada y publicada diariamente, al cierre de mercado, por el Banco Central Europeo
+Euro Interbank Offered Rate: Tipo de interés de referencia del mercado interbancario del euro
+Es el tipo de interés representativo de la oferta de depósitos interbancarios en euros por entidades de
+primera calidad crediticia a otras entidades de su misma calidad crediticia.
+Se publica diariamente, a las 11.00 a.m. CET para fecha valor (T+2).
+Es la tasa de interés que se utiliza para depósitos mayores a un millón de pesos,
+Marca el nivel de tasa de interés para el resto de las tasas de interés del sistema financiero argentino
+También se utiliza para como referencia para el pago de bonos (nacionales y provinciales) en pesos a tasa
+variable (Badlar más un porcentaje adicional).
+
+EONIA
+
+EURIBOR
+
+BADLAR
+
+63
+
+Tipos de interés de referencia
+
+Otros tipos de interés de referencia.
+
+En el mercado monetario se elaboran otra serie de referencias como son:
+• LIBOR, London Interbank Offered Rate, utilizado para operaciones en el mercado
+en otras monedas (US$, SFR, YEN, STG y EURO):
+- Bancos contribuidores: 12 a 18, según moneda.
+- Significa el tipo de interés al que tomarían de la mejor contrapartida a
+
+diversos plazos en la moneda correspondiente.
+
+- Se eliminan el 25% de los tipos cotizados más altos y más bajos y se
+calcula la media aritmética con el resto.
+
+• MIDSWAP, tipo intermedio entre la oferta y la demanda de las cotizaciones de
+las permutas financiera de intereses (IRS).
+• Eurepo es el tipo de interés a las 11.00 horas, hora de Bruselas, al que un banco
+ofrece los fondos en euros a otro banco si a cambio recibe de éste último la
+mejor garantía en el mercado europeo. Este índice se dejó de publicar el 31 de
+diciembre de 2014.
+
+64
+
+Tipos de interés de referencia
+
+Transición EONIA / €STR.
+
+• El grupo de trabajo RFR (Risk Free Rate) recomendó en septiembre de 2018 el uso
+del €STR como tipo de referencia del área del euro en sustitución del EONIA.
+• No obstante, el EONIA seguirá existiendo y podrá utilizarse en los contratos en vigor
+durante un período de tiempo limitado para facilitar su transición al €STR.
+• Para ello, desde el 2 de octubre hasta finales de 2021, el EONIA se va a calcular
+aplicando un diferencial fijo sobre el €STR, en lugar de basarse en los datos
+aportados por un panel de entidades de crédito.
+• Este diferencial ha sido fijado por el BCE en 0,085% (8,5 puntos básicos). Para su
+cálculo, el BCE ha utilizado datos diarios desde el 17 de abril de 2018 hasta el 16 de
+abril de 2019, según la metodología adoptada por EMMI.
+• EONIA dejará de publicarse el 3 de enero de 2022.
+
+65
+
+Tipos de interés de referencia
+
+Transición EONIA / €STR:
+Calendario de la transición:
+
+66
+
+Tipos de interés de referencia
+
+• EURIBOR y EONIA son indicadores de referencia críticos.
+• La regulación BMR fija los requisitos para que estos indicadores se puedan seguir utilizando
+con un adecuado nivel de representatividad y seguridad.
+• El administrador del €STR y responsable de su cálculo es el BCE por la importancia que tiene
+este indicador en la trasmisión de la política monetaria.
+• La metodología de cálculo del €STR ha sustituido al anterior cálculo del EONIA desde el pasado
+02/10/19.
+• EONIA se seguirá publicando como €STR + 8,5 pbs hasta el 31 de diciembre de 2021 y a partir
+de esta fecha desaparecerá.
+• El cálculo del EURIBOR se va a sustituir por una “metodología híbrida” en la que se
+tendrán en cuenta transacciones reales y el juicio experto de los bancos
+contribuidores, siguiendo un riguroso procedimiento establecido por EMMI.
+•Se ha reforzado la exigencia de requisitos de gobernanza y de control aplicables a los
+bancos que contribuyen al cálculo del EURIBOR.
+• Las autoridades europeas confirman que el EURIBOR cumple los requisitos
+contenidos en la normativa BMR dándose un paso importante para su continuidad.
+
+67
+
+Estructura Temporal de los Tipos de Interés (ETTI )
+
+Existen tres clases de tipos de interés:
+
+Curva de tipos de interés al contado o spot:
+La tasa que el mercado aplica hoy, para valorar un activo sin riesgo de crédito o
+liquidez, que vence en un plazo determinado.
+
+Curva de tipos de interés a plazo implícitos o forward:
+Se espera poder determinar, cuál será el tipo de interés al que se realizará una
+inversión entre dos fechas futuras.
+
+Función de descuento:
+Equivale al valor actual de una unidad monetaria que se pagará en algún
+momento futuro.
+
+68
+
+Estructura Temporal de los Tipos de Interés (ETTI )
+
+Representación gráfica de los tipos de interés y plazos de los
+activos financieros.
+
+Permiten establecer comparaciones entre las rentabilidades
+de los diferentes instrumentos, monedas, países, nivel de
+riesgo crediticio, lo que facilita al inversor la toma de
+decisiones.
+
+69
+
+Curvas de tipos de interés y tipos implícitos
+
+En la práctica, la curva de tipos (relación entre precio del dinero y plazo de tiempo) da lugar a
+cuatro posibles formas generales (gráfico):
+
+Curva de tipos de interés normal o creciente: a mayor plazo el mercado paga una mayor tasa
+de interés. Es una curva ligeramente creciente, indica que, a mayor tiempo, se percibe un
+mayor riesgo, y por tanto el tipo de interés es ligeramente superior, lo cual se considera un
+comportamiento normal del mercado.
+
+Curva de tipos de interés plana: Los tipos de interés permanecen constantes, sin importar el
+plazo de vencimiento del activo financiero. Poco común, e incluso se considera anómala y poco
+realista.
+
+Curva de tipos de interés invertida: a mayor plazo, el mercado paga una menor tasa de
+interés. Esta situación no es normal, en principio, puede significar expectativas de bajadas de
+tipos de interés, siempre y cuando no existan problemas inflacionistas.
+Curva de tipos de interés oscilante o con jorobas: resulta cuando el mercado se encuentra en
+situaciones de inestabilidad e incertidumbre, generándose variaciones en el comportamiento
+de los agentes. Al representar la función de la curva de tipos de interés se observarán tramos
+crecientes y tramos decrecientes.
+
+70
+
+Curvas de tipos de interés y tipos implícitos
+
+71
+
+Mercados Monetarios
+
+Son aquellos donde unas empresas buscan financiación a corto plazo.
+
+En Europa estos plazos tienen un máximo 18 meses /2 años,
+En Argentina estamos hablando de plazos no mayores a un año, en ambos
+casos también tenemos que considerar las inversiones de excedentes de
+tesorería.
+
+Mercado Interbancario de Depósitos: Características generales
+
+Se entiende por Mercado Interbancario de Depósitos aquél en el que se
+desarrollan tanto las operaciones de regulación monetaria entre las
+entidades de crédito pertenecientes a un sistema financiero y su banco
+central, como operaciones de depósitos entre las propias entidades de
+crédito.
+
+.
+
+72
+En Argentina podemos decir que los bancos preservan parte de su activo
+en forma de reservas, i.e. colocaciones líquidas, seguras y que puedan
+utilizarse como dinero o puedan ser convertidas rápidamente en él.
+
+Atendiendo a la importancia de ellas para el buen funcionamiento del
+sistema bancario las autoridades monetarias generalmente imponen
+requisitos mínimos de liquidez, a la vez que los propios bancos
+normalmente mantienen reservas por encima de los requerimientos legales
+aun cuando estas no configuren la inversión más rentable.
+
+Al realizar una revisión de las regulaciones de liquidez que imperan en
+Argentina y presentar las características más importantes de los mercados
+interbancarios locales, se demuestra que las reservas bancarias se
+mantienen en un intento de satisfacer la restricción de supervivencia que
+enfrentan los bancos.
+Mercados Monetarios
+
+73
+
+Agentes Participantes
+
+En Argentina podrán ser miembros de este mercado todas las entidades de crédito
+sujetas a la supervisión del BCRA (Banco Central de la República Argentina),
+conforme lo determina la Ley de Entidades Financieras.
+
+Asimismo, el Banco Central de la República Argentina: cumple las funciones de:
+
+Agente de Supervisión y Control:
+
+• Autoriza a las entidades participantes.
+
+• Publica las normas de funcionamiento (circulares).
+Mercados Monetarios
+
+74
+
+Activos Negociados:
+
+Con carácter general, un depósito interbancario es una operación establecida
+entre dos partes, actuantes en el mercado interbancario, por la que una de ellas (la
+prestamista) cede un importe pre acordado de dinero físico o numerario durante
+un período preestablecido generalmente corto plazo, y por el que la parte
+prestataria o tomadora de los fondos se compromete a pagar un tipo de interés a
+vencimiento del depósito, junto a la devolución del principal.
+Se trata pues de activos cupón cero a plazo fijo.
+La convención en el mercado para el cálculo de intereses se aplica para el cálculo
+de rentabilidad la capitalización simple.
+Mercados Monetarios
+
+75
+En función del plazo de las operaciones del mercado interbancario, podemos
+distinguir entre:
+
+Operaciones al contado:
+Cuando entre la fecha de contratación de la operación y la fecha de valor existe
+cinco ó menos días hábiles.
+
+Operaciones a plazo:
+En el caso de que existan más de cinco días hábiles entre la fecha de contratación y
+la fecha valor de la operación.
+
+En función del instrumento negociado hablaremos de:
+
+– Operaciones de depósitos no transferibles.
+– Operaciones de depósitos transferibles.
+Mercados Monetarios
+
+76
+
+Depósitos no Transferibles:
+
+Aquel en el que tanto la entidad depositaria como la entidad depositante han de
+mantener inalteradas hasta la fecha de vencimiento pactado la posición contraída
+en el momento de contratación del mismo.
+
+Características:
+Se trata de un mercado primario: los préstamos que nacen en él, formalizados
+como depósitos interbancarios, no son posteriormente negociables en el mercado
+secundario.
+Las posiciones contraídas en el interbancario de depósitos no transferibles tienen
+un carácter irreversible.
+De lo anterior se deduce que dichas posiciones permanecerán en el balance hasta
+su vencimiento, consumiendo recursos propios de la entidad.
+Mercados Monetarios
+
+77
+
+Depósitos Transferibles:
+
+Se trata de depósitos cuyo pago de principal e intereses pactados entre la entidad
+prestataria y prestamista para una fecha determinada es susceptible de ser cedido
+durante el periodo que media entre su fecha de emisión y de vencimiento.
+Mercados Monetarios
+
+78
+
+Principales Funciones de los Bancos
+
+Principales Funciones de los Bancos: Riesgos Asociados:
+
+Sistema de pagos. Liquidez.
+
+Agente de Inversión y Transformación Liquidez y
+de Activos (de corto a largo plazo). Solvencia.
+
+79
+
+Principales Regulaciones del Sistema Financiero Argentino
+
+Riesgo de Crédito y Solvencia
+
+• Capitales Mínimos.
+
+• Clasificación y Previsionamiento.
+
+• Fraccionamiento y Graduación del
+Riesgo.
+
+Riesgo de Liquidez
+
+• Efectivo Mínimo.
+
+• Garantía de Depósitos (SEDESA).
+
+• Asistencia de liquidez del Banco
+Central.
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa. 80
+
+Establece la
+liquidez mínima a
+mantener por las
+Entidades
+Financieras para
+hacer frente a sus
+obligaciones.
+
+Obligaciones
+con terceros
+
+Exigencia de
+Liquidez
+
+Efectivo y otros activos
+
+líquidos
+
+Efectivo Mínimo
+
+81
+
+Exigencia:
+
+• Depósitos y otras obligaciones por intermediación financiera a la vista y a
+plazo (en pesos, ME (Moneda Extranjera) y títulos valores).
+
+• Saldos sin utilizar de adelantos en cuenta corriente.
+
+• Defecto de Aplicación de Recursos ME (Moneda Extranjera).
+
+Integración:
+• Cuenta Corriente en BCRA (Banco Central de la República Argentina) en
+Pesos / ME (Moneda Extranjera).
+
+• Cuentas Especiales de Garantías a favor de cámaras electrónicas de
+compensación y del ANSES.
+
+Efectivo Mínimo
+
+82
+La Carta Orgánica del BCRA (Banco Central de la República Argentina),
+faculta a ese Banco Central a otorgar redescuentos a las Entidades
+Financieras, por razones de iliquidez transitoria, hasta un máximo del
+(Patrimonio Neto) PN de las mismas.
+Asistencia Financiera del BCRA (Banco Central de la República
+Argentina)
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa. 83
+
+Establece cuál es el capital
+mínimo que se requiere
+para que una Entidad
+Financiera pueda operar
+en función a sus activos.
+
+Capitales Mínimos
+
+84
+
+Capitales Mínimos
+
+Objetivos:
+• Absorber las perdidas inesperadas (no cubiertas por previsiones).
+• Internalizar los Riesgos asumidos por la entidad.
+
+Exigencia:
+1. Capital Básico
+2. Suma de los Riesgos
+Riesgo de Crédito
+Riesgo de Mercado
+Riesgo Operacional
+
+Ambos el mayor
+
+Integración:
+Responsabilidad Patrimonial Computable ( RPC ).
+
+85
+
+Exigencia Mínima Básica – Anexo I
+
+* Ejemplos categorías establecidas en el punto 3,3, Sección 3 Capítulo II de Circular CREFI -2
+
+Categoría I: CABA.
+
+Categoría II: Gran Bs As, Bahía Blanca, Mar del Plata, Gran Córdoba, Gran
+Mendoza.
+
+Categoría III: Corrientes, Salta, Santiago del Estero, Catamarca, La Pampa.
+
+Capitales Mínimos
+
+86
+
+Riesgo de Crédito:
+
+CRC = (k x 0,08 x APRc) + INC + IP
+
+donde:
+
+CRC: exigencia de capital por riesgo de crédito.
+k: Camel – 1= 1; 2= 1,03; 3- 1,08; 4- 1,13; 5= 1,19
+APRc: activos ponderados por riesgo de crédito,
+INC: incremento en relaciones técnica,
+IP: incremento por aplicación del limite de posición global neta negativa.
+Capitales Mínimos
+
+87
+
+Riesgo de Mercado
+
+Es posibilidad de sufrir pérdidas en posiciones registradas dentro y fuera
+de balance a raíz de las fluctuaciones adversas en los precios de mercado.
+
+RM = RT + RA + RTC + ROP
+
+Donde:
+
+RM = Riesgo de Mercado
+RT = Riesgos por tasa de interés
+RA = Riesgo de Acciones
+RTC = Tipo de cambio
+ROPP = Riesgo de Opciones
+Capitales Mínimos
+
+88
+
+Riesgo Operacional
+
+Pérdida resultante por fallas de procesos internos, actuación personal,
+sistemas internas y eventos externos.
+Se determinará mensualmente aplicando la siguiente expresión:
+
+CRO: Exigencia de capital por riesgo operacional.
+a: 15%.
+n: Períodos de 12 meses consecutivos en los cuales el IB es +,
+
+tomando en cuenta los últimos 36 meses.
+
+IBt: Ingreso bruto de períodos de 12 meses consecutivos -siempre que sea
+positivo-, correspondientes a los últimos 36 meses anteriores al mes en que
+se efectúa el cálculo.
+Capitales Mínimos
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa. 89
+
+Establece el valor
+patrimonial utilizado como
+parámetro representativo del
+Capital Propio de la
+Entidades Financieras.
+
+R.P.C
+
+(Responsabilidad Patrimonial
+
+Computable)
+
+Capitales Mínimos
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa. 90
+
+R
+
+P
+C
+
+Patrimonio neto
+básico
+
+Patrimonio neto
+complementario
+(sin superar el 100%
+del PN básico)
+
+Conceptos
+Deducibles
+
+=
+
++
+
+-
+Capitales Mínimos
+
+91
+El Banco Central establece normas de clasificación de la calidad de los Deudores
+con el objeto de evaluar los potenciales riesgos de incobrabilidad.
+Clasificación y Previsionamiento
+
+Cartera comercial: Cartera para
+consumo o vivienda:
+Créditos Personales,
+tarjetas de crédito
+
+Cartera asimilable a
+consumo: naturaleza
+
+comercial
+Categorías
+
+92
+
+Criterios de Clasificación:
+
+Cartera comercial:
+La evaluación para la clasificación se realiza de acuerdo a capacidad de pago y
+flujo de fondos.
+
+Indicadores:
+
+• Liquidez.
+• Estructura de financiamiento.
+• Cumplimiento en el pago.
+• Calidad de dirección y administración.
+• Sistemas de información.
+• Situación jurídica.
+
+Cartera asimilable y consumo: Grado de cumplimiento en el pago.
+Clasificación y Previsionamiento
+
+93
+
+Clasificación y Previsionamiento
+
+Nuevo criterio de Clasificación y Previsionamiento – NIIF 9
+(Normas Internacionales de Información Financiera)
+
+94
+
+Clasificación y Previsionamiento
+
+El BCRA (Banco Central de la República Argentina) estableció con vigencia 2020,
+el modelo de perdida crediticia esperada establecido por la NIIF 9. Este modelo
+requiere recolectar informaciones históricas del comportamiento de los
+deudores.
+
+El modelo de deterioro se basa en el concepto de pérdida esperada,
+anteriormente sólo se registraba la pérdida incurrida (atraso o incumplimiento),
+lo que hace que la registración contable sea anterior a la ocurrencia del evento
+de pérdida.
+
+El modelo maneja un criterio DUAL, es decir:
+pérdidas esperadas para los próximos 12 meses (Riesgo Crediticio Bajo), o
+pérdidas proyectadas para toda la vida del activo (Riesgo alto).
+
+Además, el cálculo de las previsiones o coberturas se harán continuamente por
+toda la vida de cada instrumento.
+
+95
+
+Clasificación y Previsionamiento
+
+La medición de las pérdidas crediticias esperadas – enfoque de “probabilidad de
+incumplimiento” explicita:
+
+PE = PD x EAD x LGD
+
+Donde:
+PE: Pérdida Esperada
+PD: Probabilidad de “default” en un tiempo determinado.
+EAD: Importe de deuda pendiente de pago en el momento de default del cliente.
+LGD: Es el % de pérdida producida en caso de que se produzca el default.
+Para ello se consideran los % de recupero promedio, sobre operaciones que alcanzaron el
+estado de “default”, a lo largo de la gestión de recuperación.
+
+Documentación elaborada para la Escuela de Formación de FEF/IEAF y adaptada para el Instituto Argentino de Ejecutivos de
+Finanzas, IAEF ©. Prohibida su reproducción sin la autorización expresa. 96
+Grandes Exposiciones a
+Riesgo de Crèdito: Establece
+los límites máximos de
+asistencia crediticia a
+deudores con el objetivo de
+diversificar el riesgo de
+
+crédito.
+
+Graduación: Establece los
+límites máximos de asistencia
+crediticia a deudores en función
+a la solvencia del propio deudor,
+con el objetivo de minimizar el
+
+riesgo crediticio.
+
+Grandes Exposiciones y Graduación
+
+97
+
+Objetivo:
+Acotar el riesgo, asegurando una diversificación mínima de financiaciones.
+
+Grandes Exposiciones al Riesgo de Crédito:
+
+Establece los siguientes Límites a las financiaciones otorgadas a clientes,
+en función a la RPC (Responsabilidad Patrimonial Computable) del Banco,
+del último día del mes anterior:
+
+1. Operaciones SIN garantías otorgadas de una empresa o persona individual (excepto
+Entidades Financieras y Corresponsales del Exterior). 15%
+
+2. Operaciones CON garantías otorgadas de una empresa o persona individual (excepto
+Entidades Financieras y Corresponsales del Exterior). 25%
+
+3. Operaciones otorgadas a Entidades Financieras . 25%
+Grandes Exposiciones y Graduación
+
+98
+
+Graduación:
+
+Las financiaciones otorgadas, no podrán superar los porcentajes de la
+RPC (Responsabilidad Patrimonial Computable) de cada cliente, según
+los siguientes límites:
+
+1. Margen Básico 100%
+
+2. Margen Complementario 200%
+Sin superar el 2,5% de la RPC (Responsabilidad Patrimonial Computable)
+de la Entidad Financiera, del segundo
+mes anterior al del otorgamiento del crédito.

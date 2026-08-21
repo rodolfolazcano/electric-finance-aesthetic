@@ -85,11 +85,13 @@ function detectarFuente(tipo: string, mercado: string): FuentePrecio {
 
 export const syncIOLPortfolio = createServerFn({ method: "POST" })
   .validator((input: unknown) =>
-    z.object({
-      accessToken: z.string().min(1),
-      refreshToken: z.string().nullable(),
-      pais: z.string().default("Argentina"),
-    }).parse(input),
+    z
+      .object({
+        accessToken: z.string().min(1),
+        refreshToken: z.string().nullable(),
+        pais: z.string().default("Argentina"),
+      })
+      .parse(input),
   )
   .handler(async ({ data }): Promise<IOLSyncResult> => {
     try {
@@ -107,7 +109,7 @@ export const syncIOLPortfolio = createServerFn({ method: "POST" })
       let items: FlatItem[] = [];
       if (portafolioRes.status === "fulfilled") {
         const raw = portafolioRes.value;
-        const arr = Array.isArray(raw) ? raw : (raw as any)?.activos ?? [];
+        const arr = Array.isArray(raw) ? raw : ((raw as any)?.activos ?? []);
         items = arr.map(normalizarActivo).filter((x): x is FlatItem => x !== null);
         if (items.length === 0 && arr.length > 0) {
           items = arr
@@ -143,13 +145,14 @@ export const syncIOLPortfolio = createServerFn({ method: "POST" })
         warnings.push("No se pudo obtener el estado de cuenta IOL.");
       }
 
-      const totalValorizado = estadoCuenta?.totalCuentaValorizado
-        ?? items.reduce((s, i) => s + i.valorizado, 0);
+      const totalValorizado =
+        estadoCuenta?.totalCuentaValorizado ?? items.reduce((s, i) => s + i.valorizado, 0);
 
-      const liquidezInmediata = estadoCuenta?.disponibleOperar
-        ?? estadoCuenta?.saldoCuentaCorriente
-        ?? estadoCuenta?.disponibleComprar
-        ?? 0;
+      const liquidezInmediata =
+        estadoCuenta?.disponibleOperar ??
+        estadoCuenta?.saldoCuentaCorriente ??
+        estadoCuenta?.disponibleComprar ??
+        0;
 
       const portfolioInputs: PortfolioAssetInput[] = items
         .filter((i) => i.simbolo && i.cantidad > 0)
@@ -184,10 +187,12 @@ export const syncIOLPortfolio = createServerFn({ method: "POST" })
 
 export const syncIOLAdvisorClients = createServerFn({ method: "POST" })
   .validator((input: unknown) =>
-    z.object({
-      accessToken: z.string().min(1),
-      refreshToken: z.string().nullable(),
-    }).parse(input),
+    z
+      .object({
+        accessToken: z.string().min(1),
+        refreshToken: z.string().nullable(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }): Promise<{ clients: IOLClientSummary[]; error?: string }> => {
     try {
@@ -212,4 +217,3 @@ export const syncIOLAdvisorClients = createServerFn({ method: "POST" })
       return { clients: [], error: (err as Error).message };
     }
   });
-

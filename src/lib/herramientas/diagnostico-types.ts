@@ -1,12 +1,19 @@
-export type FuentePrecio = 'IOL' | 'ArgentinaDatos' | 'Yahoo';
-export type TipoDeclarado = 'bono' | 'on' | 'letra' | 'fci' | 'cedear' | 'accion' | 'adr';
-export type CategoriaMacro = 'RentaFija' | 'RentaVariable' | 'Liquidez';
+export type FuentePrecio = "IOL" | "ArgentinaDatos" | "Yahoo";
+export type TipoDeclarado = "bono" | "on" | "letra" | "fci" | "cedear" | "accion" | "adr";
+export type CategoriaMacro = "RentaFija" | "RentaVariable" | "Liquidez";
 export type Subtipo =
-  | 'Bono' | 'ON' | 'Letra'
-  | 'FCI-RF' | 'FCI-RV' | 'FCI-Mixto'
-  | 'CEDEAR' | 'Accion' | 'AccionExterior' | 'ADR';
-export type Geografia = 'Argentina' | 'EEUU' | 'Otro';
-export type OrigenMoneda = 'ARS' | 'USD';
+  | "Bono"
+  | "ON"
+  | "Letra"
+  | "FCI-RF"
+  | "FCI-RV"
+  | "FCI-Mixto"
+  | "CEDEAR"
+  | "Accion"
+  | "AccionExterior"
+  | "ADR";
+export type Geografia = "Argentina" | "EEUU" | "Otro";
+export type OrigenMoneda = "ARS" | "USD";
 
 export interface PortfolioAssetInput {
   id: string;
@@ -65,14 +72,16 @@ export interface ClasificacionExtendida {
 }
 
 export type AlertaDiagnostico = {
-  tipo: "sobrecompra" | "sobreventa" | "tir_competitiva" | "fcf_destacado" | "concentracion" | "info";
+  tipo:
+    "sobrecompra" | "sobreventa" | "tir_competitiva" | "fcf_destacado" | "concentracion" | "info";
   mensaje: string;
   ticker?: string;
   severidad: "alta" | "media" | "baja";
 };
 
 export interface DiagnosticoHibridoResult {
-  activos: (PositionEnriquecida & ClasificacionExtendida & { fcfYield: number | null; fundamentalScore: number | null })[];
+  activos: (PositionEnriquecida &
+    ClasificacionExtendida & { fcfYield: number | null; fundamentalScore: number | null })[];
   totalValorizado: number;
   composicion: {
     argentinaVsEeuu: { argentina: number; eeuu: number; otro: number };

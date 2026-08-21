@@ -27,21 +27,86 @@ export const WINDOW_CONFIGS: Record<WindowKey, WindowConfig> = {
 // ─── RATIO DEFINITIONS ──────────────────────────────────────────────
 
 export const RATIO_DEFINITIONS = [
-  { id: "CRB_BONDS", label: "CRB/Bonds", formula: "DBC ÷ TLT", leading: "Inflación vs desinflación (el REY)" },
-  { id: "BONDS_STOCKS", label: "Bonds/Stocks", formula: "TLT ÷ SPY", leading: "Flight-to-quality vs Risk-on" },
-  { id: "COMMODITIES_STOCKS", label: "Commodities/Stocks", formula: "DBC ÷ SPY", leading: "Régimen inflacionario vs crecimiento" },
-  { id: "COPPER_GOLD", label: "Copper/Gold", formula: "HG=F ÷ GLD", leading: "Dr. Copper — ciclo industrial (3-6m adelantado)" },
-  { id: "GOLD_OIL", label: "Gold/Oil", formula: "GLD ÷ USO", leading: "Inflación de demanda vs incertidumbre" },
+  {
+    id: "CRB_BONDS",
+    label: "CRB/Bonds",
+    formula: "DBC ÷ TLT",
+    leading: "Inflación vs desinflación (el REY)",
+  },
+  {
+    id: "BONDS_STOCKS",
+    label: "Bonds/Stocks",
+    formula: "TLT ÷ SPY",
+    leading: "Flight-to-quality vs Risk-on",
+  },
+  {
+    id: "COMMODITIES_STOCKS",
+    label: "Commodities/Stocks",
+    formula: "DBC ÷ SPY",
+    leading: "Régimen inflacionario vs crecimiento",
+  },
+  {
+    id: "COPPER_GOLD",
+    label: "Copper/Gold",
+    formula: "HG=F ÷ GLD",
+    leading: "Dr. Copper — ciclo industrial (3-6m adelantado)",
+  },
+  {
+    id: "GOLD_OIL",
+    label: "Gold/Oil",
+    formula: "GLD ÷ USO",
+    leading: "Inflación de demanda vs incertidumbre",
+  },
   { id: "XLY_XLP", label: "XLY/XLP", formula: "XLY ÷ XLP", leading: "Confianza consumidor" },
-  { id: "IWM_SPY", label: "IWM/SPY", formula: "IWM ÷ SPY", leading: "Small vs Large — rotación riesgo" },
-  { id: "XLK_XLE", label: "XLK/XLE", formula: "XLK ÷ XLE", leading: "Tech vs Energy — rotación sectorial clave" },
-  { id: "RSP_SPY", label: "RSP/SPY", formula: "RSP ÷ SPY", leading: "Amplitud de mercado — mercado angosto = late cycle" },
-  { id: "HYG_LQD", label: "HYG/LQD", formula: "HYG ÷ LQD", leading: "Apetito crediticio — leading de equities" },
-  { id: "DOW_GOLD", label: "Dow/Gold", formula: "^DJI ÷ GLD", leading: "Ciclo largo papel vs activos duros" },
-  { id: "YIELD_CURVE", label: "Yield Curve", formula: "^TNX − ^IRX", leading: "Spread 10Y−3M — señal más temprana de recesión" },
+  {
+    id: "IWM_SPY",
+    label: "IWM/SPY",
+    formula: "IWM ÷ SPY",
+    leading: "Small vs Large — rotación riesgo",
+  },
+  {
+    id: "XLK_XLE",
+    label: "XLK/XLE",
+    formula: "XLK ÷ XLE",
+    leading: "Tech vs Energy — rotación sectorial clave",
+  },
+  {
+    id: "RSP_SPY",
+    label: "RSP/SPY",
+    formula: "RSP ÷ SPY",
+    leading: "Amplitud de mercado — mercado angosto = late cycle",
+  },
+  {
+    id: "HYG_LQD",
+    label: "HYG/LQD",
+    formula: "HYG ÷ LQD",
+    leading: "Apetito crediticio — leading de equities",
+  },
+  {
+    id: "DOW_GOLD",
+    label: "Dow/Gold",
+    formula: "^DJI ÷ GLD",
+    leading: "Ciclo largo papel vs activos duros",
+  },
+  {
+    id: "YIELD_CURVE",
+    label: "Yield Curve",
+    formula: "^TNX − ^IRX",
+    leading: "Spread 10Y−3M — señal más temprana de recesión",
+  },
   // ─── Nuevos ratios (Cap. 2, 10) ─────────────────────────────────
-  { id: "GOLD_SILVER", label: "Gold/Silver", formula: "GLD ÷ SLV", leading: "Señal de miedo financiero extremo (Cap. 10)" },
-  { id: "GDX_GLD", label: "GDX/GLD", formula: "GDX ÷ GLD", leading: "Miners vs Gold — confirma si el rally del oro es real (Cap. 10)" },
+  {
+    id: "GOLD_SILVER",
+    label: "Gold/Silver",
+    formula: "GLD ÷ SLV",
+    leading: "Señal de miedo financiero extremo (Cap. 10)",
+  },
+  {
+    id: "GDX_GLD",
+    label: "GDX/GLD",
+    formula: "GDX ÷ GLD",
+    leading: "Miners vs Gold — confirma si el rally del oro es real (Cap. 10)",
+  },
 ] as const;
 
 export type RatioId = (typeof RATIO_DEFINITIONS)[number]["id"];
@@ -247,10 +312,34 @@ export interface DivergenceRule {
 }
 
 export const DIVERGENCE_RULES: DivergenceRule[] = [
-  { extremeRatio: "CRB_BONDS", confirmingRatio: "COPPER_GOLD", signal: "Inflación tocando techo — rotar a bonds", direction: "bearish", description: "CRB/Bonds extremo + Copper/Gold bajando" },
-  { extremeRatio: "BONDS_STOCKS", confirmingRatio: "HYG_LQD", signal: "Miedo extremo — posible rebote risk-on", direction: "bullish", description: "Bonds/Stocks extremo + HYG/LQD cayendo" },
-  { extremeRatio: "XLY_XLP", confirmingRatio: "RSP_SPY", signal: "Recesión confirmada — mantenerse defensivo", direction: "bearish", description: "XLY/XLP extremo bajo + RSP/SPY cayendo" },
-  { extremeRatio: "HYG_LQD", confirmingRatio: "COPPER_GOLD", signal: "Expansión genuina — riesgo-on válido", direction: "bullish", description: "HYG/LQD extremo + Copper/Gold también subiendo" },
+  {
+    extremeRatio: "CRB_BONDS",
+    confirmingRatio: "COPPER_GOLD",
+    signal: "Inflación tocando techo — rotar a bonds",
+    direction: "bearish",
+    description: "CRB/Bonds extremo + Copper/Gold bajando",
+  },
+  {
+    extremeRatio: "BONDS_STOCKS",
+    confirmingRatio: "HYG_LQD",
+    signal: "Miedo extremo — posible rebote risk-on",
+    direction: "bullish",
+    description: "Bonds/Stocks extremo + HYG/LQD cayendo",
+  },
+  {
+    extremeRatio: "XLY_XLP",
+    confirmingRatio: "RSP_SPY",
+    signal: "Recesión confirmada — mantenerse defensivo",
+    direction: "bearish",
+    description: "XLY/XLP extremo bajo + RSP/SPY cayendo",
+  },
+  {
+    extremeRatio: "HYG_LQD",
+    confirmingRatio: "COPPER_GOLD",
+    signal: "Expansión genuina — riesgo-on válido",
+    direction: "bullish",
+    description: "HYG/LQD extremo + Copper/Gold también subiendo",
+  },
 ];
 
 export interface CompleteIntermarketResult {
@@ -268,8 +357,18 @@ export interface CompleteIntermarketResult {
 
 // ─── COINTEGRATION PAIRS (expected per Murphy) ─────────────────────
 
-export const COINTEGRATION_PAIRS: { a: RatioId; b: RatioId; expectedCointegrated: boolean; label: string }[] = [
-  { a: "CRB_BONDS", b: "COPPER_GOLD", expectedCointegrated: true, label: "CRB/Bond vs Copper/Gold" },
+export const COINTEGRATION_PAIRS: {
+  a: RatioId;
+  b: RatioId;
+  expectedCointegrated: boolean;
+  label: string;
+}[] = [
+  {
+    a: "CRB_BONDS",
+    b: "COPPER_GOLD",
+    expectedCointegrated: true,
+    label: "CRB/Bond vs Copper/Gold",
+  },
   { a: "BONDS_STOCKS", b: "HYG_LQD", expectedCointegrated: true, label: "Bonds/Stocks vs HYG/LQD" },
   { a: "XLY_XLP", b: "RSP_SPY", expectedCointegrated: true, label: "XLY/XLP vs RSP/SPY" },
   { a: "XLK_XLE", b: "IWM_SPY", expectedCointegrated: true, label: "XLK/XLE vs IWM/SPY" },
@@ -288,7 +387,7 @@ export const SCORE_WEIGHTS: Record<RatioId, number> = {
   IWM_SPY: 0.03,
   XLK_XLE: 0.04,
   RSP_SPY: 0.05,
-  HYG_LQD: 0.10,
+  HYG_LQD: 0.1,
   DOW_GOLD: 0.02,
   YIELD_CURVE: 0.15,
   GOLD_SILVER: 0.04,
@@ -334,7 +433,11 @@ export function computeReturns(series: number[]): number[] {
   return returns;
 }
 
-export function computePearsonCorrelation(a: number[], b: number[], window?: number): number | null {
+export function computePearsonCorrelation(
+  a: number[],
+  b: number[],
+  window?: number,
+): number | null {
   const n = Math.min(a.length, b.length, window ?? Number.MAX_SAFE_INTEGER);
   if (n < 10) return null;
   const xs = a.slice(-n);
@@ -391,7 +494,8 @@ export function computeSlope(series: number[], window: number): number | null {
   const n = slice.length;
   const xMean = (n - 1) / 2;
   const yMean = slice.reduce((a, b) => a + b, 0) / n;
-  let num = 0, den = 0;
+  let num = 0,
+    den = 0;
   for (let i = 0; i < n; i++) {
     const dx = i - xMean;
     const dy = slice[i] - yMean;
@@ -418,24 +522,40 @@ export function computePercentile(series: number[], currentValue: number): Perce
     return { value: currentValue, rank: 50, category: "normal", signal: null };
   }
   const sorted = [...series].sort((a, b) => a - b);
-  const rank = currentValue < sorted[0]
-    ? 0
-    : currentValue > sorted[sorted.length - 1]
-      ? 100
-      : (sorted.findIndex((v) => v >= currentValue) / sorted.length) * 100;
+  const rank =
+    currentValue < sorted[0]
+      ? 0
+      : currentValue > sorted[sorted.length - 1]
+        ? 100
+        : (sorted.findIndex((v) => v >= currentValue) / sorted.length) * 100;
 
   let category: PercentileInfo["category"];
   let signal: PercentileInfo["signal"];
-  if (rank < 5) { category = "oversold_extreme"; signal = "buy"; }
-  else if (rank < 20) { category = "low"; signal = null; }
-  else if (rank <= 80) { category = "normal"; signal = null; }
-  else if (rank <= 95) { category = "high"; signal = null; }
-  else { category = "overbought_extreme"; signal = "sell"; }
+  if (rank < 5) {
+    category = "oversold_extreme";
+    signal = "buy";
+  } else if (rank < 20) {
+    category = "low";
+    signal = null;
+  } else if (rank <= 80) {
+    category = "normal";
+    signal = null;
+  } else if (rank <= 95) {
+    category = "high";
+    signal = null;
+  } else {
+    category = "overbought_extreme";
+    signal = "sell";
+  }
 
   return { value: currentValue, rank: Math.round(rank * 100) / 100, category, signal };
 }
 
-export function computeZScore(series: number[], currentValue: number, period: number = 200): ZScoreInfo | null {
+export function computeZScore(
+  series: number[],
+  currentValue: number,
+  period: number = 200,
+): ZScoreInfo | null {
   if (series.length < period) return null;
   const ma = computeSMA(series, period);
   if (ma == null) return null;
@@ -446,16 +566,26 @@ export function computeZScore(series: number[], currentValue: number, period: nu
 
   let category: ZScoreInfo["category"];
   let signal: ZScoreInfo["signal"];
-  if (z > 2) { category = "overbought"; signal = "sell"; }
-  else if (z < -2) { category = "overSold"; signal = "buy"; }
-  else { category = "normal"; signal = null; }
+  if (z > 2) {
+    category = "overbought";
+    signal = "sell";
+  } else if (z < -2) {
+    category = "overSold";
+    signal = "buy";
+  } else {
+    category = "normal";
+    signal = null;
+  }
 
   return { zScore: Math.round(z * 100) / 100, vsMA: ma, stdDev, category, signal };
 }
 
 // ─── SIMPLIFIED ADF TEST FOR COINTEGRATION ─────────────────────────
 
-export function adfTest(spread: number[], maxLags: number = 5): {
+export function adfTest(
+  spread: number[],
+  maxLags: number = 5,
+): {
   statistic: number | null;
   pValue: number | null;
   criticalValues: { "1%": number; "5%": number; "10%": number };
@@ -481,7 +611,8 @@ export function adfTest(spread: number[], maxLags: number = 5): {
   const xMean = yLag.reduce((a, b) => a + b, 0) / m;
   const yMean = dy.reduce((a, b) => a + b, 0) / m;
 
-  let num = 0, den = 0;
+  let num = 0,
+    den = 0;
   for (let i = 0; i < m; i++) {
     num += (yLag[i] - xMean) * (dy[i] - yMean);
     den += (yLag[i] - xMean) ** 2;
@@ -502,7 +633,11 @@ export function adfTest(spread: number[], maxLags: number = 5): {
     pValue = Math.round(cdfVal * 10000) / 10000;
   }
 
-  return { statistic: statistic != null ? Math.round(statistic * 100) / 100 : null, pValue, criticalValues };
+  return {
+    statistic: statistic != null ? Math.round(statistic * 100) / 100 : null,
+    pValue,
+    criticalValues,
+  };
 }
 
 export function computeCointegration(
@@ -515,10 +650,13 @@ export function computeCointegration(
   const minLen = Math.min(seriesA.length, seriesB.length);
   if (minLen < 30) {
     return {
-      pairRatioId: ratioIdB, pairLabel: ratioIdB,
-      adfStatistic: null, pValue: null,
+      pairRatioId: ratioIdB,
+      pairLabel: ratioIdB,
+      adfStatistic: null,
+      pValue: null,
       criticalValues: { "1%": -3.43, "5%": -2.86, "10%": -2.57 },
-      cointegrated: null, expectedPerMurphy: expectedCointegrated,
+      cointegrated: null,
+      expectedPerMurphy: expectedCointegrated,
       regimeAnomalous: null,
     };
   }
@@ -532,10 +670,13 @@ export function computeCointegration(
 
   if (spread.length < 30) {
     return {
-      pairRatioId: ratioIdB, pairLabel: ratioIdB,
-      adfStatistic: null, pValue: null,
+      pairRatioId: ratioIdB,
+      pairLabel: ratioIdB,
+      adfStatistic: null,
+      pValue: null,
       criticalValues: { "1%": -3.43, "5%": -2.86, "10%": -2.57 },
-      cointegrated: null, expectedPerMurphy: expectedCointegrated,
+      cointegrated: null,
+      expectedPerMurphy: expectedCointegrated,
       regimeAnomalous: null,
     };
   }
@@ -545,10 +686,13 @@ export function computeCointegration(
   const regimeAnomalous = cointegrated != null ? cointegrated !== expectedCointegrated : null;
 
   return {
-    pairRatioId: ratioIdB, pairLabel: ratioIdB,
-    adfStatistic: statistic, pValue,
+    pairRatioId: ratioIdB,
+    pairLabel: ratioIdB,
+    adfStatistic: statistic,
+    pValue,
     criticalValues,
-    cointegrated, expectedPerMurphy: expectedCointegrated,
+    cointegrated,
+    expectedPerMurphy: expectedCointegrated,
     regimeAnomalous,
   };
 }
@@ -567,7 +711,10 @@ export function analyzeRatioSeries(
     const value = rawSeries.length > 0 ? rawSeries[rawSeries.length - 1] : null;
     const changePct = computeChangePct(rawSeries, w);
     const slope = computeSlope(rawSeries, Math.min(w, rawSeries.length));
-    const percentile = rawSeries.length > w * 2 ? computePercentile(rawSeries.slice(0, -Math.floor(w / 2)), value ?? 0) : null;
+    const percentile =
+      rawSeries.length > w * 2
+        ? computePercentile(rawSeries.slice(0, -Math.floor(w / 2)), value ?? 0)
+        : null;
     const zScore = computeZScore(rawSeries, value ?? 0, Math.min(w * 2, rawSeries.length));
 
     windows[w] = { value, changePct, slope, percentile, zScore };
@@ -578,28 +725,33 @@ export function analyzeRatioSeries(
     if (pair.a === id) {
       const pairSeries = allRatiosSeries[pair.b];
       if (pairSeries && pairSeries.length > 0) {
-        cointegration.push(computeCointegration(rawSeries, pairSeries, pair.a, pair.b, pair.expectedCointegrated));
+        cointegration.push(
+          computeCointegration(rawSeries, pairSeries, pair.a, pair.b, pair.expectedCointegrated),
+        );
       }
     } else if (pair.b === id) {
       const pairSeries = allRatiosSeries[pair.a];
       if (pairSeries && pairSeries.length > 0) {
-        cointegration.push(computeCointegration(rawSeries, pairSeries, pair.b, pair.a, pair.expectedCointegrated));
+        cointegration.push(
+          computeCointegration(rawSeries, pairSeries, pair.b, pair.a, pair.expectedCointegrated),
+        );
       }
     }
   }
 
   const trend63d = windows[63]?.changePct;
   const direction: TrendDirection =
-    trend63d != null
-      ? trend63d > 2 ? "rising" : trend63d < -2 ? "falling" : "flat"
-      : null;
+    trend63d != null ? (trend63d > 2 ? "rising" : trend63d < -2 ? "falling" : "flat") : null;
 
   const strength = trend63d != null ? Math.min(Math.abs(trend63d) / 20, 1) : 0;
   const regime: "bullish" | "bearish" | "neutral" =
     direction === "rising" ? "bullish" : direction === "falling" ? "bearish" : "neutral";
 
   return {
-    id, label: def.label, formula: def.formula, leading: def.leading,
+    id,
+    label: def.label,
+    formula: def.formula,
+    leading: def.leading,
     stats: { windows },
     cointegration,
     signal: { direction, strength, regime },
@@ -616,7 +768,9 @@ export function detectReversalSignals(ratios: RatioAnalysis[]): ReversalSignal[]
     const allWindows = ratio.stats.windows;
 
     const percentileExtreme = Object.values(allWindows).some(
-      (w) => w?.percentile?.category === "oversold_extreme" || w?.percentile?.category === "overbought_extreme",
+      (w) =>
+        w?.percentile?.category === "oversold_extreme" ||
+        w?.percentile?.category === "overbought_extreme",
     );
     const zScoreExtreme = Object.values(allWindows).some(
       (w) => w?.zScore?.category === "overbought" || w?.zScore?.category === "overSold",
@@ -635,17 +789,22 @@ export function detectReversalSignals(ratios: RatioAnalysis[]): ReversalSignal[]
 
       if (rule.direction === "bearish") {
         const isExtremeHigh = Object.values(allWindows).some(
-          (w) => w?.percentile?.category === "overbought_extreme" || w?.zScore?.category === "overbought",
+          (w) =>
+            w?.percentile?.category === "overbought_extreme" ||
+            w?.zScore?.category === "overbought",
         );
         divergenceDetected = isExtremeHigh && confirmingTrend === "falling";
       } else {
         const isExtremeLow = Object.values(allWindows).some(
-          (w) => w?.percentile?.category === "oversold_extreme" || w?.zScore?.category === "overSold",
+          (w) =>
+            w?.percentile?.category === "oversold_extreme" || w?.zScore?.category === "overSold",
         );
         divergenceDetected = isExtremeLow && confirmingTrend === "rising";
       }
 
-      const layerCount = [percentileExtreme, zScoreExtreme, divergenceDetected].filter(Boolean).length;
+      const layerCount = [percentileExtreme, zScoreExtreme, divergenceDetected].filter(
+        Boolean,
+      ).length;
       const confidence = layerCount / 3;
 
       if (layerCount >= 2) {
@@ -674,7 +833,8 @@ export function computeSequentialAnalysis(
   ratios: RatioAnalysis[],
   dowTheory?: DowTheorySnapshot,
 ): SequentialAnalysis {
-  const getTrend = (id: RatioId): TrendDirection => ratios.find((r) => r.id === id)?.signal.direction ?? null;
+  const getTrend = (id: RatioId): TrendDirection =>
+    ratios.find((r) => r.id === id)?.signal.direction ?? null;
   const getValue = (id: RatioId, window: WindowKey = 21): number | null =>
     ratios.find((r) => r.id === id)?.stats.windows[window]?.changePct ?? null;
 
@@ -683,7 +843,8 @@ export function computeSequentialAnalysis(
 
   // STEP 1: Yield Curve
   const ycTrend = getTrend("YIELD_CURVE");
-  const ycInverted = (ratios.find((r) => r.id === "YIELD_CURVE")?.stats.windows[21]?.value ?? 0) < 0;
+  const ycInverted =
+    (ratios.find((r) => r.id === "YIELD_CURVE")?.stats.windows[21]?.value ?? 0) < 0;
   let step1Signal: SequentialStep["signal"] = "neutral";
   let step1Result = "";
 
@@ -702,7 +863,13 @@ export function computeSequentialAnalysis(
     nextStep = 2;
   }
 
-  steps.push({ step: 1, name: "Curva de Yields", result: step1Result, signal: step1Signal, nextStep });
+  steps.push({
+    step: 1,
+    name: "Curva de Yields",
+    result: step1Result,
+    signal: step1Signal,
+    nextStep,
+  });
 
   // STEP 2: CRB/Bonds (the KING ratio)
   if (nextStep === 2) {
@@ -724,7 +891,13 @@ export function computeSequentialAnalysis(
       step2Next = 3;
     }
 
-    steps.push({ step: 2, name: "CRB/Bonds (Rey)", result: step2Result, signal: step2Signal, nextStep: step2Next });
+    steps.push({
+      step: 2,
+      name: "CRB/Bonds (Rey)",
+      result: step2Result,
+      signal: step2Signal,
+      nextStep: step2Next,
+    });
     nextStep = step2Next;
   }
 
@@ -741,15 +914,23 @@ export function computeSequentialAnalysis(
 
       if (copperTrend === "rising") {
         step3Signal = "bullish";
-        step3Result = "Copper/Gold ↑ → Inflación de DEMANDA (buena). Stage 3-4. Comprar XLE, XLB, GLD.";
+        step3Result =
+          "Copper/Gold ↑ → Inflación de DEMANDA (buena). Stage 3-4. Comprar XLE, XLB, GLD.";
       } else if (goldOilTrend === "rising") {
         step3Signal = "warning";
-        step3Result = "Gold/Oil ↑ → Inflación de INCERTIDUMBRE (mala). Stage 5. Comprar XLP, XLU, TLT.";
+        step3Result =
+          "Gold/Oil ↑ → Inflación de INCERTIDUMBRE (mala). Stage 5. Comprar XLP, XLU, TLT.";
       } else {
         step3Result = "Sin señal clara de inflación. Continuar a PASO 4.";
       }
 
-      steps.push({ step: 3, name: "Diagnóstico Inflacionario", result: step3Result, signal: step3Signal, nextStep: 5 });
+      steps.push({
+        step: 3,
+        name: "Diagnóstico Inflacionario",
+        result: step3Result,
+        signal: step3Signal,
+        nextStep: 5,
+      });
       nextStep = 5;
     } else {
       // STEP 3B (mapped to step 4 in sequence)
@@ -759,7 +940,8 @@ export function computeSequentialAnalysis(
 
       if (hygTrend === "rising") {
         step3BSignal = "bullish";
-        step3BResult = "HYG/LQD ↑ (risk-on) → Crecimiento genuino. Stage 1-2. Comprar XLK, XLY, IWM.";
+        step3BResult =
+          "HYG/LQD ↑ (risk-on) → Crecimiento genuino. Stage 1-2. Comprar XLK, XLY, IWM.";
       } else if (hygTrend === "falling") {
         step3BSignal = "warning";
         step3BResult = "HYG/LQD ↓ (risk-off) → Contracción. Stage 4-5. Comprar TLT, GLD, Cash.";
@@ -767,7 +949,13 @@ export function computeSequentialAnalysis(
         step3BResult = "HYG/LQD estable. Continuar a PASO 4.";
       }
 
-      steps.push({ step: 4, name: "Diagnóstico Desinflacionario", result: step3BResult, signal: step3BSignal, nextStep: 5 });
+      steps.push({
+        step: 4,
+        name: "Diagnóstico Desinflacionario",
+        result: step3BResult,
+        signal: step3BSignal,
+        nextStep: 5,
+      });
       nextStep = 5;
     }
   }
@@ -783,14 +971,17 @@ export function computeSequentialAnalysis(
     if (xlkXleTrend === "rising") signals.push("Tech lidera → Stage 1-2 confirmado");
     else if (xlkXleTrend === "falling") signals.push("Energy lidera → Stage 3-4 confirmado");
     if (rspSpyTrend === "falling") signals.push("Mercado angosto → Late cycle confirmado");
-    if (xlyXlpTrend === "falling" && iwmSpyTrend === "falling") signals.push("Contracción confirmada");
+    if (xlyXlpTrend === "falling" && iwmSpyTrend === "falling")
+      signals.push("Contracción confirmada");
 
-    const result = signals.length > 0 ? signals.join(". ") : "Sin confirmación adicional de rotación.";
+    const result =
+      signals.length > 0 ? signals.join(". ") : "Sin confirmación adicional de rotación.";
     steps.push({
       step: steps.length + 1,
       name: "Rotación Fina (confirmación)",
       result,
-      signal: rspSpyTrend === "falling" ? "warning" : xlkXleTrend === "rising" ? "bullish" : "neutral",
+      signal:
+        rspSpyTrend === "falling" ? "warning" : xlkXleTrend === "rising" ? "bullish" : "neutral",
       nextStep: steps.length + 2,
     });
   }
@@ -821,7 +1012,13 @@ export function computeSequentialAnalysis(
       dowResult = "Dow Theory: Sin señal clara. Monitorear.";
     }
 
-    steps.push({ step: steps.length + 1, name: "Dow Theory (confirmación DJI+DJT)", result: dowResult, signal: dowSignal, nextStep: -1 });
+    steps.push({
+      step: steps.length + 1,
+      name: "Dow Theory (confirmación DJI+DJT)",
+      result: dowResult,
+      signal: dowSignal,
+      nextStep: -1,
+    });
   }
 
   // Determine final regime and stage (consistent con detectCyclePhase 0-5)
@@ -867,7 +1064,13 @@ export function computeCompositeScore(ratios: RatioAnalysis[]): CompositeScore {
     const cointegrationMultiplier = hasAnomalousCointegration ? 0.5 : 1.0;
 
     const contribution = weight * signalValue * cointegrationMultiplier;
-    components.push({ ratioId: ratio.id, weight, signalValue, cointegrationMultiplier, contribution });
+    components.push({
+      ratioId: ratio.id,
+      weight,
+      signalValue,
+      cointegrationMultiplier,
+      contribution,
+    });
   }
 
   const totalWeight = Object.values(SCORE_WEIGHTS).reduce((a, b) => a + b, 0);
@@ -876,13 +1079,25 @@ export function computeCompositeScore(ratios: RatioAnalysis[]): CompositeScore {
 
   let label: string;
   let riskProfile: CompositeScore["riskProfile"];
-  if (score >= 50) { label = "RISK-ON AGRESIVO"; riskProfile = "aggressive_risk_on"; }
-  else if (score >= 20) { label = "RISK-ON MODERADO"; riskProfile = "moderate_risk_on"; }
-  else if (score >= -19) { label = "NEUTRAL / CAUTELA"; riskProfile = "neutral"; }
-  else if (score >= -49) { label = "DEFENSIVO"; riskProfile = "defensive"; }
-  else { label = "RISK-OFF / CASH"; riskProfile = "risk_off"; }
+  if (score >= 50) {
+    label = "RISK-ON AGRESIVO";
+    riskProfile = "aggressive_risk_on";
+  } else if (score >= 20) {
+    label = "RISK-ON MODERADO";
+    riskProfile = "moderate_risk_on";
+  } else if (score >= -19) {
+    label = "NEUTRAL / CAUTELA";
+    riskProfile = "neutral";
+  } else if (score >= -49) {
+    label = "DEFENSIVO";
+    riskProfile = "defensive";
+  } else {
+    label = "RISK-OFF / CASH";
+    riskProfile = "risk_off";
+  }
 
-  const interpretation = `Score compuesto: ${score}. ${label}. ` +
+  const interpretation =
+    `Score compuesto: ${score}. ${label}. ` +
     components
       .filter((c) => c.signalValue !== 0)
       .map((c) => {
@@ -896,9 +1111,7 @@ export function computeCompositeScore(ratios: RatioAnalysis[]): CompositeScore {
 
 // ─── COMPLEMENTARY INDICATORS ANALYSIS ─────────────────────────────
 
-export function analyzeVixRegime(
-  vixSeries: number[],
-): VixRegimeInfo {
+export function analyzeVixRegime(vixSeries: number[]): VixRegimeInfo {
   if (vixSeries.length < 21) {
     return { currentValue: null, percentile: null, zScore: null, category: null, trend21d: null };
   }
@@ -948,13 +1161,24 @@ function computeLeadLagRelationship(
   expectedLagDays: { min: number; max: number },
   maxLag: number,
 ): LeadLagRelationship {
-  const result = computeBestLagCorrelation(computeReturns(leaderSeries), computeReturns(followerSeries), maxLag, 5);
-  const leader = result.leader === "synchronous"
-    ? "Sincrónico"
-    : result.leader === "first" ? leaderName : followerName;
-  const confirmsMurphy = result.correlation == null
-    ? null
-    : result.leader === "first" && result.lagDays >= expectedLagDays.min && result.lagDays <= expectedLagDays.max;
+  const result = computeBestLagCorrelation(
+    computeReturns(leaderSeries),
+    computeReturns(followerSeries),
+    maxLag,
+    5,
+  );
+  const leader =
+    result.leader === "synchronous"
+      ? "Sincrónico"
+      : result.leader === "first"
+        ? leaderName
+        : followerName;
+  const confirmsMurphy =
+    result.correlation == null
+      ? null
+      : result.leader === "first" &&
+        result.lagDays >= expectedLagDays.min &&
+        result.lagDays <= expectedLagDays.max;
   return {
     pair,
     leader,
@@ -965,7 +1189,9 @@ function computeLeadLagRelationship(
   };
 }
 
-export function computeMurphyMarketContext(series: Partial<MurphyMarketSeries>): MurphyMarketContext {
+export function computeMurphyMarketContext(
+  series: Partial<MurphyMarketSeries>,
+): MurphyMarketContext {
   const empty = [] as number[];
   const dxy = computeAssetTrendSnapshot(series.dxy ?? empty);
   const commodities = computeAssetTrendSnapshot(series.commodities ?? empty);
@@ -1007,45 +1233,93 @@ export function computeMurphyMarketContext(series: Partial<MurphyMarketSeries>):
   ];
 
   const leadLag: LeadLagRelationship[] = [
-    computeLeadLagRelationship("DXY vs DBC", "DXY", "DBC", series.dxy ?? empty, series.commodities ?? empty, { min: 30, max: 90 }, 120),
-    computeLeadLagRelationship("DBC vs SPY", "DBC", "SPY", series.commodities ?? empty, series.stocks ?? empty, { min: 60, max: 120 }, 180),
-    computeLeadLagRelationship("TLT vs SPY", "TLT", "SPY", series.bonds ?? empty, series.stocks ?? empty, { min: 30, max: 180 }, 180),
+    computeLeadLagRelationship(
+      "DXY vs DBC",
+      "DXY",
+      "DBC",
+      series.dxy ?? empty,
+      series.commodities ?? empty,
+      { min: 30, max: 90 },
+      120,
+    ),
+    computeLeadLagRelationship(
+      "DBC vs SPY",
+      "DBC",
+      "SPY",
+      series.commodities ?? empty,
+      series.stocks ?? empty,
+      { min: 60, max: 120 },
+      180,
+    ),
+    computeLeadLagRelationship(
+      "TLT vs SPY",
+      "TLT",
+      "SPY",
+      series.bonds ?? empty,
+      series.stocks ?? empty,
+      { min: 30, max: 180 },
+      180,
+    ),
   ];
 
   const dowTheory: DowTheorySnapshot = {
     industrialsTrend: dow.direction,
     transportsTrend: transports.direction,
     confirmed: directionAgreement(dow.direction, transports.direction),
-    divergence: dow.direction != null && transports.direction != null && dow.direction !== transports.direction
-      ? dow.direction === "rising" ? "bearish" : "bullish"
-      : null,
+    divergence:
+      dow.direction != null &&
+      transports.direction != null &&
+      dow.direction !== transports.direction
+        ? dow.direction === "rising"
+          ? "bearish"
+          : "bullish"
+        : null,
   };
 
   const goldSeries = gold;
   const dowSeries = series.dow ?? empty;
   const minLongCycle = Math.min(dowSeries.length, goldSeries.length);
-  const dowGoldSeries = minLongCycle > 0
-    ? dowSeries.slice(-minLongCycle).map((value, index) => {
-        const goldValue = goldSeries[goldSeries.length - minLongCycle + index];
-        return goldValue > 0 ? value / goldValue : 0;
-      }).filter((value) => value > 0)
-    : empty;
+  const dowGoldSeries =
+    minLongCycle > 0
+      ? dowSeries
+          .slice(-minLongCycle)
+          .map((value, index) => {
+            const goldValue = goldSeries[goldSeries.length - minLongCycle + index];
+            return goldValue > 0 ? value / goldValue : 0;
+          })
+          .filter((value) => value > 0)
+      : empty;
   const longCycleDirection = computeTrendDirection(computeChangePct(dowGoldSeries, 252));
   const longCycle: LongCycleSnapshot = {
     ratio: dowGoldSeries.length > 0 ? dowGoldSeries[dowGoldSeries.length - 1] : null,
     change252d: computeChangePct(dowGoldSeries, 252),
     change504d: computeChangePct(dowGoldSeries, 504),
     direction: longCycleDirection,
-    label: longCycleDirection === "rising"
-      ? "Activos financieros dominan"
-      : longCycleDirection === "falling"
-        ? "Activos duros dominan"
-        : "Ciclo largo sin dirección clara",
+    label:
+      longCycleDirection === "rising"
+        ? "Activos financieros dominan"
+        : longCycleDirection === "falling"
+          ? "Activos duros dominan"
+          : "Ciclo largo sin dirección clara",
   };
 
   return {
-    dxy, commodities, bonds, stocks, oil, oilShares, dow, transports,
-    japan, china, emerging, developed, correlations, leadLag, dowTheory, longCycle,
+    dxy,
+    commodities,
+    bonds,
+    stocks,
+    oil,
+    oilShares,
+    dow,
+    transports,
+    japan,
+    china,
+    emerging,
+    developed,
+    correlations,
+    leadLag,
+    dowTheory,
+    longCycle,
   };
 }
 
@@ -1053,7 +1327,8 @@ export function analyzeFedFundsCycle(
   fedFundsRateSeries: number[],
   yieldCurveSpread: number | null,
 ): FedFundsInfo {
-  const currentRate = fedFundsRateSeries.length > 0 ? fedFundsRateSeries[fedFundsRateSeries.length - 1] : null;
+  const currentRate =
+    fedFundsRateSeries.length > 0 ? fedFundsRateSeries[fedFundsRateSeries.length - 1] : null;
 
   // Determine cycle phase from last 12 months of rate changes
   let cyclePhase: FedFundsInfo["cyclePhase"] = "neutral";
@@ -1063,12 +1338,13 @@ export function analyzeFedFundsCycle(
     if (currentRate != null && yearAgo != null) {
       if (currentRate > yearAgo + 0.25) cyclePhase = "tightening";
       else if (currentRate < yearAgo - 0.25) cyclePhase = "cutting";
-      else if (sixMonthsAgo != null && Math.abs(currentRate - sixMonthsAgo) < 0.25) cyclePhase = "pause";
+      else if (sixMonthsAgo != null && Math.abs(currentRate - sixMonthsAgo) < 0.25)
+        cyclePhase = "pause";
     }
   }
 
   // Fed vs spread divergence
-  let fedVsSpread: FedFundsInfo["fedVsSpread"] = {
+  const fedVsSpread: FedFundsInfo["fedVsSpread"] = {
     fedAboveSpread: null,
     divergence: null,
     interpretation: "Sin datos suficientes",
@@ -1079,7 +1355,9 @@ export function analyzeFedFundsCycle(
     fedVsSpread.divergence =
       currentRate > 3 && yieldCurveSpread < 0
         ? "widening"
-        : (currentRate < yieldCurveSpread ? "narrowing" : null);
+        : currentRate < yieldCurveSpread
+          ? "narrowing"
+          : null;
 
     if (fedVsSpread.fedAboveSpread && yieldCurveSpread < 0) {
       fedVsSpread.interpretation =
@@ -1146,7 +1424,8 @@ export function computeCompleteAnalysis(
     xlre: {
       price: xlreData.length > 0 ? xlreData[xlreData.length - 1] : null,
       change21d: computeChangePct(xlreData, 21),
-      percentile: xlreData.length > 50 ? computePercentile(xlreData, xlreData[xlreData.length - 1]) : null,
+      percentile:
+        xlreData.length > 50 ? computePercentile(xlreData, xlreData[xlreData.length - 1]) : null,
     },
     bil: {
       yield: bilData.length > 0 ? bilData[bilData.length - 1] : null,

@@ -9,60 +9,60 @@ export const FACTOR_META: Record<string, { name: string; cat: string; sub: strin
   "DX-Y.NYB": { name: "Dólar Index (DXY)", cat: "Macro", sub: "Currency" },
   "^TNX": { name: "Yield 10Y Tesoro", cat: "Macro", sub: "Rates" },
   "^VIX": { name: "Índice de Volatilidad", cat: "Macro", sub: "Risk" },
-  "TIP": { name: "TIPS (Inflación)", cat: "Macro", sub: "Inflation" },
+  TIP: { name: "TIPS (Inflación)", cat: "Macro", sub: "Inflation" },
   // BONOS
-  "SHY": { name: "Bonos 1-3Y", cat: "Bonds", sub: "Yield" },
-  "IEF": { name: "Bonos 7-10Y", cat: "Bonds", sub: "Yield" },
-  "TLT": { name: "Bonos 20+Y", cat: "Bonds", sub: "Yield" },
-  "HYG": { name: "High Yield Corp.", cat: "Bonds", sub: "Risk" },
-  "LQD": { name: "Corp. Investment Grade", cat: "Bonds", sub: "Risk" },
-  "BNDX": { name: "Bonos Int. Total", cat: "Bonds", sub: "Global" },
+  SHY: { name: "Bonos 1-3Y", cat: "Bonds", sub: "Yield" },
+  IEF: { name: "Bonos 7-10Y", cat: "Bonds", sub: "Yield" },
+  TLT: { name: "Bonos 20+Y", cat: "Bonds", sub: "Yield" },
+  HYG: { name: "High Yield Corp.", cat: "Bonds", sub: "Risk" },
+  LQD: { name: "Corp. Investment Grade", cat: "Bonds", sub: "Risk" },
+  BNDX: { name: "Bonos Int. Total", cat: "Bonds", sub: "Global" },
   // COMMODITIES
-  "USO": { name: "Petróleo WTI", cat: "Commodities", sub: "Energy" },
-  "UNG": { name: "Gas Natural", cat: "Commodities", sub: "Energy" },
-  "GLD": { name: "Oro", cat: "Commodities", sub: "Precious" },
-  "SLV": { name: "Plata", cat: "Commodities", sub: "Precious" },
-  "COPX": { name: "Cobre", cat: "Commodities", sub: "Industrial" },
-  "DBC": { name: "Comm. (CRB)", cat: "Commodities", sub: "Broad" },
-  "DBA": { name: "Agricultura", cat: "Commodities", sub: "Agri" },
-  "LIT": { name: "Litio", cat: "Commodities", sub: "Strategic" },
+  USO: { name: "Petróleo WTI", cat: "Commodities", sub: "Energy" },
+  UNG: { name: "Gas Natural", cat: "Commodities", sub: "Energy" },
+  GLD: { name: "Oro", cat: "Commodities", sub: "Precious" },
+  SLV: { name: "Plata", cat: "Commodities", sub: "Precious" },
+  COPX: { name: "Cobre", cat: "Commodities", sub: "Industrial" },
+  DBC: { name: "Comm. (CRB)", cat: "Commodities", sub: "Broad" },
+  DBA: { name: "Agricultura", cat: "Commodities", sub: "Agri" },
+  LIT: { name: "Litio", cat: "Commodities", sub: "Strategic" },
   // SECTORES EE.UU.
-  "XLK": { name: "Tecnología", cat: "Sectors", sub: "US" },
-  "XLF": { name: "Finanzas", cat: "Sectors", sub: "US" },
-  "XLV": { name: "Salud", cat: "Sectors", sub: "US" },
-  "XLE": { name: "Energía", cat: "Sectors", sub: "US" },
-  "XLC": { name: "Comunicación", cat: "Sectors", sub: "US" },
-  "XLY": { name: "Consumo Discrecional", cat: "Sectors", sub: "US" },
-  "XLP": { name: "Consumo Básico", cat: "Sectors", sub: "US" },
-  "XLI": { name: "Industrial", cat: "Sectors", sub: "US" },
-  "XLB": { name: "Materiales", cat: "Sectors", sub: "US" },
-  "XLRE": { name: "Inmobiliario", cat: "Sectors", sub: "US" },
-  "XLU": { name: "Utilities", cat: "Sectors", sub: "US" },
-  "XAR": { name: "Aero-Defensa", cat: "Sectors", sub: "US" },
+  XLK: { name: "Tecnología", cat: "Sectors", sub: "US" },
+  XLF: { name: "Finanzas", cat: "Sectors", sub: "US" },
+  XLV: { name: "Salud", cat: "Sectors", sub: "US" },
+  XLE: { name: "Energía", cat: "Sectors", sub: "US" },
+  XLC: { name: "Comunicación", cat: "Sectors", sub: "US" },
+  XLY: { name: "Consumo Discrecional", cat: "Sectors", sub: "US" },
+  XLP: { name: "Consumo Básico", cat: "Sectors", sub: "US" },
+  XLI: { name: "Industrial", cat: "Sectors", sub: "US" },
+  XLB: { name: "Materiales", cat: "Sectors", sub: "US" },
+  XLRE: { name: "Inmobiliario", cat: "Sectors", sub: "US" },
+  XLU: { name: "Utilities", cat: "Sectors", sub: "US" },
+  XAR: { name: "Aero-Defensa", cat: "Sectors", sub: "US" },
   // SMART BETA / FACTORES
-  "MTUM": { name: "Momentum", cat: "Factors", sub: "Alpha" },
-  "QUAL": { name: "Calidad", cat: "Factors", sub: "Alpha" },
-  "SIZE": { name: "Small Caps", cat: "Factors", sub: "Style" },
-  "USMV": { name: "Min. Volatilidad", cat: "Factors", sub: "Risk" },
-  "IVE": { name: "Value", cat: "Factors", sub: "Style" },
-  "IVW": { name: "Growth", cat: "Factors", sub: "Style" },
-  "IWM": { name: "Russell 2000", cat: "Factors", sub: "Market" },
+  MTUM: { name: "Momentum", cat: "Factors", sub: "Alpha" },
+  QUAL: { name: "Calidad", cat: "Factors", sub: "Alpha" },
+  SIZE: { name: "Small Caps", cat: "Factors", sub: "Style" },
+  USMV: { name: "Min. Volatilidad", cat: "Factors", sub: "Risk" },
+  IVE: { name: "Value", cat: "Factors", sub: "Style" },
+  IVW: { name: "Growth", cat: "Factors", sub: "Style" },
+  IWM: { name: "Russell 2000", cat: "Factors", sub: "Market" },
   // PAÍSES Y REGIONES
-  "ARGT": { name: "MSCI Argentina", cat: "Countries", sub: "Latam" },
-  "EWZ": { name: "MSCI Brasil", cat: "Countries", sub: "Latam" },
-  "EWW": { name: "MSCI México", cat: "Countries", sub: "Latam" },
-  "ECH": { name: "MSCI Chile", cat: "Countries", sub: "Latam" },
-  "EEM": { name: "Emergentes", cat: "Countries", sub: "Global" },
-  "VWO": { name: "Emerging Vanguard", cat: "Countries", sub: "Global" },
-  "FXI": { name: "China Large Caps", cat: "Countries", sub: "Asia" },
-  "INDA": { name: "MSCI India", cat: "Countries", sub: "Asia" },
-  "EFA": { name: "Desarrollados ex-US", cat: "Countries", sub: "Global" },
-  "EWG": { name: "MSCI Alemania", cat: "Countries", sub: "Europe" },
-  "EWJ": { name: "MSCI Japón", cat: "Countries", sub: "Asia" },
+  ARGT: { name: "MSCI Argentina", cat: "Countries", sub: "Latam" },
+  EWZ: { name: "MSCI Brasil", cat: "Countries", sub: "Latam" },
+  EWW: { name: "MSCI México", cat: "Countries", sub: "Latam" },
+  ECH: { name: "MSCI Chile", cat: "Countries", sub: "Latam" },
+  EEM: { name: "Emergentes", cat: "Countries", sub: "Global" },
+  VWO: { name: "Emerging Vanguard", cat: "Countries", sub: "Global" },
+  FXI: { name: "China Large Caps", cat: "Countries", sub: "Asia" },
+  INDA: { name: "MSCI India", cat: "Countries", sub: "Asia" },
+  EFA: { name: "Desarrollados ex-US", cat: "Countries", sub: "Global" },
+  EWG: { name: "MSCI Alemania", cat: "Countries", sub: "Europe" },
+  EWJ: { name: "MSCI Japón", cat: "Countries", sub: "Asia" },
   // MARKET INDICES
-  "SPY": { name: "S&P 500", cat: "Market", sub: "US" },
-  "QQQ": { name: "NASDAQ 100", cat: "Market", sub: "US" },
-  "DIA": { name: "Dow Jones", cat: "Market", sub: "US" },
+  SPY: { name: "S&P 500", cat: "Market", sub: "US" },
+  QQQ: { name: "NASDAQ 100", cat: "Market", sub: "US" },
+  DIA: { name: "Dow Jones", cat: "Market", sub: "US" },
 };
 
 // All tickers (optimized set: remove currency pairs, keep everything else)
@@ -133,11 +133,46 @@ export interface BenchMultiBeta {
 }
 
 const CUELLOS_BOTELLA: CuelloBotellaSector[] = [
-  { sectorKey: "Utilities", label: "Servicios Públicos", justificacion: "Redes eléctricas, transmisión y distribución regulada con demanda inelástica. Inversión en infraestructura de redes inteligentes.", tienePricingPower: true, esEstructural: true },
-  { sectorKey: "Energy", label: "Energía", justificacion: "Ingeniería nuclear, generación eléctrica de base. Ciclo de rearme nuclear global. Oferta limitada por regulación ambiental.", tienePricingPower: true, esEstructural: true },
-  { sectorKey: "Industrials", label: "Industriales", justificacion: "Fabricación de transformadores, turbinas, equipos de transmisión. Cuello de botella global por reshoring y electrificación.", tienePricingPower: false, esEstructural: true },
-  { sectorKey: "Basic Materials", label: "Materiales", justificacion: "Minería de cobre, litio, tierras raras. Demanda estructural por electrificación y energías limpias.", tienePricingPower: true, esEstructural: true },
-  { sectorKey: "Technology", label: "Tecnología", justificacion: "Semiconductores (SMH), infraestructura de data centers, chips de IA. Cuello de botella en capacidad de fabricación 3nm/5nm.", tienePricingPower: true, esEstructural: true },
+  {
+    sectorKey: "Utilities",
+    label: "Servicios Públicos",
+    justificacion:
+      "Redes eléctricas, transmisión y distribución regulada con demanda inelástica. Inversión en infraestructura de redes inteligentes.",
+    tienePricingPower: true,
+    esEstructural: true,
+  },
+  {
+    sectorKey: "Energy",
+    label: "Energía",
+    justificacion:
+      "Ingeniería nuclear, generación eléctrica de base. Ciclo de rearme nuclear global. Oferta limitada por regulación ambiental.",
+    tienePricingPower: true,
+    esEstructural: true,
+  },
+  {
+    sectorKey: "Industrials",
+    label: "Industriales",
+    justificacion:
+      "Fabricación de transformadores, turbinas, equipos de transmisión. Cuello de botella global por reshoring y electrificación.",
+    tienePricingPower: false,
+    esEstructural: true,
+  },
+  {
+    sectorKey: "Basic Materials",
+    label: "Materiales",
+    justificacion:
+      "Minería de cobre, litio, tierras raras. Demanda estructural por electrificación y energías limpias.",
+    tienePricingPower: true,
+    esEstructural: true,
+  },
+  {
+    sectorKey: "Technology",
+    label: "Tecnología",
+    justificacion:
+      "Semiconductores (SMH), infraestructura de data centers, chips de IA. Cuello de botella en capacidad de fabricación 3nm/5nm.",
+    tienePricingPower: true,
+    esEstructural: true,
+  },
 ];
 
 export interface BenchmarksMatrixResult {
@@ -157,7 +192,14 @@ function computeCRBBondsTrend(closesMap: Map<string, number[]>): MacroFilterResu
   const dbc = closesMap.get("DBC");
   const tlt = closesMap.get("TLT");
   if (!dbc || !tlt || dbc.length < 30 || tlt.length < 30) {
-    return { crbBondsRatio: null, crbBondsTrend: null, crbBondsChange1m: null, regimeLabel: "Sin datos", sectoresFavorecidos: [], sectoresDesfavorecidos: [] };
+    return {
+      crbBondsRatio: null,
+      crbBondsTrend: null,
+      crbBondsChange1m: null,
+      regimeLabel: "Sin datos",
+      sectoresFavorecidos: [],
+      sectoresDesfavorecidos: [],
+    };
   }
   const minLen = Math.min(dbc.length, tlt.length);
   const ratios: number[] = [];
@@ -170,7 +212,8 @@ function computeCRBBondsTrend(closesMap: Map<string, number[]>): MacroFilterResu
   const prevRatio3m = ratios[idx12w];
   const change3m = prevRatio3m > 0 ? (lastRatio - prevRatio3m) / prevRatio3m : 0;
 
-  const trend: CRBBondsTrend = change3m > 0.03 ? "rising" : change3m < -0.03 ? "falling" : "neutral";
+  const trend: CRBBondsTrend =
+    change3m > 0.03 ? "rising" : change3m < -0.03 ? "falling" : "neutral";
 
   let regimeLabel: string;
   let sectoresFavorecidos: string[];
@@ -205,8 +248,16 @@ async function getYF(): Promise<any> {
   if (_yf) return _yf;
   const mod: any = await import("yahoo-finance2");
   const YF = mod.default ?? mod;
-  try { _yf = typeof YF === "function" ? new YF() : YF; } catch { _yf = YF; }
-  try { _yf.suppressNotices?.(["yahooSurvey", "ripHistorical"]); } catch { /* noop */ }
+  try {
+    _yf = typeof YF === "function" ? new YF() : YF;
+  } catch {
+    _yf = YF;
+  }
+  try {
+    _yf.suppressNotices?.(["yahooSurvey", "ripHistorical"]);
+  } catch {
+    /* noop */
+  }
   return _yf;
 }
 
@@ -232,7 +283,9 @@ async function fetchWeeklyClosesBatch(tickers: string[]): Promise<Map<string, nu
         map.set(r.value.ticker, r.value.closes);
       }
     }
-  } catch { /* partial data is ok */ }
+  } catch {
+    /* partial data is ok */
+  }
   return map;
 }
 
@@ -249,11 +302,20 @@ function weeklyReturns(closes: number[]): number[] {
 export function computeBeta(x: number[], y: number[]): { beta: number; alpha: number; r2: number } {
   const n = Math.min(x.length, y.length);
   if (n < 10) return { beta: 0, alpha: 0, r2: 0 };
-  const xs = x.slice(-n), ys = y.slice(-n);
+  const xs = x.slice(-n),
+    ys = y.slice(-n);
   const mx = xs.reduce((a, b) => a + b, 0) / n;
   const my = ys.reduce((a, b) => a + b, 0) / n;
-  let cov = 0, vx = 0, vy = 0;
-  for (let i = 0; i < n; i++) { const dx = xs[i] - mx, dy = ys[i] - my; cov += dx * dy; vx += dx * dx; vy += dy * dy; }
+  let cov = 0,
+    vx = 0,
+    vy = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = xs[i] - mx,
+      dy = ys[i] - my;
+    cov += dx * dy;
+    vx += dx * dx;
+    vy += dy * dy;
+  }
   const beta = vy > 0 ? cov / vy : 0;
   const alpha = mx - beta * my;
   const r = computePearsonCorrelation(xs, ys) ?? 0;
@@ -268,99 +330,116 @@ function perfilLabel(beta: number): string {
 
 // ─── Main function ───────────────────────────────────────────────────────────
 
-export const getBenchmarksMatrix = createServerFn({ method: "GET" }).handler(async (): Promise<BenchmarksMatrixResult> => {
-  const closesMap = await fetchWeeklyClosesBatch(ALL_TICKERS);
-  const etfs = [...closesMap.keys()];
-  const returnsMap = new Map<string, number[]>();
-  for (const etf of etfs) returnsMap.set(etf, weeklyReturns(closesMap.get(etf)!));
+export const getBenchmarksMatrix = createServerFn({ method: "GET" }).handler(
+  async (): Promise<BenchmarksMatrixResult> => {
+    const closesMap = await fetchWeeklyClosesBatch(ALL_TICKERS);
+    const etfs = [...closesMap.keys()];
+    const returnsMap = new Map<string, number[]>();
+    for (const etf of etfs) returnsMap.set(etf, weeklyReturns(closesMap.get(etf)!));
 
-  // ── Matriz de correlación entre todos los pares ──
-  const matrix: BenchMatrixRow[] = [];
-  for (let i = 0; i < etfs.length; i++) {
-    for (let j = i + 1; j < etfs.length; j++) {
-      const corr = computePearsonCorrelation(returnsMap.get(etfs[i])!, returnsMap.get(etfs[j])!) ?? 0;
-      matrix.push({
-        etfA: etfs[i], etfB: etfs[j],
-        sectorA: ETF_SECTOR_MAP[etfs[i]] ?? etfs[i],
-        sectorB: ETF_SECTOR_MAP[etfs[j]] ?? etfs[j],
-        correlation: Math.round(corr * 10000) / 10000,
-      });
-    }
-  }
-  const sorted = [...matrix].sort((a, b) => a.correlation - b.correlation);
-  const mejoresParaDiversificar = sorted.slice(0, 3);
-  const masRedundantes = sorted.slice(-3).reverse();
-
-  // ── Betas: para CADA activo, encontrar el mejor benchmark (mayor R²) ──
-  const spyRet = returnsMap.get("SPY") ?? [];
-  const allBenchmarkRetMap = new Map(returnsMap); // all tickers as potential benchmarks
-
-  const betas: BenchBetaRow[] = etfs
-    .filter((e) => e !== "SPY")
-    .map((e) => {
-      const retE = returnsMap.get(e)!;
-
-      // Beta vs SPY (estandarizada)
-      const { beta: bSpy, alpha, r2: r2Spy } = spyRet.length >= 10 ? computeBeta(retE, spyRet) : { beta: 0, alpha: 0, r2: 0 };
-
-      // Buscar el mejor benchmark de TODA la lista (excluyéndose a sí mismo)
-      let bestBenchmark = "SPY";
-      let bestBeta = bSpy;
-      let bestR2 = r2Spy;
-      for (const [bm, retBm] of allBenchmarkRetMap) {
-        if (bm === e || retBm.length < 20) continue;
-        const { beta: bBeta, r2: bR2 } = computeBeta(retE, retBm);
-        if (bR2 > bestR2) {
-          bestR2 = bR2;
-          bestBeta = bBeta;
-          bestBenchmark = bm;
-        }
+    // ── Matriz de correlación entre todos los pares ──
+    const matrix: BenchMatrixRow[] = [];
+    for (let i = 0; i < etfs.length; i++) {
+      for (let j = i + 1; j < etfs.length; j++) {
+        const corr =
+          computePearsonCorrelation(returnsMap.get(etfs[i])!, returnsMap.get(etfs[j])!) ?? 0;
+        matrix.push({
+          etfA: etfs[i],
+          etfB: etfs[j],
+          sectorA: ETF_SECTOR_MAP[etfs[i]] ?? etfs[i],
+          sectorB: ETF_SECTOR_MAP[etfs[j]] ?? etfs[j],
+          correlation: Math.round(corr * 10000) / 10000,
+        });
       }
+    }
+    const sorted = [...matrix].sort((a, b) => a.correlation - b.correlation);
+    const mejoresParaDiversificar = sorted.slice(0, 3);
+    const masRedundantes = sorted.slice(-3).reverse();
 
-      const meta = FACTOR_META[bestBenchmark];
-      const bestBenchmarkName = meta ? `${meta.name} (${meta.cat})` : bestBenchmark;
+    // ── Betas: para CADA activo, encontrar el mejor benchmark (mayor R²) ──
+    const spyRet = returnsMap.get("SPY") ?? [];
+    const allBenchmarkRetMap = new Map(returnsMap); // all tickers as potential benchmarks
 
-      return {
-        etf: e,
-        sector: ETF_SECTOR_MAP[e] ?? e,
-        betaVsSPY: Math.round(bSpy * 10000) / 10000,
-        alpha: Math.round(alpha * 100000) / 100000,
-        r2: Math.round(r2Spy * 10000) / 10000,
-        perfil: bSpy < 0.8 ? "Defensivo" : bSpy > 1.2 ? "Agresivo/Cíclico" : "Neutral",
-        bestBenchmark,
-        bestBenchmarkName,
-        bestBeta: Math.round(bestBeta * 10000) / 10000,
-        bestR2: Math.round(bestR2 * 10000) / 10000,
-        bestPerfil: perfilLabel(bestBeta),
-      };
-    });
-
-  // ── Multi-benchmark (QQQ, DIA, IWM) para compatibilidad descendente ──
-  const multiBenchmarks = ["QQQ", "DIA", "IWM"];
-  const multiBetas: BenchMultiBeta[] = [];
-  for (const bm of multiBenchmarks) {
-    const bmRet = returnsMap.get(bm);
-    if (!bmRet || bmRet.length < 20) continue;
-    const entries = etfs
-      .filter((e) => e !== bm && e !== "SPY")
+    const betas: BenchBetaRow[] = etfs
+      .filter((e) => e !== "SPY")
       .map((e) => {
-        const { beta, alpha, r2 } = computeBeta(returnsMap.get(e)!, bmRet);
+        const retE = returnsMap.get(e)!;
+
+        // Beta vs SPY (estandarizada)
+        const {
+          beta: bSpy,
+          alpha,
+          r2: r2Spy,
+        } = spyRet.length >= 10 ? computeBeta(retE, spyRet) : { beta: 0, alpha: 0, r2: 0 };
+
+        // Buscar el mejor benchmark de TODA la lista (excluyéndose a sí mismo)
+        let bestBenchmark = "SPY";
+        let bestBeta = bSpy;
+        let bestR2 = r2Spy;
+        for (const [bm, retBm] of allBenchmarkRetMap) {
+          if (bm === e || retBm.length < 20) continue;
+          const { beta: bBeta, r2: bR2 } = computeBeta(retE, retBm);
+          if (bR2 > bestR2) {
+            bestR2 = bR2;
+            bestBeta = bBeta;
+            bestBenchmark = bm;
+          }
+        }
+
+        const meta = FACTOR_META[bestBenchmark];
+        const bestBenchmarkName = meta ? `${meta.name} (${meta.cat})` : bestBenchmark;
+
         return {
           etf: e,
-          beta: Math.round(beta * 10000) / 10000,
+          sector: ETF_SECTOR_MAP[e] ?? e,
+          betaVsSPY: Math.round(bSpy * 10000) / 10000,
           alpha: Math.round(alpha * 100000) / 100000,
-          r2: Math.round(r2 * 10000) / 10000,
-          perfil: perfilLabel(beta),
+          r2: Math.round(r2Spy * 10000) / 10000,
+          perfil: bSpy < 0.8 ? "Defensivo" : bSpy > 1.2 ? "Agresivo/Cíclico" : "Neutral",
+          bestBenchmark,
+          bestBenchmarkName,
+          bestBeta: Math.round(bestBeta * 10000) / 10000,
+          bestR2: Math.round(bestR2 * 10000) / 10000,
+          bestPerfil: perfilLabel(bestBeta),
         };
       });
-    multiBetas.push({ benchmark: bm, benchmarkName: FACTOR_META[bm]?.name ?? bm, entries });
-  }
 
-  const returns: Record<string, number[]> = {};
-  for (const [etf, rets] of returnsMap) returns[etf] = rets;
+    // ── Multi-benchmark (QQQ, DIA, IWM) para compatibilidad descendente ──
+    const multiBenchmarks = ["QQQ", "DIA", "IWM"];
+    const multiBetas: BenchMultiBeta[] = [];
+    for (const bm of multiBenchmarks) {
+      const bmRet = returnsMap.get(bm);
+      if (!bmRet || bmRet.length < 20) continue;
+      const entries = etfs
+        .filter((e) => e !== bm && e !== "SPY")
+        .map((e) => {
+          const { beta, alpha, r2 } = computeBeta(returnsMap.get(e)!, bmRet);
+          return {
+            etf: e,
+            beta: Math.round(beta * 10000) / 10000,
+            alpha: Math.round(alpha * 100000) / 100000,
+            r2: Math.round(r2 * 10000) / 10000,
+            perfil: perfilLabel(beta),
+          };
+        });
+      multiBetas.push({ benchmark: bm, benchmarkName: FACTOR_META[bm]?.name ?? bm, entries });
+    }
 
-  const macroFilter = computeCRBBondsTrend(closesMap);
-  const cuellosBotella = CUELLOS_BOTELLA;
+    const returns: Record<string, number[]> = {};
+    for (const [etf, rets] of returnsMap) returns[etf] = rets;
 
-  return { matrix, betas, mejoresParaDiversificar, masRedundantes, multiBetas, returns, macroFilter, cuellosBotella };
-});
+    const macroFilter = computeCRBBondsTrend(closesMap);
+    const cuellosBotella = CUELLOS_BOTELLA;
+
+    return {
+      matrix,
+      betas,
+      mejoresParaDiversificar,
+      masRedundantes,
+      multiBetas,
+      returns,
+      macroFilter,
+      cuellosBotella,
+    };
+  },
+);

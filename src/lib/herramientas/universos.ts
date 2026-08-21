@@ -24,10 +24,10 @@ function ensureFlat(): TickerInfo[] {
   const result: TickerInfo[] = [];
   const unificado = unificadoData as any;
   const sectores = unificado.sectores ?? unificado;
-  
+
   for (const [sector, sectorData] of Object.entries(sectores)) {
     if (sector === "No disponible" || sector === "Sin Clasificar") continue;
-    const industrias = (sectorData as any).industrias ?? sectorData as Record<string, any[]>;
+    const industrias = (sectorData as any).industrias ?? (sectorData as Record<string, any[]>);
     for (const [industria, tickers] of Object.entries(industrias)) {
       for (const t of tickers as any[]) {
         result.push({
@@ -81,10 +81,32 @@ export function getTickerInfo(ticker: string): TickerInfo | undefined {
 
 // Universo combinado para Oportunidades (acciones US líquidas + .BA argentinas)
 export const UNIVERSO_TECNICO = [
-  "AAPL", "MSFT", "NVDA", "TSLA", "AMZN", "GOOGL", "META", "AMD", "SPY", "QQQ",
-  "GGAL.BA", "YPFD.BA", "PAMP.BA", "BMA.BA", "TXAR.BA", "ALUA.BA", "CRES.BA",
-  "SUPV.BA", "COME.BA", "TGSU2.BA", "BBAR.BA", "CEPU.BA", "LOMA.BA", "MIRG.BA",
-  "TECO2.BA", "VALO.BA",
+  "AAPL",
+  "MSFT",
+  "NVDA",
+  "TSLA",
+  "AMZN",
+  "GOOGL",
+  "META",
+  "AMD",
+  "SPY",
+  "QQQ",
+  "GGAL.BA",
+  "YPFD.BA",
+  "PAMP.BA",
+  "BMA.BA",
+  "TXAR.BA",
+  "ALUA.BA",
+  "CRES.BA",
+  "SUPV.BA",
+  "COME.BA",
+  "TGSU2.BA",
+  "BBAR.BA",
+  "CEPU.BA",
+  "LOMA.BA",
+  "MIRG.BA",
+  "TECO2.BA",
+  "VALO.BA",
 ];
 
 // Universo valuación (mismo array)
@@ -92,5 +114,14 @@ export const UNIVERSO_VALUACION = UNIVERSO_TECNICO;
 
 // Bonos largos IOL
 export const UNIVERSO_BONOS_IOL = [
-  "AL30", "AL30D", "AL35", "AL35D", "GD30", "GD30D", "GD35", "GD35D", "AE38", "AE38D",
+  "AL30",
+  "AL30D",
+  "AL35",
+  "AL35D",
+  "GD30",
+  "GD30D",
+  "GD35",
+  "GD35D",
+  "AE38",
+  "AE38D",
 ];

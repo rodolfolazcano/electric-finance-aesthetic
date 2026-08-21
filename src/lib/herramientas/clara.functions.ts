@@ -135,7 +135,10 @@ export const semaforoTickerFn = createServerFn({ method: "POST" })
 export const noticiasTickerFn = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z
-      .object({ ticker: z.string().min(1).max(60), cantidad: z.number().int().min(1).max(20).optional().default(8) })
+      .object({
+        ticker: z.string().min(1).max(60),
+        cantidad: z.number().int().min(1).max(20).optional().default(8),
+      })
       .parse(input),
   )
   .handler(async ({ data }) => {

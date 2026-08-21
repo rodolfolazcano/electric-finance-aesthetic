@@ -1,13 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  Activity,
-  ArrowDownRight,
-  ArrowUpRight,
-  Compass,
-  Globe2,
-  RefreshCw,
-} from "lucide-react";
+import { Activity, ArrowDownRight, ArrowUpRight, Compass, Globe2, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -69,7 +62,10 @@ function MacroCard() {
         </Badge>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm md:grid-cols-3">
-        <Dato etiqueta="Riesgo país" valor={d.riesgo_pais != null ? `${d.riesgo_pais.toFixed(0)} bps` : "s/d"} />
+        <Dato
+          etiqueta="Riesgo país"
+          valor={d.riesgo_pais != null ? `${d.riesgo_pais.toFixed(0)} bps` : "s/d"}
+        />
         <Dato
           etiqueta="Inflación mensual"
           valor={d.inflacion_mensual != null ? `${d.inflacion_mensual.toFixed(1)}%` : "s/d"}
@@ -80,7 +76,9 @@ function MacroCard() {
         />
         <Dato
           etiqueta="Tasa real Fisher (anual)"
-          valor={d.tasa_real_anual_fisher != null ? `${d.tasa_real_anual_fisher.toFixed(1)}%` : "s/d"}
+          valor={
+            d.tasa_real_anual_fisher != null ? `${d.tasa_real_anual_fisher.toFixed(1)}%` : "s/d"
+          }
         />
         <Dato etiqueta="Dólar oficial" valor={dolar(d.dolar_oficial)} />
         <Dato etiqueta="Dólar blue" valor={dolar(d.dolar_blue)} />
@@ -88,7 +86,9 @@ function MacroCard() {
         <Dato etiqueta="Dólar CCL" valor={dolar(d.dolar_ccl)} />
         <Dato
           etiqueta="Tasa libre de riesgo local"
-          valor={d.tasa_libre_riesgo_local != null ? `${d.tasa_libre_riesgo_local.toFixed(2)}%` : "s/d"}
+          valor={
+            d.tasa_libre_riesgo_local != null ? `${d.tasa_libre_riesgo_local.toFixed(2)}%` : "s/d"
+          }
         />
       </CardContent>
       {d.senal_regimen.length > 0 && (
@@ -239,7 +239,11 @@ function PerformanceSectorial() {
                   positivo ? "text-emerald-400" : "text-red-400",
                 )}
               >
-                {positivo ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                {positivo ? (
+                  <ArrowUpRight className="h-3 w-3" />
+                ) : (
+                  <ArrowDownRight className="h-3 w-3" />
+                )}
                 {fmtPct(it.changePercent)}
               </div>
             </div>
@@ -256,8 +260,8 @@ export function ContextoTab() {
       <div>
         <h2 className="text-lg font-semibold">Contexto de mercado</h2>
         <p className="text-sm text-muted-foreground">
-          Régimen macro argentino, ciclo económico intermarket y rotación sectorial con datos en vivo
-          (BCRA, ArgentinaDatos, CriptoYa y Yahoo Finance).
+          Régimen macro argentino, ciclo económico intermarket y rotación sectorial con datos en
+          vivo (BCRA, ArgentinaDatos, CriptoYa y Yahoo Finance).
         </p>
       </div>
       <MacroCard />

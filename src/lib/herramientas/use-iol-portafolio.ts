@@ -35,7 +35,9 @@ export function useIOLPortafolio() {
     setLoading(true);
     setError(null);
     try {
-      const res = await clientesFn({ data: { token: accessToken, refreshToken: refreshToken ?? null } });
+      const res = await clientesFn({
+        data: { token: accessToken, refreshToken: refreshToken ?? null },
+      });
       if (res.newToken) updateTokens(res.newToken, res.newRefreshToken ?? "");
       setClientes(res.data ?? []);
       setEsAsesor((res.data ?? []).length > 0);
@@ -52,25 +54,33 @@ export function useIOLPortafolio() {
    * Carga los activos del portafolio (cuenta propia o de un cliente asesorado).
    * Devuelve el array crudo de activos para que cada tab lo procese a su manera.
    */
-  const loadPortfolio = useCallback(async (cliente?: number): Promise<any[]> => {
-    if (!accessToken) return [];
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await portafolioFn({
-        data: { token: accessToken, refreshToken: refreshToken ?? null, pais: "argentina", clienteId: cliente || undefined },
-      });
-      if (res.newToken) updateTokens(res.newToken, res.newRefreshToken ?? "");
-      const raw: any = res.data;
-      const activos: any[] = Array.isArray(raw) ? raw : (raw?.activos ?? []);
-      return activos;
-    } catch (e: any) {
-      setError(e?.message || "Error al cargar portafolio IOL");
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, [accessToken, refreshToken, updateTokens, portafolioFn]);
+  const loadPortfolio = useCallback(
+    async (cliente?: number): Promise<any[]> => {
+      if (!accessToken) return [];
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await portafolioFn({
+          data: {
+            token: accessToken,
+            refreshToken: refreshToken ?? null,
+            pais: "argentina",
+            clienteId: cliente || undefined,
+          },
+        });
+        if (res.newToken) updateTokens(res.newToken, res.newRefreshToken ?? "");
+        const raw: any = res.data;
+        const activos: any[] = Array.isArray(raw) ? raw : (raw?.activos ?? []);
+        return activos;
+      } catch (e: any) {
+        setError(e?.message || "Error al cargar portafolio IOL");
+        return [];
+      } finally {
+        setLoading(false);
+      }
+    },
+    [accessToken, refreshToken, updateTokens, portafolioFn],
+  );
 
   return {
     accessToken,
@@ -87,4 +97,3 @@ export function useIOLPortafolio() {
     loadPortfolio,
   };
 }
-

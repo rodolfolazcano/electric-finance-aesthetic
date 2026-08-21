@@ -29,13 +29,48 @@ export interface InfoActivo {
 }
 
 const BONOS_ARG = new Set([
-  "AL29","AL29D","AL29C","AL30","AL30D","AL30C",
-  "AL35","AL35D","AL35C","AL41","AL41D","AL41C",
-  "GD29","GD30","GD35","GD38","GD41","GD46",
-  "AE38","AE38D","AE38C","DICP","DIP0","PR13",
-  "PR15","PR26","TDJ24","TO23","TO26","TV24","TV26",
-  "PARA","PARP","PAYI","PRAM","PRYP",
-  "BPA7D","BPA8D","BPB7D","BPB8D","BPC7D","BPD7D",
+  "AL29",
+  "AL29D",
+  "AL29C",
+  "AL30",
+  "AL30D",
+  "AL30C",
+  "AL35",
+  "AL35D",
+  "AL35C",
+  "AL41",
+  "AL41D",
+  "AL41C",
+  "GD29",
+  "GD30",
+  "GD35",
+  "GD38",
+  "GD41",
+  "GD46",
+  "AE38",
+  "AE38D",
+  "AE38C",
+  "DICP",
+  "DIP0",
+  "PR13",
+  "PR15",
+  "PR26",
+  "TDJ24",
+  "TO23",
+  "TO26",
+  "TV24",
+  "TV26",
+  "PARA",
+  "PARP",
+  "PAYI",
+  "PRAM",
+  "PRYP",
+  "BPA7D",
+  "BPA8D",
+  "BPB7D",
+  "BPB8D",
+  "BPC7D",
+  "BPD7D",
 ]);
 
 const ONS_SUFIJO_O = /O$/;
@@ -62,7 +97,12 @@ function heuristicoTipo(ticker: string, quoteType: string | null): TipoActivo {
     // O-species de ONs suelen terminar en O, pero el quoteType las marca como "BOND"
     if (quoteType === "BOND") return "ON";
     // Si termina en O pero tiene más de 4 chars y no es un bono conocido, probablemente ON
-    if (upper.length >= 4 && upper.endsWith("O") && !upper.endsWith("ADO") && !upper.endsWith("BCO"))
+    if (
+      upper.length >= 4 &&
+      upper.endsWith("O") &&
+      !upper.endsWith("ADO") &&
+      !upper.endsWith("BCO")
+    )
       return "ON";
   }
 

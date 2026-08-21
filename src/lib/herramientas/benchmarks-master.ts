@@ -139,8 +139,11 @@ export const BENCHMARKS_MASTER = [...byTicker.values()];
 
 export const AUTO_BENCHMARKS = BENCHMARKS_MASTER.map((e) => e.ticker);
 export const FACTORS_MASTER_LIST: Record<string, { name: string; cat: string; sub: string }> = {};
-for (const e of BENCHMARKS_MASTER) FACTORS_MASTER_LIST[e.ticker] = { name: e.name, cat: e.cat, sub: e.sub };
-export const BENCHMARKS_CLASIFICACION: { ticker: string; name: string }[] = BENCHMARKS_MASTER.map((e) => ({
-  ticker: e.ticker,
-  name: e.name,
-}));
+for (const e of BENCHMARKS_MASTER)
+  FACTORS_MASTER_LIST[e.ticker] = { name: e.name, cat: e.cat, sub: e.sub };
+export const BENCHMARKS_CLASIFICACION: { ticker: string; name: string }[] = BENCHMARKS_MASTER.map(
+  (e) => ({
+    ticker: e.ticker,
+    name: e.name,
+  }),
+);

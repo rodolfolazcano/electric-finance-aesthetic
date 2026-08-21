@@ -31,21 +31,24 @@ async function supabaseGet<T>(key: string): Promise<{ payload: T; ttlSeconds: nu
   }
 }
 
-async function supabaseSet<T>(key: string, fuente: FuenteAPI, ttlSeconds: number, payload: T): Promise<void> {
+async function supabaseSet<T>(
+  key: string,
+  fuente: FuenteAPI,
+  ttlSeconds: number,
+  payload: T,
+): Promise<void> {
   if (!supabase || typeof supabase.from !== "function") return;
   try {
-    const { error } = await supabase
-      .from("api_cache")
-      .upsert(
-        {
-          cache_key: key,
-          fuente,
-          payload,
-          fetched_at: new Date().toISOString(),
-          ttl_seconds: ttlSeconds,
-        },
-        { onConflict: "cache_key" },
-      );
+    const { error } = await supabase.from("api_cache").upsert(
+      {
+        cache_key: key,
+        fuente,
+        payload,
+        fetched_at: new Date().toISOString(),
+        ttl_seconds: ttlSeconds,
+      },
+      { onConflict: "cache_key" },
+    );
     if (error) console.error(`[api-cache] upsert error for ${key}:`, error.message);
   } catch (e) {
     console.error(`[api-cache] upsert error for ${key}:`, (e as Error)?.message ?? e);

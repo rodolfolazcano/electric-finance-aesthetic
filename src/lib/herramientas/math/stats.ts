@@ -64,8 +64,8 @@ export function normalCDFInverse(p: number): number {
   const y = p - 0.5;
   if (Math.abs(y) < 0.42) {
     const r = y * y;
-    let num = y * (((a[3] * r + a[2]) * r + a[1]) * r + a[0]);
-    let den = (((b[3] * r + b[2]) * r + b[1]) * r + b[0]) * r + 1;
+    const num = y * (((a[3] * r + a[2]) * r + a[1]) * r + a[0]);
+    const den = (((b[3] * r + b[2]) * r + b[1]) * r + b[0]) * r + 1;
     return num / den;
   }
   const r = p < 0.5 ? p : 1 - p;
@@ -335,7 +335,11 @@ export function fractionalBrownianMotion(n: number, H: number): number[] {
   for (let i = 0; i < N; i++) {
     cov[i] = [];
     for (let j = 0; j < N; j++) {
-      cov[i][j] = 0.5 * (Math.pow(Math.abs(i), 2 * H) + Math.pow(Math.abs(j), 2 * H) - Math.pow(Math.abs(i - j), 2 * H));
+      cov[i][j] =
+        0.5 *
+        (Math.pow(Math.abs(i), 2 * H) +
+          Math.pow(Math.abs(j), 2 * H) -
+          Math.pow(Math.abs(i - j), 2 * H));
     }
   }
   // Cholesky decomposition

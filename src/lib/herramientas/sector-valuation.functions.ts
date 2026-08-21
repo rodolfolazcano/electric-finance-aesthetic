@@ -56,8 +56,12 @@ function capWeightedPE(data: { pe: number | null; mcap: number }[]): number | nu
   valid.sort((a, b) => a.pe! - b.pe!);
   const trim = valid.slice(0, Math.floor(valid.length * 0.99));
   if (trim.length < 2) return null;
-  let num = 0, den = 0;
-  for (const d of trim) { num += d.pe! * d.mcap; den += d.mcap; }
+  let num = 0,
+    den = 0;
+  for (const d of trim) {
+    num += d.pe! * d.mcap;
+    den += d.mcap;
+  }
   return den > 0 ? num / den : null;
 }
 
@@ -65,7 +69,10 @@ function pctRank(arr: number[], value: number): number {
   if (arr.length === 0) return 50;
   const s = [...arr].filter(Number.isFinite).sort((a, b) => a - b);
   let below = 0;
-  for (const v of s) { if (v <= value) below++; else break; }
+  for (const v of s) {
+    if (v <= value) below++;
+    else break;
+  }
   return (below / s.length) * 100;
 }
 
@@ -77,24 +84,35 @@ function wMedian(values: number[], weights: number[]): number | null {
   if (pairs.length === 0) return null;
   const total = pairs.reduce((s, p) => s + p.w, 0);
   let cum = 0;
-  for (const p of pairs) { cum += p.w; if (cum >= total / 2) return p.v; }
+  for (const p of pairs) {
+    cum += p.w;
+    if (cum >= total / 2) return p.v;
+  }
   return pairs[pairs.length - 1].v;
 }
 
-function buildTTM(s: { endDate: { raw: number } | null; dilutedEPS: { raw: number } | null }[]): { date: number; eps: number }[] {
+function buildTTM(
+  s: { endDate: { raw: number } | null; dilutedEPS: { raw: number } | null }[],
+): { date: number; eps: number }[] {
   const v = s
     .map((x) => ({ date: x.endDate?.raw ?? 0, eps: x.dilutedEPS?.raw ?? 0 }))
     .filter((x) => x.date > 0 && x.eps > 0 && Number.isFinite(x.eps))
     .sort((a, b) => a.date - b.date);
   if (v.length < 4) return [];
   const out: { date: number; eps: number }[] = [];
-  for (let i = 3; i < v.length; i++) out.push({ date: v[i].date, eps: v[i].eps + v[i - 1].eps + v[i - 2].eps + v[i - 3].eps });
+  for (let i = 3; i < v.length; i++)
+    out.push({ date: v[i].date, eps: v[i].eps + v[i - 1].eps + v[i - 2].eps + v[i - 3].eps });
   return out;
 }
 
-function alignPER(ts: number[], close: number[], ttm: { date: number; eps: number }[]): { dates: number[]; per: number[] } {
+function alignPER(
+  ts: number[],
+  close: number[],
+  ttm: { date: number; eps: number }[],
+): { dates: number[]; per: number[] } {
   if (!ttm.length || !ts.length) return { dates: [], per: [] };
-  const dates: number[] = []; const per: number[] = [];
+  const dates: number[] = [];
+  const per: number[] = [];
   let ti = 0;
   for (let i = 0; i < ts.length; i++) {
     const p = close[i];
@@ -102,7 +120,10 @@ function alignPER(ts: number[], close: number[], ttm: { date: number; eps: numbe
     while (ti < ttm.length - 1 && ttm[ti + 1].date <= ts[i]) ti++;
     if (ti >= ttm.length || ttm[ti].date > ts[i] || ttm[ti].eps <= 0) continue;
     const r = p / ttm[ti].eps;
-    if (Number.isFinite(r) && r > 0 && r < PE_CAP) { dates.push(ts[i]); per.push(r); }
+    if (Number.isFinite(r) && r > 0 && r < PE_CAP) {
+      dates.push(ts[i]);
+      per.push(r);
+    }
   }
   return { dates, per };
 }
@@ -112,34 +133,72 @@ function alignPER(ts: number[], close: number[], ttm: { date: number; eps: numbe
 function getTickers(sector: string): { ticker: string; nombre: string }[] {
   const data = DICT[sector];
   if (!data) return [];
-  const seen = new Set<string>(), out: { ticker: string; nombre: string }[] = [];
-  for (const ind of Object.keys(data)) for (const t of data[ind]) if (!seen.has(t.ticker)) { seen.add(t.ticker); out.push(t); }
+  const seen = new Set<string>(),
+    out: { ticker: string; nombre: string }[] = [];
+  for (const ind of Object.keys(data))
+    for (const t of data[ind])
+      if (!seen.has(t.ticker)) {
+        seen.add(t.ticker);
+        out.push(t);
+      }
   return out;
 }
 
 function sectorNames(): string[] {
-  return Object.keys(DICT).filter((s) => s !== "No disponible").sort();
+  return Object.keys(DICT)
+    .filter((s) => s !== "No disponible")
+    .sort();
 }
 
 // ─── Snapshot: fetch ticker fundamentals ───────────────────────────
 
-async function snapOne(ticker: string): Promise<{ marketCap: number; forwardPE: number | null; trailingPE: number | null } | null> {
+async function snapOne(
+  ticker: string,
+): Promise<{ marketCap: number; forwardPE: number | null; trailingPE: number | null } | null> {
   try {
-    const r = await fetchYahooQuoteSummaryJson<any>(ticker, ["price", "summaryDetail", "defaultKeyStatistics", "financialData"]);
+    const r = await fetchYahooQuoteSummaryJson<any>(ticker, [
+      "price",
+      "summaryDetail",
+      "defaultKeyStatistics",
+      "financialData",
+    ]);
     const d = r?.json?.quoteSummary?.result?.[0];
     if (!d) return null;
-    const sd = d.summaryDetail ?? {}, dks = d.defaultKeyStatistics ?? {}, fd = d.financialData ?? {}, pr = d.price ?? {};
+    const sd = d.summaryDetail ?? {},
+      dks = d.defaultKeyStatistics ?? {},
+      fd = d.financialData ?? {},
+      pr = d.price ?? {};
     const mcap = raw(sd, "marketCap") ?? raw(fd, "marketCap") ?? raw(pr, "marketCap");
     if (!mcap || mcap <= 0) return null;
-    return { marketCap: mcap, forwardPE: raw(sd, "forwardPE") ?? raw(dks, "forwardPE"), trailingPE: raw(sd, "trailingPE") ?? raw(dks, "trailingPE") };
-  } catch { return null; }
+    return {
+      marketCap: mcap,
+      forwardPE: raw(sd, "forwardPE") ?? raw(dks, "forwardPE"),
+      trailingPE: raw(sd, "trailingPE") ?? raw(dks, "trailingPE"),
+    };
+  } catch {
+    return null;
+  }
 }
 
-async function batchSnap(tickers: string[]): Promise<{ ticker: string; marketCap: number; forwardPE: number | null; trailingPE: number | null }[]> {
-  const out: { ticker: string; marketCap: number; forwardPE: number | null; trailingPE: number | null }[] = [];
+async function batchSnap(
+  tickers: string[],
+): Promise<
+  { ticker: string; marketCap: number; forwardPE: number | null; trailingPE: number | null }[]
+> {
+  const out: {
+    ticker: string;
+    marketCap: number;
+    forwardPE: number | null;
+    trailingPE: number | null;
+  }[] = [];
   for (let i = 0; i < tickers.length; i += BATCH) {
     const batch = tickers.slice(i, i + BATCH);
-    const res = await Promise.all(batch.map(async (t) => { const d = await snapOne(t); return d ? { ticker: t, ...d } : null; }));
+    const res = await Promise.all(
+      batch.map(async (t) => {
+        const d = await snapOne(t);
+        return d ? { ticker: t, ...d } : null;
+      }),
+    );
     for (const r of res) if (r) out.push(r);
   }
   return out;
@@ -147,8 +206,8 @@ async function batchSnap(tickers: string[]): Promise<{ ticker: string; marketCap
 
 // ─── SERVER FN: getSectorValuationSnapshot ────────────────────────
 
-export const getSectorValuationSnapshot = createServerFn({ method: "POST" })
-  .handler(async (): Promise<SectorValuationSnapshotResult> => {
+export const getSectorValuationSnapshot = createServerFn({ method: "POST" }).handler(
+  async (): Promise<SectorValuationSnapshotResult> => {
     const cacheKey = "sv-snapshot";
     const cached = getCached<SectorValuationSnapshotResult>(cacheKey, SNAPSHOT_CACHE_TTL);
     if (cached) return cached;
@@ -171,8 +230,12 @@ export const getSectorValuationSnapshot = createServerFn({ method: "POST" })
         percentileTrailing: null,
         yearsHistory: null,
         constituentCount: tickers.length,
-        validForwardCount: top.filter((d) => d.forwardPE != null && d.forwardPE > 0 && d.forwardPE < PE_CAP).length,
-        validTrailingCount: top.filter((d) => d.trailingPE != null && d.trailingPE > 0 && d.trailingPE < PE_CAP).length,
+        validForwardCount: top.filter(
+          (d) => d.forwardPE != null && d.forwardPE > 0 && d.forwardPE < PE_CAP,
+        ).length,
+        validTrailingCount: top.filter(
+          (d) => d.trailingPE != null && d.trailingPE > 0 && d.trailingPE < PE_CAP,
+        ).length,
         totalMarketCap: totalMcap,
       });
     }
@@ -180,7 +243,8 @@ export const getSectorValuationSnapshot = createServerFn({ method: "POST" })
     const result: SectorValuationSnapshotResult = { rows, generatedAt: new Date().toISOString() };
     setCache(cacheKey, result);
     return result;
-  });
+  },
+);
 
 // ─── History: fetch PER series for one ticker ──────────────────────
 
@@ -194,21 +258,32 @@ async function fetchPERHistory(ticker: string): Promise<{ dates: number[]; per: 
     const timestamps: number[] = cr?.timestamp ?? [];
     const closes: number[] = cr?.indicators?.quote?.[0]?.close ?? [];
     if (timestamps.length < 50) return null;
-    const stmts = qsRaw?.json?.quoteSummary?.result?.[0]?.incomeStatementHistoryQuarterly?.incomeStatementHistory ?? [];
+    const stmts =
+      qsRaw?.json?.quoteSummary?.result?.[0]?.incomeStatementHistoryQuarterly
+        ?.incomeStatementHistory ?? [];
     if (!Array.isArray(stmts) || stmts.length < 4) return null;
     const ttm = buildTTM(stmts);
     if (ttm.length < 2) return null;
     return alignPER(timestamps, closes, ttm);
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
-async function sectorHistory(sector: string): Promise<{ percentile: number; yearsHistory: number } | null> {
+async function sectorHistory(
+  sector: string,
+): Promise<{ percentile: number; yearsHistory: number } | null> {
   const tickers = getTickers(sector);
   if (tickers.length < 2) return null;
   const all: { ticker: string; dates: number[]; per: number[] }[] = [];
   for (let i = 0; i < Math.min(tickers.length, MAX_TICKERS); i += BATCH) {
     const batch = tickers.slice(i, i + BATCH);
-    const res = await Promise.all(batch.map(async (t) => { const d = await fetchPERHistory(t.ticker); return d && d.dates.length > 0 ? { ticker: t.ticker, ...d } : null; }));
+    const res = await Promise.all(
+      batch.map(async (t) => {
+        const d = await fetchPERHistory(t.ticker);
+        return d && d.dates.length > 0 ? { ticker: t.ticker, ...d } : null;
+      }),
+    );
     for (const r of res) if (r) all.push(r);
   }
   if (all.length < 2) return null;
@@ -221,31 +296,43 @@ async function sectorHistory(sector: string): Promise<{ percentile: number; year
   const dateSet = new Set<number>();
   for (const r of all) {
     const m = new Map<number, number>();
-    for (let i = 0; i < r.dates.length; i++) { m.set(r.dates[i], r.per[i]); dateSet.add(r.dates[i]); }
+    for (let i = 0; i < r.dates.length; i++) {
+      m.set(r.dates[i], r.per[i]);
+      dateSet.add(r.dates[i]);
+    }
     tickerMaps.push(m);
   }
   const sortedDates = [...dateSet].sort((a, b) => a - b);
   const minValid = Math.ceil(all.length * 0.6);
   const sectorPER: number[] = [];
   for (const date of sortedDates) {
-    const vals: number[] = []; const wts: number[] = [];
+    const vals: number[] = [];
+    const wts: number[] = [];
     for (let i = 0; i < all.length; i++) {
       const per = tickerMaps[i].get(date);
-      if (per != null && per > 0 && per < PE_CAP) { vals.push(per); wts.push(mcapMap.get(all[i].ticker) ?? 0); }
+      if (per != null && per > 0 && per < PE_CAP) {
+        vals.push(per);
+        wts.push(mcapMap.get(all[i].ticker) ?? 0);
+      }
     }
-    if (vals.length >= minValid) { const wm = wMedian(vals, wts); if (wm != null) sectorPER.push(wm); }
+    if (vals.length >= minValid) {
+      const wm = wMedian(vals, wts);
+      if (wm != null) sectorPER.push(wm);
+    }
   }
   if (sectorPER.length < 10) return null;
   const current = sectorPER[sectorPER.length - 1];
   const pc = pctRank(sectorPER, current);
-  const years = Math.round(((sortedDates[sortedDates.length - 1] - sortedDates[0]) / (365.25 * 86400)) * 10) / 10;
+  const years =
+    Math.round(((sortedDates[sortedDates.length - 1] - sortedDates[0]) / (365.25 * 86400)) * 10) /
+    10;
   return { percentile: Math.round(pc * 10) / 10, yearsHistory: years };
 }
 
 // ─── SERVER FN: getSectorValuationPercentiles ─────────────────────
 
-export const getSectorValuationPercentiles = createServerFn({ method: "POST" })
-  .handler(async (): Promise<SectorValuationPercentilesResult> => {
+export const getSectorValuationPercentiles = createServerFn({ method: "POST" }).handler(
+  async (): Promise<SectorValuationPercentilesResult> => {
     const cacheKey = "sv-percentiles";
     const cached = getCached<SectorValuationPercentilesResult>(cacheKey, HISTORY_CACHE_TTL);
     if (cached) return cached;
@@ -261,10 +348,14 @@ export const getSectorValuationPercentiles = createServerFn({ method: "POST" })
       }
     }
 
-    const result: SectorValuationPercentilesResult = { percentiles, generatedAt: new Date().toISOString() };
+    const result: SectorValuationPercentilesResult = {
+      percentiles,
+      generatedAt: new Date().toISOString(),
+    };
     if (Object.keys(percentiles).length > 0) setCache(cacheKey, result);
     return result;
-  });
+  },
+);
 
 // ─── Per-ticker valuation data (reusing fundamental analysis method) ──
 
@@ -280,7 +371,9 @@ async function getYF(): Promise<any> {
   }
   try {
     _yf.suppressNotices?.(["yahooSurvey", "ripHistorical"]);
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
   return _yf;
 }
 
@@ -320,12 +413,16 @@ export interface SectorTickerValuation {
 }
 
 export const getSectorValuationByTicker = createServerFn({ method: "POST" })
-  .inputValidator(
-    (d: { sector: string; tickers: { ticker: string; nombre: string }[] }) =>
-      z.object({
+  .inputValidator((d: { sector: string; tickers: { ticker: string; nombre: string }[] }) =>
+    z
+      .object({
         sector: z.string().min(1),
-        tickers: z.array(z.object({ ticker: z.string(), nombre: z.string() })).min(1).max(50),
-      }).parse(d),
+        tickers: z
+          .array(z.object({ ticker: z.string(), nombre: z.string() }))
+          .min(1)
+          .max(50),
+      })
+      .parse(d),
   )
   .handler(async ({ data }): Promise<{ results: SectorTickerValuation[]; errors: string[] }> => {
     const results: SectorTickerValuation[] = [];
@@ -339,7 +436,13 @@ export const getSectorValuationByTicker = createServerFn({ method: "POST" })
           try {
             const yf = await getYF();
             const q = await yf.quoteSummary(ticker, {
-              modules: ["assetProfile", "summaryDetail", "financialData", "defaultKeyStatistics", "price"],
+              modules: [
+                "assetProfile",
+                "summaryDetail",
+                "financialData",
+                "defaultKeyStatistics",
+                "price",
+              ],
             });
 
             const ap = q.assetProfile ?? {};
@@ -361,9 +464,13 @@ export const getSectorValuationByTicker = createServerFn({ method: "POST" })
             const earningsGrowth = numVal(fd.earningsGrowth);
             const profitMargin = numVal(fd.profitMargins) ?? numVal(ks.profitMargins);
             const freeCashflow = numVal(fd.freeCashflow);
-            const fcfYield = freeCashflow != null && marketCap != null && marketCap > 0 ? freeCashflow / marketCap : null;
+            const fcfYield =
+              freeCashflow != null && marketCap != null && marketCap > 0
+                ? freeCashflow / marketCap
+                : null;
             let debtToEquity = numVal(fd.debtToEquity);
-            const dividendYield = numVal(sd.dividendYield) ?? numVal(sd.trailingAnnualDividendYield);
+            const dividendYield =
+              numVal(sd.dividendYield) ?? numVal(sd.trailingAnnualDividendYield);
             // Sanity: si bookValuePerShare es despreciable frente al precio, P/B no es representativo
             if (priceToBook != null && currentPrice != null && currentPrice > 0) {
               const bookValuePerShare = currentPrice / priceToBook;
@@ -377,9 +484,10 @@ export const getSectorValuationByTicker = createServerFn({ method: "POST" })
             const targetMeanPrice = numVal(fd.targetMeanPrice);
             const recommendationMean = numVal(fd.recommendationMean);
             const numberOfAnalystOpinions = numVal(fd.numberOfAnalystOpinions);
-            const upsidePct = targetMeanPrice != null && currentPrice != null && currentPrice > 0
-              ? ((targetMeanPrice - currentPrice) / currentPrice) * 100
-              : null;
+            const upsidePct =
+              targetMeanPrice != null && currentPrice != null && currentPrice > 0
+                ? ((targetMeanPrice - currentPrice) / currentPrice) * 100
+                : null;
 
             // Fund score (same methodology as fundamental analysis)
             const scoreParts: { pts: number; max: number }[] = [];
@@ -417,9 +525,15 @@ export const getSectorValuationByTicker = createServerFn({ method: "POST" })
             let pePercentile: number | null = null;
             try {
               const ish = await yf.quoteSummary(ticker, { modules: ["incomeStatementHistory"] });
-              const incomeRows = (ish.incomeStatementHistory?.incomeStatementHistory ?? []) as Record<string, any>[];
+              const incomeRows = (ish.incomeStatementHistory?.incomeStatementHistory ??
+                []) as Record<string, any>[];
               const sharesOutstanding = numVal(ks.sharesOutstanding);
-              if (sharesOutstanding && sharesOutstanding > 0 && incomeRows.length >= 2 && currentPrice != null) {
+              if (
+                sharesOutstanding &&
+                sharesOutstanding > 0 &&
+                incomeRows.length >= 2 &&
+                currentPrice != null
+              ) {
                 const peVals: number[] = [];
                 for (const row of incomeRows) {
                   const ni = numVal(row.netIncome);
@@ -434,38 +548,69 @@ export const getSectorValuationByTicker = createServerFn({ method: "POST" })
                   pePercentile = Math.round((below / peVals.length) * 100);
                 }
               }
-            } catch { /* pe percentile optional */ }
+            } catch {
+              /* pe percentile optional */
+            }
 
             // Safety: never emit NaN/Infinity to the UI
             const safe = (v: number | null | undefined): number | null =>
               v != null && isFinite(v) ? v : null;
             return {
-              ticker, nombre,
+              ticker,
+              nombre,
               companyName: String(ap.longName ?? ap.shortName ?? nombre),
               industry: ap.industry ?? null,
-              currentPrice: safe(currentPrice), marketCap: safe(marketCap),
-              trailingPE: safe(trailingPE), forwardPE: safe(forwardPE), pegRatio: safe(pegRatio),
-              priceToBook: safe(priceToBook), evToEbitda: safe(evToEbitda),
-              returnOnEquity: safe(returnOnEquity), revenueGrowth: safe(revenueGrowth),
-              earningsGrowth: safe(earningsGrowth), profitMargin: safe(profitMargin),
-              fcfYield: safe(fcfYield), debtToEquity: safe(debtToEquity),
+              currentPrice: safe(currentPrice),
+              marketCap: safe(marketCap),
+              trailingPE: safe(trailingPE),
+              forwardPE: safe(forwardPE),
+              pegRatio: safe(pegRatio),
+              priceToBook: safe(priceToBook),
+              evToEbitda: safe(evToEbitda),
+              returnOnEquity: safe(returnOnEquity),
+              revenueGrowth: safe(revenueGrowth),
+              earningsGrowth: safe(earningsGrowth),
+              profitMargin: safe(profitMargin),
+              fcfYield: safe(fcfYield),
+              debtToEquity: safe(debtToEquity),
               dividendYield: safe(dividendYield),
-              targetMeanPrice: safe(targetMeanPrice), recommendationMean: safe(recommendationMean),
-              numberOfAnalystOpinions: safe(numberOfAnalystOpinions), upsidePct: safe(upsidePct),
-              beta: safe(beta), fundScore: safe(fundScore),
-              pePercentile: safe(pePercentile), error: null,
+              targetMeanPrice: safe(targetMeanPrice),
+              recommendationMean: safe(recommendationMean),
+              numberOfAnalystOpinions: safe(numberOfAnalystOpinions),
+              upsidePct: safe(upsidePct),
+              beta: safe(beta),
+              fundScore: safe(fundScore),
+              pePercentile: safe(pePercentile),
+              error: null,
             };
           } catch (e) {
             errors.push(`${ticker}: ${e instanceof Error ? e.message : "Error"}`);
             return {
-              ticker, nombre,
-              companyName: null, industry: null,
-              currentPrice: null, marketCap: null,
-              trailingPE: null, forwardPE: null, pegRatio: null, priceToBook: null, evToEbitda: null,
-              returnOnEquity: null, revenueGrowth: null, earningsGrowth: null, profitMargin: null,
-              fcfYield: null, debtToEquity: null, dividendYield: null,
-              targetMeanPrice: null, recommendationMean: null, numberOfAnalystOpinions: null, upsidePct: null,
-              beta: null, fundScore: null, pePercentile: null,
+              ticker,
+              nombre,
+              companyName: null,
+              industry: null,
+              currentPrice: null,
+              marketCap: null,
+              trailingPE: null,
+              forwardPE: null,
+              pegRatio: null,
+              priceToBook: null,
+              evToEbitda: null,
+              returnOnEquity: null,
+              revenueGrowth: null,
+              earningsGrowth: null,
+              profitMargin: null,
+              fcfYield: null,
+              debtToEquity: null,
+              dividendYield: null,
+              targetMeanPrice: null,
+              recommendationMean: null,
+              numberOfAnalystOpinions: null,
+              upsidePct: null,
+              beta: null,
+              fundScore: null,
+              pePercentile: null,
               error: e instanceof Error ? e.message : "Error",
             };
           }

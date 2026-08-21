@@ -103,30 +103,52 @@ export const getSectorPerformance = createServerFn({ method: "GET" })
     for (const [sector, tickers] of sectores) {
       const muestra = tickers.slice(0, 15);
 
-      const semaforos = await getSemaforoBatch({ data: { tickers: muestra.map((t) => t.ticker) } }).catch(() => []);
+      const semaforos = await getSemaforoBatch({
+        data: { tickers: muestra.map((t) => t.ticker) },
+      }).catch(() => []);
       const scoreMap = new Map(semaforos.map((s) => [s.ticker, s.totalScore]));
 
       const variaciones = await Promise.all(
         muestra.map(async (t) => {
           try {
             const ohlcv = await yahooChartOHLCV(t.ticker, yfRange, "1d");
-            if (ohlcv.length < 2) return { ticker: t.ticker, nombre: t.nombre, variacion: null, score: scoreMap.get(t.ticker) ?? null };
+            if (ohlcv.length < 2)
+              return {
+                ticker: t.ticker,
+                nombre: t.nombre,
+                variacion: null,
+                score: scoreMap.get(t.ticker) ?? null,
+              };
             const inicio = ohlcv[0].close;
             const fin = ohlcv[ohlcv.length - 1].close;
             const varPct = inicio > 0 ? ((fin - inicio) / inicio) * 100 : null;
-            return { ticker: t.ticker, nombre: t.nombre, variacion: varPct, score: scoreMap.get(t.ticker) ?? null };
+            return {
+              ticker: t.ticker,
+              nombre: t.nombre,
+              variacion: varPct,
+              score: scoreMap.get(t.ticker) ?? null,
+            };
           } catch {
-            return { ticker: t.ticker, nombre: t.nombre, variacion: null, score: scoreMap.get(t.ticker) ?? null };
+            return {
+              ticker: t.ticker,
+              nombre: t.nombre,
+              variacion: null,
+              score: scoreMap.get(t.ticker) ?? null,
+            };
           }
         }),
       );
 
-      const validas = variaciones.filter((v): v is { ticker: string; nombre: string; variacion: number; score: number | null } => v.variacion !== null);
+      const validas = variaciones.filter(
+        (v): v is { ticker: string; nombre: string; variacion: number; score: number | null } =>
+          v.variacion !== null,
+      );
       if (validas.length === 0) continue;
 
       const promedio = validas.reduce((a, b) => a + b.variacion, 0) / validas.length;
       const scores = validas.map((v) => v.score).filter((s): s is number => s != null);
-      const scorePromedio = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+      const scorePromedio =
+        scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
 
       resultados.push({
         sector,
@@ -155,11 +177,13 @@ export const getSectorPerformanceSemanal = createServerFn({ method: "GET" }).han
 
 export const getSectorDailyPerformance = createServerFn({ method: "GET" }).handler(async () => {
   const result = await getSectorPerformance({ data: { period: "5d" } });
-  return { items: result.items.map((i) => ({
-    key: (i.etf || "").toLowerCase(),
-    label: i.sector,
-    etf: i.etf || "",
-    dot: i.dot || "",
-    changePercent: i.variacionPromedio,
-  })) };
+  return {
+    items: result.items.map((i) => ({
+      key: (i.etf || "").toLowerCase(),
+      label: i.sector,
+      etf: i.etf || "",
+      dot: i.dot || "",
+      changePercent: i.variacionPromedio,
+    })),
+  };
 });

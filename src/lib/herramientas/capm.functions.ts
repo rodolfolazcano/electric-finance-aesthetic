@@ -35,13 +35,13 @@ export interface CAPMResult {
   fPValue?: number;
   bestAvgR2?: number;
   // ─── Labadie §3.2: p-variance beta + Hurst ───
-  betaP?: number;          // beta con p-variance
-  alphaP?: number;         // alpha con p-variance
+  betaP?: number; // beta con p-variance
+  alphaP?: number; // alpha con p-variance
   pVarianceAsset?: number; // p-variance del activo
   pVarianceBench?: number; // p-variance del benchmark
-  hurstExponent?: number;  // H del activo
-  hurstBench?: number;     // H del benchmark
-  impliedP?: number;       // p = 1/H del activo
+  hurstExponent?: number; // H del activo
+  hurstBench?: number; // H del benchmark
+  impliedP?: number; // p = 1/H del activo
   impliedPFromReturns?: number; // p estimado por regresión multi-escala §4.3
 }
 
@@ -73,7 +73,9 @@ export const getCAPMAnalysis = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }): Promise<CAPMResult[]> => {
     const benchmarks = data.autoDetect
-      ? (data.benchmarks.length > 0 ? data.benchmarks : AUTO_BENCHMARKS)
+      ? data.benchmarks.length > 0
+        ? data.benchmarks
+        : AUTO_BENCHMARKS
       : data.benchmarks;
     const allTickers = [...new Set([...data.tickers, ...benchmarks])];
     const histMap = new Map<string, Map<string, number>>();
@@ -140,21 +142,35 @@ export const getCAPMAnalysis = createServerFn({ method: "POST" })
       for (const ticker of data.tickers) {
         const tb = tickerBestMap.get(ticker);
         if (tb) {
-          results.push({ ...tb.result, benchmarkLabel: tb.benchmark, bestAvgR2: bestAvgR2 >= 0 ? bestAvgR2 : undefined });
+          results.push({
+            ...tb.result,
+            benchmarkLabel: tb.benchmark,
+            bestAvgR2: bestAvgR2 >= 0 ? bestAvgR2 : undefined,
+          });
         } else {
-          results.push({ ticker, alpha: 0, annualizedAlpha: 0, observations: 0, benchmarkLabel: bestOverallBenchmark });
+          results.push({
+            ticker,
+            alpha: 0,
+            annualizedAlpha: 0,
+            observations: 0,
+            benchmarkLabel: bestOverallBenchmark,
+          });
         }
       }
     } else {
       // Multiple benchmarks: compute per benchmark group and pick best overall too
       const benchScores = new Map<string, { r2Sum: number; count: number }>();
       for (const bm of data.benchmarks) {
-        let count = 0, r2Sum = 0;
+        let count = 0,
+          r2Sum = 0;
         for (const ticker of data.tickers) {
           const tickerMap = histMap.get(ticker);
           if (!tickerMap || tickerMap.size < 30) continue;
           const r = computeSingle(ticker, tickerMap, bm, histMap);
-          if (r.observations > 0 && r.rSquared != null) { r2Sum += r.rSquared; count++; }
+          if (r.observations > 0 && r.rSquared != null) {
+            r2Sum += r.rSquared;
+            count++;
+          }
         }
         if (count > 0) benchScores.set(bm, { r2Sum, count });
       }
@@ -162,17 +178,30 @@ export const getCAPMAnalysis = createServerFn({ method: "POST" })
       let bestAvgR2 = -1;
       for (const [bm, s] of benchScores) {
         const avg = s.r2Sum / s.count;
-        if (avg > bestAvgR2) { bestAvgR2 = avg; bestOverallBenchmark = bm; }
+        if (avg > bestAvgR2) {
+          bestAvgR2 = avg;
+          bestOverallBenchmark = bm;
+        }
       }
       for (const bm of data.benchmarks) {
         for (const ticker of data.tickers) {
           const tickerMap = histMap.get(ticker);
           if (!tickerMap || tickerMap.size < 30) {
-            results.push({ ticker, alpha: 0, annualizedAlpha: 0, observations: 0, benchmarkLabel: bm });
+            results.push({
+              ticker,
+              alpha: 0,
+              annualizedAlpha: 0,
+              observations: 0,
+              benchmarkLabel: bm,
+            });
             continue;
           }
           const r = computeSingle(ticker, tickerMap, bm, histMap);
-          results.push({ ...r, benchmarkLabel: bm, bestAvgR2: bm === bestOverallBenchmark && bestAvgR2 >= 0 ? bestAvgR2 : undefined });
+          results.push({
+            ...r,
+            benchmarkLabel: bm,
+            bestAvgR2: bm === bestOverallBenchmark && bestAvgR2 >= 0 ? bestAvgR2 : undefined,
+          });
         }
       }
     }
@@ -242,15 +271,23 @@ function computeSingle(
   // Reconstruir precios desde returns para calcular Hurst
   const pricesFromRets: number[] = [];
   let p = 100;
-  for (const r of y) { p *= (1 + r); pricesFromRets.push(p); }
+  for (const r of y) {
+    p *= 1 + r;
+    pricesFromRets.push(p);
+  }
   const benchPrices: number[] = [];
   let bp = 100;
-  for (const r of x) { bp *= (1 + r); benchPrices.push(bp); }
+  for (const r of x) {
+    bp *= 1 + r;
+    benchPrices.push(bp);
+  }
 
   const hurstExponent = pricesFromRets.length >= 100 ? computeHurst(pricesFromRets) : undefined;
   const hurstBench = benchPrices.length >= 100 ? computeHurst(benchPrices) : undefined;
-  const impliedP = hurstExponent != null && hurstExponent > 0
-    ? Math.min(10, Math.max(1.1, 1 / hurstExponent)) : undefined;
+  const impliedP =
+    hurstExponent != null && hurstExponent > 0
+      ? Math.min(10, Math.max(1.1, 1 / hurstExponent))
+      : undefined;
   const impliedPFromReturnsVal = y.length >= 100 ? impliedPFromReturns(y) : undefined;
 
   // p-variance del activo y benchmark
@@ -266,7 +303,12 @@ function computeSingle(
     const meanX = mean(x);
     const meanY = mean(y);
     const p = 2;
-    const covP = x.reduce((s, xi, i) => s + Math.pow(Math.abs(xi - meanX), p/2) * Math.pow(Math.abs(y[i] - meanY), p/2), 0) / n;
+    const covP =
+      x.reduce(
+        (s, xi, i) =>
+          s + Math.pow(Math.abs(xi - meanX), p / 2) * Math.pow(Math.abs(y[i] - meanY), p / 2),
+        0,
+      ) / n;
     betaP = covP > 0 && pVarianceBench > 0 ? covP / pVarianceBench : undefined;
     alphaP = betaP != null ? meanY - betaP * meanX : undefined;
   }
@@ -289,7 +331,8 @@ function computeSingle(
     hurstExponent: hurstExponent != null ? Math.round(hurstExponent * 10000) / 10000 : undefined,
     hurstBench: hurstBench != null ? Math.round(hurstBench * 10000) / 10000 : undefined,
     impliedP: impliedP != null ? Math.round(impliedP * 100) / 100 : undefined,
-    impliedPFromReturns: impliedPFromReturnsVal != null ? Math.round(impliedPFromReturnsVal * 100) / 100 : undefined,
+    impliedPFromReturns:
+      impliedPFromReturnsVal != null ? Math.round(impliedPFromReturnsVal * 100) / 100 : undefined,
   };
 }
 
@@ -452,7 +495,7 @@ function regIncBeta(a: number, b: number, x: number): number {
 
 function contFrac(a: number, b: number, x: number): number {
   const eps = 1e-10;
-  let qab = a + b,
+  const qab = a + b,
     qap = a + 1,
     qam = a - 1;
   let c = 1,

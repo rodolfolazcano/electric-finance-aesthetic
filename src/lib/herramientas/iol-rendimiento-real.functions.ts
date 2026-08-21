@@ -38,7 +38,10 @@ async function iolFetch<T>(
   if (res.status === 401 && refreshToken) {
     // IOL no soporta refresh_token. Si falla, devolvemos error claro.
     try {
-      const tokens = await fetchTokens({ refresh_token: refreshToken, grant_type: "refresh_token" });
+      const tokens = await fetchTokens({
+        refresh_token: refreshToken,
+        grant_type: "refresh_token",
+      });
       if (!("error" in tokens)) {
         const retry = await fetch(url, {
           headers: { Authorization: `Bearer ${tokens.accessToken}`, Accept: "application/json" },
@@ -54,7 +57,9 @@ async function iolFetch<T>(
     } catch {
       // Ignorar error de refresh
     }
-    throw new Error("SesiÃƒÂ³n IOL expirada. IniciÃƒÂ¡ sesiÃƒÂ³n nuevamente desde el botÃƒÂ³n superior derecho.");
+    throw new Error(
+      "SesiÃƒÂ³n IOL expirada. IniciÃƒÂ¡ sesiÃƒÂ³n nuevamente desde el botÃƒÂ³n superior derecho.",
+    );
   }
   if (!res.ok) throw new Error(`IOL error ${res.status}: ${await res.text().catch(() => "")}`);
   return { data: (await res.json()) as T };
@@ -599,7 +604,15 @@ export const getRendimientoRealPortafolio = createServerFn({ method: "POST" })
     const localTickers = new Set<string>();
     const yahooTickers = new Set<string>();
     for (const sym of allSymbols) {
-      const titulo: IOLTitulo = { simbolo: sym, descripcion: "", pais: "argentina", mercado: "bCBA", tipo: "ACCION", plazo: "t0", moneda: "peso_Argentino" };
+      const titulo: IOLTitulo = {
+        simbolo: sym,
+        descripcion: "",
+        pais: "argentina",
+        mercado: "bCBA",
+        tipo: "ACCION",
+        plazo: "t0",
+        moneda: "peso_Argentino",
+      };
       const resolved = resolveDraftTickerFromIOL(titulo);
       if (resolved.canUseYahoo && resolved.analysisSymbol) {
         yahooTickers.add(resolved.analysisSymbol);
@@ -610,13 +623,23 @@ export const getRendimientoRealPortafolio = createServerFn({ method: "POST" })
 
     // 5. Fetch prices
     const yahooSymbols = [...yahooTickers];
-    const days = Math.round((new Date(fechaHasta).getTime() - new Date(fechaDesde).getTime()) / 86400000);
+    const days = Math.round(
+      (new Date(fechaHasta).getTime() - new Date(fechaDesde).getTime()) / 86400000,
+    );
     const prices = await fetchPricesForTickers(yahooSymbols, days, data.token);
 
     // 6. Map prices back to original symbols
     const priceMap = new Map<string, Map<string, number>>();
     for (const sym of allSymbols) {
-      const titulo: IOLTitulo = { simbolo: sym, descripcion: "", pais: "argentina", mercado: "bCBA", tipo: "ACCION", plazo: "t0", moneda: "peso_Argentino" };
+      const titulo: IOLTitulo = {
+        simbolo: sym,
+        descripcion: "",
+        pais: "argentina",
+        mercado: "bCBA",
+        tipo: "ACCION",
+        plazo: "t0",
+        moneda: "peso_Argentino",
+      };
       const resolved = resolveDraftTickerFromIOL(titulo);
       const yahooSym = resolved.canUseYahoo ? resolved.analysisSymbol : null;
       if (yahooSym && prices.has(yahooSym)) {

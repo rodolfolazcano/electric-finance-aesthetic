@@ -13,7 +13,9 @@ export type { DataSourceToggleProps };
 
 export function DataSourceToggle({ mode, onModeChange, disabled = false }: DataSourceToggleProps) {
   const [hydrated, setHydrated] = useState(false);
-  useEffect(() => { setHydrated(true); }, []);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   const isDisabled = hydrated ? disabled : false;
 

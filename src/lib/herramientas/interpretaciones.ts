@@ -15,7 +15,11 @@ export interface InterpretacionSignal {
 
 type TendenciaDir = "alcista" | "bajista" | "lateral";
 
-function interpretarPrecioSMA50(current: number, sma50: number, tendencia: TendenciaDir): Interpretacion {
+function interpretarPrecioSMA50(
+  current: number,
+  sma50: number,
+  tendencia: TendenciaDir,
+): Interpretacion {
   const diff = ((current - sma50) / sma50) * 100;
   const sobre = current > sma50;
   if (sobre) {
@@ -35,7 +39,8 @@ function interpretarPrecioSMA50(current: number, sma50: number, tendencia: Tende
   }
   return {
     dato: `Precio $${current.toFixed(2)} bajo SMA50 $${sma50.toFixed(2)} (${diff.toFixed(1)}%)`,
-    lectura: "El precio está por debajo de su media de 50 sesiones, señal de debilidad en el corto plazo.",
+    lectura:
+      "El precio está por debajo de su media de 50 sesiones, señal de debilidad en el corto plazo.",
     implicancia:
       tendencia === "bajista"
         ? "El precio confirma la debilidad de corto plazo. No es momento de comprar."
@@ -44,7 +49,11 @@ function interpretarPrecioSMA50(current: number, sma50: number, tendencia: Tende
   };
 }
 
-function interpretarCruceMedias(sma50: number, sma200: number | null, closes: number[]): Interpretacion {
+function interpretarCruceMedias(
+  sma50: number,
+  sma200: number | null,
+  closes: number[],
+): Interpretacion {
   if (sma200 == null) {
     return {
       dato: `SMA200 no disponible (histórico < 200 barras)`,
@@ -60,7 +69,8 @@ function interpretarCruceMedias(sma50: number, sma200: number | null, closes: nu
       lectura: cerca
         ? "Las medias están muy cerca — puede haber un cambio de tendencia pronto."
         : "La media de 50 está por encima de la de 200, confirmando tendencia alcista de mediano plazo.",
-      implicancia: "Las medias están alineadas con una tendencia alcista. Se considera una señal positiva.",
+      implicancia:
+        "Las medias están alineadas con una tendencia alcista. Se considera una señal positiva.",
       tono: "positivo",
     };
   }
@@ -109,12 +119,14 @@ function interpretarRSI(rsi: number, tendencia: TendenciaDir): Interpretacion {
   }
   return {
     dato,
-    lectura: rsi < 45
-      ? "El RSI está del lado bajista, aunque sin estar en sobreventa."
-      : "El RSI está del lado alcista, aunque sin estar en sobrecompra.",
-    implicancia: rsi < 45
-      ? "El sesgo es ligeramente bajista. Mantener cautela."
-      : "El sesgo es ligeramente alcista. Favorable pero sin exceso.",
+    lectura:
+      rsi < 45
+        ? "El RSI está del lado bajista, aunque sin estar en sobreventa."
+        : "El RSI está del lado alcista, aunque sin estar en sobrecompra.",
+    implicancia:
+      rsi < 45
+        ? "El sesgo es ligeramente bajista. Mantener cautela."
+        : "El sesgo es ligeramente alcista. Favorable pero sin exceso.",
     tono: "neutral",
   };
 }
@@ -124,8 +136,10 @@ function interpretarMACD(macd: number, signal: number): Interpretacion {
   if (macd > signal && macd > 0) {
     return {
       dato,
-      lectura: "El MACD está por encima de su señal y en terreno positivo — momentum alcista sólido.",
-      implicancia: "La tendencia de corto plazo está siendo impulsada por compradores. Señal favorable.",
+      lectura:
+        "El MACD está por encima de su señal y en terreno positivo — momentum alcista sólido.",
+      implicancia:
+        "La tendencia de corto plazo está siendo impulsada por compradores. Señal favorable.",
       tono: "positivo",
     };
   }
@@ -133,7 +147,8 @@ function interpretarMACD(macd: number, signal: number): Interpretacion {
     return {
       dato,
       lectura: "El MACD acaba de cruzar al alza, pero aún está en terreno negativo.",
-      implicancia: "Posible cambio de tendencia temprano. Requiere confirmación en los próximos días.",
+      implicancia:
+        "Posible cambio de tendencia temprano. Requiere confirmación en los próximos días.",
       tono: "neutral",
     };
   }
@@ -141,14 +156,16 @@ function interpretarMACD(macd: number, signal: number): Interpretacion {
     return {
       dato,
       lectura: "El MACD está perdiendo fuerza, aunque aún está en terreno positivo.",
-      implicancia: "El impulso alcista se está debilitando. Podría ser el inicio de una corrección.",
+      implicancia:
+        "El impulso alcista se está debilitando. Podría ser el inicio de una corrección.",
       tono: "alerta",
     };
   }
   return {
     dato,
     lectura: "El MACD está por debajo de su señal y en terreno negativo — momentum bajista.",
-    implicancia: "Los vendedores están controlando el corto plazo. Evitar compras hasta que mejore.",
+    implicancia:
+      "Los vendedores están controlando el corto plazo. Evitar compras hasta que mejore.",
     tono: "alerta",
   };
 }
@@ -189,7 +206,8 @@ function interpretarRevenueGrowth(growth: number | null): Interpretacion | null 
     return {
       dato,
       lectura: "La empresa está creciendo sus ingresos a un ritmo fuerte.",
-      implicancia: "El crecimiento de ingresos es sólido, lo que suele preceder a ganancias más altas.",
+      implicancia:
+        "El crecimiento de ingresos es sólido, lo que suele preceder a ganancias más altas.",
       tono: "positivo",
     };
   }
@@ -216,7 +234,8 @@ function interpretarProfitMargin(margin: number | null): Interpretacion | null {
   if (margin > 0.2) {
     return {
       dato,
-      lectura: "La empresa convierte más del 20% de sus ingresos en ganancia — márgenes excelentes.",
+      lectura:
+        "La empresa convierte más del 20% de sus ingresos en ganancia — márgenes excelentes.",
       implicancia: "Alta eficiencia operativa. La empresa tiene poder de fijación de precios.",
       tono: "positivo",
     };
@@ -343,17 +362,21 @@ export function generarInterpretacionCartera(
   return "Tu cartera tiene fundamentos mixtos — algunas posiciones son más sólidas que otras.";
 }
 
-export function generarCierreScore(scoreTotal: number, scoreTec: number, scoreFund: number): string {
+export function generarCierreScore(
+  scoreTotal: number,
+  scoreTec: number,
+  scoreFund: number,
+): string {
   // scoreTotal = techScore (continuo) + fundScore, rango típico -5 a +8
   const recomendacion =
     scoreTotal >= 5
       ? "El score combinado es sólido. Si querés revisar cómo encaja en tu cartera, agendá una consulta."
       : scoreTotal >= 1.5
         ? "Las señales técnicas y fundamentales son moderadamente positivas. Monitorear evolución."
-      : scoreTotal >= -0.5
-        ? "El mercado no da señales claras en este momento — es un buen momento para revisar tu estrategia general, no necesariamente esta posición puntual."
-      : scoreTotal >= -4
-        ? "Las señales son mixtas con sesgo negativo. Antes de tomar una decisión, revisá tu exposición actual con un asesor."
-      : "Las señales técnicas y fundamentales son desfavorables. Evaluar cobertura o reducción de posición.";
+        : scoreTotal >= -0.5
+          ? "El mercado no da señales claras en este momento — es un buen momento para revisar tu estrategia general, no necesariamente esta posición puntual."
+          : scoreTotal >= -4
+            ? "Las señales son mixtas con sesgo negativo. Antes de tomar una decisión, revisá tu exposición actual con un asesor."
+            : "Las señales técnicas y fundamentales son desfavorables. Evaluar cobertura o reducción de posición.";
   return recomendacion;
 }

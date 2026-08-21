@@ -76,10 +76,18 @@ export function analizarTendencia(
     const sma50Prev = sma50Arr[last];
     const sma200Prev = sma200Arr[last];
     if (sma50Prev > sma200Prev && current > sma50) {
-      return { direccion: "alcista", score: 1.5, label: "Cruce dorado — tendencia alcista incipiente" };
+      return {
+        direccion: "alcista",
+        score: 1.5,
+        label: "Cruce dorado — tendencia alcista incipiente",
+      };
     }
     if (sma50Prev < sma200Prev && current < sma50) {
-      return { direccion: "bajista", score: -1.5, label: "Cruce de la muerte — tendencia bajista incipiente" };
+      return {
+        direccion: "bajista",
+        score: -1.5,
+        label: "Cruce de la muerte — tendencia bajista incipiente",
+      };
     }
   }
 

@@ -618,7 +618,7 @@ export const getSectorAnalysis = createServerFn({ method: "POST" })
         const industryBestBenchmarks: IndustryBestBenchmark[] = [];
         const tickerBestBenchmarks: TickerBestBenchmark[] = [];
         let factorsTestedCount = 0;
-        let factorData: { ticker: string; name: string; returns: number[] }[] = [];
+        const factorData: { ticker: string; name: string; returns: number[] }[] = [];
 
         if (validTickers.length >= 2 && elapsedMs < BENCH_TIME_BUDGET) {
           const secData = SECTORES[data.sector];

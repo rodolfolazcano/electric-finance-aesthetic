@@ -50,18 +50,25 @@ import {
   AUTO_BENCHMARKS,
   type CAPMResult,
 } from "@/lib/herramientas/capm.functions";
-import { CHART_TOOLTIP_STYLE, AXIS_TICK_SM, GRID_STROKE, PIE_COLORS } from "@/components/herramientas/shared/chart-constants";
+import {
+  CHART_TOOLTIP_STYLE,
+  AXIS_TICK_SM,
+  GRID_STROKE,
+  PIE_COLORS,
+} from "@/components/herramientas/shared/chart-constants";
 import { cn } from "@/lib/utils";
 
 const EJEMPLOS_CARTERA = "SPY, QQQ, AAPL, MSFT, KO, JPM, GLD, TLT";
 
 function parseTickers(raw: string): string[] {
-  return [...new Set(
-    raw
-      .split(/[,\n;]+/)
-      .map((t) => t.trim().toUpperCase())
-      .filter(Boolean),
-  )].slice(0, 20);
+  return [
+    ...new Set(
+      raw
+        .split(/[,\n;]+/)
+        .map((t) => t.trim().toUpperCase())
+        .filter(Boolean),
+    ),
+  ].slice(0, 20);
 }
 
 function fmtPct(v: number | null | undefined, dec = 1): string {
@@ -121,8 +128,15 @@ function OptimizadorPanel() {
             rows={2}
             className="w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm outline-none focus-visible:ring-1 focus-visible:ring-ring"
           />
-          <Button onClick={() => m.mutate(parseTickers(raw))} disabled={m.isPending || parseTickers(raw).length < 2}>
-            {m.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+          <Button
+            onClick={() => m.mutate(parseTickers(raw))}
+            disabled={m.isPending || parseTickers(raw).length < 2}
+          >
+            {m.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
             Optimizar cartera
           </Button>
           {m.isError && (
@@ -141,7 +155,8 @@ function OptimizadorPanel() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-sm">
-                <Scale className="h-4 w-4 text-primary" /> Estrategias de optimización (2 años, diaria)
+                <Scale className="h-4 w-4 text-primary" /> Estrategias de optimización (2 años,
+                diaria)
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -158,18 +173,32 @@ function OptimizadorPanel() {
                 <TableBody>
                   {estrategiasActivas.map((e) => {
                     const d = e.data as unknown as
-                      | { retornoAnual?: number; volatilidadAnual?: number; sharpe?: number; var95?: number }
+                      | {
+                          retornoAnual?: number;
+                          volatilidadAnual?: number;
+                          sharpe?: number;
+                          var95?: number;
+                        }
                       | undefined;
                     if (!d) return null;
                     return (
                       <TableRow key={e.key}>
                         <TableCell className="font-medium">{e.label}</TableCell>
-                        <TableCell className={cn("text-right font-mono", (d.retornoAnual ?? 0) >= 0 ? "text-emerald-400" : "text-red-400")}>
+                        <TableCell
+                          className={cn(
+                            "text-right font-mono",
+                            (d.retornoAnual ?? 0) >= 0 ? "text-emerald-400" : "text-red-400",
+                          )}
+                        >
                           {fmtPct(d.retornoAnual)}
                         </TableCell>
-                        <TableCell className="text-right font-mono">{fmtPct(d.volatilidadAnual)}</TableCell>
+                        <TableCell className="text-right font-mono">
+                          {fmtPct(d.volatilidadAnual)}
+                        </TableCell>
                         <TableCell className="text-right font-mono">{fmtNum2(d.sharpe)}</TableCell>
-                        <TableCell className="text-right font-mono text-red-400">{fmtPct(d.var95)}</TableCell>
+                        <TableCell className="text-right font-mono text-red-400">
+                          {fmtPct(d.var95)}
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -179,52 +208,68 @@ function OptimizadorPanel() {
           </Card>
 
           {/* Pesos de la mejor estrategia con datos */}
-          {estrategiasActivas.filter((e) => e.data).slice(0, 5).map((e) => {
-            const d = e.data as unknown as { pesos?: Record<string, number> } | undefined;
-            const pesos = Object.entries(d?.pesos ?? {})
-              .map(([ticker, peso]) => ({ ticker, peso: Number(peso) }))
-              .filter((x) => x.peso > 0.001)
-              .sort((a, b) => b.peso - a.peso);
-            if (!pesos.length) return null;
-            return (
-              <Card key={e.key}>
-                <CardHeader className="pb-1">
-                  <CardTitle className="text-sm">Pesos · {e.label}</CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-2">
-                  <div style={{ height: 220 }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie data={pesos} dataKey="peso" nameKey="ticker" innerRadius={45} outerRadius={80} paddingAngle={2}>
-                          {pesos.map((_, i) => (
-                            <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} stroke="none" />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          contentStyle={CHART_TOOLTIP_STYLE}
-                          formatter={(v: number | string) => `${(Number(v) * 100).toFixed(1)}%`}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="max-h-[220px] space-y-1 overflow-auto pr-1">
-                    {pesos.map((p) => (
-                      <div key={p.ticker} className="flex items-center gap-2 text-xs">
-                        <span className="w-16 shrink-0 font-mono">{p.ticker}</span>
-                        <div className="h-2 flex-1 overflow-hidden rounded bg-accent/40">
-                          <div
-                            className="h-full rounded bg-primary/60"
-                            style={{ width: `${Math.min(100, p.peso * 100)}%` }}
+          {estrategiasActivas
+            .filter((e) => e.data)
+            .slice(0, 5)
+            .map((e) => {
+              const d = e.data as unknown as { pesos?: Record<string, number> } | undefined;
+              const pesos = Object.entries(d?.pesos ?? {})
+                .map(([ticker, peso]) => ({ ticker, peso: Number(peso) }))
+                .filter((x) => x.peso > 0.001)
+                .sort((a, b) => b.peso - a.peso);
+              if (!pesos.length) return null;
+              return (
+                <Card key={e.key}>
+                  <CardHeader className="pb-1">
+                    <CardTitle className="text-sm">Pesos · {e.label}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid gap-4 md:grid-cols-2">
+                    <div style={{ height: 220 }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={pesos}
+                            dataKey="peso"
+                            nameKey="ticker"
+                            innerRadius={45}
+                            outerRadius={80}
+                            paddingAngle={2}
+                          >
+                            {pesos.map((_, i) => (
+                              <Cell
+                                key={i}
+                                fill={PIE_COLORS[i % PIE_COLORS.length]}
+                                stroke="none"
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            contentStyle={CHART_TOOLTIP_STYLE}
+                            formatter={(v: number | string) => `${(Number(v) * 100).toFixed(1)}%`}
                           />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="max-h-[220px] space-y-1 overflow-auto pr-1">
+                      {pesos.map((p) => (
+                        <div key={p.ticker} className="flex items-center gap-2 text-xs">
+                          <span className="w-16 shrink-0 font-mono">{p.ticker}</span>
+                          <div className="h-2 flex-1 overflow-hidden rounded bg-accent/40">
+                            <div
+                              className="h-full rounded bg-primary/60"
+                              style={{ width: `${Math.min(100, p.peso * 100)}%` }}
+                            />
+                          </div>
+                          <span className="w-12 shrink-0 text-right font-mono">
+                            {(p.peso * 100).toFixed(1)}%
+                          </span>
                         </div>
-                        <span className="w-12 shrink-0 text-right font-mono">{(p.peso * 100).toFixed(1)}%</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
         </div>
       )}
     </div>
@@ -263,7 +308,9 @@ function RiesgoPanel() {
               aria-label="Intervalo"
             >
               {VALID_INTERVALS.map((i) => (
-                <option key={i} value={i}>{i}</option>
+                <option key={i} value={i}>
+                  {i}
+                </option>
               ))}
             </select>
             <select
@@ -273,15 +320,28 @@ function RiesgoPanel() {
               aria-label="Período"
             >
               {VALID_PERIODS.map((p) => (
-                <option key={p} value={p}>{p}</option>
+                <option key={p} value={p}>
+                  {p}
+                </option>
               ))}
             </select>
           </div>
-          <Button onClick={() => m.mutate({ tickers: parseTickers(raw), period: periodo, interval: intervalo })} disabled={m.isPending}>
-            {m.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Shield className="h-4 w-4" />}
+          <Button
+            onClick={() =>
+              m.mutate({ tickers: parseTickers(raw), period: periodo, interval: intervalo })
+            }
+            disabled={m.isPending}
+          >
+            {m.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Shield className="h-4 w-4" />
+            )}
             Analizar riesgo
           </Button>
-          {m.isError && <p className="text-sm text-red-400">{(m.error as Error)?.message ?? "Error."}</p>}
+          {m.isError && (
+            <p className="text-sm text-red-400">{(m.error as Error)?.message ?? "Error."}</p>
+          )}
         </CardContent>
       </Card>
 
@@ -313,12 +373,23 @@ function RiesgoPanel() {
                   {resultados.map((r) => (
                     <TableRow key={r.ticker}>
                       <TableCell className="font-mono font-medium">{r.ticker}</TableCell>
-                      <TableCell className={cn("text-right font-mono", r.meanAnnual >= 0 ? "text-emerald-400" : "text-red-400")}>
+                      <TableCell
+                        className={cn(
+                          "text-right font-mono",
+                          r.meanAnnual >= 0 ? "text-emerald-400" : "text-red-400",
+                        )}
+                      >
                         {fmtPct(r.meanAnnual)}
                       </TableCell>
-                      <TableCell className="text-right font-mono">{fmtPct(r.volatilityAnnual)}</TableCell>
-                      <TableCell className="text-right font-mono">{fmtNum2(r.sharpeRatio)}</TableCell>
-                      <TableCell className="text-right font-mono text-red-400">{fmtPct(r.var95)}</TableCell>
+                      <TableCell className="text-right font-mono">
+                        {fmtPct(r.volatilityAnnual)}
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
+                        {fmtNum2(r.sharpeRatio)}
+                      </TableCell>
+                      <TableCell className="text-right font-mono text-red-400">
+                        {fmtPct(r.var95)}
+                      </TableCell>
                       <TableCell className="text-right font-mono">{fmtNum2(r.skewness)}</TableCell>
                       <TableCell className="text-right font-mono">{fmtNum2(r.kurtosis)}</TableCell>
                       <TableCell className="text-right">
@@ -352,13 +423,23 @@ function RiesgoPanel() {
                     <div style={{ height: 200 }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={hist} margin={{ top: 4, right: 8, bottom: 0, left: -18 }}>
-                          <CartesianGrid stroke={GRID_STROKE} strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="x" tick={AXIS_TICK_SM} tickFormatter={(v: number) => `${(v * 100).toFixed(0)}%`} />
+                          <CartesianGrid
+                            stroke={GRID_STROKE}
+                            strokeDasharray="3 3"
+                            vertical={false}
+                          />
+                          <XAxis
+                            dataKey="x"
+                            tick={AXIS_TICK_SM}
+                            tickFormatter={(v: number) => `${(v * 100).toFixed(0)}%`}
+                          />
                           <YAxis tick={AXIS_TICK_SM} />
                           <Tooltip
                             contentStyle={CHART_TOOLTIP_STYLE}
                             formatter={(v: number | string) => [String(v), "frecuencia"]}
-                            labelFormatter={(l: number | string) => `${(Number(l) * 100).toFixed(2)}%`}
+                            labelFormatter={(l: number | string) =>
+                              `${(Number(l) * 100).toFixed(2)}%`
+                            }
                           />
                           <ReferenceLine x={0} stroke="#94a3b8" strokeDasharray="4 4" />
                           <Bar dataKey="freq" fill="#38bdf8" opacity={0.7} />
@@ -455,10 +536,16 @@ function CapmPanel() {
             }
             disabled={m.isPending}
           >
-            {m.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingUp className="h-4 w-4" />}
+            {m.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <TrendingUp className="h-4 w-4" />
+            )}
             Calcular CAPM
           </Button>
-          {m.isError && <p className="text-sm text-red-400">{(m.error as Error)?.message ?? "Error."}</p>}
+          {m.isError && (
+            <p className="text-sm text-red-400">{(m.error as Error)?.message ?? "Error."}</p>
+          )}
           {auto && (
             <p className="text-xs text-muted-foreground">
               Auto-detección entre {AUTO_BENCHMARKS.slice(0, 6).join(", ")}… según mejor R².
@@ -493,11 +580,20 @@ function CapmPanel() {
                     <TableRow key={r.ticker}>
                       <TableCell className="font-mono font-medium">{r.ticker}</TableCell>
                       <TableCell className="text-right font-mono">{fmtNum2(r.beta)}</TableCell>
-                      <TableCell className={cn("text-right font-mono", (r.annualizedAlpha ?? 0) >= 0 ? "text-emerald-400" : "text-red-400")}>
+                      <TableCell
+                        className={cn(
+                          "text-right font-mono",
+                          (r.annualizedAlpha ?? 0) >= 0 ? "text-emerald-400" : "text-red-400",
+                        )}
+                      >
                         {fmtPct(r.annualizedAlpha)}
                       </TableCell>
-                      <TableCell className="text-right font-mono">{fmtNum2(r.rSquared, 3)}</TableCell>
-                      <TableCell className="text-right font-mono">{fmtNum2(r.correlation, 3)}</TableCell>
+                      <TableCell className="text-right font-mono">
+                        {fmtNum2(r.rSquared, 3)}
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
+                        {fmtNum2(r.correlation, 3)}
+                      </TableCell>
                       <TableCell className="text-right font-mono">{fmtNum2(r.pValue, 4)}</TableCell>
                       <TableCell className="font-mono text-xs text-muted-foreground">
                         {r.benchmarkLabel ?? "—"}
@@ -526,7 +622,10 @@ function CapmPanel() {
                       domain={["dataMin - 0.2", "dataMax + 0.2"]}
                     />
                     <YAxis type="number" dataKey="alpha" name="Alpha %" tick={AXIS_TICK_SM} />
-                    <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: number | string) => Number(v).toFixed(3)} />
+                    <Tooltip
+                      contentStyle={CHART_TOOLTIP_STYLE}
+                      formatter={(v: number | string) => Number(v).toFixed(3)}
+                    />
                     <ReferenceLine y={0} stroke="#94a3b8" strokeDasharray="4 4" />
                     <ReferenceLine x={1} stroke="#94a3b8" strokeDasharray="4 4" />
                     <Scatter data={scatterData} fill="#38bdf8">

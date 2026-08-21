@@ -39,13 +39,19 @@ export async function fetchHistoryIOL(
   const fechaHasta = hoy.toISOString().split("T")[0];
 
   let result = await tryFetch(ticker, mercado, token, fechaDesde, fechaHasta);
-  if (result) return result.filter((r) => r.fecha && r.cierre > 0).map((r) => ({ date: r.fecha, close: r.cierre }));
+  if (result)
+    return result
+      .filter((r) => r.fecha && r.cierre > 0)
+      .map((r) => ({ date: r.fecha, close: r.cierre }));
 
   if (refreshToken) {
     const tokens = await fetchTokens({ refresh_token: refreshToken, grant_type: "refresh_token" });
     if (!("error" in tokens)) {
       result = await tryFetch(ticker, mercado, tokens.accessToken, fechaDesde, fechaHasta);
-      if (result) return result.filter((r) => r.fecha && r.cierre > 0).map((r) => ({ date: r.fecha, close: r.cierre }));
+      if (result)
+        return result
+          .filter((r) => r.fecha && r.cierre > 0)
+          .map((r) => ({ date: r.fecha, close: r.cierre }));
     }
   }
 

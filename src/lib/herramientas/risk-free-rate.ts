@@ -31,20 +31,19 @@ async function fetchTreasuryRate(): Promise<number> {
 
 async function fetchBADLARRate(): Promise<number> {
   try {
-    const r = await fetch(
-      "https://api.bcra.gob.ar/estadisticas/v4.0/Monetarias/7",
-      { cache: "no-store" },
-    );
-    if (!r.ok) return 0.30;
+    const r = await fetch("https://api.bcra.gob.ar/estadisticas/v4.0/Monetarias/7", {
+      cache: "no-store",
+    });
+    if (!r.ok) return 0.3;
     const j = await r.json();
     const results = j?.results ?? [];
-    if (results.length === 0) return 0.30;
+    if (results.length === 0) return 0.3;
     const last = results[results.length - 1];
     const detalles = last?.detalle ?? [];
-    if (detalles.length === 0) return 0.30;
+    if (detalles.length === 0) return 0.3;
     return detalles[detalles.length - 1].valor / 100;
   } catch {
-    return 0.30;
+    return 0.3;
   }
 }
 
@@ -75,7 +74,7 @@ export async function getRiskFreeRate(currency: "USD" | "ARS" = "USD"): Promise<
 export function getRiskFreeRateSync(currency: "USD" | "ARS" = "USD"): number {
   const c = currency === "ARS" ? cacheARS : cacheUSD;
   if (c && Date.now() - c.timestamp < CACHE_TTL) return c.tasa;
-  return currency === "ARS" ? 0.30 : 0.045;
+  return currency === "ARS" ? 0.3 : 0.045;
 }
 
 // Inicializa la tasa al importar el módulo en server (fire-and-forget, no bloquea)

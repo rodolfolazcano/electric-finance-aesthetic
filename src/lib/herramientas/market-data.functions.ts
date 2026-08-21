@@ -144,9 +144,8 @@ export const getYahooHistoricalServer = createServerFn({ method: "GET" })
         })
         .parse(input),
   )
-  .handler(
-    async ({ data }): Promise<HistoricalBar[]> =>
-      yahooHistoricalBars(data.symbol, data.rango, data.intervalo),
+  .handler(async ({ data }): Promise<HistoricalBar[]> =>
+    yahooHistoricalBars(data.symbol, data.rango, data.intervalo),
   );
 
 // ─── IOL: helpers ───────────────────────────────────────────────────────────

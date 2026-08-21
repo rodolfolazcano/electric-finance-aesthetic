@@ -28,7 +28,7 @@ export const fetchDraftAssetInfo = createServerFn({ method: "POST" })
 
     try {
       const sameSymbol = res.priceSymbol === res.analysisSymbol;
-      
+
       // Fetch price and analysis data in parallel
       // For CEDEARs: price from priceSymbol (AAPL.BA), analysis from analysisSymbol (AAPL)
       // For BCBA stocks: both from .BA symbol
@@ -51,7 +51,7 @@ export const fetchDraftAssetInfo = createServerFn({ method: "POST" })
         industry = qs.industry ?? null;
         longName = qs.longName ?? null;
       }
-      
+
       // Use price data for the current price (from the specific market)
       if (qsPrice) {
         ultimoPrecio = qsPrice.currentPrice ?? null;
@@ -76,17 +76,20 @@ export const fetchDraftAssetInfo = createServerFn({ method: "POST" })
         if (lrA.length >= 2 && lrB.length >= 2) {
           const mB = mean(lrB);
           const mA = mean(lrA);
-          let cov = 0, varB = 0;
+          let cov = 0,
+            varB = 0;
           for (let i = 0; i < lrA.length; i++) {
             cov += (lrA[i] - mA) * (lrB[i] - mB);
             varB += (lrB[i] - mB) ** 2;
           }
-          cov /= (lrA.length - 1);
-          varB /= (lrB.length - 1);
+          cov /= lrA.length - 1;
+          varB /= lrB.length - 1;
           if (varB > 0) beta = cov / varB;
         }
       }
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
 
     return {
       symbol: data.symbol,
@@ -100,8 +103,9 @@ export const fetchDraftAssetInfo = createServerFn({ method: "POST" })
       volatilidadAnual,
       dailyLogReturns,
       longName,
-      error: sector == null && ultimoPrecio == null && prices.length === 0
-        ? "Sin datos disponibles"
-        : null,
+      error:
+        sector == null && ultimoPrecio == null && prices.length === 0
+          ? "Sin datos disponibles"
+          : null,
     };
   });

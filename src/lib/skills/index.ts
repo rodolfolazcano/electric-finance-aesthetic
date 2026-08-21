@@ -301,4 +301,21 @@ export function obtenerSkill(id: string): Skill | undefined {
   return POR_ID.get(id);
 }
 
+/** Skill de análisis de opciones - replicado de las capacidades opciones222-Monstruos */
+{
+    id: "analisis-opciones",
+    nombre: "Análisis de Opciones",
+    descripcion:
+      "Análisis de cadenas de opciones, valoración de opciones, Greeks y simulaciones Monte Carlo. Portado desde el sistema opciones222-Monstruos.",
+    instrucciones: `[SKILL · Análisis de Opciones — portado desde opciones222-Monstruos]
+- Ejecutá SIEMPRE consultar_mercado con el ticker del activo ANTES de responder sobre opciones.
+- Calculá valor intrínseco, moneyness y clasificación ITM/OTM con datos reales.
+- Ejecutá analizar_distribucion_retornos sobre la serie histórica para obtener media, volatilidad, skewness, kurtosis, VaR 95% y probabilidad de ganancia.
+- Ejecutá monto_carlo_simulacion para proyecciones de precios futuros con múltiples escenarios.
+- Clasificá el análisis: completa (con datos reales), precio teórico (con supuestos del usuario), o datos no disponibles.
+- NUNCA inventes precios de opción, griegos o volatilidad implícita: si los datos reales no están disponibles en este turno, decilo con honestidad.
+- El análisis es educativo: no es recomendación de inversión. Los resultados son informativos y basados en datos de mercado reales.`,
+},
+ */
+
 export { SKILLS };

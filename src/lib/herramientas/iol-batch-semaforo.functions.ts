@@ -27,10 +27,7 @@ export interface IOLSemaforoResult {
   history: { date: string; close: number }[];
 }
 
-async function iolFetchRaw<T>(
-  url: string,
-  token: string,
-): Promise<T | null> {
+async function iolFetchRaw<T>(url: string, token: string): Promise<T | null> {
   try {
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
@@ -64,7 +61,9 @@ async function fetchIOLHistory(
     }
   }
   if (!data) return [];
-  return data.filter((r) => r.fecha && r.cierre > 0).map((r) => ({ date: r.fecha, close: r.cierre }));
+  return data
+    .filter((r) => r.fecha && r.cierre > 0)
+    .map((r) => ({ date: r.fecha, close: r.cierre }));
 }
 
 function computeClasificacion(total: number): {
@@ -73,36 +72,57 @@ function computeClasificacion(total: number): {
   light: "green" | "yellow" | "red";
 } {
   const clasificacionJerarquica: any =
-    total >= 5 ? "COMPRA" :
-    total >= 2 ? "COMPRA CON CAUTELA" :
-    total >= 0 ? "MANTENER" :
-    total >= -3 ? "REDUCIR" :
-    "VENTA";
-  const light: any = clasificacionJerarquica === "COMPRA" || clasificacionJerarquica === "COMPRA CON CAUTELA"
-    ? "green" : clasificacionJerarquica === "MANTENER" ? "yellow" : "red";
-  const recommendation: any = light === "green" ? "COMPRA" : light === "yellow" ? "MANTENER" : "VENTA";
+    total >= 5
+      ? "COMPRA"
+      : total >= 2
+        ? "COMPRA CON CAUTELA"
+        : total >= 0
+          ? "MANTENER"
+          : total >= -3
+            ? "REDUCIR"
+            : "VENTA";
+  const light: any =
+    clasificacionJerarquica === "COMPRA" || clasificacionJerarquica === "COMPRA CON CAUTELA"
+      ? "green"
+      : clasificacionJerarquica === "MANTENER"
+        ? "yellow"
+        : "red";
+  const recommendation: any =
+    light === "green" ? "COMPRA" : light === "yellow" ? "MANTENER" : "VENTA";
   return { clasificacionJerarquica, recommendation, light };
 }
 
 export const getIOLSemaforoBatch = createServerFn({ method: "POST" })
-  .inputValidator(
-    (input: unknown) =>
-      z.object({
-        tickers: z.array(z.object({
-          simbolo: z.string(),
-          mercado: z.string().default("bCBA"),
-          moneda: z.string().default("ARS"),
-        })).min(1).max(20),
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tickers: z
+          .array(
+            z.object({
+              simbolo: z.string(),
+              mercado: z.string().default("bCBA"),
+              moneda: z.string().default("ARS"),
+            }),
+          )
+          .min(1)
+          .max(20),
         token: z.string().min(1),
         refreshToken: z.string().nullable(),
         days: z.number().default(730),
-      }).parse(input),
+      })
+      .parse(input),
   )
   .handler(async ({ data }): Promise<IOLSemaforoResult[]> => {
     const results: IOLSemaforoResult[] = [];
     for (const t of data.tickers) {
       try {
-        const hist = await fetchIOLHistory(t.simbolo, t.mercado, data.token, data.refreshToken, data.days);
+        const hist = await fetchIOLHistory(
+          t.simbolo,
+          t.mercado,
+          data.token,
+          data.refreshToken,
+          data.days,
+        );
         if (hist.length < 30) continue;
         const closes = hist.map((h) => h.close);
         const current = closes[closes.length - 1];
@@ -114,15 +134,20 @@ export const getIOLSemaforoBatch = createServerFn({ method: "POST" })
         const { macd: macdVal, signal: macdS } = macdFn(closes);
 
         let tech = 0;
-        if (current > sma50Val) tech += 1; else tech -= 1;
+        if (current > sma50Val) tech += 1;
+        else tech -= 1;
         if (sma200Val != null && sma50Val > sma200Val) tech += 1;
         else if (sma200Val != null && sma50Val < sma200Val) tech -= 1;
         if (rsiVal < 30) tech += 2;
         else if (rsiVal > 70) tech -= 2;
-        if (macdVal > macdS) tech += 1; else tech -= 1;
+        if (macdVal > macdS) tech += 1;
+        else tech -= 1;
 
-        const trendBoost = sma200Val != null && sma50Val > sma200Val ? 1 : sma50Val > current ? -1 : 0;
-        const { clasificacionJerarquica, recommendation, light } = computeClasificacion(tech + trendBoost);
+        const trendBoost =
+          sma200Val != null && sma50Val > sma200Val ? 1 : sma50Val > current ? -1 : 0;
+        const { clasificacionJerarquica, recommendation, light } = computeClasificacion(
+          tech + trendBoost,
+        );
 
         results.push({
           ticker: t.simbolo,

@@ -49,7 +49,9 @@ export const fetchDraftAssetInfoFromIOL = createServerFn({ method: "POST" })
       // For BCBA stocks: both from .BA symbol
       // For US stocks: both from base ticker
       const [qsPrice, qsAnalysis, closes, spyCloses] = await Promise.all([
-        res.priceSymbol ? yahooQuoteSummary(res.priceSymbol).catch(() => null) : Promise.resolve(null),
+        res.priceSymbol
+          ? yahooQuoteSummary(res.priceSymbol).catch(() => null)
+          : Promise.resolve(null),
         sameSymbol || !res.analysisSymbol
           ? Promise.resolve(null)
           : yahooQuoteSummary(res.analysisSymbol).catch(() => null),
@@ -93,17 +95,20 @@ export const fetchDraftAssetInfoFromIOL = createServerFn({ method: "POST" })
         if (lrA.length >= 2 && lrB.length >= 2) {
           const mB = mean(lrB);
           const mA = mean(lrA);
-          let cov = 0, varB = 0;
+          let cov = 0,
+            varB = 0;
           for (let i = 0; i < lrA.length; i++) {
             cov += (lrA[i] - mA) * (lrB[i] - mB);
             varB += (lrB[i] - mB) ** 2;
           }
-          cov /= (lrA.length - 1);
-          varB /= (lrB.length - 1);
+          cov /= lrA.length - 1;
+          varB /= lrB.length - 1;
           if (varB > 0) beta = cov / varB;
         }
       }
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
 
     return {
       symbol: iolTitulo.simbolo,
@@ -121,8 +126,9 @@ export const fetchDraftAssetInfoFromIOL = createServerFn({ method: "POST" })
       moneda: res.moneda,
       mercado: res.mercado,
       pais: res.pais,
-      error: sector == null && ultimoPrecio == null && prices.length === 0
-        ? "Sin datos disponibles"
-        : null,
+      error:
+        sector == null && ultimoPrecio == null && prices.length === 0
+          ? "Sin datos disponibles"
+          : null,
     };
   });

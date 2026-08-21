@@ -1,0 +1,1017 @@
+﻿Asesoramiento y Planificación Financiera 
+Manual 2022
+  
+
+Dirigido por: 
+Jesús M. López Zaballos 
+Director Gerente de la Escuela FEF 
+Presidente de European Federation of Financial Analyst Societies, EFFAS 
+Editado por: 
+FUNDACIÓN DE ESTUDIOS FINANCIEROS (FEF), Basílica, 17-Oficinas-1ª Planta. 28020 Madrid, España 
+ISBN: 978-84-695-7525-3
+Asesoramiento y Planificación Financiera 
+Índice 
+0. NIVEL DE CERTIFICACIÓN ....................................................................................................... 5 
+1. EL CLIENTE Y LA ASESORÍA FINANCIERA ............................................................................... 7 1.1.Principios Éticos del Asesoramiento Financiero......................................................... 7 1.2. Banca de Producto vs. Banca de Clientes.............................................................. 7 1.3. Concepto y Características de la banca personal vs banca privada ..........................13 1.3.1. Tipología de clientes de banca personal y de banca privada ......................15 1.3.2. Análisis de los clientes de banca personal (y privada)...............................16 1.4. Características de la Banca Privada ....................................................................18 1.4.1. Definición y Objetivos de la Banca Privada..............................................18 1.4.2. Ventajas de la Banca Privada ................................................................19 1.5. Entidades y servicios a ofrecer...........................................................................19 1.5.1. Las Empresas de Asesoramiento Financiero (EAF)....................................21 
+1.5.2. Principales características de los servicios que estas entidades suelen ofrecer ...............................................................................................22 
+2. RECOPILACIÓN DE LOS DATOS DEL CLIENTE Y DETERMINACIÓN DE LOS OBJETIVOS Y EXPECTATIVAS ....................................................................................................................... 25 
+2.1. Obtención de información del cliente a través de una entrevista/cuestionario sobre sus recursos financieros y obligaciones.....................................................................25 
+2.2. Determinar los objetivos personales y financieros del cliente, las necesidades del cliente y prioridades .........................................................................................31 
+2.3. Conocer los valores, actitudes y expectativas del cliente .......................................34 2.4. Determinar el nivel de tolerancia al riesgo del cliente............................................37 
+3. EL PROCESO DE PLANIFICACIÓN FINANCIERA (ASESORAMIENTO) ADAPTADO AL CLIENTE40 3.1. Definición........................................................................................................40 3.2. Servicios ofrecidos en la PF ...............................................................................42 3.3. Ventajas y obstáculos de la planificación financiera...............................................42 3.4. Etapas ............................................................................................................43 
+4. DISEÑO DE CARTERAS BÁSICAS SEGÚN LOS DIVERSOS OBJETIVOS DEL CLIENTE ........... 48 5. GESTIÓN DE LAS CARTERAS. REAJUSTES Y REEQUILIBRIOS .............................................. 56 6. ASESORAMIENTO FINANCIERO INDEPENDIENTE: EAFIS ..................................................... 58 7. BIBLIOGRAFÍA Y WEBS CONSULTADAS Y DE INTERÉS......................................................... 61
+Fundación de Estudios Financieros© 3 
+Asesoramiento y Planificación Financiera 4 Fundación de Estudios Financieros©
+Asesoramiento y Planificación Financiera 
+0. NIVEL DE CERTIFICACIÓN 
+La Escuela FEF prepara para la superación de los exámenes de los distintos niveles de certificación profesional que otorgan el Instituto Español de Analistas Financieros (IEAF) y la European Financial Planning Association (EFPA) en el ámbito del asesoramiento financiero y la gestión patrimonial: 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+Nivel Básico IEAF Asesor en Servicios Financieros (ASF) EFPA European Investment Assistant (EIA) Nivel I IEAF Asesor Financiero (AF) 
+EFPA European Investment Practitioner (EIP) 
+Nivel I+II 
+IEAF Gestor Patrimonial (GP) EFPA European Financial Advisor (EFA) 
+Estas certificaciones profesionales supondrán para sus titulares un reconocimiento externo de sus conocimientos y competencias para realizar una labor de asesoramiento e información acorde con las recomendaciones recogidas en la normativa MiFID II y en el marco europeo de ESMA de cualificaciones profesionales en los servicios financieros.
+Las certificadoras fijan para cada nivel de acreditación, un programa de contenidos acorde basado en el ejercicio profesional. 
+El presente manual desarrolla con un lenguaje claro, sencillo y didáctico los contenidos fijados para la materia de la que versa, la cual está enmarcada en el siguiente nivel/es de certificación: 
+Contenidos 
+NOTA: 
+Nivel Básico 
+Nivel I 
+Nivel II 
+Estos contenidos son por tanto objeto de examen 
+exclusivamente en las certificaciones de: 
+▪ Nivel I 
+▪ Nivel I+II 
+Los alumnos de Nivel Básico no deberán prepararlos. 
+Fundación de Estudios Financieros© 5 
+Asesoramiento y Planificación Financiera 6 Fundación de Estudios Financieros©
+Asesoramiento y Planificación Financiera 
+1. EL CLIENTE Y LA ASESORÍA FINANCIERA 
+1.1. Principios Éticos del Asesoramiento Financiero 
+Comenzamos el área de asesoramiento y planificación financiera con una breve introducción  de los cuatro principios básicos para el desempeño del asesoramiento financiero y la gestión de 
+patrimonios centrándonos en su aspecto ético: 
+Gestión independiente del patrimonio del cliente. En este sentido resulta esencial que el 
+asesor no se deje influenciar por opiniones externas que ejerzan presión y acaben sesgando la  inversión o el asesoramiento. 
+Secreto profesional. El cliente pone a disposición del asesor o gestor, información muy sensible sobre su patrimonio. La discreción del asesor es fundamental para garantizar un buen servicio, y dicha información no debe ser divulgada. 
+Transparencia en las inversiones. El cliente debe recibir información puntual sobre su 
+patrimonio. Dicha información debe ser la estipulada por la ley, así como aquella que el gestor  considere importante para su cliente. Por otra parte, si el asesor detecta la aparición de algún  conflicto de intereses entre la entidad para la que trabaja y las inversiones de sus clientes,  deberá comunicárselo al cliente a la mayor brevedad posible. 
+Cumplimiento normativo de la legislación aplicable y de la política interna de la  empresa para la que trabaja. Resulta evidente que la gestión patrimonial es una actividad 
+sometida a una elevada regulación debido a la materia prima con la trabajamos, el dinero del  cliente. Además de esta regulación, el asesor o gestor es responsable con su actuación del  buen nombre de la firma, ya que los clientes son, en última instancia de la entidad y no del  asesor. Por esta razón, no sólo debe el asesor velar por el cumplimiento de la normativa legal,  sino que también debe cumplir la normativa interna de la entidad para la que trabaja. 
+1.2. Banca de Producto vs. Banca de Clientes 
+Definimos la banca de productos como aquella que tiene lugar en las oficinas de la red comercial de las entidades financieras, prestándose servicios bancarios de activo y de pasivo,
+Fundación de Estudios Financieros© 7 
+Asesoramiento y Planificación Financiera 
+así como comercializándose fondos de inversión, productos de ahorro y seguro y, en definitiva, 
+cualquier operación transaccional que precise el cliente. En la banca de productos no se establecen límites de patrimonio para ser cliente, y se prima la colocación del producto sobre 
+la adecuación a las circunstancias del cliente, dónde se está centrado en la venta según las campañas, y dónde las oficinas bancarias son meros centros administrativos en lugar de un sitio en el que recibir consejos financieros. Se trata de conseguir los objetivos de ventas, rentabilidad, o captación de clientes, lo más rápidamente posible, sin pararse a evaluar detenidamente si esa política es sostenible en el medio y largo plazo. 
+Como primera aproximación a la segmentación que las entidades financieras llevan a cabo con sus clientes, mostramos en la Tabla 1 la clasificación del profesor Córdoba Bueno (2014). Más 
+adelante, veremos otras clasificaciones, y es importante destacar que no existe una clasificación universal, variando ésta según la interpretación de cada entidad financiera. 
+Clasificación de actividades bancarias 
+Tabla 1 
+Tipo de Banca 
+	Patrimonio
+	Banca Retail o Banca de  
+Particulares
+	Patrimonio < 100.000€
+	Banca Personal 
+	100.000€ < Patrimonio <  
+300.000€
+	Banca Privada 
+	300.000€ < Patrimonio <  
+2.400.000€
+	Family Office 
+	2.400.000€ < Patrimonio
+	
+
+
+
+Fuente: Miguel Córdoba Bueno (2014) 
+Según esta clasificación que acabamos de exponer, la banca de productos encajaría dentro de la banca de particulares o banca retail que es como se denomina a la actividad que se realiza en las oficinas de la red comercial, y que se basa en el ofrecimiento a los clientes de los productos creados por la propia entidad, mientras que la banca privada y la banca personal buscan dar respuestas personales a objetivos y necesidades concretas. El importe de 2,4 millones de euros que marca el patrimonio de los Family Offices en esta clasificación se basa en el límite legal que se establece en España para constituir una SICAV (Sociedad de Inversión 
+de Capital Variable). 
+Una vez definido el concepto y el alcance de la banca de productos, pasamos a la banca de clientes, que se centra en rentabilizar la relación con el cliente, viendo esta relación como un todo y no como una simple suma de productos y servicios. En general, el modelo de banca de clientes se centra en rentabilizar la relación con el cliente, viéndola como un todo y no como una suma de productos y servicios.
+8 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Este modelo se basa en tres estrategias: 
+1. Atraer clientes. En el caso español, esta acción se apoya en gran medida en las redes de oficinas bancarias. 
+2. Mantener clientes (tasas de retención y fidelización). Es posiblemente el aspecto más difícil en el negocio, al tener que gestionar el binomio confianza depositada por el cliente – volatilidad de los mercados. 
+3. Aumentar las relaciones con los clientes (ventas cruzadas). Se trata de aprovechar al cliente interno dentro de las corporaciones bancarias, que ya existe por otros motivos, para darle servicios de banca personalizados. 
+En la Banca de clientes el cómo (servicio) puede llegar a ser tan importante como el qué (producto), e incluso más. 
+Según la Harvard Deusto Business Review, los pilares de un buen modelo de banca de clientes son los siguientes1: tecnología, atribuciones, objetivos e incentivos, información de satisfacción del cliente interno y externo, estructura organizativa y gestión de los recursos humanos y tutela de la alta dirección. 
+1.- Tecnología: Las sucursales continúan recibiendo listados infinitos, el único cambio aparente es que ahora llegan vía internet y no en papel. La nueva tecnología no se ha visto como algo que ayuda sino como algo que coarta la capacidad de iniciativa personal. La tecnología puede ayudar mucho a que el gestor piense en términos de cliente si recibe información sobre su posición global, sobre su potencial en los diferentes productos o servicios, grado de satisfacción, etc. El modelo de cauterización muchas veces no es bien recibido en la red, especialmente en los casos en los que la posibilidad del gestor de hacer cambios en su cartera es nula. 
+2.- Atribuciones: El cliente asocia casi exclusivamente el banco o caja con la persona que le atiende en la sucursal. Si pretendemos que la percepción del cliente frente a la institución sea de correcto asesoramiento, un trato personalizado y una implicación del gestor es necesario que el gestor cuente con un margen de maniobra. 
+3.-Objetivos e incentivos: Las métricas de seguimiento del negocio son un factor clave para alinear en un sentido u otro, la cultura de la empresa. Cuando a una oficina se le mide por el número de productos que vende en un período determinado de tiempo, se le está empujando a “colocar” el fondo de turno a cualquiera que aparezca por la puerta, independientemente de que sea o no adecuado para ese cliente. Si la métrica que se sigue es el margen por cliente en largos períodos de tiempo, el gestor asume que de nada vale “colocar” un producto con presión, ya que, a medio plazo, la confianza y el margen por cliente se resentirán. 
+1 Resumen de Francisco Segrelles de GREF del artículo publicado en octubre y cuyos autores son Luis Huete (IESE) y Nicolás López (de Globalpraxis Group).
+Fundación de Estudios Financieros© 9 
+Asesoramiento y Planificación Financiera 
+El gran paso consiste en ligar los incentivos de la red a estas nuevas métricas, especialmente a la posición global del cliente (volumen), al margen y a la retención. Aquí es donde el papel de la tecnología de la que se habla en el primer pilar puede resultar de gran ayuda. 
+4.- Información de satisfacción del cliente interno y externo: En este apartado los autores vienen a decir que las mismas inquietudes que se tienen en captar, retener, vincular, y en definitiva satisfacer al cliente, se debe tener con el cliente interno, con los gestores. Para ello hay que realizar investigaciones periódicas, sobre la satisfacción percibida respecto a los departamentos que deben prestarle servicio. La idea sería preguntar al usuario (gestor) por los parámetros clave que definen el servicio que debe recibir (agilidad, claridad, accesibilidad, etc.). Y lo lógico es que se incorporen los resultados conseguidos al salario. 
+5.- Estructura organizativa y gestión de los recursos humanos: El organigrama comercial debe ser plano. Esto facilitará la velocidad de respuesta y que el mensaje lanzado por la dirección General llegue sin distorsiones al director de oficina. El Departamento de Clientes debe estar próximo a la Dirección General, y participar en los Comités de Dirección. Y organizar los departamentos de apoyo (riesgos, medios, productos, etc.) alineados con los segmentos de clientes a los que da servicio la red. 
+La gestión de Recursos Humanos puede prestar un gran servicio en dos aspectos: 1.- siendo un centro de intercambio de buenas prácticas. 2.- estableciendo una adecuada política de promoción y ascensos, y unos criterios claros de compensación en función de resultados. 
+6.- Tutela de la Alta Dirección: Destacamos las siguientes sugerencias: Insistir en el mensaje de la importancia del cliente; participar activamente en las sesiones de formación para empleados de la red, hablando siempre de temas relacionados con el servicio al cliente o la fidelización; asociar una cartera mínima de clientes (corporativos o grandes empresas) a cada uno de los miembros de la Alta Dirección; utilizar métricas de clientes en las presentaciones de resultados. 
+La transformación del negocio y el reto que supone el éxito de este cambio (pasar de banca de productos a banca de clientes) por las magnitudes que las entidades mueven, tanto en tecnología como en personal, hace que se oriente la organización al cliente, definiendo las estrategias comerciales segmentadas y reevaluando la función y densidad de los canales (los telemáticos están ganando terreno) y el posicionamiento de la red. 
+Es evidente que las nuevas realidades que presionan sobre la actividad bancaria hacen que surjan nuevos conceptos, enfoques y perspectivas para abordar el negocio bancario (tabla 2). Por ello, se establece como premisa fundamental rebasar la añeja banca de productos, para pasar hacia una nueva y dinámica banca de clientes. 
+El enfoque de la banca de clientes responde a una evolución lógica de un mercado mucho más abierto y competitivo, como es el mercado español. Esto ha supuesto un profundo cambio en
+10 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+las organizaciones; y la nota característica que denota el cambio en las instituciones ha sido rebasar el perfil profesional de las personas que realizan banca de productos hacia otro que es sustancialmente diferente para gestionar banca de clientes, ya que uno es básicamente captador de pasivo y el otro responde a un perfil de personas con una visión, concepción y conocimientos del negocio bancario más amplios y especializados 
+Nuevas realidades en la actividad bancaria 
+Tabla 2 
+Viejo perfil empresarial 
+(banca de productos)
+	Nuevo perfil empresarial 
+(banca de clientes)
+	Énfasis en habilidades bancarias 
+	Focalización en marketing, relación cliente y ventajas de marca.
+	Precios por productos 
+	Política de precios por cliente y canal.
+	Autoridad = grado y puesto 
+	Autoridad = función, capacidades y competencias
+	Estructura jerarquizada 
+	Organización flexible basada sobre equipos 
+multidisciplinarios.
+	Punto de relación: oficina 
+	Gestión cliente multicanal.
+	Rentabilidad por producto 
+	Rentabilidad por cliente y segmento de clientes.
+	
+
+
+
+Fuente: elaboración propia 
+En definitiva, la banca actualmente pasa por atraer clientes sin incrementar sus gastos generales. Esto ha provocado la orientación hacia el marketing de clientes, que consiste en identificar los grupos más rentables actuales y futuros, teniendo en cuenta la plena aparición del Mercado Único desde 1993. 
+Antes, la banca española se encontraba en una estrategia indiferenciada, pues lanzaba sus productos al mercado a través de sus canales de distribución, sin tener en cuenta quiénes podrían ser sus clientes finales. Esto provocó un servicio indiscriminado por parte de la oficina y una sensación de estandarización. Un ejemplo singular lo ofreció la banca extranjera al llegar a España, que eligió la estrategia opuesta a la que estaba siguiendo el sector, fijando un único tipo de cliente objetivo de todos sus esfuerzos. En principio fueron elegidas las grandes empresas y entidades corporativas, debido a la falta de red comercial y escasez de recursos humanos de la banca extranjera.
+Fundación de Estudios Financieros© 11 
+Asesoramiento y Planificación Financiera 
+Ante esta dinámica, la banca española respondió de dos maneras diferentes, por un lado, comenzó a segmentar la clientela en función del nivel de ingresos, lugar de residencia, edad y actividad laboral. Por otra parte, se consideró más oportuno segmentar la red de distribución red de oficinas, creando la especialización dentro de España. 
+Una vez transcurrida esta experiencia, en la década de los noventa se perfilaron estrategias más duras en términos de competitividad, identificándose una serie de variables que ayudan a profundizar en la segmentación del mercado financiero español, como pueden ser: sexo, edad, nivel de ingresos, unidad familiar, lugar de residencia, hobbies y actividades de recreo, profesión y actividad laboral. 
+Estas claves tienen en cuenta las variables básicas, como son: el envejecimiento de la población y la mayor cultura financiera de la clientela (particulares y empresas.) Se trataba de seleccionar una serie de segmentos de clientes, sobre los cuales desarrollar una promoción intensiva, en función del estudio del comportamiento de los mismos. 
+Por consiguiente, ahora la banca determina en qué segmentos hay que crecer, qué segmentos se deben abandonar y, consecuentemente, invertir o desinvertir en marketing. Esta es una dinámica que obliga a las instituciones a optimizar en todo momento las sinergias y oportunidades que el mercado propicia. 
+Para concluir este epígrafe, podríamos resumir las diferencias entre banca de productos y de clientes en: 
+Banca de producto: 
+∙ Las oficinas son centros administrativos. 
+∙ Venta por demanda o por campaña. 
+∙ Desconocimiento de la mayoría de los clientes. 
+∙ Énfasis en el precio, tecnología, comunicación y desarrollo de productos. 
+∙ Predomina la “visión interna”: el cliente y el empleado ocupan una posición secundaria en la definición de la estrategia. 
+Banca de clientes: 
+∙ Segmentación de clientes. 
+∙ Énfasis en la especialización de paquetes por segmentos de clientes. 
+∙ Amplio conocimiento de los clientes: atención global. 
+∙ Actitud comercial proactiva: Venta cruzada.
+12 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+∙ Visión participativa: 
+o Satisfacer al máximo las necesidades del cliente. 
+o Los empleados son la empresa, el asesor financiero personal es el ejecutivo de cuenta del cliente y es, en muchos casos un consultor, es decir, que simplemente asesora y analiza riesgos. 
+1.3. Concepto y Características de la banca personal vs banca privada 
+El término 'Banca Privada' no es nuevo en el ámbito financiero y ha estado asociado a la gestión de grandes patrimonios. Implica una gestión integral de patrimonio del cliente por parte de un equipo de asesores personales que tendrá en cuenta, tanto los aspectos financieros como los fiscales. 
+En los últimos tiempos, ha surgido el término 'Banca Personal'2, que se enfoca a clientes con menor volumen de patrimonio, en un intento de fidelizarlo a la entidad y de que aumente su vinculación a ella. El elemento identificador de la misma es la asignación de un 'gestor personal' que será el encargado de asesoramiento y de la gestión de nuestro patrimonio, así como, nuestro contacto con la entidad. 
+En muchos casos, lo que en una entidad se califica de Banca Privada puede ser Banca Personal en otra. No se trata más que de una manera de 'segmentar' a los clientes, en función del volumen de patrimonio, y de darle unos servicios complementarios a los que recibe el cliente con menor patrimonio o menor vinculación a la entidad. 
+Esta modalidad de banca se fundamenta en cuatro pilares enfocados única y exclusivamente a satisfacer las necesidades del cliente: 
+∙ eficaz gestión de clientes, 
+∙ trato personal, 
+∙ productos exclusivos y 
+∙ la más alta calidad que el cliente merece. 
+Además, las entidades son conscientes que lo más importante para el cliente es el trato exclusivo y personalizado, por ello ponen a su disposición un gerente de banca personal en todo momento que le ofrece consejo en temas financieros y fiscales, así como la información actualizada sobre la situación de los mercados. Es habitual, además, que se proporcionen 
+2 En España hacemos esta distinción en función del patrimonio gestionado para diferenciarla de la banca de productos, también llamada banca universal o banca tradicional.
+Fundación de Estudios Financieros© 13 
+Asesoramiento y Planificación Financiera 
+recomendaciones de inversión en formato newsletter, entre muchos otros servicios y productos distintivos. 
+Ahora bien, junto a estos cuatro pilares, el gestor de banca personal deberá también asesorar a sus clientes para conseguir: 
+▪ La diversificación del riesgo: no para ganar más, sino para arriesgarse menos. 
+▪ Optimizar su fiscalidad: no para no pagar impuestos, sino para conseguir una optimización de la rentabilidad financiero-fiscal del patrimonio. 
+Para ello, el asesor, ha de ser neutro en sus juicios y no estar influenciado por motivaciones personales, profesionales (a veces por defensa de los intereses de su entidad) o coyunturales de los mercados financieros. 
+¿Cuáles han sido los factores que han influido en la demanda de servicios de banca personal? 
+Sin duda, entre otros: la socialización de la riqueza, la estructura de la pirámide de la población, el futuro del sistema público de pensiones, la popularización de los sistemas colectivos de inversión y el mayor conocimiento de los inversores. 
+• La socialización de la riqueza: antes los servicios de banca privada estaban dirigidos a un segmento poblacional muy reducido, mientras que actualmente los avances informáticos han permitido aprovechar economías de escala y poder extender formas de actuar dirigidas a elites a personas con niveles de renta inferiores. 
+• Pirámide de población: claramente en los países desarrollados se esta produciendo un envejecimiento de la población. En el caso de España el número de nacimientos por mujer es de 1,1, y la edad media de la población aumenta, como lo reflejan diversos estudios realizados al respecto: para 2040 más del 35% de la población en España tendrá más de 65 años. 
+• El futuro del sistema público de pensiones: el sistema financiero español de Seguridad Social Pública es de reparto, es decir, que el dinero que entra cada mes procedente de las cotizaciones sociales se destina a pagar a los pensionistas, por lo que sólo se generarían “huchas” si la pirámide poblacional fuese natural, y la tasa de paro baja; por otro lado, y considerando la solidaridad del sistema, la pensión pública está topada a un máximo, que contrasta con la existencia de un segmento poblacional con mayor nivel de renta donde la pensión pública representa un porcentaje bajo sobre su última renta del trabajo. Todo esto nos lleva a entender que los sistemas complementarios privados podrán suplir, en parte, las carencias del sistema público de pensiones, como ya ocurre en otros países occidentales. 
+• Determinadas formas de inversión se han popularizado. En los últimos 15 años, las Instituciones de Inversión Colectiva han permitido acercar las finanzas a toda clase de
+14 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+públicos y desarrollar en la práctica la teoría de gestión de carteras, antes dirigida a un colectivo pequeño de personas. 
+En definitiva, aunque no existe un modelo de negocio único en la labor de asesoramiento y gestión patrimonial, cada entidad establecerá su estrategia en función del patrimonio del cliente y del nivel de asesoramiento requerido (cuadro 1). 
+Modelos de negocio según asesoramiento y patrimonio 
+Cuadro 1 
+Fuente: Accenture 
+1.3.1. Tipología de clientes de banca personal y de banca privada 
+Como ya hemos citado anteriormente, en general, clasificamos los clientes de banca personal y banca privada en función del patrimonio bajo gestión (tabla 3). Así, los clientes se suelen clasificar en: 
+Tipología de clientes 
+Tabla 3 
+Cliente 
+	Patrimonio en gestión 
+(millones de €)
+	Tipología de Banca
+	Ultra-High Net Worth Individuals 
+	Patrimonio > 30€ 
+	Banca Privada
+	Millonarios Next Door (MND) 
+	1€ < Patrimonio < 5€ 
+	Banca Privada
+	Mid - Tier Millonarios (MTMs) 
+	5€ < Patrimonio < 30€ 
+	Banca Privada
+	Mass Affluent (MA) 
+	0,1€ < Patrimonio < 1€ 
+	Banca Personal
+	
+
+
+
+Fuente: IEAF
+Fundación de Estudios Financieros© 15 
+Asesoramiento y Planificación Financiera 
+El cliente de banca personal tiene unas características distintas de las del cliente de la banca tradicional. Trataremos de resumirlas a continuación3. 
+Perfil sociodemográfico: una gran mayoría son hombres, casados o viviendo en pareja, de edad media entre 40 y 59 años, con formación superior (58% con título universitario / post grado) y con ingresos superiores a 3.000€ mensuales netos. 
+Principales motivaciones: quieren ser considerados “importantes” por parte de las entidades. Necesitan una actitud pedagógica por parte de su asesor. Necesitan sentir que sus elecciones han sido correctas. Dejan sus ahorros en manos de empresas de su confianza. Les gusta estar al día / informado (especialmente por internet) de sus productos en cartera. 
+Relación con el ahorro: Invierten para “ganar dinero” (fructificar capital). Los principales productos con los que ahorran son las Cuentas corriente (50%), Depósitos (43%) y Acciones (22%). Diversifican sus ahorros en diferentes entidades. 
+Variables para elegir a la entidad: seleccionan a las entidades y a sus gestores en función de su capacidad de Asesoramiento (57%), Confianza (57%) y generación de Rentabilidad (56%). 
+Demandan productos: con beneficios pragmáticos y tangibles con un bajo componente de servicio: bajas comisiones, rentables, seguros, líquidos, asesoramiento y seguimiento. 
+Fuentes de información: La publicidad es clave. Se informan a través de la web de la compañía, prensa especializada e Internet. 
+1.3.2. Análisis de los clientes de banca personal (y privada) 
+Según Accenture4, la perspectiva actual nos dice que la crisis financiera de 2008 y la posterior crisis económica ha supuesto un antes y un después en el perfil del cliente, dando paso a un cliente más consciente de los riesgos, menos confiado y más exigente. 
+El nuevo cliente es consciente de que una única entidad no puede sistemáticamente ofrecer el mejor producto del mercado, sabe de la existencia de conflictos de interés y está más predispuesto a contratar productos procedentes de distintas entidades. 
+Sin duda, el cliente de banca personal del futuro sabe que debe y puede ser: • Más protagonista en la toma de decisiones. 
+• Más independiente, gracias al mayor acceso a más volumen de información a través de internet. 
+• Más protegido por parte de regulador y supervisor. 
+3 Datos facilitados por AXA. 
+4 Ver http://www.accenture.com/SiteCollectionDocuments/Local_Spain/PDF/Accenture-Banca-Privada-Reset.pdf
+16 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Adicionalmente, los cambios en las pautas de generación de riqueza en España y las consecuencias de la crisis ponen en relieve que este colectivo es menos homogéneo que en otras épocas (ver cuadro 2). Considerar el origen y el tipo de la riqueza de los clientes, así como su comportamiento respecto del asesoramiento, es cada vez un factor más importante e influyente en el mantenimiento de relaciones a largo plazo. 
+Importancia de las distintas fuentes de ingreso 
+en la construcción del patrimonio personal 
+Cuadro 2 
+
+El cliente tipo de banca privada (y personal) ha sido una persona de mediana/ avanzada edad, familiarizado con la tecnología pero que no hace uso de ella de forma activa. Este aspecto ya está cambiando con la entrada una nueva generación de clientes o potenciales clientes que hacen un uso intensivo de las nuevas tecnologías. Este nuevo perfil está totalmente dispuesto a integrar la tecnología en su manera de relacionarse con el mercado financiero.
+Fundación de Estudios Financieros© 17 
+Asesoramiento y Planificación Financiera 
+Además, la proliferación de blogs, portales financieros, redes sociales financieras, etc. ha posibilitado que los clientes tengan acceso a una ingente cantidad información: análisis y recomendaciones de expertos, carteras recomendadas por perfil, comparativa de productos financieros, etc. 
+La banca personal tendrá que enfrentarse a la aparición de plataformas de asesoramiento colaborativo en internet que pondrán en riesgo los modelos de servicio a los clientes, sobre todo en sus segmentos affluent. Las comunidades construirán criterios, a partir de la opinión de sus participantes más prestigiosos y valorados y dispondrán de herramientas que permitirán realizar reporting avanzado de las posiciones informadas por los clientes. 
+Como respuesta, las entidades tendrán que desarrollar nuevos modelos de atención basados en un uso extensivo de la tecnología (webcams, comunicación online, interconectividad con expertos, etc). La Banca Personal no puede quedarse al margen de esta evolución. Los vencedores en este proceso serán las entidades que incluyan este nuevo escenario en sus procesos de reflexión estratégica y en todos los eslabones de la cadena de valor. 
+1.4. Características de la Banca Privada 
+1.4.1. Definición y Objetivos de la Banca Privada 
+La Banca Privada se puede definir como “la gestión de la riqueza”, y es el servicio destinado a satisfacer las necesidades de inversión, planificación patrimonial, financiera y fiscal de personas o grupos familiares con un patrimonio relevante. 
+Encontramos la esencia del concepto Banca Privada cuando centramos la mirada en aquello que es común en las necesidades de una persona en su dimensión “riqueza-patrimonio”: 
+∙ La preservación del valor patrimonial. 
+∙ La revalorización y obtención de rentas aprovechando las oportunidades del mercado. 
+∙ La anticipación de las necesidades futuras en el ciclo vital y sus implicaciones financieras y de liquidez. 
+∙ La adecuación de los niveles de riesgo-rentabilidad de la posición global patrimonial. 
+∙ La articulación adecuada (legal/fiscal) de los instrumentos para canalizar la inversión financiación. 
+∙ La organización fiscalmente adecuada de la transferencia generacional,
+18 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+1.4.2. Ventajas de la Banca Privada 
+Las ventajas que hacen atractiva la banca privada son: 
+Para el cliente: 
+∙ Asesoramiento global y trato personalizado. 
+∙ Productos a medida, tanto propios como de otras entidades. 
+∙ Asesoramiento en la selección de productos financieros internacionales. ∙ Acceso a innovación financiera. 
+∙ Seguimiento de la cartera de inversiones. 
+Para las entidades financieras: 
+∙ Un mercado en crecimiento que ofrece atractiva rentabilidad con bajo riesgo (con un bajo consumo de recursos propios). 
+1.5. Entidades y servicios a ofrecer 
+Por el lado de la oferta encontramos muy diversos actores dirigidos a clientes de este mercado: 
+✔ Entidades Especializadas en la Gestión de Grandes Patrimonios 
+✔ Bancos Privados especializados. 
+✔ Boutiques independientes. 
+✔ Banca Universal. 
+✔ Family Office. 
+▪ Entidades especializadas: de manera general, con foco en la gestión de grandes patrimonios, generalmente por encima de 2MM €. 
+Su apuesta estratégica se basa en: 
+• Pocos clientes por asesor. 
+• Contratación de gestores de gran prestigio en el mercado. 
+• Desarrollo de un producto con calidad percibida muy alta en el mercado. • Obtención de contratos de gestión y mandatos de grandes SICAVs. 
+• Presencia comercial onshore en España limitada y gestión del patrimonio realizada offshore, aunque con la posibilidad de cierto despliegue onshore.
+Fundación de Estudios Financieros© 19 
+Asesoramiento y Planificación Financiera 
+• Pueden establecerse como sucursales o como sociedades de valores. 
+▪ Bancos españoles privados especializados: la mayor parte de los bancos con este modelo pertenecen a un grupo financiero de banca universal con cuyas áreas de banca privada pueden competir. Suelen compartir las siguientes características: 
+∙ Se apalancan en capacidades de la matriz, sobre todo desde el punto de vista tecnológico. 
+∙ Su cliente tipo es también un cliente HNWI si bien mantienen esquemas de servicio affluent bastante relevantes. 
+∙ Adicionalmente a los servicios de asesoramiento en inversiones despliegan capacidades de corporate y acceso a productos y servicios bancarios tradicionales (tarjetas, trasferencias, hipotecas). 
+▪ Boutiques independientes: construidas sobre el principio de asesoramiento independiente. Se caracterizan por aspectos como: 
+∙ Los socios son habitualmente profesionales procedentes de entidades de banca privada que lanzan un proyecto profesional basado en el asesoramiento. 
+∙ Su cliente objetivo no tiene un umbral de carácter patrimonial, sino que está más vinculado al tipo de servicios que demande. 
+∙ Habitualmente se configuran como ESIs o incluso como banco. 
+∙ Dentro de este grupo se encuentran desde entidades que se diferencian por su plataforma de asesoramiento hasta entidades que combinan el asesoramiento con la gestión de activos. 
+▪ Banca Universal: se trata de bancos y cajas que han desarrollado la actividad de banca privada sin generar un balance específico para esta actividad. Se caracterizan por: 
+∙ Realizan esta actividad con marca propia o dentro de la marca de la matriz. 
+∙ Tienen un enfoque estratégico multi-segmento, ofreciendo diferentes niveles de servicio para distintos segmentos de patrimonio. 
+∙ Desde el punto de vista comercial, estas entidades se apalancan en la banca retail, convirtiendo clientes de banca comercial, de empresas o personal en clientes de banca privada, gestionándolos en exclusividad o de manera conjunta con la red de oficinas.
+20 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+La tabla 4 resume las características de los modelos de negocio definidos anteriormente. Tabla 4 
+Fuente: Accenture. 
+1.5.1. Las Empresas de Asesoramiento Financiero (EAF). 
+Son una tipología de Empresa de Servicio de Inversión (ESI) y, por lo tanto, están reguladas por la CNMV. Con esta figura se profundiza en el ámbito del asesoramiento, considerando el valor diferencial que puede aportar al sector que lo realice un tercero independiente, más aún en el caso de que su remuneración proceda exclusivamente del cliente asesorado. 
+La EAF podrá además prestar servicios auxiliares tales como asesoramiento a empresas sobre estructura de capital, estrategia industrial, asesoramiento en relación con fusiones y adquisiciones de empresas, etc.
+Fundación de Estudios Financieros© 21 
+Asesoramiento y Planificación Financiera 
+Respecto de su relación con los bancos privados, la gran mayoría de los directivos consultados sobre este tipo de entidades, han coincidido en considerarlas un nuevo canal de captación para las entidades de Banca Privada ya que: 
+• Permiten captar nuevo patrimonio y operaciones sin aumento de los costes fijos. • Son especialmente interesantes para la expansión mediante alianzas. 
+• Colaborando con una EAF se reduce el riesgo-reputación. 
+Es imposible definir un modelo de negocio único para las EAFs pues cada EAF está desarrollando el suyo particular. Algunas EAFs se dirigen únicamente a la gestión de clientes de grandes patrimonios con modelos de negocio propios de Family Office; otras, por el contrario, quieren cubrir el nicho de mercado del pequeño inversor y asesorarles personalmente en sus inversiones en bolsa; algunos únicamente asesoran en áreas corporativas, o hacen asset allocation de la cartera patrimonial. 
+1.5.2. Principales características de los servicios que estas entidades suelen ofrecer a. Correduría 
+b. Asesoramiento Financiero. 
+c. Gestión por Mandato. 
+d. Financial Planning. 
+e. Family Office. 
+a. Correduría 
+Dirigido a clientes con criterio propio y que deciden por sí mismos, independientemente de su capacidad financiera. 
+La retribución del servicio puede generar notables ingresos por corretajes de ejecución, de retrocesión, tasas de custodia y permanencia temporal de importantes saldos en cuenta corriente. 
+Las principales obligaciones del ejecutor son: 
+�� Estar bien informado sobre los mercados. 
+�� Ejecución rápida y precisa. 
+�� Subcuenta del cliente agregada y actualizada al día.
+22 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+En cuanto a la operativa: 
+�� El cliente llama directamente al ejecutor. 
+�� Si solicita información sobre el mercado se le da. 
+�� Si solicita opinión, se le da. Nunca recomendaciones. 
+�� Todas las operaciones contra subcuenta agregada. 
+b. Asesoramiento Financiero 
+Dirigido a clientes con ciertos conocimientos que desean comprar algún producto financiero sencillo (fondos de inversión, acciones, bonos). Se les aconseja, se les invierte y ellos mismos deben decidir cuándo vender. 
+La retribución del servicio se basa en corretajes de compra y venta, corretajes de dividendos y eventuales retrocesiones. 
+c. Gestión discrecional (por mandato) 
+Dirigido a clientes con una mayor capacidad inversora, que desean se les gestione por mandato su patrimonio. 
+La retribución del servicio se fija en base a honorarios de gestión, corretajes de ejecución y de dividendos, eventuales retrocesiones en el caso de fondos de terceros. 
+Sin duda, es de gran importancia la figura del ejecutivo de cuentas, que asume la responsabilidad de estructurar y seguir las carteras a su cargo. 
+Las principales funciones a realizar por el ejecutivo de cuentas son las siguientes: ∙ Determinar el perfil de riesgo del cliente. 
+∙ Estructurar su cartera inicial. 
+∙ Gestionar dinámicamente a través del tiempo. 
+∙ Formar e informar al cliente. 
+∙ Este servicio también engloba el asesoramiento fiscal. 
+d. Financial Planning 
+Se define como el desarrollo de un plan exhaustivo en el que se determinan la totalidad de objetivos financieros del individuo y en el que se seleccionan y ejecutan las mejores estrategias coordinadas para alcanzar dichos objetivos. 
+El objetivo de la planificación financiera es llegar a conseguir en el momento actual un equilibrio entre recursos futuros y futuras necesidades.
+Fundación de Estudios Financieros© 23 
+Asesoramiento y Planificación Financiera 
+El servicio básico de Financial Planning engloba: 
+∙ Planificación Patrimonial. 
+∙ Planificación Fiscal. 
+∙ Planificación Inmobiliaria. 
+∙ Planificación Sucesoria. 
+e. Family Office 
+El concepto de Family Office se fraguó en el siglo XIX como un recurso para coordinar, para cada familia y de forma individual, las actividades financieras y legales referidas a las grandes fortunas industriales. Supusieron un éxito claro al dotar de transparencia, claridad y servicio a la gestión de grandes fortunas. 
+La finalidad de todo servicio de Family Office es la de ofrecer al cliente asesoramiento integrado y pro-activo, con soluciones personalizadas para contribuir al crecimiento del patrimonio familiar, ya sea financiero o no financiero, para sucesivas generaciones. 
+En origen, un family office se caracteriza por la independencia del equipo con respecto a los bancos y gestores donde invierte el dinero de sus clientes, puesto que trabaja exclusivamente para su cliente, que es quien le remunera, y no para un banco o gestora. No obstante, actualmente la banca privada ofrece servicios característicos de un family office. 
+La forma de retribución es variable, dependiendo de si trabajan para una sola familia o para varias. Normalmente suele ser un tanto por ciento del patrimonio gestionado.
+24 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+2. RECOPILACIÓN DE LOS DATOS DEL CLIENTE Y DETERMINACIÓN DE LOS OBJETIVOS Y  
+EXPECTATIVAS 
+2.1. Obtención de información del cliente a través de una entrevista/cuestionario sobre sus recursos financieros y obligaciones 
+Debemos recordar que la inclusión del cliente dentro de la categoría de Banca Personal o Privada viene determinada por su patrimonio inversor: generalmente desde los 150.000 € hasta el millón de euros. La explicación de semejante disparidad deriva directamente de la estrategia de la entidad en cuestión: ¿Queremos pocos clientes y grandes, o creemos que para crecer es necesario suavizar los baremos de admisión? 
+Por ello, a veces, algunas entidades consideran también el patrimonio global que deposita el cliente en diferentes entidades financieras. En Barclays, por ejemplo, “lo determinante para considerar un cliente como de Banca privada es su posición global con bancos, y no la posición con nuestra entidad en cuestión”. 
+Aunque rebajar los baremos de admisión representa la “vulgarización” del negocio, es cierto que dicha flexibilidad es necesaria para la captación de, al menos, estos dos tipos de clientes: 
+(1) El que empieza en Banca privada desde abajo, probando, con cantidades no muy elevadas (ej. 300.000 €). 
+(2) Aquel “rico potencial” que está a punto de entrar en fase de acumulación de riqueza. El admitir ahora a éste, aún no rico, permitirá mantenerlo como cliente cuando ya lo sea efectivamente, y comience a ser objeto de deseo para la competencia. Dicho esto, cuidado con aquél que trae por debajo del baremo de admisión, no completa, y al cabo de poco tiempo encima se lleva dinero. Esta cuenta deja de ser rentable para el banco, con lo que pueden ocurrir dos cosas: que el cliente caiga en el olvido y nadie se ocupe de su patrimonio y/o que le inviten a dejar la entidad o le bajen al segmento inferior. 
+En la práctica profesional, la labor del gestor personal se inicia con el conocimiento del cliente: su situación personal y familiar, su situación laboral, su patrimonio, sus necesidades financieras, sus relaciones comerciales, etc, siendo el objetivo último de su gestión, que a través de los productos de la entidad y del mercado, pueda satisfacer plenamente las necesidades (objetivos) y expectativas del cliente. Además, un mayor nivel de conocimiento implicará relaciones más fluidas con los clientes.
+Fundación de Estudios Financieros© 25 
+Asesoramiento y Planificación Financiera 
+Este conocimiento nos permitirá hacer un diagnóstico del mismo, es decir, un análisis de su situación financiera en función de la información que conocemos. En definitiva, el conocimiento del cliente es el eje sobre el que gira el proceso de asesoría y planificación financiera en la banca personal y privada. Conocer al cliente significa disponer de respuestas personalizadas. 
+Ahora bien, no olvidemos que, en la banca personal o banca comercial privada, la relación con el cliente suele iniciarse con la “venta” de productos clásicos: tarjetas de crédito, seguros, operaciones de activo a corto y/o largo plazo, que nos habrán aportado información previa del cliente y sus necesidades. 
+En general, para conocer a un cliente necesitamos disponer de dos tipos de datos (tabla 5): datos objetivos, que no dependen de la manera de ser del cliente, y datos subjetivos, que si dependen de la manera de ser del cliente. 
+Datos necesarios para conocer al cliente de banca personal 
+Tabla 5 
+Datos Objetivos 
+	Datos Subjetivos
+	∙ Datos personales: edad, preferencias, etc.
+	∙ Objetivos de las inversiones.
+	∙ Datos familiares: nº de hijos, edades de estos, etc.
+	∙ Horizonte temporal de las 
+inversiones.
+	∙ Profesión. 
+	∙ Nivel de tolerancia al riesgo.
+	∙ Régimen económico del matrimonio. 
+	∙ Sensibilidad fiscal.
+	∙ Situación patrimonial (bienes y deudas). 
+	∙ Experiencias financieras anteriores.
+	∙ Situación tributaria. 
+	∙ Conocimientos financieros.
+	
+
+
+
+Fuente: elaboración propia. 
+En base a estos datos (y las respuestas al cuestionario que veremos a continuación), las entidades tratarán de clasificar a sus clientes en base a su “perfil de riesgo”, aunque sería más adecuado hablar de su perfil de “rentabilidad-riesgo”. Téngase en cuenta que un mismo cliente puede ser clasificado con distintos perfiles, en distintas entidades, ya que estos perfiles se establecen en función de las clasificaciones que cada entidad tenga y no tienen por qué coincidir. 
+Además, el “perfil” del inversor puede variar a lo largo de su vida debido, sobre todo, a cambios en su situación económica y personal, cambios en los mercados financieros o cambios en el entorno económico.
+26 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+La CNMV establece que el perfil de un inversor se define por la relación que existe entre los riesgos que está dispuesto a asumir y los rendimientos que espera obtener. Así, se puede hablar de inversores con un perfil conservador, medio o arriesgado. Por ejemplo, si no está dispuesto a perder dinero en ninguna circunstancia, el intermediario con el que opere le catalogará como un inversor conservador. En este caso debería estar dispuesto a aceptar un rendimiento bajo, ya que riesgo y rentabilidad suelen estar directamente relacionados: cuanto mayor sea la rentabilidad esperada, mayor será el riesgo asumido. 
+Para determinar su perfil la CNMV recomienda conocer las respuestas a las siguientes preguntas: 
+Pregunta 
+	Observaciones
+	¿Cuál es mi punto de partida?
+	Se trata de definir su situación financiera actual: ingresos, gastos, deudas…
+	¿Cuáles son mis metas concretas?
+	Es imprescindible determinar cuáles son sus objetivos financieros, de un modo realista y concreto. Por ejemplo, “alcanzar la independencia financiera” no es concreto. Sin embargo, “ahorrar 10.000 euros en tres años para hacer un curso en el extranjero” sí es un objetivo bien planteado: incluye plazo, cuantía y finalidad.
+	¿De cuánto tiempo 
+dispongo para alcanzar el objetivo?
+	Esta respuesta depende de la anterior, y le ayudará a determinar el tipo de productos que pueden interesarle.
+	¿Qué nivel de riesgo estoy dispuesto a 
+asumir en el camino?
+	Esta cuestión tiene un componente objetivo (su capacidad financiera, lo que puede permitirse perder) y otro subjetivo (sus conocimientos financieros, su forma de ser y cómo influye en su tolerancia al riesgo).
+	¿Necesito 
+asesoramiento?
+	Los productos de inversión y la operativa de los mercados son cada vez más complejos y requieren atención y seguimiento constantes, por lo que podría ser conveniente recurrir a la orientación de profesionales. En todo caso, la elección entre decidir por sí mismo o buscar asesoramiento dependerá de sus conocimientos y experiencia en los mercados.
+	
+
+
+
+En función de las respuestas, la CNMV establece, para los contratos de gestión discrecional aceptados, cuatro criterios: conservador, moderado, arriesgado y muy arriesgado.
+Fundación de Estudios Financieros© 27 
+Asesoramiento y Planificación Financiera 
+La CNMV considera importante que cada inversor reflexione para estar seguro de que el riesgo que está asumiendo en sus inversiones es compatible con su perfil inversor, esto es, con su situación financiera y con su disposición a aceptar pérdidas si estas se producen (ver cuadro 3). 
+Pero la evaluación del perfil no siempre arroja resultados concluyentes, por lo que puede ser necesaria una revaluación. Normalmente, los casos dudosos se plantean cuando la capacidad para asumir riesgos que pueden deducirse de la capacidad financiera no está alineada con la tolerancia personal al riesgo. No obstante, no debe rechazarse un producto por el mero hecho de que implique algún riesgo, ya que tal vez sea recomendado invertir en el mismo en el marco de una cartera bien diversificada. 
+Disposición y capacidad de asumir riesgos 
+Cuadro 3 
+Capacidad de asumir riesgo 
+Según la situación financiera 
+Por debajo Por encima 
+de la media de la media 
+Disposición Por debajo Baja tolerancia 
+a aceptar de la media al riesgo Replantear 
+riesgos según 
+Fuente: CNMV 
+el carácter Por encima inversor de la media 
+Replantear 
+	
+
+
+
+Alta tolerancia al riesgo
+	
+
+
+
+Finalmente, como ejemplo de cómo las entidades financieras tratan de ampliar su conocimiento del cliente podemos ver el cuestionario o “test de riesgo” que algunas tienen en sus páginas Web.
+28 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Cuestionario sobre el perfil de inversor. 
+1. Cuanto tiempo piensa usted mantener esta inversión? 
+🔾 Menos de 1 año. 
+🔾 Entre 1 y 3 años. 
+🔾 Más de 3 años. 
+2. ¿Qué parte de sus ahorros representará esta inversión? 
+🔾 Menos del 25%. 
+🔾 Del 25 al 50%. 
+🔾 Del 50% al 75%. 
+🔾 Más del 75%. 
+3. En los próximos años, espera que su capacidad de ahorro o liquidez... 🔾 Aumente. 
+🔾 No varíe. 
+🔾 Disminuya. 
+4. ¿Qué frase describe mejor su nivel de riesgo? 
+🔾 Rentabilidad moderada con estabilidad en la inversión. 
+🔾 Rentabilidad media con algunas oscilaciones. 
+🔾 Alta rentabilidad con bastantes oscilaciones. 
+5. ¿Cuál es su experiencia como inversor? 
+🔾 Nunca he invertido en productos de Renta Variable, sólo en Depósitos Bancarios, Renta Fija o Letras del Tesoro. 
+🔾 Podría diversificar mi patrimonio en fondos que invierten una pequeña parte en Renta Variable. 
+🔾 Estaría dispuesto a invertir parte de mis ahorros en fondos de Renta Variable, admitiendo un riesgo medio, con el objetivo de conseguir una mayor rentabilidad a medio plazo. 
+🔾 Estaría dispuesto a invertir la mayor parte de mis ahorros en fondos de Renta Variable, asumiendo un riesgo mayor, con el objetivo de maximizar mi rentabilidad a medio-largo plazo. 
+6. Si el valor de su inversión bajase... 
+🔾 Vendería Inmediatamente. 
+🔾 Vendería una parte. 
+🔾 Consultaría qué decisión tomar. 
+🔾 No vendería, sabiendo que a largo plazo puedo ganar más. 
+7. Su edad está comprendida entre: 
+🔾 Menos de 35 años. 
+🔾 De 36 a 45 años. 
+🔾 De 46 a 60 años. 
+🔾 Más de 60 años.
+Fundación de Estudios Financieros© 29 
+Asesoramiento y Planificación Financiera 
+En base a las respuestas a estos cuestionarios, la entidad catalogará al cliente dentro de un grupo homogéneo, grupo al que se le pueden ofertar productos similares que satisfagan sus necesidades (o al menos no ofrecerle productos que no le encajen o no demande). Se hace así más sencilla la elección de productos y carteras y se gana en eficiencia y eficacia. 
+Dicho esto, el seguimiento individualizado continúa siendo imprescindible para una buena gestión por parte del asesor. 
+A continuación, se exponen, en nuestra opinión, las características básicas de los dos perfiles de inversión opuestos: el conservador y el muy arriesgado. 
+Perfil Conservador: 
+✔ Se conforma con alcanzar una rentabilidad efectiva moderada, algo superior a la tasa de inflación. También suele tener interés en obtener algún tipo de renta periódica (dividendos, cupones, etc.) 
+✔ Rechaza el riesgo. Su prioridad es la seguridad en la recuperación de la inversión. 
+✔ Prefiere las inversiones con elevada liquidez, aunque esto pueda suponer una penalización o merma de rentabilidad. 
+✔ Prefiere el corto plazo, si bien dependerá del objetivo o finalidad personal de la inversión. Perfil Muy Arriesgado: 
+✔ Su principal motivación es la de obtener rentabilidades superiores a las del perfil conservador, a cambio de aceptar más cuota de riesgo. 
+✔ En la combinación rentabilidad-riesgo, el inversor muy arriesgado da prioridad a la rentabilidad, aunque esto no signifique que ignore el riesgo. 
+✔ Es muy importante que diversifique sus inversiones, para evitar que buena parte de las mismas dependan de unos pocos valores. 
+Lo más importante, como ya ha quedado señalado repetidas veces, es que en cada uno de los perfiles de inversión las características expuestas dentro de cada perfil sean coherentes entre sí.
+30 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+2.2. Determinar los objetivos personales y financieros del cliente, las necesidades del cliente y prioridades 
+En general, la mayoría de los clientes de Banca personal y privada suelen coincidir en los objetivos que tratan de alcanzar utilizando los servicios de su “banquero personal” (tabla 6). 
+Objetivos del cliente de Banca Personal y Privada 
+Tabla 6 
+Fuente: elaboración propia. 
+Conseguir que las inversiones propuestas por el banquero personal permitan alcanzar estos objetivos, exige que el banquero conozca las necesidades y expectativas del cliente respecto a las siguientes variables: plazo de inversión, nivel y tipo de rentas, tipo marginal de la renta, necesidad de rentas periódicas, liquidez mínima, expectativas de rentabilidad, capacidad de asumir riesgos, y nivel de seguridad exigido. 
+∙ Plazos de inversión: 
+o Corto plazo (hasta 12 meses). 
+o Medio plazo (De uno a 4 años). 
+o Largo plazo (Mas de 4 años).
+Fundación de Estudios Financieros© 31 
+Asesoramiento y Planificación Financiera 
+o Están también relacionados con la edad del inversor y la fase del ciclo vital en que se encuentre: 
+▪ Acumulación: hasta los 45-50 años. 
+▪ Consolidación: desde la edad anterior hasta la jubilación. 
+▪ Prestación o gasto: una vez jubilado. 
+∙ Nivel de renta y tipo de rentas: 
+o Rentas de trabajo por cuenta propia (Autónomos). 
+o Rentas de trabajo por cuenta ajena. 
+o Otras rentas y su periodicidad. 
+o Capacidad de ahorro e inversión (a un cliente de banca privada que tiene en su renta periódica el origen de su fortuna se le supone la capacidad de ahorrar unos 150.000 € al año). 
+∙ Tipo marginal en renta y patrimonio: 
+o Para adecuar productos en función de su fiscalidad. 
+∙ Búsqueda de rentas periódicas o incrementos de capital: 
+o Renta fija con cupones periódicos. 
+o Renta variable con rentabilidad vía dividendos. 
+o Renta variable con expectativas de alza de precios. 
+∙ Nivel de riesgo asumible: 
+o Volatilidad del valor. 
+o Calificación crediticia. 
+∙ Expectativas de rentabilidad: 
+o Asociadas a cada inversión. 
+∙ Liquidez: 
+o Posibles realizaciones del valor sin excesiva merma de precio. 
+∙ Seguridad: 
+o Posibilidades de no recuperar el capital invertido a vencimiento o de no cobrar los rendimientos periódicos en fechas estipuladas.
+32 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Aunque todas estas variables deben ser tenidas en cuenta, sintetizando podemos afirmar que, de acuerdo con el horizonte temporal de la inversión y las preferencias del cliente, la gestión del patrimonio debe conseguir una combinación óptima de los tres objetivos claves de una inversión financiera: 
+⮚ Rentabilidad 
+⮚ Seguridad 
+⮚ Liquidez 
+La Rentabilidad: mide el rendimiento (rentabilidad o ganancia) que produce una inversión durante un periodo de tiempo, en relación con el capital invertido. La rentabilidad suele expresarse en un porcentaje anual y podemos diferenciar entre TAE (incluye) y nominal (no incluye la periodicidad en el cobro de los intereses). 
+La Seguridad: es recuperar el capital invertido al vencimiento, así como los rendimientos esperados en las fechas previstas. 
+La liquidez: es la facilidad con que un activo financiero se puede vender en el mercado sin excesiva merma de precio. 
+Junto con los objetivos expuestos, conviven el horizonte temporal de la inversión y los riesgos de mercado y de crédito: 
+El Horizonte temporal: es el plazo de la inversión que fija el cliente, es decir, el tiempo que transcurre desde que se realiza la inversión hasta que se necesita disponer el dinero invertido. El horizonte temporal condiciona los objetivos a alcanzar y la estrategia de gestión del patrimonio, ya que en la rentabilidad a obtener y por supuesto en el riesgo incurrido (riesgo y rentabilidad son las 2 caras de una misma moneda, como a menudo lo son también rentabilidad y liquidez). 
+Por último, conviene señalar que el horizonte temporal de la inversión es una variable que se convierte en un “aliado” del inversor en la planificación financiera. Es por ello que: 
+▪ No hay que confundir el plazo o vencimiento de los activos financieros con el horizonte temporal que fija el cliente en función de sus necesidades y objetivos. 
+▪ En la función de asesoramiento, lo primero que hay que procurar que defina el cliente es el objetivo de la inversión y su horizonte temporal. A partir de aquí, deberán de jerarquizarse los factores que definirán la inversión: rentabilidad, seguridad y liquidez.
+Fundación de Estudios Financieros© 33 
+Asesoramiento y Planificación Financiera 
+2.3. Conocer los valores, actitudes y expectativas del cliente La información que recabar del cliente debe permitir responder las siguientes cuestiones: 1. ¿Dónde estoy? (situación financiera actual). 
+2. ¿A dónde quiero ir? (objetivos personales y financieros). 
+3. ¿De cuánto tiempo dispongo para llegar? (horizonte temporal). 
+4. ¿Qué nivel de riesgo estoy dispuesto a asumir? (tolerancia al riesgo).
+34 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+
+Fundación de Estudios Financieros© 35
+Asesoramiento y Planificación Financiera 
+
+Se trata de entender, una vez que se han recopilado los datos (objetivos y subjetivos) necesarios para formar el plan de inversión del cliente, los objetivos personales y las motivaciones vitales del cliente para conocer si están apoyados en bases financieras razonables, en otras creencias y expectativas o en falsos razonamientos y malos entendidos. Esto evitará problemas en el futuro. 
+Este “darse cuenta” de las motivaciones personales del cliente supone reconocer el sistema de valores del mismo. Por otro lado, se trata de entender las actitudes que generan motivaciones financieras y profesionales sobre las presentes y futuras necesidades, expectativas, y deseos
+36 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+personales y financieros. Todo este análisis previo de entendimiento del cliente permitirá sustentar mejor la relación con el cliente en el futuro. 
+2.4. Determinar el nivel de tolerancia al riesgo del cliente 
+El concepto de riesgo es subjetivo y puede ser objeto de diversas definiciones, como las que podemos ver a continuación: 
+• Posibilidad de obtener rentabilidades negativas. 
+• La quiebra o suspensión de pagos de la empresa emisora del activo. 
+• Posibilidad de obtener una rentabilidad inferior a la que ofrece el activo libre de riesgo. 
+• Existencia de incertidumbre respecto al momento e importe del cobro de los compromisos pactados con la entidad emisora del activo. 
+• Existencia de una elevada fluctuación de la rentabilidad del activo respecto al valor de su rentabilidad esperada. 
+• Que el comportamiento de la rentabilidad del activo sea muy diferente de la del índice tomado como referencia. 
+• Etc. 
+En finanzas la definición más amplia se recoge en “la existencia de una elevada fluctuación de la rentabilidad del activo respecto al valor de su rentabilidad esperada”. 
+Una vez conocido el concepto de riesgo, se trata de entender cómo un cliente siente los riesgos que puede confrontar en su vida. Para ello, el asesor necesita cerciorarse de: 
+a) Una vez identificados los riesgos que puede tener su cliente, si el cliente tiene una comprensión razonable de éstos. 
+b) El sentimiento del cliente frente a los riesgos específicos que puede confrontar y cómo reaccionaría frente a ciertas eventualidades (Capacidad Financiera de asumir pérdidas). 
+c) El nivel de tolerancia que el cliente tiene frente a los riesgos específicos que puede confrontar y si su estructura financiera refleja adecuadamente su tolerancia al riesgo (Disposición psicológica a tener pérdidas). 
+“A priori”, el nivel de tolerancia al riesgo (disposición psicológica) suele establecerse mediante un sencillo cuestionario o “perfilador” (máx. 10 cuestiones). “A posteriori”, el PF deberá ajustar el resultado en función de su experiencia, tras analizar los objetivos, el Horizonte Temporal y la estructura financiera, pero siempre consensuando con su cliente la decisión. A cada perfil de riesgo se le asociará una esperanza de rentabilidad.
+Fundación de Estudios Financieros© 37 
+Asesoramiento y Planificación Financiera 
+El perfil de un cliente depende  de loscriterios  que siga 
+cada entidad
+Variaciones del perfil a lo largo de su vida ⮚ Cambios en su 
+situación 
+económica y 
+personal. 
+⮚ Cambio en su estatus profesional. 
+⮚ Cambios del 
+entorno 
+económico. 
+CNMV: 
+Conservador Moderado 
+Arriesgado Muy Arriesgado 
+38 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+En definitiva, perfil de riesgo de un cliente es función del horizonte temporal inversión, de la rentabilidad que desea obtener, del patrimonio del inversor, de las pérdidas pasadas, de los tipos de interés, de las circunstancias familiares (como el número de hijos), del patrimonio inicial y del proyecto sucesorio. 
+Nota: hay analistas que segmentan estos datos en objetivos (no dependen) y subjetivos (si dependen de la manera de ser del cliente). 
+Comentar que los bancos españoles tienen poco conocimiento de la tolerancia al riesgo de sus clientes, afirmando el 33% de los gestores tener un conocimiento limitado de éste. Esto es importante, pues muchos problemas de los bancos enfocados en el segmento de la banca privada o departamentos de banca privada de los bancos universales llegan al introducir en bolsa a clientes sin definir su perfil de riesgo. Sin embargo, las crisis bursátiles sirvieron para este fin, pues si el cliente aguanta pensando que a largo plazo sus pérdidas se transformaran en ganancias su perfil es agresivo; si en cambio se marcha de bolsa, el inversor es conservador, aunque esté dispuesto a asumir más riesgo en fase bursátiles expansivas o diga que en bolsa a largo plazo siempre se gana (este es el prototipo de cliente que, tentado por la rentabilidad bursátil, acaba suscribiendo un garantizado). 
+Dicho esto, comentar que existen también terminologías propias dentro de cada entidad para catalogar a los clientes según su perfil de riesgo siendo la más común la siguiente: 
+o Conservador. 
+o Moderado. 
+o Audaz-Decidido. 
+O bien, otra en función del porcentaje de riesgo asumible, que van desde el 0% al 100%, o asociado a las siguientes denominaciones de riesgo: 
+o Muy bajo. 
+o Bajo. 
+o Medio bajo. 
+o Medio alto. 
+o Alto. 
+o Muy alto.
+Fundación de Estudios Financieros© 39 
+Asesoramiento y Planificación Financiera 
+3. EL PROCESO DE PLANIFICACIÓN FINANCIERA (ASESORAMIENTO) ADAPTADO AL CLIENTE 
+En el caso de que debamos organizar un plan de inversión de horizonte temporal ilimitado (caso de familias acomodadas cuyo objetivo es que su capital acumulado pase a las siguientes generaciones, instituciones o fundaciones) y que debamos ocuparnos también de la gestión de ingresos, gastos, seguros y planes de jubilación (en el plan de inversión no se dice nada sobre nuevas aportaciones o reembolsos al plan como resultado de circunstancias positivas o negativas a lo largo de la vida del inversor) es más conveniente establecer, como decíamos antes, una estrategia intergeneracional, estrategia que se incluye dentro de un concepto más amplio: el de planificación financiera. 
+3.1. Definición 
+El proceso de planificación financiera se define como el desarrollo de un plan exhaustivo en el que se determinan la totalidad de objetivos financieros del individuo y en el que se seleccionan y ejecutan las mejores estrategias coordinadas para alcanzar dichos objetivos. 
+Engloba: 
+▪ Planificación patrimonial. 
+▪ Planificación fiscal. 
+▪ Planificación inmobiliaria. 
+▪ Planificación sucesoria. 
+Su objetivo es llegar a conseguir un equilibrio entre recursos futuros y necesidades a través del tiempo y de la forma menos accidentada posible. La planificación financiera trata de prever y controlar a largo plazo el flujo de dinero familiar y, mediante una gestión prudente del mismo, alcanzar el mejor bienestar financiero de entre todos los posibles. 
+Como señalan ROA, A. y Borrás, M. es importante diferenciar entre los conceptos de plan de inversión y planificación financiera: 
+⯈ Plan de inversión: se dispone de un capital y se desea invertirlo con un objetivo bien formulado a un plazo determinado. 
+⯈ Planificación Financiera: se trata de conseguir el equilibrio entre los recursos y las necesidades a través del tiempo, para que la vida financiera del cliente sea lo menos accidentada posible.
+40 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Esto, a su vez, está relacionado con el concepto de inversión: 
+⯈ Invertir bien no es realizar una serie de pequeñas especulaciones con éxito. ⯈ Invertir bien es tener un plan de inversión y seguirlo con disciplina. 
+⯈ Invertir es comprar algo a largo plazo con el objeto de obtener su rendimiento histórico promedio. 
+⯈ Especular es comprar y vender lo mismo a corto plazo con avaricia. 
+Normalmente, se empieza con un recuento de la actual situación financiera y continúa con una previsión de los futuros ingresos, gastos y riesgos. 
+A nivel cuantitativo, se intenta estimar, entre otras, las siguientes variables: o Nivel de ingresos actuales. 
+o Previsión de los ingresos corrientes futuros. 
+o Previsión de los gastos corrientes futuros. 
+o Previsión de gastos extraordinarios (estudios de hijo, boda, etc). 
+o Capacidad de ahorro para capitalizar el patrimonio financiero e inmobiliario. o Contribuciones para la jubilación (seguridad social, planes privados). o Contribuciones a previsión sanitaria (seguridad social, seguros privados). 
+En base a estos datos se establecen las pautas de ahorro para cubrir la jubilación, además de otros riesgos a futuro, como la posible discontinuidad en el trabajo. 
+El plan de inversión se integrará dentro de la planificación financiera, puesto que es el encargado de la correcta gestión del patrimonio obtenido. Forma parte intrínseca de ella, pero no lo es todo. 
+Podría decirse que una planificación financiera perfecta, para un matrimonio sin herederos, sería la que al fallecer el último conyugue emplea el último euro en pagar la esquela, tras haber vivido ambos sin problemas financieros. 
+En definitiva, la Planificación Financiera (PF) es el proceso de proveer asesoramiento y asistencia al cliente en el campo patrimonial, diseñando un plan global e integrado con el fin de conseguir los objetivos personales, a través de la utilización de las herramientas y los vehículos de inversión más idóneos. La PF es un proceso, no un evento, lo que implica una vertiente dinámica y un contenido de planificación y previsión.
+Fundación de Estudios Financieros© 41 
+Asesoramiento y Planificación Financiera 
+3.2. Servicios ofrecidos en la PF 
+A continuación, recogemos, nuevamente, los servicios que suelen ofrecerse en el proceso de planificación financiera: 
+
+3.3. Ventajas y obstáculos de la planificación financiera 
+El proceso de la planificación financiera da coherencia a las decisiones financieras: 
+• Permite entender cómo una decisión financiera sobre un aspecto concreto puede afectar al conjunto de las finanzas personales. 
+(por ejemplo, comprar un producto de inversión puede ayudar a amortizar anticipadamente una deuda o bien puede retrasar la jubilación) 
+• Permite ver los efectos a corto y largo plazo sobre los objetivos globales mediante el análisis agregado de los impactos sobre los objetivos parciales. Análisis individual con visión global. 
+• Permite adaptarse más fácilmente a los cambios en la situación personal y familiar manteniendo la seguridad de que los objetivos finales no se han descontrolado.
+42 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Sin pretender recoger todas las ventajas e inconveniente de la PF, presentamos a continuación los más relevantes: 
+Ventajas: 
+⮚ Superar la complejidad del entorno fiscal, legal y financiero. 
+⮚ Mejorar el nivel y calidad de vida. 
+⮚ Reducir o eliminar problemas vinculados a la financiación. 
+⮚ Asegurar la Planificación de la Jubilación. 
+⮚ Reducir los costes de donación. 
+Obstáculos 
+⮚ Incapacidad para ahorrar. 
+⮚ Pensar que la planificación sólo es de aplicación a grandes patrimonios. ⮚ Tendencia humana a aplazar la toma de decisiones sobre el futuro. 
+3.4. Etapas 
+Para conseguir una buena planificación financiera es vital que el cliente establezca, con el gestor de patrimonios, los objetivos que quiere alcanzar con su patrimonio. Aquí empieza el proceso básico que podemos desglosar en cinco fases (cuadro 4): 
+Fases de la planificación financiera 
+Cuadro 4 
+
+Fuente: elaboración propia
+Fundación de Estudios Financieros© 43 
+Asesoramiento y Planificación Financiera 
+Fase primera: Establecimiento y definición de la relación entre el cliente y el asesor financiero: El Financial Planner (FP) deberá explicar al cliente los servicios que va a facilitarle definiendo las responsabilidades de ambos. 
+El FP deberá dejar claramente definido cuál será su remuneración y a cargo de quién correrá. El FP y el cliente deberán acordar la duración de la relación profesional y cómo se tomarán las decisiones. 
+En definitiva, se trata de: 
+▪ Identificar al cliente la gama de servicios a ofrecer. 
+▪ Aclarar las comisiones a aplicar. 
+▪ Definir las responsabilidades de las partes. 
+▪ Determinar la duración del acuerdo. 
+▪ Aportar la información necesaria para definir o limitar el marco de actuación. 
+Fase segunda: Captación de información y definición de los objetivos y prioridades del cliente antes de realizar el asesor financiero recomendación alguna: (ver epígrafe 2) El FP deberá preguntar por la situación personal y financiera del cliente. 
+El FP y el cliente deberán definir conjuntamente los objetivos personales y financieros, fijando el marco temporal para la discusión y el análisis de resultados y, si fuera importante, definir cuál va a ser la actitud del cliente frente al riesgo. 
+El FP debería obtener por parte del cliente toda la documentación necesaria para la toma de decisiones antes de ofrecerle su asesoramiento. 
+El FP deberá analizar las inversiones y la composición actual de la cartera de valores del cliente. 
+El FP debe conocer los compromisos de pago del cliente por las deudas contraídas en la generación de su patrimonio. 
+En función de los servicios que se hayan contratado esto puede incluir análisis de activos, pasivos, flujos de caja, seguros, inversiones o estrategias fiscales. 
+Se mantendrán reuniones con el cliente en las que se estudiará la situación de partida: patrimonio financiero objeto de gestión y su composición actual, patrimonio inmobiliario, fuentes de ingresos recurrentes y atípicas, así como contexto familiar y personal. 
+La capacidad del gestor para ir creando un ambiente de confianza es clave en esta segunda fase, el cliente debe ofrecer al gestor una transparencia total en cuanto a su situación patrimonial, así como los probables compromisos adquiridos. 
+Análisis de los objetivos: A su vez, los objetivos en finanzas se deben transformar en una rentabilidad y en un riesgo deseable.
+44 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+A través de contacto entre el gestor y el cliente éste deberá establecer cuál es su objetivo a la hora de invertir su patrimonio. En esta fase la labor del gestor tiene un alto componente psicológico. El gestor debe ayudar al cliente a aclarar sus ideas y sobre todo acercarlo a la realidad de lo que se puede y lo que no se puede, de lo que significa la palabra riesgo, así como lo que supone la volatilidad en los mercados. 
+El detectar el verdadero perfil de riesgo del cliente es fundamental para el mantenimiento de las relaciones profesionales. 
+Merece la pena volver a recordar al cliente el ABC de la inversión, los conceptos de seguridad, liquidez y rentabilidad. Establecer cuál es la rentabilidad de los activos sin riesgo, y sobre esa base establecer el binomio rentabilidad/riesgo y los distintos activos objeto de inversión. Las entidades financieras suelen utilizar diversos cuestionarios para intentar establecer el perfil de riesgo y sobre la base de éste desarrollar la política de asignación de activos. El problema de estos cuestionarios es que son demasiado estáticos y cuantitativos olvidándose de los aspectos cualitativos tan importantes para ajustar el perfil del inversor. Por otra parte, los perfiles van cambiando a lo largo del tiempo; es por ello que se hace necesario replantearse los objetivos de la inversión y la exposición a riesgo que se está dispuesto a correr cada cierto tiempo. 
+Fase Tercera: Desarrollo y presentación de alternativas y recomendaciones de planificación financiera: 
+El FP ofrecerá recomendaciones para alcanzar los objetivos del cliente basadas en la información que éste le haya proporcionado. 
+El FP deberá explicar detenidamente las recomendaciones hechas para ayudar a su cliente a entenderlas y poder tomar así decisiones razonadas. 
+El FP debe también escuchar atentamente los comentarios y dudas del cliente y revisar las recomendaciones hechas cuando sea necesario. 
+Esta fase incluye las siguientes actividades: 
+▪ Preparar recomendaciones alternativas apropiadas para hacer frente a los objetivos del cliente. 
+▪ Realizar un análisis de sensibilidad de las alternativas de inversión presentadas (por ej. cambiando las hipótesis tales como la tasa de inflación utilizada, tasas de retorno, el horizonte temporal, etc.). 
+▪ Documentar las alternativas de inversión (por ej. prospectos, informes de análisis financiero, etc.). 
+▪ Presentar alternativas, recomendaciones y revisar las hipótesis utilizadas con el cliente. ▪ Obtener feedback del cliente y revisar las recomendaciones, cuando sea necesario.
+Fundación de Estudios Financieros© 45 
+Asesoramiento y Planificación Financiera 
+▪ Priorizar los diversos planes de acción. 
+▪ Obtener la aprobación del cliente al plan de acción. 
+Una vez determinado el objetivo a conseguir habrá que establecer una cartera de inversión que pueda dar respuesta a dichos objetivos. El proceso se puede desglosar en las siguientes etapas: 
+▪ Fijar el horizonte de la inversión y el nivel de riesgo. 
+▪ Marcar unos objetivos para cada parte del patrimonio. 
+▪ Establecer las expectativas actuales de rentabilidad por mercados. 
+▪ Decidir las divisas, activos, mercados y sectores dentro de cada mercado donde invertir. Realizados todos estos pasos, se habrá constituido una cartera diversificada, capaz de dar respuesta tanto al riesgo que quiere asumir el cliente, así como a la rentabilidad a largo plazo que se quiere obtener. 
+Fase cuarta: Ejecución de la estrategia definida: 
+El FP deberá consensuar con el cliente cómo y cuándo llevar a cabo las recomendaciones hechas. 
+El FP puede llevarlas a cabo por sí mismo o colaborar con otros especialistas en aquellas áreas que lo precise (abogados, brokers, etc). 
+Se trata de: 
+▪ Crear un calendario de implementación del plan de acción. 
+▪ Implementar las recomendaciones, construyendo las carteras con los vehículos de inversión más adecuados considerando también la fiscalidad. 
+▪ Coordinar con el cliente y otros profesionales, si es preciso, el proyecto. 
+Fase quinta: Seguimiento de la estrategia: 
+El FP deberá ponerse de acuerdo con el cliente en quién deberá evaluar el grado de éxito alcanzado. 
+Si se encarga el propio FP deberá reportar al cliente de forma periódica para revisar su situación y ajustar las recomendaciones si fuera necesario por cambios en las circunstancias del cliente.
+46 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Se trata de: 
+▪ Controlar y evaluar la efectividad de las recomendaciones efectuadas por el asesor sobre los objetivos marcados inicialmente. 
+▪ Revisar la rentabilidad y el progreso del plan de acción con el cliente. 
+▪ Revisar y evaluar el impacto en el plan de acción de posibles cambios en las circunstancias particulares del cliente. 
+▪ Revisar y evaluar el impacto en el plan de acción de cambios legales, fiscales y en el entorno económico. 
+▪ Realizar recomendaciones para acomodar el plan de acción a las nuevas circunstancias del cliente y de los mercados financieros. 
+▪ Valorar la gestión de la entidad gestora. 
+Es en esta fase, donde más sentido cobra la gestión de patrimonios. A través del proceso de seguimiento de la estrategia marcada es donde se realizan los ajustes necesarios para, en caso de desviaciones sobre el objetivo, permitir la consecución de los objetivos marcados. 
+Así como en la vida se producen cambios de forma constante, variando las circunstancias familiares, personales y profesionales, en los mercados financieros también se producen modificaciones que obligan al gestor a realizar modificaciones en las estrategias planteadas. Es por ello que el dialogo entre el cliente y el gestor es esencial para la consecución de los objetivos.
+Fundación de Estudios Financieros© 47 
+Asesoramiento y Planificación Financiera 
+4. DISEÑO DE CARTERAS BÁSICAS SEGÚN LOS  DIVERSOS OBJETIVOS DEL CLIENTE 
+El diseño de un plan de inversión tiene como punto culminante la determinación del ratio básico, o proporción de acciones (activos más volátiles) respecto de bonos (activos de menos volátiles). Lógicamente a mayor proporción de acciones, mayor rentabilidad a obtener y también mayor riesgo incurrido. 
+Importante: Las proporciones obtenidas, el ratio básico correcto, son las que debe tener la cartera al final, cuando vence el plan, y no, como creen muchos inversores, necesariamente desde el principio. 
+Éste ratio, además, sólo puede definirse a partir del conocimiento del umbral de insomnio (básicamente la proporción de acciones/bonos debe ser tal que en todo momento la caída de rentabilidad por efecto de una corrección de mercado quede dentro de los límites de insomnio del inversor) y del horizonte temporal. Respecto de este último factor sucede que a más horizonte temporal o mayor juventud del inversor respectivamente, más plazo hay para recuperar si las cosas van mal y mayor tolerancia al riesgo tenemos como inversor. Inversamente a medida que avanzamos en edad debemos reducir nuestra posición en renta variable, pues nuestra tolerancia es menor y la recuperación más difícil (aunque a medida que se acerca el vencimiento de la cartera no hace falta que el porcentaje de acciones se reduzca linealmente, bastando con hacerlo aceleradamente en los últimos años). Para los aspectos cuantitativos del proceso se suele disponer de tablas, aunque no existe unanimidad sobre ellas, pues cada entidad dispone de las suyas, que van en función de su propia filosofía de inversión. 
+ESTRUCTURA INICIAL DE UNA CARTERA 
+Una vez determinado el ratio básico, queda empezar con las compras reales, de acciones y bonos. 
+Renta fija: invertir ya el importe íntegro que pensemos depositar en renta fija. 
+Renta variable: la compra de acciones conviene espaciarla en el tiempo, lo que nos permite reducir sustancialmente el riesgo de inicio (hay que proceder con cautela con las acciones, pues no sabemos si los mercados bajaran o subirán cuando empecemos con las compras). Este riesgo se define como la posibilidad de que ocurra una caída súbita o prolongada al tiempo de invertir.
+48 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Para determinar la cadencia de inversión conviene fijarnos en el ciclo bursátil: 
+o Si es bajista, espaciaremos al máximo nuestras compras en renta variable, ya que compraremos cada vez más barato. El sobrante que no utilizamos lo dejamos provisionalmente en renta fija. 
+o Si es alcista, al contrario, espaciaremos lo menos posible las compras pues las estamos haciendo cada vez más caras (considerar este lucro cesante como una prima de seguro que pagamos por tomar menos riesgo). 
+GESTIÓN ESTÁTICA, PASIVA/ACTIVA O DINÁMICA 
+Antes de decantarse por cualquier tipo de gestión, comentar que, en ningún caso, y como ya hemos explicado anteriormente, el asesor debe de dejar de determinar el perfil de riesgo del cliente. Para ello el asesor debe realizar una tarea activa vía, por ejemplo, la realización de cuestionarios. No olvidar que no se debe nunca meter al cliente en bolsa, aunque hay inversiones bursátiles poco arriesgadas, sin tener definido su perfil de riesgo. 
+Lo habitual es tratar de gestionar patrimonialmente al cliente, que es decidir acerca de su “asset allocation” (% de inversión por tipo de activo), distinto de gestionar carteras y hacer “stock picking”), y hacerlo bien (hacerlo mejor que el “benchmark” ya no es considerado una buena gestión mientras el cliente pierda dinero y/o lo haga con una volatilidad superior). El cumplimiento de estas dos máximas nos lleva directamente a la gestión estática consistente en gestionar al cliente mediante una distribución de activos estática o rígida (Ej. más común: 60% RF y 40% RV e inversamente), con ponderaciones tácticas en torno al 10-15%, en función de las expectativas a corto plazo sobre los mercados, gestión que irá sufriendo reajustes en función del horizonte temporal y reequilibrios en función del vaivén de los activos. 
+Añadir que la gestión estática se encuentra a medio camino entre la gestión pasiva y la activa (trata de batir a un índice), pues si bien no se trata de replicar a un índice (gestión pasiva, magníficamente llevada a cabo por los fondos de gestión pasiva que replican a los índices con gastos muy reducidos), sí que es cierto que la distribución de activos propuesta es en cierta forma también un índice de referencia cuyo rendimiento es determinado en un x % por el comportamiento de la renta variable y en un y % por el comportamiento de la renta fija. Asimismo, y si bien no se trata tampoco de una gestión activa al 100% sí que es cierto que la gestión estática no es inmune a los vaivenes de mercado y se permiten las ya citadas ponderaciones tácticas, que pueden alterar en 10 o 15 puntos los porcentajes en los distintos activos (por ejemplo, como referencia). 
+Terminar con la gestión dinámica, consistente en gestionar de forma mixta (bonos, acciones, gestión alternativa) y a través de una política de inversiones flexible y no predefinida, de
+Fundación de Estudios Financieros© 49 
+Asesoramiento y Planificación Financiera 
+forma global (el gestor escoge libremente activos y divisas en las que operar una cartera). Esta gestión ira variando, es dinámica, según las perspectivas económicas y del mercado, sin que el accionista/bonista o más generalmente partícipe del fondo o de los fondos de inversión tenga que intervenir. Este tipo de gestión presenta, además, la ventaja de que, frente a la tradicional diversificación entre renta fija y renta variable, diversifica más pues incluye otros activos como renta fija privada, bonos de alta rentabilidad, emergentes, gestión alternativa, etc. 
+Pero es el uso del VaR (“Value at risk”) lo que a menudo hace a esta gestión diferencial: Al cliente se le plantea abiertamente qué pérdida está dispuesto a asumir, pues el VAR, mecanismo de control de riesgos aplicado por los gestores, permite fijar de antemano en función de un intervalo de confianza preestablecido lo máximo que puede perder el cliente en un periodo de tiempo determinado, en el peor de los escenarios de mercado posible, pérdida que se transformará además en “cero” en un plazo de x años. Es decir, que, si bien el cliente puede alcanzar la pérdida máxima fijada en el primer año, a medio plazo este tipo de gestión te garantiza la inversión. Asimismo, en un escenario favorable de mercado, sitúa al cliente en frontera eficiente (Markowitz), es decir, minimiza el riesgo (varianza) para una rentabilidad esperada (“dime cuánto estás dispuesto a perder y te diré lo que puedes ganar”). 
+Nota: El VAR hace referencia a lo máximo que puedes perder en 1 año. Ejemplo un VAR de 8 significa que con un nivel de confianza del 95% no tendrá pérdidas superiores a un 8% en un año. 
+Resumen: Paso a paso: el diseño de un plan de inversión consta de las siguientes fases: 1. Definir el umbral de insomnio en función de los objetivos. 
+2. Utilizar las tablas para definir el ratio básico en función de la edad. 
+3. Ajustar el ratio básico hasta que duerma toda la noche seguida. 
+4. Al iniciar la inversión proceda cautelosamente con la parte dedicada a acciones más arriesgadas. 
+5. Reequilibre cada año tal y como el mismo mercado le indique. 
+6. Si se encuentra en edad comprometida, entre los 40 y los 70 años, reajuste cambiando acciones arriesgadas contra fondos mixtos de renta fija, bonos, monetarios o garantizados. Haga el reajuste en la misma fecha cada año, puesto que no sabemos cuál será el mejor momento de mercado del año, es mejor no intentar ir por delante del mercado en este caso. 
+7. Cualquier dinero adicional que se añada al plan hágalo en los activos que están funcionando mejor ya sean acciones de riesgo o bonos, o activos sin riesgo.
+50 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+8. Es conveniente estar invertido al 100%, nunca intentar adelantarse al mercado o enmendarle la plana. 
+9. Cambiar siempre que se quiera de acción, bono etc. Pero sin alterar el perfil de riesgo de su cartera. 
+Importante recalcar: Las proporciones obtenidas, el ratio básico correcto, son las que debe tener la cartera al final de la vida de la inversión, cuando vence el plan, y no, como creen muchos inversores, necesariamente al principio. 
+Los activos en los que invertir los podemos incluir en algunos de los apartados de las siguientes dos categorías: 
+RENTA FIJA 
+⮚ Emisor: 
+o Público. 
+o Privado. 
+⮚ Plazo: 
+o Corto plazo. 
+o Medio plazo. 
+o Largo plazo. 
+⮚ Denominación de los Títulos: 
+o En divisa propia. 
+o En otras monedas. 
+Así, en Renta Fija, existirá el cobro de cupones, con la correspondiente fiscalidad, posibles variaciones de precios en función de la duración, posibles riesgos asociados a los emisores, a los tipos de cambio, etc. 
+Lamentablemente, incluso hoy en día, algunos asesores financieros siguen creyendo que la Renta Fija es “fija” y que, por lo tanto, no tiene riesgo alguno para el cliente. Es decir, que el precio de un bono no se verá afectado a lo largo de la vida del mismo por las variaciones que experimenten los tipos de interés. Algunos, incluso, creen que la rentabilidad que recibirá un cliente será equivalente al cupón del bono. Sin embargo los activos de Renta Fija tienen sus particularidades y se verán afectados por los tipos de interés (bajando su precio si los tipos de interés suben o viceversa); por ello es esencial que el asesor ponga en conocimiento del cliente los riesgos inherentes a esta clase de activos.
+Fundación de Estudios Financieros© 51 
+Asesoramiento y Planificación Financiera 
+RENTA VARIABLE 
+⮚ En mercados domésticos. 
+⮚ De gran o pequeña capitalización bursátil. 
+⮚ En otros países. 
+Podemos aquí asociar, además de las variables comentadas para la renta fija, la posibilidad de utilizar métodos de selección de valores a través del análisis fundamental o el análisis técnico, etc. En los próximos gráficos, determinaremos lo que pueden ser carteras-tipo, en función de algunas de las categorías de clientes que hemos señalado anteriormente. 
+Para una cartera basada en inversiones de renta fija, vamos a desarrollar los posibles modelos a planificar en función de tres tipos de clientes, según su aversión al riesgo. 
+Riesgo mínimo. 
+EJEMPLO 
+Tendríamos los siguientes porcentajes de inversión: 
+Renta Fija, a corto plazo 90% 
+Renta Fija, a medio plazo 10% 
+Los rendimientos serían siempre positivos, pero muy bajos. 
+Al ser operaciones a corto plazo, irían los tipos evolucionando en función de la curva de tipos a corto plazo, es decir, muy próximos a los tipos de intervención del BCE. 
+Aquí estaríamos hablando de inversiones en euros.
+52 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Riesgo medio 
+EJEMPLO 
+Los porcentajes de inversión serían: 
+50% en renta fija a corto plazo. 
+25% en renta fija a medio plazo. 
+15% en renta fija a largo plazo. 
+10% en renta fija en divisas. 
+La duración de las inversiones en el largo plazo condiciona los rendimientos que, además de generarse vía cupones, vendrán originados por las variaciones en precios de los títulos, ante las variaciones de tipos de interés. 
+Es una cartera modelo más especulativa, aunque mantiene un componente de liquidez importante, al estar en el corto plazo el 50% de las inversiones.
+Fundación de Estudios Financieros© 53 
+Asesoramiento y Planificación Financiera 
+EJEMPLO 
+Riesgo alto 
+Aquí nos moveríamos en los siguientes porcentajes: 
+Renta fija a corto plazo, un 25%. 
+Renta fija a medio plazo, 30%. 
+Renta fija a largo plazo, 10%. 
+Renta fija en divisas, 35%. 
+RF c-plazo RF m-plazo RF l-plazo RF divisas
+Aquí estamos apostando por una cartera de alto riesgo, donde pretendemos rentabilizarla al máximo, interviniendo en los mercados de divisas y de “ratings” corporativos frente a tesoros y alargando la duración de nuestra cartera, a fin de beneficiarnos de posibles bajadas de tipos de interés en el largo plazo. 
+No hay que olvidar que no existe una cartera modelo única que se pueda aplicar de forma universal a todos los planes de inversión, ya que cada gestor o cada entidad tiene una serie de parámetros que considera más o menos importantes a la hora de elaborar esa cartera. 
+54 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Alto Riesgo 
+Pasamos a evaluar, también a modo de ejemplo, lo que sería una cartera de alto riesgo, que pueda combinar los tres factores que habitualmente consideramos: tipo de cambio, renta fija y renta variable: 
+EJEMPLOSe pretende que la combinación de riesgos optimice los resultados, obteniendo la máxima rentabilidad. 
+Se aplicaría para un posible plan de inversión agresivo mixto, y donde el inversor no tuviera que recuperar los fondos a corto plazo, asumiendo el riesgo de la inversión de renta fija (“duración” (se abordará en el módulo de renta fija) elevada), de renta variable (un 30 % más 15%), y de riesgo de tipo de cambio (un 30% entre renta fija y variable). 
+Los porcentajes a considerar para este ejemplo, son: 
+Liquidez, o renta fija a corto plazo, 10%. 
+Renta fija a medio plazo, 15%. 
+Renta fija a largo plazo, 15%. 
+Renta fija en divisas, 15%. 
+Renta Variable en Euros, 30% 
+Renta Variable en divisas, 15% 
+Fundación de Estudios Financieros© 55 
+Asesoramiento y Planificación Financiera 
+5. GESTIÓN DE LAS CARTERAS. REAJUSTES Y REEQUILIBRIOS 
+REAJUSTE DE LA CARTERA 
+Su finalidad es la de rebajar la volatilidad de la inversión cuando más cerca está de su final. Tiene la virtud de ir consolidando paulatinamente en bonos los mejores beneficios obtenidos por las acciones, cuando la bolsa es favorable. Toda cartera debe iniciarse lo más agresiva posible, y diluir esta agresividad en los últimos años aumentando la proporción de bonos sobre el de acciones. Un ejemplo de reajuste sería el de la siguiente tabla: 
+15 últimos años en carteras conservadoras. 
+10 últimos años en carteras moderadas. 
+5 últimos en carteras agresivas. 
+AÑOS DEL PLAN
+PORCENTAJE DE BONOS / ACCIONES EN FUNCIÓN DEL UMBRAL DE INSOMNIO
+
+
+(Horizonte 
+temporal) 
++ de 15 años 
+	BAJO 
+(Conservador) 
+BONOS ACCIONES 40 60 
+	MEDIO 
+(Moderado) 
+BONOS ACCIONES 25 75 
+	ALTO 
+(Agresivo) 
+BONOS ACCIONES 10 90
+	14 
+13 
+12 
+11 
+10 
+	43 57 
+46 54 
+49 51 
+52 58 
+55 45 
+	25 75 
+25 75 
+25 75 
+25 75 
+25 75 
+	10 90 
+10 90 
+10 90 
+10 90 
+10 90
+	9 
+8 
+7 
+6 
+5 
+	58 42 
+61 39 
+64 36 
+67 33 
+70 30 
+	29 71 
+32 68 
+36 64 
+39 61 
+43 57 
+	10 90 
+10 90 
+10 90 
+10 90 
+10 90
+	4 
+3 
+2 
+1 
+Vence el plan 
+	73 27 
+76 24 
+79 21 
+82 18 
+85 15 
+	46 54 
+50 50 
+53 47 
+57 43 
+60 40 
+	12 80 
+14 86 
+16 84 
+18 82 
+20 80
+	
+
+
+
+56 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+Gráficamente sería así: 
+S 
+POSICIÓN INICIAL BONOS 
+S 
+POSICIÓN FINAL BONOS
+NO O B L ACINI INÓIC 
+NO O B L 
+NA IFNÓIC 
+SI 
+SI 
+PO 
+PO 
+REEQUILIBRIO DE LA CARTERA 
+Dado que a través del tiempo la proporción de bonos/acciones se desequilibra por efecto de que ambos tienen diferentes velocidades de beneficios, conviene reequilibrarlas de tanto en cuando, es decir, llevar a la cartera a su posición neutral en cuanto al % de cada tipo de activo. 
+El reequilibrio hay que hacerlo una vez al año, cuando se cumple el aniversario de inicio de la cartera, o dos veces al año (abril y noviembre) para aprovechar la estacionalidad que tiende a haber en la bolsa, y/o siempre que la desviación sobrepase un cierto porcentaje, por ejemplo el 5%. 
+Ventajas de reequilibrar una cartera 
+Con el reequilibrio no se intenta ganar más, aunque a veces se consiga, sino proteger la cartera y/o transformar una rentabilidad en fija. Es además deseable hacer coincidir reequilibrio con reajuste, sobre todo si el primero se efectúa de forma regular. 
+Fundación de Estudios Financieros© 57 
+Asesoramiento y Planificación Financiera 
+6. ASESORAMIENTO FINANCIERO INDEPENDIENTE: EAFIS. 
+Dedicaremos el último epígrafe de este módulo a un tipo de empresa de servicios de inversión (ESIs) cuya principal función es el asesoramiento financiero, nos referimos a las empresas de asesoramiento financiero o EAFIs. Antes de exponer las particularidades de estas entidades, recordemos que hay cuatro tipos de empresas de servicios de inversión (ESIs): 
+∙ Sociedades de Valores (Dealers). 
+∙ Agencias de Valores (Brokers). 
+∙ Sociedades Gestoras de Carteras o SGCs. 
+∙ Empresas de Asesoramiento Financiero o EAFIs. 
+De estas cuatro, las tres primeras estaban ya introducidas en la legislación española (ley 24/1988 del mercado de valores), mientras que las EAFIs aparecen en nuestro ordenamiento jurídico en 2007, y cuentan con un ámbito de actuación más limitado que las otras tres empresas de servicios de inversión, esto es, sus atribuciones son muy inferiores a las de sociedades y agencia de valores y sociedades gestoras de carteras, veamos las funciones de 
+las EAFIs: 
+∙ Prestación o recomendaciones personalizadas a clientes, ya sea a petición de los clientes o por iniciativa de otras empresas de inversión con respecto a operaciones relativas a instrumentos financieros. 
+∙ Asesoramiento a empresas sobre estructura de capital, estrategia industrial y cuestiones afines, así como el asesoramiento y demás servicios en relación con fusiones y adquisiciones de empresas. 
+∙ Elaboración de informes de inversiones y análisis financieros u otras formas de recomendación sobre operaciones de instrumentos financieros. 
+Una importante característica de las EAFIs es que, en ningún caso, podrán realizar operaciones sobre valores o efectivo por cuenta propia, salvo para la administración de su propio patrimonio, y no pueden tener fondos o valores de clientes. También es importante destacar que estas empresas no están cubiertas por el Fondo de Garantía de Inversiones.
+58 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+En cuanto a su formalización legal, las EAFIs pueden ser personas físicas o personas jurídicas, siendo obligatoria su inscripción en la CNMV, y, además, deben incluir el término EAFI en su denominación social. Por lo tanto, la autorización de estas empresas de asesoramiento recae en la CNMV, que tiene un plazo de entre tres y seis meses para otorgar la autorización. Si no hay respuesta de la CNMV en el plazo mencionado, entenderemos que no se ha autorizado. Veamos a continuación, los requisitos que exige la CNMV para su autorización: 
+∙ La persona física o los miembros del consejo de administración de la persona jurídica  deben tener reconocida honorabilidad empresarial o profesional, y poseer conocimientos y experiencia adecuados para realizar las funciones de la EAFI.  Para garantizar estos conocimientos se deben haber desempeñado durante un plazo no inferior a tres años funciones de alta administración, dirección, control o asesoramiento de entidades financieras. 
+∙ La EAFI debe contar con los procedimientos, medidas, y medios necesarios para cumplir con los requisitos de organización establecidos por la CNMV. 
+∙ Si la EAFI presta servicios telemáticos, debe garantizar la seguridad, confidencialidad, fiabilidad y capacidad del servicio prestado, y cumplir en su caso la normativa sobre prevención de blanqueo de capitales. 
+∙ Debe estar domiciliada y operativa en España. 
+∙ Debe presentar un plan de negocio que acredite que el proyecto de empresa es viable en el futuro. 
+∙ Únicamente se podrá delegar en terceros el ejercicio de funciones de tipo administrativo. 
+∙ Si es una persona jurídica, debe tener un capital inicial de 50.000€. Si es una persona física, debe tener un seguro de responsabilidad civil profesional que cubra todo el territorio de la Unión Europea, aval u otra garantía comparable para hacer frente a la responsabilidad por negligencia profesional, con una cobertura mínima de 1.000.000 de euros por reclamación de daños, y de un total de 1.500.000 de euros anuales para todas las reclamaciones. Para empresas jurídicas se permite una combinación de capital y seguro.
+Fundación de Estudios Financieros© 59 
+Asesoramiento y Planificación Financiera 
+Respecto a la capacidad organizativa de las EAFIs, independientemente de la naturaleza jurídica de la misma, están obligadas a hacer un seguimiento ordenado de su actividad  y organización, llevando los siguientes registros: 
+∙ Registro de clientes, en el que conste que se ha obtenido información suficiente sobre los conocimientos, experiencia, situación financiera y objetivos de inversión de los clientes. 
+∙ Registro de contratos u otros documentos que acrediten la recomendación personalizada o realizada. 
+∙ Registro de conflictos de interés que hayan surgido o puedan surgir en el desarrollo de la actividad de la EAFI. 
+∙ Registro de operaciones personales de administradores, empleados y apoderados de la persona jurídica o a título personal de la persona física. 
+Concluimos esta breve exposición con las principales ventajas de las EAFIs: ∙ Enfocadas al asesoramiento y no a la venta de productos financieros. ∙ Transparencia en las recomendaciones bajo la supervisión de la CNMV. ∙ Trato personalizado a las necesidades de cada cliente. 
+∙ Independencia respecto a los productos que recomiendan. 
+∙ Evitan conflictos de interés para emitir recomendaciones.
+60 Fundación de Estudios Financieros© 
+Asesoramiento y Planificación Financiera 
+7. BIBLIOGRAFÍA Y WEBS CONSULTADAS Y DE INTERÉS 
+▪ “Curso de bolsa y mercados financieros”, José Luis Sanchez Fernandez De Valderrama. Ariel Economía (2002). 
+▪ “El directivo ante el espejo, José Antonio Rodríguez Piedrabuena”. Press Onda (1998). ▪ “Fidelizando para Fidelizar”, Cosimo Chiesa de Negri. Universidad de Navarra, Ediciones, S. A. (2002) 
+▪ “Manual del asesor financiero. 2ª edición”, García Olalla, M., Martínez García, F.J., Fernández González, E. Madrid: Ediciones Paraninfo (2018) 
+▪ “Memento practico de gestión del patrimonio personal 2003-2004”. Francis Lefebvre (2003). 
+▪ “Paradigmas de Liderazgo”, Pérez López y otros. McGraw Hill (2001) ▪ www.bancomadrid.es 
+▪ www.bankia.es 
+▪ www.bde.es 
+▪ www.bme.es 
+▪ www.citibank.es 
+▪ www.cnmv.es 
+▪ www.gruposantander.es 
+▪ www.inverco.es 
+▪ www.inversis.com 
+▪ www.renta4.es 
+▪ www.unespa.es
+Fundación de Estudios Financieros© 61 
+
+
+Basílica, 17- Oficinas- 1ª Planta. 28020 Madrid Teléfono: 00 
+34 91 598 25 50 – Fax: 00 34 91 556 89 67 
+www.fef.es – www.escuelafef.ese 
+mail: formacion@fef.es
