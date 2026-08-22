@@ -14,7 +14,7 @@
 import { ColaDeTareas } from "@/lib/agents/queue";
 import { MemoriaDeSesion } from "@/lib/agents/memory";
 import { AGENTES, obtenerAgente, type RolAgente } from "@/lib/agents/registry";
-import { TOOLS, estadoDeHerramienta, NOMBRE_HERRAMIENTAS } from "@/lib/agents/herramientas";
+import { TOOLS, estadoDeHerramienta, type ToolSpec } from "@/lib/agents/herramientas";
 import {
   ejecutarMercado,
   ejecutarNoticias,
@@ -344,10 +344,213 @@ function detectarIntencionSkill(pregunta: string): string[] {
     skills.push("orquestacion-fuentes-datos");
   }
 
+  // Metodologías del corpus académico (pt/) y funcionalidades portadas.
+  // Los acrónimos (VAN, TIR, PER...) se chequean sobre el texto original porque
+  // el lowercase colisiona con palabras españolas comunes ("van").
+  if (
+    /valuaci[oó]n|cu[aá]nto vale|valor intr[ií]nseco|goodwill|flujo descontado|m[uú]ltiplos|ev\/ebitda|precio objetivo|valor por acci[oó]n/.test(p) ||
+    /\b(PER|EVA)\b/.test(pregunta)
+  ) {
+    skills.push("metodo-pascale-valuacion");
+  }
+  if (
+    /estados contables|\bbalance\b|patrimonio neto|flujo de fondos|calidad contable|an[aá]lisis (vertical|horizontal)|ajuste por inflaci[oó]n|contabilidad|\bicon\b|\bconii\b/.test(p)
+  ) {
+    skills.push("analisis-estados-contables");
+  }
+  if (
+    /cartera|portafolio|diversific|rebalanceo|asignaci[oó]n de activos|perfil de riesgo|d[oó]nde invierto|en qu[eé] invierto|fondos comunes/.test(p)
+  ) {
+    skills.push("carteras-elbaum");
+  }
+  if (
+    /tasa efectiva|tasa nominal|capitalizaci[oó]n|equivalencia de tasas|curva de (tasas|tipos)|duraci[oó]n de bonos?|bonos?|amortizaci[oó]n|cauci[oó]n|valor presente|valor futuro|int[eé]r[eé]s compuesto|descuento de flujos?/.test(p) ||
+    /\b(VAN|TIR|TEA|CFT|ETTI|BADLAR)\b/.test(pregunta)
+  ) {
+    skills.push("calculo-financiero-dumrauf");
+  }
+  if (
+    /macroeconom|inflaci[oó]n|recesi[oó]n|devaluaci[oó]n|riesgo pa[íi]s|ciclo econ[oó]mico|pol[íi]tica monetaria|pol[íi]tica fiscal|base monetaria|\bleliq\b|d[eé]ficit fiscal|demanda agregada|tipo de cambio real/.test(p)
+  ) {
+    skills.push("macro-latam-ciclo");
+  }
+  if (
+    /se[ñn]ales?\b|cedears?\b|\bbcba\b|panel l[ií]der|l[ií]quidos?\b|movers|noticias hoy|qu[eé] (compro|comprar|vendo|vender)( hoy)?/.test(p)
+  ) {
+    skills.push("cedear-signals");
+  }
+  if (
+    /opci[oó]n(es)?\b|\bstrikes?\b|\bprimas?\b|griegas?|\bdelta\b|\bgamma\b|\btheta\b|\bvega\b|volatilidad impl[ií]cita|monte ?carlo|\bitm\b|black.?scholes|sonrisa de (la )?volatilidad/.test(p)
+  ) {
+    skills.push("options-analysis");
+  }
+  if (
+    /patrimonio total|mis tenencias|pegu[eé] mi (portafolio|cartera|cuenta)/.test(p)
+  ) {
+    skills.push("portfolio-paste-parser");
+  }
+
   return skills;
 }
 
 export { detectarIntencionSkill };
+
+// --- Recorte de herramientas por pregunta -----------------------------------
+//
+// Enviar siempre las ~48 definiciones de herramientas infla el prompt de cada
+// ronda del coordinador y del redactor (prefill lento = más latencia por llamada).
+// Acá se arma un subconjunto relevante: base + grupos activados por roles del
+// router, palabras clave o skills detectadas. Las redes de seguridad del turno
+// ejecutan igual las herramientas críticas aunque no estén en la lista.
+
+const HERRAMIENTAS_BASE = new Set([
+  "buscar_web",
+  "consultar_mercado",
+  "buscar_noticias",
+  "consultar_base_conocimiento",
+  "datos_financieros",
+]);
+
+const GRUPOS_HERRAMIENTAS: Record<string, string[]> = {
+  valoracion: [
+    "calcular_dcf",
+    "valor_intrinseco_real",
+    "analizar_fundamental",
+    "calcular_wacc",
+    "valor_por_metodos",
+    "ficha_de_decision",
+    "score_sectorial",
+  ],
+  semaforo: ["analizar_semaforo", "analisis_tecnico"],
+  cuantitativo: [
+    "analizar_capm",
+    "matriz_capm",
+    "analizar_sectores",
+    "estadisticas_retornos",
+    "optimizar_portafolio",
+    "analizar_factores",
+    "calcular_cobertura",
+    "analizar_riesgo",
+    "distribucion_riesgo",
+    "capm_auto",
+    "optimizar_cartera_avanzada",
+    "backtest_optimizacion",
+    "matriz_benchmarks",
+  ],
+  iol: [
+    "iol_login",
+    "iol_cuenta",
+    "iol_mercado",
+    "iol_operar",
+    "iol_asesor",
+    "analizar_portafolio_clarity",
+  ],
+  salida: ["grafico_chat", "generar_informe"],
+  macro: [
+    "contexto_macro",
+    "ciclo_economico",
+    "performance_sectorial",
+    "valuacion_sectorial",
+    "ranking_valuacion_sectores",
+    "analisis_industria",
+    "consultar_catalogo",
+  ],
+  labadie: ["pairs_trading_labadie", "curva_ejecucion_labadie"],
+  mercadoExtra: [
+    "oportunidades_diarias",
+    "consultar_cierre_mercado",
+    "generar_informe_matutino",
+    "consultar_agenda_economica",
+    "generar_senales_cedear",
+  ],
+  opciones: ["analizar_opciones_completo"],
+};
+
+function agregarGrupoHerramientas(nombres: Set<string>, grupo: string): void {
+  for (const n of GRUPOS_HERRAMIENTAS[grupo] ?? []) nombres.add(n);
+}
+
+const SKILL_A_GRUPO: Record<string, string> = {
+  "statarb-labadie": "labadie",
+  "ejecucion-optima-labadie": "labadie",
+  "options-analysis": "opciones",
+  "cedear-signals": "mercadoExtra",
+  "portfolio-paste-parser": "iol",
+  "orquestacion-fuentes-datos": "salida",
+};
+
+/** Subconjunto de TOOLS relevante para la pregunta (menos prefill, respuesta más rápida). */
+export function filtrarToolsParaPregunta(pregunta: string, roles: RolAgente[]): ToolSpec[] {
+  const p = (pregunta ?? "").toLowerCase();
+  const nombres = new Set(HERRAMIENTAS_BASE);
+
+  if (
+    roles.includes("valoracion") ||
+    /valor\s+intr[íi]nsec|cu[aá]nto\s+vale|dcf\b|wacc|fundamental\s+(de|del)|valua|valuaci[oó]n|m[uú]ltiplos|ficha\s+de\s+decisi/.test(
+      p,
+    )
+  ) {
+    agregarGrupoHerramientas(nombres, "valoracion");
+  }
+  if (
+    roles.includes("semaforo") ||
+    /t[ée]cnico|rsi|macd|medias?\s+m[óo]viles|ema\b|soportes?|resistencias?|sem[áa]foro/.test(p)
+  ) {
+    agregarGrupoHerramientas(nombres, "semaforo");
+  }
+  if (
+    roles.includes("cuantitativo") ||
+    /beta|capm|correlaci|volatilidad|sharpe|\bvar\s*9|\bvar\s*99|drawdown|optimiz|frontera|covarianza|markowitz|\bpca\b/.test(
+      p,
+    )
+  ) {
+    agregarGrupoHerramientas(nombres, "cuantitativo");
+  }
+  if (
+    /iol|invertir\s*online|portafolio|cartera|estado\s+de\s+cuenta|estadocuenta|mis\s+(operaciones|tenencias)|loguea|login|test\s+inversor/.test(
+      p,
+    )
+  ) {
+    agregarGrupoHerramientas(nombres, "iol");
+  }
+  if (/gr[áa]fic|chart|tradingview|velas|visualiz|informe|reporte|resumen\s+ejecutivo|\bpdf\b/.test(p)) {
+    agregarGrupoHerramientas(nombres, "salida");
+  }
+  if (
+    roles.includes("cuantitativo") ||
+    /macro|ciclo\s+econ[óo]mico|r[ée]gimen|sector|industria|inflaci[óo]n|recesi[óo]n/.test(p)
+  ) {
+    agregarGrupoHerramientas(nombres, "macro");
+  }
+  if (
+    /pairs?\s*trading|cointegra|arbitraje\s+estad|spread\s+entre|curva\s+de\s+ejecuci|almgren|implementation\s+shortfall|target\s+close|impacto\s+de\s+mercado/.test(
+      p,
+    )
+  ) {
+    agregarGrupoHerramientas(nombres, "labadie");
+  }
+  if (
+    /oportunidades|cierre\s+de\s+mercado|c[óo]mo\s+(cerr[óo]|cerraron)|agenda|calendario|se[ñn]ales?\b|cedear|movers|qu[ée]\s+(subi[oó]|baj[oó])/.test(
+      p,
+    )
+  ) {
+    agregarGrupoHerramientas(nombres, "mercadoExtra");
+  }
+  if (
+    /opci[oó]n(es)?\b|\bstrikes?\b|\bprimas?\b|griegas|\bdelta\b|\bgamma\b|\btheta\b|\bvega\b|black.?scholes|sonrisa\s+de\s+vol/.test(
+      p,
+    )
+  ) {
+    agregarGrupoHerramientas(nombres, "opciones");
+  }
+
+  for (const skill of detectarIntencionSkill(pregunta ?? "")) {
+    const grupo = SKILL_A_GRUPO[skill];
+    if (grupo) agregarGrupoHerramientas(nombres, grupo);
+  }
+
+  return TOOLS.filter((t) => nombres.has(t.function.name));
+}
 
 type AgentResult = {
   rol: RolAgente;
@@ -690,7 +893,12 @@ export async function ejecutarTool(
       case "analizar_portfolio_pegado": {
         const { ejecutarPortfolioPegado } = await import("@/lib/agents/ejecutores");
         const res = await ejecutarPortfolioPegado(argsRaw);
-        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok, eventos: (res as any).eventos };
+      }
+      case "analizar_opciones_completo": {
+        const { ejecutarOpcionesCompleto } = await import("@/lib/agents/ejecutores");
+        const res = await ejecutarOpcionesCompleto(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok, eventos: (res as any).eventos };
       }
       default:
       return { ...(await ejecutarBusqueda(query)), ok: true };
@@ -967,6 +1175,10 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   const activos = enrutar(pregunta);
   const roles = [...activos] as RolAgente[];
 
+  // Herramientas relevantes para ESTA pregunta (menos prefill por ronda).
+  const toolsTurno = filtrarToolsParaPregunta(pregunta, roles);
+  const nombresHerramientasTurno = toolsTurno.map((t) => t.function.name);
+
   // 2) Despacho en paralelo a través de la cola de tareas.
   if (roles.length > 1) enviar({ t: "status", v: "cola", q: roles.length });
   const agentes: AgentResult[] = [];
@@ -1067,7 +1279,7 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
       if (modeloPlanner.enableThinking && modeloPlanner.reasoningBudget) {
         body["reasoning_budget"] = modeloPlanner.reasoningBudget;
       }
-      body["tools"] = TOOLS;
+      body["tools"] = toolsTurno;
       body["tool_choice"] = "auto";
       const planRes = await postCompletionsResiliente(apiKey, body);
       if (!planRes.ok) break;
@@ -1546,7 +1758,7 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
       apiKey,
       modeloSalida.id,
       messages,
-      NOMBRE_HERRAMIENTAS,
+      nombresHerramientasTurno,
       opcionesInfladas,
     );
     if (!res.ok) {

@@ -6,7 +6,7 @@
  * paralelo; el coordinador los supervisa y razona sobre sus respuestas.
  */
 
-import { NOMBRE_HERRAMIENTAS, type EstadoHerramienta } from "@/lib/agents/herramientas";
+import type { EstadoHerramienta } from "@/lib/agents/herramientas";
 
 export type RolAgente =
   | "coordinador"
@@ -31,11 +31,68 @@ export type AgenteDef = {
   status: EstadoHerramienta;
 };
 
+// Recorte de herramientas por rol: enviar las ~48 definiciones a cada agente
+// infla el prefill de cada llamada. Cada especialista recibe su set puntual más
+// un complemento mínimo; el coordinador/redactor filtran además por pregunta.
+const BASE_COMUN = [
+  "buscar_web",
+  "consultar_mercado",
+  "buscar_noticias",
+  "consultar_base_conocimiento",
+  "datos_financieros",
+];
+
+const HERRAMIENTAS_POR_ROL: Record<RolAgente, string[]> = {
+  coordinador: BASE_COMUN,
+  mercado: [...BASE_COMUN, "consultar_catalogo"],
+  noticias: ["buscar_noticias", "buscar_web", "consultar_mercado"],
+  conocimiento: ["consultar_base_conocimiento", "buscar_web", "buscar_noticias", "consultar_mercado"],
+  valoracion: [
+    "ficha_de_decision",
+    "valor_por_metodos",
+    "calcular_wacc",
+    "analizar_fundamental",
+    "valor_intrinseco_real",
+    "calcular_dcf",
+    "score_sectorial",
+    "buscar_noticias",
+    "buscar_web",
+    "consultar_mercado",
+  ],
+  semaforo: ["analizar_semaforo", "analisis_tecnico", "score_sectorial", "buscar_noticias", "buscar_web"],
+  cuantitativo: [
+    "analizar_capm",
+    "matriz_capm",
+    "calcular_wacc",
+    "analizar_fundamental",
+    "analizar_sectores",
+    "analizar_factores",
+    "performance_sectorial",
+    "valuacion_sectorial",
+    "estadisticas_retornos",
+    "analizar_riesgo",
+    "contexto_macro",
+    "ciclo_economico",
+    "optimizar_portafolio",
+    "calcular_cobertura",
+    "consultar_catalogo",
+    "distribucion_riesgo",
+    "capm_auto",
+    "optimizar_cartera_avanzada",
+    "backtest_optimizacion",
+    "matriz_benchmarks",
+    "analisis_industria",
+    "ranking_valuacion_sectores",
+    "buscar_web",
+  ],
+  redactor: BASE_COMUN,
+};
+
 export const AGENTES: Record<RolAgente, AgenteDef> = {
   coordinador: {
     rol: "coordinador",
     nombre: "Coordinador",
-    herramientas: NOMBRE_HERRAMIENTAS,
+    herramientas: HERRAMIENTAS_POR_ROL.coordinador,
     categoria: "razonamiento",
     status: "searching",
     sistema: `Sos el coordinador del equipo de agentes de IA. Recibís las respuestas de los agentes especializados y razonás sobre ellas para guiar la respuesta final. Tenés acceso a las mismas herramientas del sistema (mercado, noticias, base de conocimiento, búsqueda web, DCF y valoración) y podés usarlas para verificar o completar la información que falte antes de guiar la redacción final.`,
@@ -43,7 +100,7 @@ export const AGENTES: Record<RolAgente, AgenteDef> = {
   mercado: {
     rol: "mercado",
     nombre: "Agente de Mercado",
-    herramientas: NOMBRE_HERRAMIENTAS,
+    herramientas: HERRAMIENTAS_POR_ROL.mercado,
     categoria: "rapidez",
     status: "mercado",
     sistema: `Sos el Agente de Mercado de IA, asistente del mercado de capitales argentino.
@@ -55,7 +112,7 @@ export const AGENTES: Record<RolAgente, AgenteDef> = {
   noticias: {
     rol: "noticias",
     nombre: "Agente de Noticias",
-    herramientas: NOMBRE_HERRAMIENTAS,
+    herramientas: HERRAMIENTAS_POR_ROL.noticias,
     categoria: "rapidez",
     status: "noticias",
     sistema: `Sos el Agente de Noticias de IA, asistente del mercado de capitales argentino.
@@ -67,7 +124,7 @@ export const AGENTES: Record<RolAgente, AgenteDef> = {
   conocimiento: {
     rol: "conocimiento",
     nombre: "Agente de Conocimiento",
-    herramientas: NOMBRE_HERRAMIENTAS,
+    herramientas: HERRAMIENTAS_POR_ROL.conocimiento,
     categoria: "rapidez",
     status: "base_conocimiento",
     sistema: `Sos el Agente de Conocimiento de IA, asistente del mercado de capitales argentino.
@@ -80,7 +137,7 @@ export const AGENTES: Record<RolAgente, AgenteDef> = {
   valoracion: {
     rol: "valoracion",
     nombre: "Agente de Valoración",
-    herramientas: NOMBRE_HERRAMIENTAS,
+    herramientas: HERRAMIENTAS_POR_ROL.valoracion,
     categoria: "razonamiento",
     status: "valoracion",
     sistema: `Sos el Agente de Valoración de IA, asistente del mercado de capitales argentino.
@@ -93,7 +150,7 @@ export const AGENTES: Record<RolAgente, AgenteDef> = {
   semaforo: {
     rol: "semaforo",
     nombre: "Agente de Semáforo Técnico y Fundamental",
-    herramientas: NOMBRE_HERRAMIENTAS,
+    herramientas: HERRAMIENTAS_POR_ROL.semaforo,
     categoria: "razonamiento",
     status: "semaforo",
     sistema: `Sos el Agente de Semáforo Técnico y Fundamental de IA.
@@ -105,7 +162,7 @@ export const AGENTES: Record<RolAgente, AgenteDef> = {
   cuantitativo: {
     rol: "cuantitativo",
     nombre: "Agente de Análisis Cuantitativo",
-    herramientas: NOMBRE_HERRAMIENTAS,
+    herramientas: HERRAMIENTAS_POR_ROL.cuantitativo,
     categoria: "razonamiento",
     status: "searching",
     sistema: `Sos el Agente de Análisis Cuantitativo de IA, especialista en métodos cuantitativos con datos reales de Yahoo Finance.
@@ -124,7 +181,7 @@ export const AGENTES: Record<RolAgente, AgenteDef> = {
   redactor: {
     rol: "redactor",
     nombre: "Redactor",
-    herramientas: NOMBRE_HERRAMIENTAS,
+    herramientas: HERRAMIENTAS_POR_ROL.redactor,
     categoria: "rapidez",
     status: "searching",
     sistema: `Sos el redactor final de IA. Redactás la respuesta al usuario en prosa conversacional rioplatense con voseo, basándote en los datos y el enfoque que te pasan los agentes. Tenés acceso a las mismas herramientas del sistema (mercado, noticias, base de conocimiento, búsqueda web, DCF y valoración) para verificar un dato puntual si la respuesta lo requiere en este instante. Nunca inventes datos: solo lo que está en tu contexto o de una herramienta ejecutada ahora mismo.`,
