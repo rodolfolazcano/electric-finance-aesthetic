@@ -2,6 +2,11 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+// Bot unificado de señales: loop interno siempre encendido (idempotente,
+// desactivable con BOT_UNIFICADO_AUTO=false). En serverless lo cubre el cron externo.
+import { arrancarBotUnificado } from "./lib/bot-unificado/scheduler";
+
+arrancarBotUnificado();
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;

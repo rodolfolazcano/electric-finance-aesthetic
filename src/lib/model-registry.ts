@@ -107,6 +107,19 @@ const RAPIDEZ: AgentModel[] = [
   },
 ];
 
+/**
+ * Skills de metodología del corpus académico indexado (pt/): Pascale, Fowler
+ * Newton/Biondi, Elbaum, Dumrauf y macro LATAM (Blanchard/Dornbusch).
+ * Se cargan completas en los modelos planners de mayor capacidad.
+ */
+const SKILLS_CORPUS_ACADEMICO = [
+  "metodo-pascale-valuacion",
+  "analisis-estados-contables",
+  "carteras-elbaum",
+  "calculo-financiero-dumrauf",
+  "macro-latam-ciclo",
+];
+
 const RAZONAMIENTO: AgentModel[] = [
   {
     id: "nvidia/nemotron-3-ultra-550b-a55b",
@@ -116,12 +129,13 @@ const RAZONAMIENTO: AgentModel[] = [
     descripcion:
       "Agente de razonamiento con 1M de contexto: planifica, encadena herramientas y analiza en profundidad. Planner por defecto.",
     skills: [
-      "razonamiento-profundo",
+      "razonamiento-profundo", "razonamiento-autonomo-financiero",
       "analisis-dcf",
       "portfolio",
       "planificacion",
       "herramientas",
       "analisis-cuantitativo",
+      ...SKILLS_CORPUS_ACADEMICO,
     ],
     enableThinking: true,
     reasoningBudget: 16384,
@@ -136,11 +150,12 @@ const RAZONAMIENTO: AgentModel[] = [
     descripcion:
       "MoE híbrido Mamba-Transformer con 1M de contexto para razonamiento agéntico, planificación y tool calling.",
     skills: [
-      "razonamiento-profundo",
+      "razonamiento-profundo", "razonamiento-autonomo-financiero",
       "analisis-dcf",
       "planificacion",
       "herramientas",
       "analisis-cuantitativo",
+      ...SKILLS_CORPUS_ACADEMICO,
     ],
     enableThinking: true,
     reasoningBudget: 12288,
@@ -154,7 +169,7 @@ const RAZONAMIENTO: AgentModel[] = [
     categoria: "razonamiento",
     descripcion:
       "MoE de razonamiento para análisis, matemática financiera y tareas de investigación profundas.",
-    skills: ["razonamiento-profundo", "analisis-dcf", "portfolio", "analisis-cuantitativo"],
+    skills: ["razonamiento-profundo", "razonamiento-autonomo-financiero", "analisis-dcf", "portfolio", "analisis-cuantitativo", ...SKILLS_CORPUS_ACADEMICO],
     enableThinking: true,
     reasoningBudget: 12288,
     puedePlanear: true,
@@ -167,7 +182,7 @@ const RAZONAMIENTO: AgentModel[] = [
     categoria: "razonamiento",
     descripcion:
       "Razonamiento y matemática eficientes en un MoE compacto; ideal para análisis de datos financieros.",
-    skills: ["razonamiento-profundo", "analisis-dcf", "analisis-cuantitativo"],
+    skills: ["razonamiento-profundo", "razonamiento-autonomo-financiero", "analisis-dcf", "analisis-cuantitativo"],
     enableThinking: true,
     reasoningBudget: 8192,
     puedePlanear: true,
@@ -179,7 +194,7 @@ const RAZONAMIENTO: AgentModel[] = [
     editor: "Google",
     categoria: "razonamiento",
     descripcion: "Modelo denso de frontera para razonamiento, workflows agénticos y análisis fino.",
-    skills: ["razonamiento-profundo", "planificacion", "herramientas", "analisis-cuantitativo"],
+    skills: ["razonamiento-profundo", "razonamiento-autonomo-financiero", "planificacion", "herramientas", "analisis-cuantitativo"],
     enableThinking: true,
     reasoningBudget: 8192,
     puedePlanear: true,
@@ -192,7 +207,7 @@ const RAZONAMIENTO: AgentModel[] = [
     categoria: "razonamiento",
     descripcion:
       "LLM grande: razonamiento, matemática, conocimiento general y function calling para respuestas completas.",
-    skills: ["razonamiento-profundo", "analisis-dcf", "portfolio", "chat", "analisis-cuantitativo"],
+    skills: ["razonamiento-profundo", "razonamiento-autonomo-financiero", "analisis-dcf", "portfolio", "chat", "analisis-cuantitativo"],
     enableThinking: true,
     reasoningBudget: 8192,
     puedePlanear: true,
@@ -204,7 +219,7 @@ const RAZONAMIENTO: AgentModel[] = [
     editor: "Meta",
     categoria: "razonamiento",
     descripcion: "Conversaciones complejas con contexto superior, razonamiento y generación rica.",
-    skills: ["razonamiento-profundo", "analisis-dcf", "chat", "analisis-cuantitativo"],
+    skills: ["razonamiento-profundo", "razonamiento-autonomo-financiero", "analisis-dcf", "chat", "analisis-cuantitativo"],
     enableThinking: true,
     reasoningBudget: 8192,
     puedePlanear: true,
@@ -217,7 +232,7 @@ const RAZONAMIENTO: AgentModel[] = [
     categoria: "razonamiento",
     descripcion:
       "Razonamiento preciso, tool calling y chat con alta eficiencia y muy buena precisión.",
-    skills: ["razonamiento-profundo", "herramientas", "planificacion", "analisis-cuantitativo"],
+    skills: ["razonamiento-profundo", "razonamiento-autonomo-financiero", "herramientas", "planificacion", "analisis-cuantitativo"],
     enableThinking: true,
     reasoningBudget: 8192,
     puedePlanear: true,
@@ -230,7 +245,7 @@ const RAZONAMIENTO: AgentModel[] = [
     categoria: "razonamiento",
     descripcion:
       "Construido para workflows agénticos: instrucciones, function calling y análisis estructurado.",
-    skills: ["razonamiento-profundo", "herramientas", "analisis-cuantitativo"],
+    skills: ["razonamiento-profundo", "razonamiento-autonomo-financiero", "herramientas", "analisis-cuantitativo"],
     enableThinking: true,
     reasoningBudget: 8192,
     puedePlanear: true,
@@ -243,7 +258,7 @@ const RAZONAMIENTO: AgentModel[] = [
     categoria: "razonamiento",
     descripcion:
       "Flagship agéntico: razonamiento de horizonte largo y tareas de análisis extensas.",
-    skills: ["razonamiento-profundo", "planificacion", "analisis-cuantitativo"],
+    skills: ["razonamiento-profundo", "razonamiento-autonomo-financiero", "planificacion", "analisis-cuantitativo"],
     enableThinking: true,
     reasoningBudget: 8192,
     puedePlanear: true,
@@ -256,7 +271,7 @@ const RAZONAMIENTO: AgentModel[] = [
     categoria: "razonamiento",
     descripcion:
       "MoE multimodal con fuerte razonamiento, coding y tool calling para análisis robusto.",
-    skills: ["razonamiento-profundo", "herramientas", "analisis-cuantitativo"],
+    skills: ["razonamiento-profundo", "razonamiento-autonomo-financiero", "herramientas", "analisis-cuantitativo"],
     enableThinking: true,
     reasoningBudget: 8192,
     puedePlanear: true,
@@ -269,7 +284,7 @@ const RAZONAMIENTO: AgentModel[] = [
     categoria: "razonamiento",
     descripcion:
       "MoE multimodal esparso para razonamiento enterprise, agéntico y tareas de análisis.",
-    skills: ["razonamiento-profundo"],
+    skills: ["razonamiento-profundo", "razonamiento-autonomo-financiero"],
     enableThinking: true,
     reasoningBudget: 8192,
     puedePlanear: true,

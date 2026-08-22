@@ -1,0 +1,27 @@
+[
+  {
+    "desde": "conocimiento",
+    "hacia": "coord",
+    "texto": "¡Hola! ¿En qué puedo ayudarte?"
+  },
+  {
+    "desde": "mercado",
+    "hacia": "coord",
+    "texto": "El dólar oficial cotiza a **$1.520,00** (precio de venta) según los datos más recientes de consultar_mercado (actualización 21/08 a las 22:30 hs).  \n\nTené en cuenta que los precios pueden variar rápidamente y conviene confirmar en la fuente oficial antes de operar. ¿Te gustaría saber algo más sobre otras cotizaciones (blue, MEP, CCL, etc.) o sobre cómo interpretar esas variaciones?"
+  },
+  {
+    "desde": "conocimiento",
+    "hacia": "coord",
+    "texto": "El dólar oficial que aparece en la consulta de mercado tiene un **precio de compra de $1.470,00 y de venta de $1.520,00** (variación 0,33 %).  \n\nSi necesitás información más específica (por ejemplo, el tipo de cambio que utiliza un banco en particular o la cotización del “dólar blue”), solo avísame y lo consulto nuevamente."
+  },
+  {
+    "desde": "conocimiento",
+    "hacia": "coord",
+    "texto": "¡Claro! Para poder generar el gráfico necesito que me indiques cuál activo estás consultando.  \n\nEn la base de conocimientos que manejo existen varios símbolos que empiezan con **GGAL** (por ejemplo, **GGAL.BA** – la acción de Grupo Galicia que se negocia en la Bolsa de Buenos Aires).  \n\n¿Te referís a:\n\n* **GGAL.BA** (acción de Grupo Galicia en el mercado local), o  \n* algún otro ticker que contenga “GGAL” (por ejemplo, un ADR, CEDEAR, ETF, etc.)?\n\nIndivídua el ticker exacto y, si lo deseas, el período que prefieras (por ejemplo, 1 mes, 3 meses, 1 año, etc.). Con esa información podré crear el gráfico correspondiente."
+  },
+  {
+    "desde": "mercado",
+    "hacia": "coord",
+    "texto": "**Riesgo País (Argentina) – cotización más reciente**\n\n- **Valor:** **1 391,30** (puntos)  \n- **Fecha de la última actualización:** 21 de agosto de 2025, 22:30 hs  \n- **Fuente:** *ArgentinaDatos* (consulta `consultar_mercado`)\n\n> **Nota:** El riesgo país se publica diariamente y puede variar rápidamente según la evolución del mercado. Si necesitás la cifra exacta en tiempo real o la serie histórica completa, podés consultar directamente la página de *ArgentinaDatos* o el panel de *CriptoYa* donde se actualizan los valores minuto a minuto.  \n\n¿Te gustaría también ver la evolución histórica del riesgo país o alguna otra variable relacionada (por ejemplo, la cotización del dólar oficial, la brecha cambiaria, etc.)?"
+  }
+]
