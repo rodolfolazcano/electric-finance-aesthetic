@@ -267,7 +267,7 @@ export async function toolFinancialQuery(args: ToolFinancialQueryArgs): Promise<
   }
 }
 
-//  telegram — coronar_inversiones_bot
+//  telegram — @Coronarinversiones777_bot (senales) + @fpxbs777_bot (agente) — ambos hardcodeados
 
 export type ToolTelegramSignalArgs = {
   ticker: string;
@@ -510,32 +510,32 @@ export const AGENT_TOOLS: ToolRecord[] = [
   },
   {
     name: "telegram_enviar_senal",
-    description: "ENVIA una senal de trading/analisis a Telegram via @coronar_inversiones_bot. USAR cuando el usuario pide que las senales se envien a Telegram, o cuando detectas una oportunidad/valor intrinseco/score que el usuario quiere notificar. Requiere TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID configurados en .env (obtenidos de @BotFather). ticker y senal son obligatorios; precio/variacion/motivo opcionales. Sin emojis en el mensaje.",
+    description: "ENVIA una senal de trading/analisis a Telegram via @Coronarinversiones777_bot (CANAL SENALES AUTOMATICAS, token hardcodeado 8984569191). USAR cuando el usuario pide 'envia senal de X' o cuando detectas oportunidad sin preguntar. JAMAS pidas chat_id al usuario: si chatId no se pasa, el sistema usa automaticamente 8179198652 hardcodeado. Solo ticker y senal son obligatorios; precio/variacion/motivo opcionales. Ejecuta directo sin pedir confirmacion. Sin emojis.",
     params: {
-      ticker: { type: "string", description: "Ticker (ej: GGAL.BA, AAPL, SPY)" },
+      ticker: { type: "string", description: "Ticker (ej: META, GGAL.BA, AAPL, SPY)" },
       senal: { type: "string", description: "Senal: COMPRA, COMPRA CON CAUTELA, MANTENER, REDUCIR, VENTA u otra descripcion" },
       precio: { type: "number", description: "Precio actual opcional" },
       variacion1d: { type: "number", description: "Variacion % 1 dia opcional (ej: 2.5)" },
       motivo: { type: "string", description: "Motivo breve opcional (ej: Score 82/100, RSI sobreventa)" },
       nivel: { type: "string", description: "Nivel de confianza o horizonte opcional" },
-      chatId: { type: "string", description: "Chat ID opcional (si no se pasa usa TELEGRAM_CHAT_ID)" },
+      chatId: { type: "string", description: "Chat ID opcional — NO PEDIR AL USUARIO, si se omite usa 8179198652 automaticamente" },
     },
     required: ["ticker", "senal"],
     run: (a) => toolTelegramSignal(a as ToolTelegramSignalArgs),
   },
   {
     name: "telegram_enviar_mensaje",
-    description: "ENVIA un mensaje libre a Telegram via @coronar_inversiones_bot. USAR para notificaciones generales, resumenes de cartera, alertas de ciclo u otro texto. Requiere TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID en .env. Usa formato HTML.",
+    description: "ENVIA un mensaje libre a Telegram via @Coronarinversiones777_bot (hardcodeado). USAR para notificaciones generales, resumenes, alertas. JAMAS pidas chat_id: usa el hardcodeado 8179198652 si no se especifica. Usa formato HTML.",
     params: {
       text: { type: "string", description: "Texto del mensaje (max 4000 chars, HTML permitido: <b>, <i>, <code>)" },
-      chatId: { type: "string", description: "Chat ID opcional" },
+      chatId: { type: "string", description: "Chat ID opcional — NO pedir al usuario" },
     },
     required: ["text"],
     run: (a) => toolTelegramMessage(a as ToolTelegramMessageArgs),
   },
   {
     name: "telegram_estado",
-    description: "CONSULTA el estado del bot de Telegram @coronar_inversiones_bot: verifica token, muestra info del bot (username, id) y ultimos chat_ids via getUpdates. USAR para diagnosticar si el bot esta configurado correctamente.",
+    description: "CONSULTA el estado del bot de Telegram @Coronarinversiones777_bot (senales) y @fpxbs777_bot (agente): verifica tokens hardcodeados, muestra info del bot y ultimos chat_ids via getUpdates. USAR para diagnosticar configuracion.",
     params: {},
     required: [],
     run: () => toolTelegramInfo(),
