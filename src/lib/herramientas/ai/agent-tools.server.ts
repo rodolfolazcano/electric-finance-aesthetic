@@ -9,6 +9,8 @@ import { searchLibrary } from "./context-library.server";
 import {
   sendTelegramMessage as _sendTelegramMessage,
   sendTelegramSignal as _sendTelegramSignal,
+  sendSenalInstitucional as _sendSenalInstitucional,
+  formatSenalInstitucional as _formatSenalInstitucional,
   telegramGetBotInfo as _telegramGetBotInfo,
   telegramGetUpdates as _telegramGetUpdates,
 } from "@/lib/telegram.server";
@@ -306,6 +308,62 @@ export async function toolTelegramInfo(): Promise<string> {
   return `${info}\n---\n${updates}`;
 }
 
+export type ToolGenerarSenalArgs = { ticker: string; enviarTelegram?: boolean; chatId?: string };
+
+export async function toolGenerarSenalUnificada(args: ToolGenerarSenalArgs): Promise<string> {
+  const ticker = args.ticker?.trim().toUpperCase();
+  if (!ticker) return "[ERROR] ticker es obligatorio (ej: META, GGAL.BA, AAPL)";
+  try {
+    const { generarSenalUnificada } = await import("@/lib/senales/motor-unificado");
+    const s = await generarSenalUnificada(ticker);
+    const texto = _formatSenalInstitucional({
+      ticker: s.ticker,
+      senal: s.senal,
+      precio: s.precio,
+      variacion1d: s.variacion1d,
+      scoreTotal: s.scoreTotal,
+      scores: s.scores,
+      tecnica: s.tecnica,
+      motivo: s.motivo.slice(0, 220),
+      confianza: s.confianza,
+    });
+    const detalle4capas = [
+      `I=${s.scores.intermarket.toFixed(1)} F=${s.scores.fundamental.toFixed(1)} T=${s.scores.tecnico.toFixed(1)} C=${s.scores.cuantitativo.toFixed(1)} → Total ${s.scoreTotal.toFixed(1)}/10`,
+      s.tecnica.entrada != null ? `Entrada ${s.tecnica.entrada.toFixed(2)} SL ${s.tecnica.sl?.toFixed(2)} (${s.tecnica.slPct}%) TP1 ${s.tecnica.tp1?.toFixed(2)} R/R ${s.tecnica.rrr}` : "",
+    ].filter(Boolean).join(" | ");
+    let out = texto + "\n\n[DETALLE 4 CAPAS] " + detalle4capas;
+    if (args.enviarTelegram) {
+      const envio = await _sendSenalInstitucional({
+        ticker: s.ticker,
+        senal: s.senal,
+        precio: s.precio,
+        variacion1d: s.variacion1d,
+        scoreTotal: s.scoreTotal,
+        scores: s.scores,
+        tecnica: s.tecnica,
+        motivo: s.motivo.slice(0, 180),
+        confianza: s.confianza,
+        chatId: args.chatId,
+      });
+      out += "\n\n[TELEGRAM] " + envio;
+      try {
+        const { fetchYahooChart } = await import("@/lib/yahoo-http");
+        const { buildQuickChartUrl } = await import("@/lib/telegram.server");
+        const chart = await fetchYahooChart(ticker, "1y", "1d").catch(()=>null);
+        const closes: number[] = chart?.chart?.result?.[0]?.indicators?.quote?.[0]?.close ?? [];
+        if (closes.length > 20) {
+          const serie = closes.slice(-90).map((v,i)=> ({f: String(i), v: Number(v)} )).filter(p=> isFinite(p.v));
+          const url = buildQuickChartUrl(`${ticker} — ${s.senal} ${s.scoreTotal.toFixed(1)}/10`, serie, "USD");
+          out += `\n[GRAFICO] ${url} — TradingView: https://www.tradingview.com/chart/?symbol=${encodeURIComponent(ticker)}`;
+        }
+      } catch {}
+    }
+    return out;
+  } catch (e: any) {
+    return `[ERROR generar_senal_unificada ${ticker}]: ${e.message ?? String(e)}`;
+  }
+}
+
 // --- fetch_stock_data ----------------------------------------------------------
 // Obtiene datos de Yahoo Finance directamente (sin depender del servidor Flask).
 
@@ -489,6 +547,17 @@ export const AGENT_TOOLS: ToolRecord[] = [
     params: {},
     required: [],
     run: () => toolTelegramInfo(),
+  },
+  {
+    name: "generar_senal_unificada",
+    description: "GENERA señal 4 capas CORONAR (Intermarket Pring 15% → Fundamental Pascale gate 40% → Técnico semáforo 25% → Cuantitativo Sharpe/VaR/CAPM 20%) con SL/TP y R/R. Usa corpus PT y skills. Si enviarTelegram=true envía formato institucional limpio a @Coronarinversiones777_bot + URL gráfico. Para interpretar señal, USAR ESTA TOOL PRIMERO.",
+    params: {
+      ticker: { type: "string", description: "Ticker a analizar (ej: META, GGAL.BA, AAPL)" },
+      enviarTelegram: { type: "boolean", description: "Si true, envía a Telegram automáticamente (default false)" },
+      chatId: { type: "string", description: "Chat ID opcional — NO pedir al usuario" },
+    },
+    required: ["ticker"],
+    run: (a) => toolGenerarSenalUnificada(a as ToolGenerarSenalArgs),
   },
   {
     name: "fetch_stock_data",

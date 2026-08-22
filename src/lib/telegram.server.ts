@@ -116,25 +116,58 @@ export type TelegramSignalArgs = {
 };
 
 export function formatSignalForTelegram(a: TelegramSignalArgs): string {
+  // Formato legacy — mantener compatibilidad con llamadas simples
   const lines: string[] = [];
-  lines.push(`<b>CORONAR — Senal ${escapeHtml(a.senal)}</b>`);
+  lines.push(`<b>CORONAR — ${escapeHtml(a.ticker.toUpperCase())} | ${escapeHtml(a.senal)}</b>`);
   lines.push(
-    `Ticker: <b>${escapeHtml(a.ticker.toUpperCase())}</b>${a.precio != null ? `  Precio: $${a.precio.toFixed(2)}` : ""}${a.variacion1d != null ? `  (${a.variacion1d >= 0 ? "+" : ""}${a.variacion1d.toFixed(2)}%)` : ""}`,
+    `${a.precio != null ? `Precio $${a.precio.toFixed(2)}` : ""}${a.variacion1d != null ? ` (${a.variacion1d >= 0 ? "+" : ""}${a.variacion1d.toFixed(2)}%)` : ""}`.trim(),
   );
   if (a.nivel) lines.push(`Nivel: ${escapeHtml(a.nivel)}`);
-  if (a.motivo) lines.push(`Motivo: ${escapeHtml(a.motivo)}`);
-  if (a.fuente) lines.push(`Fuente: ${escapeHtml(a.fuente)}`);
-  lines.push(``);
-  lines.push(`Bot: @Coronarinversiones777_bot`);
-  lines.push(
-    `Aviso: informacion educativa, no es recomendacion de inversion. Verifica siempre en tu broker.`,
-  );
-  // Sin emojis por requerimiento de formato unificado
+  if (a.motivo) lines.push(escapeHtml(a.motivo).slice(0, 280));
+  lines.push(`<i>Educativo — no recomendación. DYOR.</i>`);
   return lines.join("\n");
+}
+
+// Formato institucional limpio para SenalUnificada 4 capas (Intermarket → Fundamental → Técnico → Cuant)
+export type SenalInstitucionalArgs = {
+  ticker: string;
+  senal: string;
+  precio: number | null;
+  variacion1d: number | null;
+  scoreTotal: number;
+  scores: { intermarket: number; fundamental: number; tecnico: number; cuantitativo: number };
+  tecnica: { entrada: number | null; sl: number | null; tp1: number | null; tp2: number | null; slPct: number | null; tp1Pct: number | null; rrr: number | null };
+  motivo?: string;
+  confianza?: number;
+};
+
+export function formatSenalInstitucional(s: SenalInstitucionalArgs): string {
+  const t = s.ticker.toUpperCase();
+  const varStr = s.variacion1d != null ? ` (${s.variacion1d >= 0 ? "+" : ""}${s.variacion1d.toFixed(2)}%)` : "";
+  const precioStr = s.precio != null ? `$${s.precio.toFixed(2)}` : "s/d";
+  const slStr = s.tecnica.sl != null ? `$${s.tecnica.sl.toFixed(2)} (${s.tecnica.slPct != null ? s.tecnica.slPct.toFixed(2) + "%" : ""})` : "—";
+  const tp1Str = s.tecnica.tp1 != null ? `$${s.tecnica.tp1.toFixed(2)} (${s.tecnica.tp1Pct != null ? "+" + s.tecnica.tp1Pct.toFixed(2) + "%" : ""})` : "—";
+  const rrrStr = s.tecnica.rrr != null ? s.tecnica.rrr.toFixed(2) : "—";
+  const entradaStr = s.tecnica.entrada != null ? `$${s.tecnica.entrada.toFixed(2)}` : precioStr;
+  return [
+    `<b>CORONAR — ${escapeHtml(t)} | ${escapeHtml(s.senal)} — ${s.scoreTotal.toFixed(1)}/10</b>`,
+    `Precio ${precioStr}${varStr} · Confianza ${(s.confianza ?? 0.6 * 100).toFixed ? ((s.confianza ?? 0.6) * 100).toFixed(0) + "%" : ""}`,
+    `Entrada ${entradaStr} · SL ${slStr} · TP1 ${tp1Str} · R/R ${rrrStr}`,
+    `I ${s.scores.intermarket.toFixed(1)} · F ${s.scores.fundamental.toFixed(1)} · T ${s.scores.tecnico.toFixed(1)} · C ${s.scores.cuantitativo.toFixed(1)}`,
+    s.motivo ? escapeHtml(s.motivo).slice(0, 220) : "",
+    `<i>Educativo — no recomendación. DYOR.</i>`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 export async function sendTelegramSignal(args: TelegramSignalArgs): Promise<string> {
   const text = formatSignalForTelegram(args);
+  return sendTelegramMessage({ text, chatId: args.chatId, parseMode: "HTML" });
+}
+
+export async function sendSenalInstitucional(args: SenalInstitucionalArgs & { chatId?: string }): Promise<string> {
+  const text = formatSenalInstitucional(args);
   return sendTelegramMessage({ text, chatId: args.chatId, parseMode: "HTML" });
 }
 
