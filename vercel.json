@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/contexto-telegram",
+      "schedule": "30 13 * * 1-5"
+    },
+    {
+      "path": "/api/cron/contexto-telegram",
+      "schedule": "30 20 * * 1-5"
+    }
+  ]
+}
