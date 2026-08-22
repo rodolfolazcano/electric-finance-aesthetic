@@ -375,6 +375,57 @@ export async function toolStockData(args: ToolStockDataArgs): Promise<string> {
   }
 }
 
+export async function toolCierreMercado(): Promise<string> {
+  try {
+    const { getCierreMercadoDashboard } = await import("@/lib/cierre-mercado.functions");
+    const data: any = await (getCierreMercadoDashboard as unknown as () => Promise<any>)();
+    const resumen = [
+      `=== CIERRE ${data.fechaCierre} (${data.timestamp.slice(0, 10)}) ===`,
+      `Indices: ${data.indices.map((i: any) => `${i.ticker} ${i.hoy != null ? (i.hoy > 0 ? "+" : "") + i.hoy.toFixed(2) + "%" : "--"}`).join(" | ")}`,
+      `Sectores top HOY: ${data.sectores.slice(0, 3).map((s: any) => `${s.nombre}:${s.hoy != null ? s.hoy.toFixed(1) + "%" : "--"}`).join(", ")} | peor: ${data.sectores.slice(-2).map((s: any) => `${s.nombre}:${s.hoy != null ? s.hoy.toFixed(1) + "%" : "--"}`).join(", ")}`,
+      `Ganadores: ${data.ganadores.map((g: any) => `${g.symbol}(${g.percentChange != null ? g.percentChange.toFixed(1) + "%" : "--"})`).join(", ") || "--"}`,
+      `Perdedores: ${data.perdedores.map((p: any) => `${p.symbol}(${p.percentChange != null ? p.percentChange.toFixed(1) + "%" : "--"})`).join(", ") || "--"}`,
+      `Tasas: ${data.tasas.map((t: any) => `${t.ticker}:${t.valor != null ? t.valor.toFixed(2) : "--"}(${t.variacion != null ? t.variacion.toFixed(1) + "%" : "--"})`).join(" | ")}`,
+      `Commodities: ${data.commodities.map((c: any) => `${c.ticker}:${c.hoy != null ? c.hoy.toFixed(1) + "%" : "--"}`).join(", ")}`,
+    ].join("\n");
+    return resumen + "\n\nJSON (truncado):\n" + JSON.stringify(data, null, 1).slice(0, 7500);
+  } catch (e: any) {
+    return `[ERROR cierre_mercado]: ${e?.message?.slice(0, 500) ?? String(e)}`;
+  }
+}
+
+export async function toolInformeMatutino(args: { fecha?: string }): Promise<string> {
+  try {
+    const { buildMarketSnapshot } = await import("@/lib/informe-matutino/snapshot.functions");
+    const snapshot: any = await (buildMarketSnapshot as unknown as () => Promise<any>)();
+    let iaPart = "";
+    try {
+      const { generateInformeMatutino } = await import("@/lib/informe-matutino/gemini.functions");
+      const ia: any = await (generateInformeMatutino as unknown as (s: any) => Promise<any>)(snapshot);
+      if (ia) iaPart = `\n\n--- NARRATIVA IA ---\nHumor: ${ia.humorMercado}\nResumen: ${ia.resumenEjecutivo}\nRadar Int: ${ia.radarInternacional?.titular} — ${ia.radarInternacional?.bullets?.join(" | ")}\nRadar Local: ${ia.radarLocal?.titular} — ${ia.radarLocal?.bullets?.join(" | ")}`;
+      else iaPart = "\n\n[IA no disponible: falta GEMINI_API_KEY o error del modelo]";
+    } catch (e: any) {
+      iaPart = `\n\n[IA error: ${e?.message?.slice(0, 300) ?? String(e)}]`;
+    }
+    const agendaResumen = `Agenda: ${snapshot.agendaDelDia?.map((a: any) => `${a.hora} ${a.evento} (${a.relevancia})`).join(" | ") || "--"}`;
+    return `=== INFORME MATUTINO ${snapshot.fecha} ===\n${agendaResumen}\nDolares oficial/blue/MEP/CCL: ${snapshot.local?.dolares?.oficial}/${snapshot.local?.dolares?.blue}/${snapshot.local?.dolares?.mep}/${snapshot.local?.dolares?.ccl} Brecha ${snapshot.local?.dolares?.brechaCCLPct?.toFixed(1)}%\nRiesgo país: ${snapshot.local?.riesgoPais?.valor} (${snapshot.local?.riesgoPais?.variacionPuntos})\nNoticias: ${snapshot.noticiasCrudas?.slice(0, 3).map((n: any) => n.titulo).join(" | ") || "--"}${iaPart}\n\nSnapshot JSON (truncado):\n` + JSON.stringify(snapshot, null, 1).slice(0, 6000);
+  } catch (e: any) {
+    return `[ERROR informe_matutino]: ${e?.message?.slice(0, 500) ?? String(e)}`;
+  }
+}
+
+export async function toolAgendaEconomica(args: { fecha?: string }): Promise<string> {
+  try {
+    const fecha = args.fecha || new Date().toISOString().slice(0, 10);
+    const { getAgendaSemana } = await import("@/lib/informe-matutino/agenda-economica");
+    const agenda: any = (getAgendaSemana as unknown as (f: string) => any)(fecha);
+    if (!agenda || agenda.length === 0) return `Agenda vacía para la semana de ${fecha}.`;
+    return `=== AGENDA ECONÓMICA semana de ${fecha} ===\n` + agenda.map((e: any) => `${e.hora} — ${e.evento} [${e.relevancia}]`).join("\n");
+  } catch (e: any) {
+    return `[ERROR agenda]: ${e?.message?.slice(0, 400) ?? String(e)}`;
+  }
+}
+
 //  Mapa de herramientas 
 // Esquemas para OpenAI tool-calling y enrutador a implementación.
 
@@ -575,6 +626,30 @@ export const AGENT_TOOLS: ToolRecord[] = [
     params: { mode: { type: "string", description: "Siempre 'video_to_text'" }, message: { type: "string", description: "Instrucción opcional" }, attachmentUrl: { type: "string", description: "URL del video (.mp4/.webm)" } },
     required: ["mode", "message"],
     run: (a) => toolMultimodal(a as any),
+  },
+  {
+    name: "consultar_cierre_mercado",
+    description:
+      "Reporte de CIERRE DE MERCADO automático (EE.UU. + global) con datos en vivo Yahoo Finance: índices, sectores SPDR, Top 6 ganadores/perdedores, DXY/VIX/tasas, renta fija y commodities con sparkline. Cacheado al último cierre Wall Street 16:15 ET. Usar para 'cierre de hoy', 'cómo cerró el mercado'.",
+    params: {},
+    required: [],
+    run: () => toolCierreMercado(),
+  },
+  {
+    name: "generar_informe_matutino",
+    description:
+      "INFORME MATUTINO completo: snapshot de mercado + agenda económica + narrativa IA (humor risk-on/off/mixto, resumen ejecutivo, radar internacional/local, oportunidades por perfil CNV). Reutiliza snapshot Yahoo/ArgentinaDatos. Parámetro fecha opcional YYYY-MM-DD.",
+    params: { fecha: { type: "string", description: "Fecha YYYY-MM-DD opcional (default hoy America/Argentina)" } },
+    required: [],
+    run: (a) => toolInformeMatutino(a as { fecha?: string }),
+  },
+  {
+    name: "consultar_agenda_economica",
+    description:
+      "Agenda ECONÓMICA curada (BCRA LECAP, INDEC IPC/EMAE, FOMC, Tesoro USA, vencimientos) con hora y relevancia alta/media/baja para la semana de la fecha pedida. Usar para 'agenda de hoy', 'eventos de la semana'.",
+    params: { fecha: { type: "string", description: "Fecha YYYY-MM-DD opcional (default hoy)" } },
+    required: [],
+    run: (a) => toolAgendaEconomica(a as { fecha?: string }),
   },
 ];
 

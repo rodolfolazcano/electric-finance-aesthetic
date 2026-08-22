@@ -1,4 +1,3 @@
-// @ts-nocheck
 // FASE 3 — Motor de noticias unificado con fallback Gemini -> keywords.
 // Reutiliza la lógica existente sin cambios:
 //   - Gemini: clasificarSentimientoNoticias (src/lib/scoring/news-scoring.ts) + sentimientoAScore.
@@ -16,7 +15,7 @@ import {
 } from "./news-scoring";
 import { keywordSentimentProvider, type NoticiaAnalizada } from "../news-scoring.functions";
 
-//  Clasificador keywords (copia 1:1 de news-scoring.functions.ts:32-65) 
+// ─── Clasificador keywords (copia 1:1 de news-scoring.functions.ts:32-65) ───
 
 interface KeywordRule {
   patron: RegExp;

@@ -61,6 +61,9 @@ import {
   ejecutarGenerarInforme,
   ejecutarPairsTradingLabadie,
   ejecutarCurvaEjecucionLabadie,
+  ejecutarCierreMercado,
+  ejecutarInformeMatutino,
+  ejecutarAgendaEconomica,
   type EventoChat,
   type ResultadoConocimiento,
 } from "@/lib/agents/ejecutores";
@@ -663,11 +666,33 @@ export async function ejecutarTool(
       const res = await ejecutarPairsTradingLabadie(argsRaw);
       return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
     }
-    case "curva_ejecucion_labadie": {
-      const res = await ejecutarCurvaEjecucionLabadie(argsRaw);
-      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
-    }
-    default:
+      case "curva_ejecucion_labadie": {
+        const res = await ejecutarCurvaEjecucionLabadie(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+      }
+      case "consultar_cierre_mercado": {
+        const res = await ejecutarCierreMercado();
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+      }
+      case "generar_informe_matutino": {
+        const res = await ejecutarInformeMatutino(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+      }
+      case "consultar_agenda_economica": {
+        const res = await ejecutarAgendaEconomica(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+      }
+      case "generar_senales_cedear": {
+        const { ejecutarSenalesCedear } = await import("@/lib/agents/ejecutores");
+        const res = await ejecutarSenalesCedear(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+      }
+      case "analizar_portfolio_pegado": {
+        const { ejecutarPortfolioPegado } = await import("@/lib/agents/ejecutores");
+        const res = await ejecutarPortfolioPegado(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+      }
+      default:
       return { ...(await ejecutarBusqueda(query)), ok: true };
   }
 }

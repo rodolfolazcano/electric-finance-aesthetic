@@ -11,7 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AsesorRouteImport } from './routes/asesor'
+import { Route as ContactoRouteImport } from './routes/contacto'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as HerramientasRouteImport } from './routes/herramientas'
+import { Route as MonitorMercadoRouteImport } from './routes/monitor-mercado'
+import { Route as PlanificacionRouteImport } from './routes/planificacion'
+import { Route as StudioRouteImport } from './routes/studio'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as ApiSugerenciasRouteImport } from './routes/api/sugerencias'
@@ -27,9 +32,34 @@ const AsesorRoute = AsesorRouteImport.update({
   path: '/asesor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactoRoute = ContactoRouteImport.update({
+  id: '/contacto',
+  path: '/contacto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HerramientasRoute = HerramientasRouteImport.update({
   id: '/herramientas',
   path: '/herramientas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MonitorMercadoRoute = MonitorMercadoRouteImport.update({
+  id: '/monitor-mercado',
+  path: '/monitor-mercado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanificacionRoute = PlanificacionRouteImport.update({
+  id: '/planificacion',
+  path: '/planificacion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudioRoute = StudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -56,7 +86,12 @@ const ApiTelegramRoute = ApiTelegramRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/asesor': typeof AsesorRoute
+  '/contacto': typeof ContactoRoute
+  '/demo': typeof DemoRoute
   '/herramientas': typeof HerramientasRoute
+  '/monitor-mercado': typeof MonitorMercadoRoute
+  '/planificacion': typeof PlanificacionRoute
+  '/studio': typeof StudioRoute
   '/api/chat': typeof ApiChatRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
@@ -65,7 +100,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/asesor': typeof AsesorRoute
+  '/contacto': typeof ContactoRoute
+  '/demo': typeof DemoRoute
   '/herramientas': typeof HerramientasRoute
+  '/monitor-mercado': typeof MonitorMercadoRoute
+  '/planificacion': typeof PlanificacionRoute
+  '/studio': typeof StudioRoute
   '/api/chat': typeof ApiChatRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
@@ -75,7 +115,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/asesor': typeof AsesorRoute
+  '/contacto': typeof ContactoRoute
+  '/demo': typeof DemoRoute
   '/herramientas': typeof HerramientasRoute
+  '/monitor-mercado': typeof MonitorMercadoRoute
+  '/planificacion': typeof PlanificacionRoute
+  '/studio': typeof StudioRoute
   '/api/chat': typeof ApiChatRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
@@ -86,7 +131,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/asesor'
+    | '/contacto'
+    | '/demo'
     | '/herramientas'
+    | '/monitor-mercado'
+    | '/planificacion'
+    | '/studio'
     | '/api/chat'
     | '/api/search'
     | '/api/sugerencias'
@@ -95,7 +145,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/asesor'
+    | '/contacto'
+    | '/demo'
     | '/herramientas'
+    | '/monitor-mercado'
+    | '/planificacion'
+    | '/studio'
     | '/api/chat'
     | '/api/search'
     | '/api/sugerencias'
@@ -104,7 +159,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/asesor'
+    | '/contacto'
+    | '/demo'
     | '/herramientas'
+    | '/monitor-mercado'
+    | '/planificacion'
+    | '/studio'
     | '/api/chat'
     | '/api/search'
     | '/api/sugerencias'
@@ -114,7 +174,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AsesorRoute: typeof AsesorRoute
+  ContactoRoute: typeof ContactoRoute
+  DemoRoute: typeof DemoRoute
   HerramientasRoute: typeof HerramientasRoute
+  MonitorMercadoRoute: typeof MonitorMercadoRoute
+  PlanificacionRoute: typeof PlanificacionRoute
+  StudioRoute: typeof StudioRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiSearchRoute: typeof ApiSearchRoute
   ApiSugerenciasRoute: typeof ApiSugerenciasRoute
@@ -137,11 +202,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AsesorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contacto': {
+      id: '/contacto'
+      path: '/contacto'
+      fullPath: '/contacto'
+      preLoaderRoute: typeof ContactoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/herramientas': {
       id: '/herramientas'
       path: '/herramientas'
       fullPath: '/herramientas'
       preLoaderRoute: typeof HerramientasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/monitor-mercado': {
+      id: '/monitor-mercado'
+      path: '/monitor-mercado'
+      fullPath: '/monitor-mercado'
+      preLoaderRoute: typeof MonitorMercadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planificacion': {
+      id: '/planificacion'
+      path: '/planificacion'
+      fullPath: '/planificacion'
+      preLoaderRoute: typeof PlanificacionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/studio': {
+      id: '/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof StudioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -178,7 +278,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AsesorRoute: AsesorRoute,
+  ContactoRoute: ContactoRoute,
+  DemoRoute: DemoRoute,
   HerramientasRoute: HerramientasRoute,
+  MonitorMercadoRoute: MonitorMercadoRoute,
+  PlanificacionRoute: PlanificacionRoute,
+  StudioRoute: StudioRoute,
   ApiChatRoute: ApiChatRoute,
   ApiSearchRoute: ApiSearchRoute,
   ApiSugerenciasRoute: ApiSugerenciasRoute,

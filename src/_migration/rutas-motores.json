@@ -1,0 +1,418 @@
+{
+  "semaforo-tecnico.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\semaforo-tecnico.ts",
+    "exports": [
+      "analizarTendencia",
+      "analizarMomentum",
+      "analizarSoporteResistencia",
+      "analizarAnomaliaPrecio",
+      "calcularScoreTecnico",
+      "TendenciaInfo",
+      "MomentumInfo",
+      "AnomaliaPrecioInfo",
+      "ScoreTecnicoResult"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\finance.functions.ts",
+        "lineas": [
+          "394"
+        ],
+        "descripcion": "uso en getSemaforo / getSemaforoBatch"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring-unificado.ts",
+        "lineas": [
+          "78"
+        ],
+        "descripcion": "importa tipos y usa scoreTecnicoNormalizado"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\senales-tecnicas.ts",
+        "lineas": [
+          "60",
+          "83",
+          "126"
+        ],
+        "descripcion": "reutiliza calcularScoreTecnico para series historicas"
+      }
+    ]
+  },
+  "scoring-unificado.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring-unificado.ts",
+    "exports": [
+      "calcularScoreFundamental",
+      "calcularScoreUnificado",
+      "detectarContradiccion",
+      "ScoreUnificadoResult",
+      "SenalUnificada",
+      "DireccionContradiccion",
+      "InfoActivo"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\finance.functions.ts",
+        "lineas": [
+          "511",
+          "747"
+        ],
+        "descripcion": "llama calcularScoreUnificado dentro de getSemaforo para campo scoreUnificado"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\motor-recomendacion.functions.ts",
+        "lineas": [
+          "859",
+          "876"
+        ],
+        "descripcion": "lee scoreUnificado y scoreTecnicoDetalle del semáforo para capas 4 y 5"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\components\\herramientas\\SemaforoCard.tsx",
+        "lineas": [
+          "263",
+          "278"
+        ],
+        "descripcion": "muestra scoreUnificado.total y contradicciones en UI"
+      }
+    ]
+  },
+  "scoring-engine.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring\\scoring-engine.ts",
+    "exports": [
+      "ejecutarScoringDiario",
+      "procesarActivo",
+      "calcularCompuesto",
+      "normalizarScoreSemaforo",
+      "AssetScoreDiario",
+      "ContextoDiario",
+      "SCORING_VERSION"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\routes\\api\\cron\\scoring-diario.ts",
+        "lineas": [
+          "6"
+        ],
+        "descripcion": "cron diario que ejecuta scoring para todo el universo y persiste a Supabase"
+      }
+    ],
+    "nota": "Motor orquestador que llama a sub-motores internos (fundamental-scoring, cuantitativo-scoring, news-scoring, etc.). No es consumido directamente por UI de panel, solo por cron jobs."
+  },
+  "fundamental-scoring.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring\\fundamental-scoring.ts",
+    "exports": [
+      "calcularScoreFundamental",
+      "FundamentalInput"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\components\\herramientas\\AnalisisFundamentalTab.tsx",
+        "lineas": [
+          "23",
+          "549"
+        ],
+        "descripcion": "usa calcularScoreFundamental para calcular score 0-100 en pestaña fundamental"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\crm\\crm.server.ts",
+        "lineas": [
+          "7"
+        ],
+        "descripcion": "importa filtrarPorCicloEconomico y funciones relacionadas"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring\\reglas-contexto.ts",
+        "lineas": [
+          "113"
+        ],
+        "descripcion": "referencia cruzada, evaluarContexto siempre retorna 0"
+      }
+    ]
+  },
+  "quantitativo-scoring.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring\\cuantitativo-scoring.ts",
+    "exports": [
+      "calcularScoreCuantitativo",
+      "Distribution"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring\\scoring-engine.ts",
+        "lineas": [
+          "163"
+        ],
+        "descripcion": "usado dentro de procesarActivo para renta variable score 0-100"
+      }
+    ],
+    "nota": "No encontrado en greps externos; solo es consumido por scoring-engine.ts internamente. Es un sub-motor del diario compuesto."
+  },
+  "score-sectorial.functions.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\score-sectorial.functions.ts",
+    "exports": [
+      "calcularScoreSectorial",
+      "filtrarPorCicloEconomico",
+      "ScoreSectorialResult",
+      "MetricaSectorialResult"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\components\\herramientas\\AnalisisFundamentalTab.tsx",
+        "lineas": [
+          "23",
+          "549"
+        ],
+        "descripcion": "usa calcularScoreSectorial en la pestaña de análisis fundamental"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\crm\\crm.server.ts",
+        "lineas": [
+          "7"
+        ],
+        "descripcion": "importa para análisis CRM y filtrado por ciclo económico"
+      }
+    ]
+  },
+  "news-scoring.functions.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\news-scoring.functions.ts",
+    "exports": [
+      "keywordSentimentProvider",
+      "analizarNoticia",
+      "NoticiaAnalizada",
+      "ScoreNoticias",
+      "getNoticiasPorTicker",
+      "getNoticiasConCache"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\oportunidades-dia.functions.ts",
+        "lineas": [
+          "6",
+          "7",
+          "693"
+        ],
+        "descripcion": "importa getNoticiasPorTicker para capa D (noticias) en processTicker"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring\\scoring-engine.ts",
+        "lineas": [
+          "231-242"
+        ],
+        "descripcion": "usado en la capa de noticias del motor diario (clasifica sentimiento via Gemini o keywords)"
+      }
+    ]
+  },
+  "scoring/news-scoring.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring\\news-scoring.ts",
+    "exports": [
+      "clasificarSentimientoNoticias",
+      "sentimientoAScore",
+      "NewsSentimiento",
+      "NEWS_SYSTEM_PROMPT"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring\\scoring-engine.ts",
+        "lineas": [
+          "235-242"
+        ],
+        "descripcion": "usado dentro de procesarActivo: si hay GEMINI_API_KEY, classifica titulares via IA y convierte a score 0-100"
+      }
+    ],
+    "nota": "Clasificador IA Gemini. Si falta GEMINI_API_KEY, retorna null y la capa de noticias se omite en scoring-engine. Es el único motor que usa IA real."
+  },
+  "motor-recomendacion.functions.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\motor-recomendacion.functions.ts",
+    "exports": [
+      "generarRecomendaciones",
+      "evaluarIntermarketMurphy",
+      "evaluarRatioCRBBonds",
+      "evaluarMacroGlobal",
+      "evaluarStovall",
+      "evaluarFundamentalUnificado",
+      "evaluarTecnicoUnificado",
+      "etiquetaConfianza",
+      "RecomendacionActivo",
+      "EvaluacionCapa"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\components\\herramientas\\ContextoMercadoTab.tsx",
+        "lineas": [
+          "7",
+          "21",
+          "31"
+        ],
+        "descripcion": "consume generarRecomendaciones para mostrar panel Contexto de Mercado"
+      }
+    ],
+    "nota": "Motor de recomendación de 5 capas (Intermarket/Murphy, Macro, Stovall, Fundamental, Técnico). Score confianza ±, maxPosible = capas disponibles. UI: ContextoMercadoTab."
+  },
+  "schvarz-recomendacion.functions.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\schvarz-recomendacion.functions.ts",
+    "exports": [
+      "scoreSchvarz",
+      "calcularValuacionSchvarz",
+      "calcularMoatSimplificado",
+      "asignarPerfil",
+      "clasificarSchvarz",
+      "getRecomendacionesSchvarz"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\components\\herramientas\\ContextoMercadoTab.tsx",
+        "lineas": [
+          "9",
+          "141",
+          "152"
+        ],
+        "descripcion": "usa scoreSchvarz para ranking por perfil de riesgo (conservador/moderado/agresivo)"
+      }
+    ],
+    "nota": "Mezcla técnico 25% + valuación 35% + calidad fundamental 15% + moat 25%. Score -1 a +1, clasificación COMpra/COMPRA CAUTELA/MANTENER. UI: ContextoMercadoTab."
+  },
+  "oportunidades-dia.functions.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\oportunidades-dia.functions.ts",
+    "exports": [
+      "processTicker",
+      "getOportunidadesDelDia",
+      "scoreTecnico",
+      "scoreSectorial",
+      "scoreFundamental",
+      "computeBeta",
+      "OportunidadItem"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\components\\herramientas\\OportunidadesDiaPanel.tsx",
+        "lineas": [
+          "15",
+          "196",
+          "202"
+        ],
+        "descripcion": "consume getOportunidadesDelDia para panel Oportunidades del Día"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\routes\\herramientas.tsx",
+        "lineas": [
+          "149",
+          "8547"
+        ],
+        "descripcion": "componente OportunidadesContent renderiza las oportunidades"
+      }
+    ]
+  },
+  "daily-opportunities.functions.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\daily-opportunities.functions.ts",
+    "exports": [
+      "calcularOportunidadScore",
+      "getTickerDailySignal",
+      "getScorePonderado",
+      "getDailyOportunidades",
+      "getMarketScreeners",
+      "getMacroContextAR"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\routes\\herramientas.tsx",
+        "lineas": [
+          "8547"
+        ],
+        "descripcion": "componente OportunidadesContent (diferente al OportunidadesDiaPanel)"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\inform-matutino\\snapshot.functions.ts",
+        "lineas": [
+          "4"
+        ],
+        "descripcion": "usado en la generación del informe matutino"
+      }
+    ],
+    "nota": "Motor de oportunidades daily con 4 sub-scores (volumen, valuación, catalizador, momentum) cada uno max 25, promedio a 0-100. Fórmula central en calcularOportunidadScore. Diferente de oportunidades-dia.functions.ts que suma A+B+C+D."
+  },
+  "coherencia-senal.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\coherencia-senal.ts",
+    "exports": [
+      "resolverSenalCoherente",
+      "SenalCoherente"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\components\\herramientas\\AnalisisFundamentalTab.tsx",
+        "lineas": [
+          "12",
+          "1114"
+        ],
+        "descripcion": "usa resolverSenalCoherente para definir plazo/acción en el resultado fundamental"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\fundamental-af.functions.ts",
+        "lineas": [
+          "4",
+          "1280",
+          "2269"
+        ],
+        "descripcion": "incorpora la señal coherente dentro de fetchFundamentalAF como campo senal.plazo/accion"
+      }
+    ]
+  },
+  "matriz-decision.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\matriz-decision.ts",
+    "exports": [
+      "matrizDecision",
+      "DecisionResult"
+    ],
+    "callSites": [],
+    "nota": "Código muerto/legacy. Búsqueda global en todo el repo (.ts y .tsx) no encuentra consumidores. Referenciado como 'Fase 3' en comentarios. No forma parte del flujo activo."
+  },
+  "oportunidades.functions.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\oportunidades.functions.ts",
+    "exports": [
+      "getOportunidadesTecnico",
+      "getOportunidadesRentaFija",
+      "getOportunidadesValuacion"
+    ],
+    "callSites": [],
+    "nota": "Sin consumidores detectados en greps sobre .ts/.tsx. Probablemente legacy o consumido por flujos no indexados. Diferente de oportunidades-dia.functions.ts y daily-opportunities.functions.ts."
+  },
+  "reglas-contexto.ts": {
+    "encontrado": true,
+    "ruta": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring\\reglas-contexto.ts",
+    "exports": [
+      "REGLAS_CONTEXTO",
+      "evaluarContexto",
+      "aplicaRegla"
+    ],
+    "callSites": [
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring\\fundamental-scoring.ts",
+        "lineas": [
+          "111-113"
+        ],
+        "descripcion": "comentario: evaluarContexto devuelve siempre 0, desactivado deliberadamente"
+      },
+      {
+        "archivo": "C:\\Users\\boosa\\Downloads\\clarity-dashboard-main (3)\\clarity-dashboard-main (5)\\clarity-dashboard-main6\\src\\lib\\scoring-engine.ts",
+        "lineas": [
+          "246"
+        ],
+        "descripcion": "llamada a evaluarContexto en procesarActivo; scoreContexto resulta siempre 50 (50 + 0)"
+      }
+    ],
+    "nota": "Reglas de contexto macro (dólar blue/oficial, riesgo país, inflación, BCRA, VIX). `evaluarContexto` está diseñado para retornar 0 deliberadamente: el contexto opera como filtro binario en score-sectorial, no como ajuste numérico al score."
+  }
+}

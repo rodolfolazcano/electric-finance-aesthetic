@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Simple in-memory cache with TTL for server functions
 const cache = new Map<string, { data: unknown; ts: number }>();
 const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes

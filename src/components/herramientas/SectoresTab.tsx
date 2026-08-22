@@ -46,6 +46,8 @@ import { getBenchmarksMatrix } from "@/lib/sectores/benchmarks-matrix.functions"
 import type { BenchmarksMatrixResult } from "@/lib/sectores/benchmarks-matrix.functions";
 import BENCHMARKS_COMPLETE from "@/lib/sectores/benchmarks-complete.json";
 import ETF_NAMES from "@/lib/sectores/etf-names.json";
+import { getMatrizCAPM } from "@/lib/herramientas/capm.functions";
+import type { MatrizCAPMResult } from "@/lib/herramientas/capm.functions";
 import sectoresData from "@/lib/herramientas/sectores.json";
 import { cn } from "@/lib/utils";
 // Sector components (Clarity parity)
@@ -78,10 +80,35 @@ type TickerJson = {
   tipo?: string;
   moneda?: string;
   mercado?: string;
+  pais?: string;
 };
 type SectoresJson = Record<string, Record<string, TickerJson[]>>;
 const SECTORES_DATA = sectoresData as unknown as SectoresJson;
 const SECTORES = Object.keys(SECTORES_DATA).sort();
+
+function enriquecerTicker(t: TickerJson): Required<TickerJson> {
+  const tk = t.ticker.toUpperCase();
+  let tipo = (t.tipo || "").toLowerCase();
+  let moneda = (t.moneda || "").toUpperCase();
+  let mercado = (t.mercado || "").toUpperCase();
+  let pais = t.pais || "";
+  if (!tipo) tipo = tk.includes(".BA") ? "cedear" : tk.length <= 5 && /^[A-Z]+$/.test(tk) ? "accion" : "accion";
+  if (!moneda) moneda = tk.endsWith("D") && !tk.includes(".") ? "USD" : tk.includes(".BA") ? "ARS" : "USD";
+  if (!mercado) mercado = tk.includes(".BA") || moneda === "ARS" ? "BCBA" : "NYSE/NASDAQ";
+  if (!pais) pais = mercado === "BCBA" && moneda === "USD" ? "EE.UU." : mercado === "BCBA" ? "Argentina" : "EE.UU.";
+  return { ticker: t.ticker, nombre: t.nombre || "—", tipo, moneda, mercado, pais };
+}
+function badgeTipo(tipo: string) {
+  const t = tipo.toLowerCase();
+  if (t === "cedear") return "bg-violet-500/20 text-violet-300 border-violet-500/30";
+  if (t === "accion") return "bg-blue-500/20 text-blue-300 border-blue-500/30";
+  if (t === "etf") return "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
+  if (t.includes("bono") || t.includes("on")) return "bg-amber-500/20 text-amber-300 border-amber-500/30";
+  return "bg-zinc-500/20 text-zinc-300 border-zinc-500/30";
+}
+function badgeMoneda(moneda: string) {
+  return moneda === "ARS" ? "bg-orange-500/15 text-orange-300 border-orange-500/30" : "bg-green-500/15 text-green-300 border-green-500/30";
+}
 
 // ── Performance (live 5d) + SectorImpact + RelStrength ──
 function PerformanceFullPanel({

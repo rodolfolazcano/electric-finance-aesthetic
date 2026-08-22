@@ -1,14 +1,18 @@
 /**
  * Constructor del índice académico para kb-academic.ts.
  *
- * Escanea los PDFs de pt/, extrae texto por página, lo divide en chunks,
- * genera embeddings con NVIDIA (con fallback a solo-texto si la API falla)
- * y escribe public/kb/academic-index.json en el formato IndiceAcademico:
+ * Escanea los directorios fuente (recursivo, incluye subcarpetas), extrae texto
+ * por página de cada PDF, lo divide en chunks, genera embeddings con NVIDIA
+ * (con fallback a solo-texto si la API falla) y escribe public/kb/academic-index.json
+ * en el formato IndiceAcademico:
  *   { modelo, dims, fecha, chunks: [{ categoria, archivo, pagina, offset, texto, v }] }
  *
  * v = vector Float16 little-endian codificado en base64 ("" si no se pudo embedar).
  *
- * Uso: node scripts/build-kb-index.mjs
+ * Uso:
+ *   node scripts/build-kb-index.mjs                          # solo app-root pt/
+ *   node scripts/build-kb-index.mjs "../ruta/corpus/pt"      # corpus externo primero
+ *   node scripts/build-kb-index.mjs "../ruta/corpus/pt" pt   # multi-fuente (dedupe por nombre de archivo)
  */
 
 import fs from "node:fs";
@@ -30,11 +34,38 @@ const CHUNK_TARGET = 1200;
 const MIN_PAGE_CHARS = 40;
 const BATCH = 8;
 
-function categoriaDe(archivo) {
-  const a = archivo.toLowerCase();
-  if (a.startsWith("dfin_pascale") || a.includes("pascale")) return "Pascale - Finanzas";
+function categoriaDe(rutaRelativa) {
+  const a = rutaRelativa.toLowerCase();
+  if (a.includes("pascale")) return "Pascale - Finanzas de la empresa";
+  if (a.includes("carteras")) return "Carteras - Elbaum";
+  if (a.includes("calculo financiero")) return "Calculo financiero - Dumrauf";
+  if (a.includes("administracion financiera")) return "Administracion financiera - Alonso/Dumrauf";
+  if (a.includes("contables fundamentales")) return "Contabilidad - Fowler Newton";
+  if (a.includes("estados contables")) return "Estados contables - Biondi";
+  if (a.includes("macroeconom")) {
+    return a.includes("dornsbusch") || a.includes("dornbusch")
+      ? "Macroeconomia - Dornbusch-Fischer"
+      : "Macroeconomia LATAM - Blanchard/Perez-Enrri";
+  }
+  if (a.includes("televisi")) return "Financiacion y mercados - Bustamante";
   if (a.includes("instrumentos")) return "Instrumentos financieros";
-  return "Corpus académico";
+  return "Corpus academico";
+}
+
+/** Recorre el directorio recursivamente devolviendo rutas de PDFs con su ruta relativa. */
+function* walkPdfs(dir, baseDir) {
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) yield* walkPdfs(full, baseDir);
+    else if (entry.isFile() && entry.name.toLowerCase().endsWith(".pdf"))
+      yield { full: full, rel: path.relative(baseDir, full) };
+  }
 }
 
 /** THREE.js toHalf: Float32 -> bits Float16. */
@@ -105,7 +136,7 @@ function chunkearTexto(texto) {
   return chunks;
 }
 
-async function extraerPaginas(pdfPath) {
+async function procesarPdf(pdfPath) {
   const buffer = fs.readFileSync(pdfPath);
   const parser = new PDFParse({ data: new Uint8Array(buffer) });
   try {
@@ -117,30 +148,41 @@ async function extraerPaginas(pdfPath) {
 }
 
 async function main() {
-  if (!fs.existsSync(PT_DIR)) {
-    console.error("No existe el directorio pt/");
-    process.exit(1);
+  const args = process.argv.slice(2);
+  const fuentes = (args.length ? args : ["pt"]).map((a) => path.resolve(ROOT, a));
+  console.log(`Fuentes: ${fuentes.join(" | ")}`);
+
+  // Dedupe por nombre de archivo: la primera fuente que lo contiene gana.
+  const vistos = new Set();
+  const pendientes = [];
+  for (const fuente of fuentes) {
+    if (!fs.existsSync(fuente)) {
+      console.warn(`AVISO: no existe la fuente ${fuente} — se omite`);
+      continue;
+    }
+    for (const { full, rel } of walkPdfs(fuente, fuente)) {
+      const nombre = path.basename(rel);
+      if (vistos.has(nombre)) continue;
+      vistos.add(nombre);
+      pendientes.push({ full: full, rel: rel });
+    }
   }
-  const archivos = fs
-    .readdirSync(PT_DIR)
-    .filter((f) => f.toLowerCase().endsWith(".pdf"))
-    .sort();
-  console.log(`PDFs encontrados: ${archivos.length}`);
+  console.log(`PDFs a indexar: ${pendientes.length}`);
 
   const chunks = [];
   let embedOk = 0;
   let embedFail = 0;
 
-  for (const archivo of archivos) {
+  for (const { full, rel } of pendientes) {
     try {
-      const paginas = await extraerPaginas(path.join(PT_DIR, archivo));
-      const categoria = categoriaDe(archivo);
+      const paginas = await procesarPdf(full);
+      const categoria = categoriaDe(rel);
       let delArchivo = 0;
       paginas.forEach((textoPagina, i) => {
         for (const c of chunkearTexto(textoPagina)) {
           chunks.push({
             categoria,
-            archivo,
+            archivo: path.basename(rel),
             pagina: i + 1,
             offset: c.offset,
             texto: c.texto,
@@ -149,9 +191,9 @@ async function main() {
           delArchivo++;
         }
       });
-      console.log(`  ${archivo}: ${paginas.length} pags, ${delArchivo} chunks`);
+      console.log(`  ${rel}: ${paginas.length} pags, ${delArchivo} chunks [${categoria}]`);
     } catch (err) {
-      console.error(`  ERROR ${archivo}: ${err.message}`);
+      console.error(`  ERROR ${rel}: ${err.message}`);
     }
   }
 

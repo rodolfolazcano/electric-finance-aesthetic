@@ -25,6 +25,7 @@ import {
   Printer,
   Download,
   KeyRound,
+  Copy,
 } from "lucide-react";
 import { CHAT_OPEN_EVENT_NAME } from "@/lib/chat-open";
 import {
@@ -1138,6 +1139,18 @@ export function ChatWidget() {
                     </div>
                     {isUser && !wasEditing ? (
                       <div className="flex items-center justify-end gap-0.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const t = messagesRef.current[i]?.content ?? m.content;
+                            navigator.clipboard.writeText(t).catch(() => {});
+                          }}
+                          aria-label="Copiar mensaje"
+                          title="Copiar mensaje"
+                          className={accBtn}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </button>
                         <button
                           type="button"
                           onClick={() => startEdit(i)}

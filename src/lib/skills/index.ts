@@ -25,13 +25,16 @@ const SKILLS: Skill[] = [
     nombre: "Razonar y Ejecutar",
     descripcion:
       "Regla universal anti-respuestas genéricas: razonar la pregunta y ejecutar herramientas antes de responder.",
-    instrucciones: `[SKILL · Razonar y Ejecutar — regla universal]
+    instrucciones: `[SKILL · Razonar y Ejecutar — regla universal] — AUTONOMIA TOTAL
 - REGLA CENTRAL: nunca respondas con una respuesta genérica ni con un resumen del contexto sin antes razonar QUÉ pide el usuario y si hace falta un dato real para responderlo.
 - Modo de trabajo obligatorio:
-  1. RAZONÁ el mensaje: ¿pide un dato actual o verificable (cotización, tasa, noticia, normativa, matrícula, valor, beta, riesgo, cobertura, sector), o un concepto/educación?
-  2. Si pide un dato o una verificación → EJECUTÁ la herramienta correspondiente en ESTE MISMO turno (consultar_mercado, buscar_noticias, buscar_web, valor_intrinseco_real, analizar_capm, analizar_riesgo, etc.) antes de escribir una sola palabra.
+  1. RAZONÁ el mensaje: ¿pide un dato actual o verificable (cotización, tasa, noticia, normativa, matrícula, valor, beta, riesgo, cobertura, sector, señales CEDEAR), o un concepto/educación?
+  2. Si pide un dato o una verificación → EJECUTÁ la herramienta correspondiente en ESTE MISMO TURNO (consultar_mercado, buscar_noticias, buscar_web, valor_intrinseco_real, analizar_capm, analizar_riesgo, generar_senales_cedear, telegram_enviar_senal, etc.) ANTES de escribir una sola palabra. NUNCA pidas confirmación.
   3. Redactá SOLO con lo que devolvió la herramienta, citando la fuente.
-- PROHIBIDO: responder "en general...", "esto suele deberse a...", volcar el contenido del sitio, o reformular la base de conocimiento cuando la pregunta pedía un dato real.
+- PROHIBIDO ABSOLUTO:
+  - Responder "en general...", "esto suele deberse a...", volcar el contenido del sitio, o reformular la base de conocimiento cuando la pregunta pedía un dato real.
+  - Listar pasos futuros ("Paso 1 consultar_catalogo, Paso 2 analizar_tecnico...") y preguntar "¿confirmas que ejecute?". Si necesitás datos, EJECUTÁ vos la herramienta en este turno. No delegues la confirmación al usuario.
+  - Pedir permiso para ejecutar una herramienta. La ejecución es autónoma y obligatoria.
 - Si la herramienta no devuelve el dato o falla → decilo con honestidad ("no tengo ese dato confirmado") y ofrecé verificarlo en la fuente oficial. NUNCA inventes cifras ni completes el vacío con una suposición plausible.
 - Si la pregunta es conceptual/educativa ("qué es X", "diferencia entre A y B", "cómo funciona X") sin dato actual, podés explicar con la base de conocimiento, pero con rigor y sin relleno genérico de cortesía.`,
   },
@@ -347,7 +350,33 @@ const SKILLS: Skill[] = [
 - HFT: Makers (proveen liquidez, ganan el spread), Takers (consumen capturando oportunidades), Gamers (spoofing, momentum ignition, stuffing: tóxicos). HFT = velocidad como ventaja principal, no necesariamente alta frecuencia de posiciones.
 - Ejecución: TWAP uniforme (predecible: aleatorizar), VWAP según curva histórica de volumen (buckets normalizados), PoV participación constante (dinámico, hora final emergente); jerarquía: métrica de portafolio → scheduling → SOR → ejecución.
 - Lecciones de los casos: Flash Crash 2010 = PoV sin topes (todo algoritmo necesita límites de participación/precio/impacto); Knight Capital 2012 = código zombie (despliegues, kill switches y monitoreo son parte del diseño).
-- Es material educativo: no representa capacidades de ejecución real del asistente.`,
+ - Es material educativo: no representa capacidades de ejecución real del asistente.`,
+  },
+  {
+    id: "cedear-signals",
+    nombre: "Señales CEDEARs / Acciones BCBA",
+    descripcion:
+      "Señales contextuales para CEDEARs y acciones BCBA mapeando subyacente NYSE/NASDAQ, con yfinance + screeners + noticias. Para líquidos, en noticias o top movers.",
+    instrucciones: `[SKILL · Señales CEDEARs / Acciones BCBA] — MODO AUTONOMO OBLIGATORIO
+- TRIGGER AUTOMATICO: ante CUALQUIER mención de "señales", "cedears", "BCBA", "liquidos", "movers", "noticias hoy", "que comprar/vender hoy" → RAZONÁ y EJECUTÁ generar_senales_cedear INMEDIATAMENTE en este mismo turno, SIN pedir confirmación, SIN pedir permiso, SIN listar pasos futuros.
+- PROHIBIDO preguntar "¿confirmas que ejecute consultar_catalogo?" o "¿quieres que empiece?". La regla universal Razonar y Ejecutar lo prohibe. Si necesitás datos, los obtenés vos con la herramienta.
+- Pipeline autónomo en este turno: generar_senales_cedear(filtro=top 6) → para cada ticker del resultado, SI hace falta profundizar, encadená analisis_tecnico + valor_intrinseco_real + analizar_riesgo con datos reales del mismo turno. No adivinar.
+- Si el mensaje del usuario implica envío a Telegram (menciona telegram, bot, notificar, enviar, fpxbs777_bot) → EJECUTÁ telegram_enviar_senal / telegram_enviar_mensaje INMEDIATAMENTE después de generar la señal, SIN pedir confirmación extra.
+- Si el usuario NO mencionó Telegram pero la señal es COMPRA/VENTA con prob>=0.55 y variación significativa, IGUAL generá la señal y MOSTRALA en chat con tabla; no requieras frase exacta "enviar a Telegram" para calcularla.
+- No inventes precios: todo viene de yfinance/screeners en este turno. Si no hay dato, omitir ticker con advertencia.
+- Formato: tabla Markdown Ticker BCBA | Subyacente US | Precio ARS | Var% | Señal | Prob | Motivo. Ofrecer grafico_chat TradingView del líder.
+- Compliance: información educativa, no recomendación; citar fuente y disclaimer; no prometer rentabilidad.`,
+  },
+  {
+    id: "portfolio-paste-parser",
+    nombre: "Portfolio Paste Parser",
+    descripcion: "Detecta paste IOL con patrimonio/tenencias y clasifica activos por tipo/moneda/mercado usando unificado_completo.json + cedears universe, replica Optimizador tab.",
+    instrucciones: `[SKILL · Portfolio Paste Parser — AUTONOMO]
+- TRIGGER AUTOMATICO: si el mensaje contiene "Patrimonio total" o bloque con tickers (PAMP/AMZN/GOOGL/SPY/MU/NU/NVDA/TSM/URA/XLE) + cantidades + "ARS" + variaciones % + "Cedears/Acciones", EJECUTÁ INMEDIATAMENTE analizar_portfolio_pegado(texto=contenido completo) en este mismo turno, SIN pedir confirmación ni listar pasos.
+- Clasificación replica diagnostico/clasificador.ts: BONOS_DB → bono/on, LETRA_PATTERN → letra, cedearsUNIVERSE ARS/USD sets + buscarEnSectores(sectores.json = unificado_completo.json) → tipo (cedear/accion/adr/etf), mercado (BCBA/NYSE), moneda (ARS/USD), fuente (IOL/Yahoo/ArgentinaDatos).
+- Ejemplo: PAMP → accion BCBA ARS, AMZN/GOOGL/IBM/NVDA → cedear BCBA ARS, MU/NU/SMH/URA/SPY/XLE/TSM → adr/etf NYSE USD.
+- Tras tabla Markdown, encadená AUTONOMAMENTE APIs: yfinance para subyacente US + estadisticas_retornos (vol anual, VaR95, Sharpe) + analizar_capm (beta vs SPY) + optimizar_portafolio (MaxSharpe/MinVar/Markowitz) para mostrar composición torta + histograma + frontera eficiente, citando Labadie portfolio.py manager + market_data.py distribution.
+- PROHIBIDO inventar precios: si yfinance/IOL no devuelve dato, omitir con advertencia.`,
   },
 ];
 

@@ -13,6 +13,7 @@ import {
   type RecomendacionesSchvarzResult,
 } from "@/lib/schvarz-recomendacion.functions";
 import { CierreMercadoPanel } from "./CierreMercadoPanel";
+import { SenalesCedearPanel } from "./SenalesCedearPanel";
 
 function fmtPct(n: number | null | undefined, dp = 2): string {
   if (n == null || !Number.isFinite(n)) return "--";
@@ -493,10 +494,11 @@ function MetricaMini({ label, value }: { label: string; value: string }) {
   );
 }
 
-// Reordenado: MacroContextoPanel primero, luego RecomendacionesPanel y RecomendacionesSchvarzPanel
+// Reordenado: Señales CEDEAR primero (mapeo subyacente US), luego resto
 export function ContextoMercadoTab() {
   return (
     <div className="space-y-4">
+      <SenalesCedearPanel />
       <CierreMercadoPanel />
       <MacroContextoPanel />
       <RecomendacionesSchvarzPanel />

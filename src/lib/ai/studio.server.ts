@@ -609,7 +609,7 @@ export async function fetchMarketNews(query: string): Promise<
   Array<{ title: string; url: string; source: string; snippet?: string }>
 > {
   const out: Array<{ title: string; url: string; source: string; snippet?: string }> = [];
-  const tavilyKey = process.env.TAVILY_API_KEY;
+  const tavilyKey = (typeof process !== "undefined" ? (process as any).env?.TAVILY_API_KEY : undefined) ?? (import.meta as any).env?.TAVILY_API_KEY;
 
   if (tavilyKey) {
     try {

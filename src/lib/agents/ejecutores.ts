@@ -3232,3 +3232,139 @@ export async function ejecutarCurvaEjecucionLabadie(argsRaw: string): Promise<{
     };
   }
 }
+
+export async function ejecutarCierreMercado(): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  try {
+    const { getCierreMercadoDashboard } = await import("@/lib/cierre-mercado.functions");
+    const data: any = await (getCierreMercadoDashboard as unknown as () => Promise<any>)();
+    const L: string[] = [];
+    L.push(`=== CIERRE DE MERCADO ${data.fechaCierre} ===`);
+    L.push(`Indices: ${data.indices.map((i: any) => `${i.nombre} (${i.ticker}) $${i.precio?.toFixed(2) ?? "--"} ${i.hoy != null ? (i.hoy > 0 ? "+" : "") + i.hoy.toFixed(2) + "% HOY" : "--"} / ${i.mes1 != null ? i.mes1.toFixed(1) + "% 1M" : "--"} / ${i.ytd != null ? i.ytd.toFixed(1) + "% YTD" : "--"}`).join(" | ")}`);
+    L.push(`Sectores (mejor→peor HOY): ${data.sectores.map((s: any) => `${s.nombre}:${s.hoy != null ? s.hoy.toFixed(2) + "%" : "--"}`).join(" | ")}`);
+    L.push(`Ganadores: ${data.ganadores.map((g: any) => `${g.symbol} $${g.price?.toFixed(2) ?? "--"} ${g.percentChange != null ? g.percentChange.toFixed(2) + "%" : "--"}`).join(" | ") || "--"}`);
+    L.push(`Perdedores: ${data.perdedores.map((p: any) => `${p.symbol} $${p.price?.toFixed(2) ?? "--"} ${p.percentChange != null ? p.percentChange.toFixed(2) + "%" : "--"}`).join(" | ") || "--"}`);
+    L.push(`Tasas: ${data.tasas.map((t: any) => `${t.nombre} ${t.valor != null ? t.valor.toFixed(2) : "--"} ${t.variacion != null ? "(" + t.variacion.toFixed(2) + "%)" : ""}`).join(" | ")}`);
+    L.push(`Renta fija Gob: ${data.rentaFijaGobierno.map((r: any) => `${r.nombre} ${r.valor?.toFixed(2) ?? "--"} ${r.variacion?.toFixed(2) ?? "--"}%`).join(" | ")}`);
+    L.push(`Renta fija Corp: ${data.rentaFijaCorporativo.map((r: any) => `${r.nombre} ${r.valor?.toFixed(2) ?? "--"} ${r.variacion?.toFixed(2) ?? "--"}%`).join(" | ")}`);
+    L.push(`Desarrollados: ${data.desarrollados.map((d: any) => `${d.nombre} ${d.variacion?.toFixed(2) ?? "--"}%`).join(" | ")}`);
+    L.push(`Emergentes: ${data.emergentes.map((e: any) => `${e.nombre} ${e.variacion?.toFixed(2) ?? "--"}%`).join(" | ")}`);
+    L.push(`Commodities: ${data.commodities.map((c: any) => `${c.nombre} (${c.ticker}) $${c.precio?.toFixed(2) ?? "--"} ${c.hoy != null ? c.hoy.toFixed(2) + "%" : "--"}`).join(" | ")}`);
+    L.push(`Fuentes: Yahoo Finance (delay 15') · Generado ${new Date(data.timestamp).toLocaleString("es-AR")}`);
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS: error al obtener cierre de mercado (${e instanceof Error ? e.message : "desconocido"}).`, fuentes: [], ok: false };
+  }
+}
+
+export async function ejecutarInformeMatutino(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  let fecha: string | undefined;
+  try { fecha = (JSON.parse(argsRaw) as any)?.fecha; } catch {}
+  try {
+    const { buildMarketSnapshot } = await import("@/lib/informe-matutino/snapshot.functions");
+    const snapshot: any = await (buildMarketSnapshot as unknown as () => Promise<any>)();
+    let iaTxt = "";
+    try {
+      const { generateInformeMatutino } = await import("@/lib/informe-matutino/gemini.functions");
+      const ia: any = await (generateInformeMatutino as unknown as (s: any) => Promise<any>)(snapshot);
+      if (ia) {
+        iaTxt = `\n--- NARRATIVA IA ---\nHumor: ${ia.humorMercado}\nResumen: ${ia.resumenEjecutivo}\nRadar Int: ${ia.radarInternacional?.titular} — ${ia.radarInternacional?.bullets?.join(" | ")}\nRadar Local: ${ia.radarLocal?.titular} — ${ia.radarLocal?.bullets?.join(" | ")}\nOportunidades: ${ia.oportunidadesDelDia?.map((o: any) => o.activo + ": " + o.motivo).join(" | ")}\nRecomendación por perfil: ${ia.recomendacionPorPerfil?.map((r: any) => r.perfil + "→" + r.claseActivo).join(" | ")}`;
+      }
+    } catch {}
+    const L: string[] = [];
+    L.push(`=== INFORME MATUTINO ${snapshot.fecha} ===`);
+    L.push(`EE.UU.: ${snapshot.internacional?.cierreEEUU?.map((c: any) => `${c.ticker} $${c.precio} ${c.variacionPct?.toFixed(2)}%`).join(" | ") || "--"}`);
+    L.push(`Asia/Europa: ${snapshot.internacional?.asiaEuropa?.map((c: any) => `${c.ticker} ${c.variacionPct?.toFixed(2)}%`).join(" | ") || "--"}`);
+    L.push(`Commodities: ${snapshot.internacional?.commodities?.map((c: any) => `${c.nombre} ${c.variacionPct?.toFixed(2)}%`).join(" | ") || "--"}`);
+    L.push(`Dolares: oficial ${snapshot.local?.dolares?.oficial} blue ${snapshot.local?.dolares?.blue} MEP ${snapshot.local?.dolares?.mep} CCL ${snapshot.local?.dolares?.ccl} brecha ${snapshot.local?.dolares?.brechaCCLPct?.toFixed(1)}%`);
+    L.push(`Riesgo país: ${snapshot.local?.riesgoPais?.valor} (${snapshot.local?.riesgoPais?.variacionPuntos}) Reservas: ${snapshot.local?.reservas?.valorUSD} Inflación: ${snapshot.local?.inflacion?.mensualPct}%`);
+    L.push(`Agenda: ${snapshot.agendaDelDia?.map((a: any) => `${a.hora} ${a.evento} [${a.relevancia}]`).join(" | ") || "--"}`);
+    if (iaTxt) L.push(iaTxt);
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS: error al generar informe matutino (${e instanceof Error ? e.message : "desconocido"}).`, fuentes: [], ok: false };
+  }
+}
+
+export async function ejecutarAgendaEconomica(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  let fecha: string | undefined;
+  try { fecha = (JSON.parse(argsRaw) as any)?.fecha; } catch {}
+  try {
+    const f = fecha || new Date().toISOString().slice(0, 10);
+    const { getAgendaSemana } = await import("@/lib/informe-matutino/agenda-economica");
+    const agenda: any = (getAgendaSemana as unknown as (d: string) => any)(f);
+    if (!agenda || agenda.length === 0) return { texto: `Agenda vacía para la semana de ${f}.`, fuentes: [], ok: true };
+    return { texto: `=== AGENDA ECONÓMICA semana de ${f} ===\n` + agenda.map((e: any) => `${e.hora} — ${e.evento} [${e.relevancia}]`).join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS: error al obtener agenda (${e instanceof Error ? e.message : "desconocido"}).`, fuentes: [], ok: false };
+  }
+}
+
+export async function ejecutarSenalesCedear(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  let filtro: any = "todos";
+  let topN = 6;
+  try {
+    const p: any = JSON.parse(argsRaw);
+    if (p?.filtro) filtro = p.filtro;
+    if (typeof p?.topN === "number") topN = p.topN;
+  } catch {}
+  try {
+    const { generarSenalesCedear } = await import("@/lib/senales-cedear.functions");
+    const res: any = await (generarSenalesCedear as any)({ data: { filtro, topN } });
+    const senales: any[] = res?.senales ?? [];
+    if (!senales.length) return { texto: "SIN SEÑALES: no se generaron señales con el filtro actual.", fuentes: [], ok: true };
+    const L: string[] = [];
+    L.push(`=== SEÑALES CEDEAR/BCBA (${filtro}) — ${res.criterio} — ${new Date(res.generadoEn).toLocaleString("es-AR")} ===`);
+    L.push(`| Ticker BCBA | Subyacente US | Precio US | Var% US | Señal | Prob | Motivo |`);
+    L.push(`|---|---|---|---|---|---|---|`);
+    for (const s of senales) {
+      const varStr = s.variacionUS != null ? s.variacionUS.toFixed(2) + "%" : s.variacionBCBA != null ? s.variacionBCBA.toFixed(2) + "%" : "--";
+      const precioStr = s.precioUS != null ? "$" + s.precioUS.toFixed(2) : s.precioBCBA != null ? "$" + s.precioBCBA.toFixed(2) : "--";
+      L.push(`| ${s.tickerBCBA} | ${s.tickerUS} | ${precioStr} | ${varStr} | ${s.senal} | ${s.prob != null ? (s.prob * 100).toFixed(0) + "%" : "--"} | ${s.motivo} |`);
+    }
+    L.push("");
+    L.push(`Fuentes: ${senales[0]?.fuente ?? "yfinance"} · Mapeo: unificado_completo.json + mapeo-cedear.ts`);
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS: error al generar señales cedear (${e instanceof Error ? e.message : "desconocido"}).`, fuentes: [], ok: false };
+  }
+}
+
+export async function ejecutarPortfolioPegado(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  let texto = "";
+  try { texto = (JSON.parse(argsRaw) as any)?.texto ?? ""; } catch {}
+  if (!texto || texto.trim().length < 30) {
+    return { texto: "SIN RESULTADOS: pega el texto completo del portfolio IOL (con Patrimonio total, Tenencias, tickers y montos ARS).", fuentes: [], ok: false };
+  }
+  try {
+    const { analizarPortfolioPegado } = await import("@/lib/portfolio-paste.functions");
+    const res: any = await (analizarPortfolioPegado as any)({ data: { texto } });
+    const L: string[] = [];
+    L.push(`=== PORTFOLIO PEGADO — Clasificacion automatica (replica Optimizador tab) ===`);
+    L.push(res.tablaMarkdown);
+    L.push("");
+    L.push(`Siguiente: pedi "optimiza este portfolio" o "riesgo de este portfolio" para ver composicion torta, histograma y frontera eficiente (Labadie portfolio.py + market_data.py).`);
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS: error al analizar portfolio pegado (${e instanceof Error ? e.message : "desconocido"}).`, fuentes: [], ok: false };
+  }
+}

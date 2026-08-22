@@ -1280,6 +1280,101 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "consultar_cierre_mercado",
+      description:
+        "Reporte de CIERRE DE MERCADO automático (EE.UU. + global) con datos en vivo de Yahoo Finance: 7 índices (S&P 500, Nasdaq 100, DJIA, Russell 2000, Mid/Small/Micro Cap) con precio, % HOY/1M/YTD y serie para sparkline; 11 sectores SPDR ordenados por % HOY; Top 6 ganadores/perdedores; DXY/VIX/tasas 5Y/10Y/30Y; renta fija gobierno (MUB/GOVT/TIP) y corporativa (CWB/LQD/HYG); 7 desarrollados y 8 emergentes; 7 commodities (oro/plata/BTC/WTI/Brent/gas/soja). Cacheado al último cierre de Wall Street (16:15 ET). Usar para 'cierre de hoy', 'cómo cerró el mercado', 'resumen del mercado'.",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "generar_informe_matutino",
+      description:
+        "INFORME MATUTINO completo con snapshot de mercado + agenda económica + narrativa IA (humor risk-on/off/mixto, resumen ejecutivo, radar internacional/local, oportunidades y recomendación por perfil CNV 7 niveles). Reutiliza snapshot de Yahoo/ArgentinaDatos + Gemini/LLM. Parámetro fecha opcional YYYY-MM-DD (default hoy). Usar para 'informe de la mañana', 'qué pasó hoy', 'resumen matutino'.",
+      parameters: {
+        type: "object",
+        properties: {
+          fecha: {
+            type: "string",
+            description: "Fecha YYYY-MM-DD opcional (default hoy, zona America/Argentina).",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "consultar_agenda_economica",
+      description:
+        "Agenda ECONÓMICA curada de la semana: eventos con hora, relevancia alta/media/baja (BCRA licitaciones LECAP, INDEC IPC/EMAE, FOMC Fed, Tesoro USA, vencimientos). Calculada para la fecha pedida o semana en curso. Usar para 'qué hay en agenda hoy', 'eventos de esta semana', 'calendario económico'.",
+      parameters: {
+        type: "object",
+        properties: {
+          fecha: {
+            type: "string",
+            description: "Fecha YYYY-MM-DD opcional para filtrar la semana (default hoy).",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "generar_senales_cedear",
+      description:
+        "Señales CEDEARs/ACCIONES BCBA: mapea subyacente NYSE/NASDAQ, trae precios BCBA+US y genera señales contextuales (liquidos / en noticias hoy / top movers / todos). Usa yfinance + screeners + noticias reales. Para 'señales cedear', 'qué cedears hoy', 'acciones BCBA señal'.",
+      parameters: {
+        type: "object",
+        properties: {
+          filtro: {
+            type: "string",
+            enum: ["liquidos", "noticias", "movers", "todos"],
+            description: "Criterio: liquidos (volumen), noticias (en noticias hoy), movers (mayor variación), todos (mix). Default todos.",
+          },
+          topN: {
+            type: "number",
+            description: "Cantidad de señales (1-15, default 6).",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "analizar_portfolio_pegado",
+      description:
+        "AUTO-DETECCION al pegar portfolio IOL: parsea texto con Patrimonio total, Tenencias, Cedears/Acciones con tickers, cantidades, montos ARS, variaciones. Clasifica cada activo por tipo/moneda/mercado usando unificado_completo.json + cedears-universe (replica Optimizador tab). Para cualquier paste con 'PAMP', 'AMZN', 'ARS', 'Cedears'. Ejecutar inmediatamente sin pedir confirmacion.",
+      parameters: {
+        type: "object",
+        properties: {
+          texto: {
+            type: "string",
+            description: "Texto completo pegado del portfolio IOL (incluir todo el bloque con tickers y montos).",
+          },
+        },
+        required: ["texto"],
+        additionalProperties: false,
+      },
+    },
+  },
 ];
 
 export type EstadoHerramienta =
@@ -1368,6 +1463,15 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
     case "pairs_trading_labadie":
       return "portafolio";
     case "curva_ejecucion_labadie":
+      return "portafolio";
+    case "consultar_cierre_mercado":
+    case "generar_informe_matutino":
+      return "informe";
+    case "consultar_agenda_economica":
+      return "mercado";
+    case "generar_senales_cedear":
+      return "mercado";
+    case "analizar_portfolio_pegado":
       return "portafolio";
     default:
       return "searching";
