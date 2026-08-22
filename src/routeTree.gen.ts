@@ -17,10 +17,12 @@ import { Route as HerramientasRouteImport } from './routes/herramientas'
 import { Route as MonitorMercadoRouteImport } from './routes/monitor-mercado'
 import { Route as PlanificacionRouteImport } from './routes/planificacion'
 import { Route as StudioRouteImport } from './routes/studio'
+import { Route as ApiBotUnificadoRouteImport } from './routes/api/bot-unificado'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as ApiSugerenciasRouteImport } from './routes/api/sugerencias'
 import { Route as ApiTelegramRouteImport } from './routes/api/telegram'
+import { Route as ApiTelegramWebhookRouteImport } from './routes/api/telegram/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -62,6 +64,11 @@ const StudioRoute = StudioRouteImport.update({
   path: '/studio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBotUnificadoRoute = ApiBotUnificadoRouteImport.update({
+  id: '/api/bot-unificado',
+  path: '/api/bot-unificado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -82,6 +89,11 @@ const ApiTelegramRoute = ApiTelegramRouteImport.update({
   path: '/api/telegram',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTelegramWebhookRoute = ApiTelegramWebhookRouteImport.update({
+  id: '/webhook',
+  path: '/webhook',
+  getParentRoute: () => ApiTelegramRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -92,10 +104,12 @@ export interface FileRoutesByFullPath {
   '/monitor-mercado': typeof MonitorMercadoRoute
   '/planificacion': typeof PlanificacionRoute
   '/studio': typeof StudioRoute
+  '/api/bot-unificado': typeof ApiBotUnificadoRoute
   '/api/chat': typeof ApiChatRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
-  '/api/telegram': typeof ApiTelegramRoute
+  '/api/telegram': typeof ApiTelegramRouteWithChildren
+  '/api/telegram/webhook': typeof ApiTelegramWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -106,10 +120,12 @@ export interface FileRoutesByTo {
   '/monitor-mercado': typeof MonitorMercadoRoute
   '/planificacion': typeof PlanificacionRoute
   '/studio': typeof StudioRoute
+  '/api/bot-unificado': typeof ApiBotUnificadoRoute
   '/api/chat': typeof ApiChatRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
-  '/api/telegram': typeof ApiTelegramRoute
+  '/api/telegram': typeof ApiTelegramRouteWithChildren
+  '/api/telegram/webhook': typeof ApiTelegramWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -121,10 +137,12 @@ export interface FileRoutesById {
   '/monitor-mercado': typeof MonitorMercadoRoute
   '/planificacion': typeof PlanificacionRoute
   '/studio': typeof StudioRoute
+  '/api/bot-unificado': typeof ApiBotUnificadoRoute
   '/api/chat': typeof ApiChatRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
-  '/api/telegram': typeof ApiTelegramRoute
+  '/api/telegram': typeof ApiTelegramRouteWithChildren
+  '/api/telegram/webhook': typeof ApiTelegramWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,10 +155,12 @@ export interface FileRouteTypes {
     | '/monitor-mercado'
     | '/planificacion'
     | '/studio'
+    | '/api/bot-unificado'
     | '/api/chat'
     | '/api/search'
     | '/api/sugerencias'
     | '/api/telegram'
+    | '/api/telegram/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -151,10 +171,12 @@ export interface FileRouteTypes {
     | '/monitor-mercado'
     | '/planificacion'
     | '/studio'
+    | '/api/bot-unificado'
     | '/api/chat'
     | '/api/search'
     | '/api/sugerencias'
     | '/api/telegram'
+    | '/api/telegram/webhook'
   id:
     | '__root__'
     | '/'
@@ -165,10 +187,12 @@ export interface FileRouteTypes {
     | '/monitor-mercado'
     | '/planificacion'
     | '/studio'
+    | '/api/bot-unificado'
     | '/api/chat'
     | '/api/search'
     | '/api/sugerencias'
     | '/api/telegram'
+    | '/api/telegram/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -180,10 +204,11 @@ export interface RootRouteChildren {
   MonitorMercadoRoute: typeof MonitorMercadoRoute
   PlanificacionRoute: typeof PlanificacionRoute
   StudioRoute: typeof StudioRoute
+  ApiBotUnificadoRoute: typeof ApiBotUnificadoRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiSearchRoute: typeof ApiSearchRoute
   ApiSugerenciasRoute: typeof ApiSugerenciasRoute
-  ApiTelegramRoute: typeof ApiTelegramRoute
+  ApiTelegramRoute: typeof ApiTelegramRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -244,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bot-unificado': {
+      id: '/api/bot-unificado'
+      path: '/api/bot-unificado'
+      fullPath: '/api/bot-unificado'
+      preLoaderRoute: typeof ApiBotUnificadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -272,8 +304,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTelegramRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/telegram/webhook': {
+      id: '/api/telegram/webhook'
+      path: '/webhook'
+      fullPath: '/api/telegram/webhook'
+      preLoaderRoute: typeof ApiTelegramWebhookRouteImport
+      parentRoute: typeof ApiTelegramRoute
+    }
   }
 }
+
+interface ApiTelegramRouteChildren {
+  ApiTelegramWebhookRoute: typeof ApiTelegramWebhookRoute
+}
+
+const ApiTelegramRouteChildren: ApiTelegramRouteChildren = {
+  ApiTelegramWebhookRoute: ApiTelegramWebhookRoute,
+}
+
+const ApiTelegramRouteWithChildren = ApiTelegramRoute._addFileChildren(
+  ApiTelegramRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -284,10 +335,11 @@ const rootRouteChildren: RootRouteChildren = {
   MonitorMercadoRoute: MonitorMercadoRoute,
   PlanificacionRoute: PlanificacionRoute,
   StudioRoute: StudioRoute,
+  ApiBotUnificadoRoute: ApiBotUnificadoRoute,
   ApiChatRoute: ApiChatRoute,
   ApiSearchRoute: ApiSearchRoute,
   ApiSugerenciasRoute: ApiSugerenciasRoute,
-  ApiTelegramRoute: ApiTelegramRoute,
+  ApiTelegramRoute: ApiTelegramRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

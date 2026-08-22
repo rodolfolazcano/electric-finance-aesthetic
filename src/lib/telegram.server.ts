@@ -57,11 +57,14 @@ export type SendTelegramArgs = {
 export async function sendTelegramMessage(args: SendTelegramArgs): Promise<string> {
   const { token, chatIds, enabled } = getTelegramConfig();
   if (!enabled) return "[TELEGRAM] Deshabilitado (TELEGRAM_ENABLED=false)";
-  if (!token) return "[TELEGRAM ERROR] Falta TELEGRAM_BOT_TOKEN en .env — obtenelo de @BotFather con /token";
+  if (!token)
+    return "[TELEGRAM ERROR] Falta TELEGRAM_BOT_TOKEN en .env — obtenelo de @BotFather con /token";
   const targets = args.chatId ? [args.chatId] : chatIds;
-  if (!targets.length) return "[TELEGRAM ERROR] Falta TELEGRAM_CHAT_ID (o TELEGRAM_CHAT_IDS). Obtenelo via getUpdates tras enviar /start a @coronar_inversiones_bot";
+  if (!targets.length)
+    return "[TELEGRAM ERROR] Falta TELEGRAM_CHAT_ID (o TELEGRAM_CHAT_IDS). Obtenelo via getUpdates tras enviar /start a @coronar_inversiones_bot";
 
-  const text = args.text.length > MAX_TEXT ? args.text.slice(0, MAX_TEXT) + "\n...[truncado]" : args.text;
+  const text =
+    args.text.length > MAX_TEXT ? args.text.slice(0, MAX_TEXT) + "\n...[truncado]" : args.text;
   const results: string[] = [];
   for (const chatId of targets) {
     const url = `https://api.telegram.org/bot${token}/sendMessage`;
@@ -78,9 +81,15 @@ export async function sendTelegramMessage(args: SendTelegramArgs): Promise<strin
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(8000),
       });
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; description?: string; result?: unknown };
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        description?: string;
+        result?: unknown;
+      };
       if (!res.ok || data.ok === false) {
-        results.push(`[FAIL chat ${chatId}] ${res.status} ${data.description ?? await res.text().catch(() => "?")}`);
+        results.push(
+          `[FAIL chat ${chatId}] ${res.status} ${data.description ?? (await res.text().catch(() => "?"))}`,
+        );
       } else {
         results.push(`[OK chat ${chatId}] mensaje enviado (${text.length} chars)`);
       }
@@ -106,13 +115,17 @@ export type TelegramSignalArgs = {
 export function formatSignalForTelegram(a: TelegramSignalArgs): string {
   const lines: string[] = [];
   lines.push(`<b>CORONAR — Senal ${escapeHtml(a.senal)}</b>`);
-  lines.push(`Ticker: <b>${escapeHtml(a.ticker.toUpperCase())}</b>${a.precio != null ? `  Precio: $${a.precio.toFixed(2)}` : ""}${a.variacion1d != null ? `  (${a.variacion1d >= 0 ? "+" : ""}${a.variacion1d.toFixed(2)}%)` : ""}`);
+  lines.push(
+    `Ticker: <b>${escapeHtml(a.ticker.toUpperCase())}</b>${a.precio != null ? `  Precio: $${a.precio.toFixed(2)}` : ""}${a.variacion1d != null ? `  (${a.variacion1d >= 0 ? "+" : ""}${a.variacion1d.toFixed(2)}%)` : ""}`,
+  );
   if (a.nivel) lines.push(`Nivel: ${escapeHtml(a.nivel)}`);
   if (a.motivo) lines.push(`Motivo: ${escapeHtml(a.motivo)}`);
   if (a.fuente) lines.push(`Fuente: ${escapeHtml(a.fuente)}`);
   lines.push(``);
   lines.push(`Bot: @coronar_inversiones_bot`);
-  lines.push(`Aviso: informacion educativa, no es recomendacion de inversion. Verifica siempre en tu broker.`);
+  lines.push(
+    `Aviso: informacion educativa, no es recomendacion de inversion. Verifica siempre en tu broker.`,
+  );
   // Sin emojis por requerimiento de formato unificado
   return lines.join("\n");
 }
@@ -125,8 +138,14 @@ export async function sendTelegramSignal(args: TelegramSignalArgs): Promise<stri
 export async function telegramGetBotInfo(): Promise<string> {
   const { token } = getTelegramConfig();
   if (!token) return "[TELEGRAM ERROR] Falta TELEGRAM_BOT_TOKEN";
-  const res = await fetch(`https://api.telegram.org/bot${token}/getMe`, { signal: AbortSignal.timeout(6000) });
-  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; result?: { username?: string; first_name?: string; id?: number }; description?: string };
+  const res = await fetch(`https://api.telegram.org/bot${token}/getMe`, {
+    signal: AbortSignal.timeout(6000),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    result?: { username?: string; first_name?: string; id?: number };
+    description?: string;
+  };
   if (!data.ok) return `[TELEGRAM ERROR] getMe fallo: ${data.description ?? res.status}`;
   const r = data.result!;
   return `[TELEGRAM OK] Bot @${r.username} (${r.first_name}) id=${r.id}`;
@@ -135,16 +154,30 @@ export async function telegramGetBotInfo(): Promise<string> {
 export async function telegramGetUpdates(): Promise<string> {
   const { token } = getTelegramConfig();
   if (!token) return "[TELEGRAM ERROR] Falta TELEGRAM_BOT_TOKEN";
-  const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates`, { signal: AbortSignal.timeout(8000) });
-  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; result?: Array<{ message?: { chat?: { id: number; type: string; title?: string; username?: string }; text?: string }; channel_post?: { chat?: { id: number; type: string } } }>; description?: string };
+  const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates`, {
+    signal: AbortSignal.timeout(8000),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    result?: Array<{
+      message?: {
+        chat?: { id: number; type: string; title?: string; username?: string };
+        text?: string;
+      };
+      channel_post?: { chat?: { id: number; type: string } };
+    }>;
+    description?: string;
+  };
   if (!data.ok) return `[TELEGRAM ERROR] getUpdates fallo: ${data.description ?? res.status}`;
   const rows = (data.result ?? []).slice(-10);
-  if (!rows.length) return "[TELEGRAM] Sin updates — enviale /start a @coronar_inversiones_bot y reintenta";
+  if (!rows.length)
+    return "[TELEGRAM] Sin updates — enviale /start a @coronar_inversiones_bot y reintenta";
   return rows
     .map((u, i) => {
-      const chat = u.message?.chat ?? u.channel_post?.chat;
-      const txt = u.message?.text ?? u.channel_post?.chat ? "(channel_post)" : "";
-      return `${i + 1}. chat_id=${chat?.id ?? "?"} type=${chat?.type ?? "?"} ${chat?.username ? "@" + chat.username : chat?.title ?? ""} text=${(txt ?? "").slice(0, 60)}`;
+      const chat = (u.message?.chat ?? u.channel_post?.chat) as
+        { id?: number; type?: string; username?: string; title?: string } | undefined;
+      const txt = u.message?.text ?? (u.channel_post ? "(channel_post)" : "");
+      return `${i + 1}. chat_id=${chat?.id ?? "?"} type=${chat?.type ?? "?"} ${chat?.username ? "@" + chat.username : (chat?.title ?? "")} text=${(txt ?? "").slice(0, 60)}`;
     })
     .join("\n");
 }
@@ -163,4 +196,133 @@ export async function broadcastExistingSignalToTelegram(input: {
     motivo: input.motivos?.slice(0, 2).join(" | "),
     fuente: input.fuente ?? "CORONAR",
   });
+}
+
+// ---------------------------------------------------------------------------
+// Bot dedicado del AGENTE IA (@fpxbs777_bot) — chat en lenguaje natural 24/7.
+// Usa el MISMO pipeline que el chat lateral de la UI via /api/chat
+// (orquestador + planner + ~48 herramientas + RAG base conocimiento + skills).
+// Credenciales embebidas a proposito: repositorio privado, decision del
+// propietario. Si se rotan, actualizar aca o definir las env vars de abajo.
+//   TELEGRAM_AGENT_BOT_TOKEN / TELEGRAM_AGENT_CHAT_IDS / TELEGRAM_WEBHOOK_SECRET
+// ---------------------------------------------------------------------------
+
+const AGENT_TOKEN_FALLBACK = "8947154888:AAHtQG4zeBw42rTcASv1jyTQn9YByl0HIr0";
+const AGENT_ALLOWED_CHATS_FALLBACK = "8179198652"; // Cintia (dueña del bot)
+const AGENT_WEBHOOK_SECRET_FALLBACK = "coronar_whsec_fpxbs777_9c41e7a2b8d3";
+
+export function getAgentBotConfig(): {
+  token: string;
+  allowedChats: string[];
+  secret: string;
+} {
+  const token = env("TELEGRAM_AGENT_BOT_TOKEN") ?? AGENT_TOKEN_FALLBACK;
+  const rawChats = env("TELEGRAM_AGENT_CHAT_IDS") ?? AGENT_ALLOWED_CHATS_FALLBACK;
+  const allowedChats = rawChats
+    .split(/[,\s;]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const secret = env("TELEGRAM_WEBHOOK_SECRET") ?? AGENT_WEBHOOK_SECRET_FALLBACK;
+  return { token, allowedChats, secret };
+}
+
+type AgentApiResponse = { ok?: boolean; result?: unknown; description?: string };
+
+async function agentApi(
+  method: string,
+  body?: Record<string, unknown>,
+  timeoutMs = 15000,
+): Promise<AgentApiResponse> {
+  const { token } = getAgentBotConfig();
+  if (!token) return { ok: false, description: "Falta token del bot agente" };
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body ?? {}),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    return (await res
+      .json()
+      .catch(() => ({ ok: false, description: `HTTP ${res.status}` }))) as AgentApiResponse;
+  } catch (e: unknown) {
+    return { ok: false, description: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+export async function agentGetMe(): Promise<string> {
+  const data = await agentApi("getMe");
+  if (!data.ok) return `[AGENTE TG ERROR] getMe fallo: ${data.description}`;
+  const r = data.result as { username?: string; first_name?: string; id?: number };
+  return `[AGENTE TG OK] @${r.username} (${r.first_name}) id=${r.id}`;
+}
+
+export async function sendAgentChatAction(
+  chatId: string | number,
+  action = "typing",
+): Promise<void> {
+  await agentApi("sendChatAction", { chat_id: chatId, action }, 8000);
+}
+
+/** Envia un texto al chat indicado. HTML con fallback a plano. Chunking 3800. */
+export async function sendAgentMessage(chatId: string | number, text: string): Promise<void> {
+  const limpio = (text || "(respuesta vacia)").trim();
+  for (let i = 0; i < limpio.length; i += 3800) {
+    const parte = limpio.slice(i, i + 3800);
+    let res = await agentApi("sendMessage", {
+      chat_id: chatId,
+      text: parte,
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+    });
+    if (!res.ok) {
+      res = await agentApi("sendMessage", {
+        chat_id: chatId,
+        text: parte,
+        disable_web_page_preview: true,
+      });
+    }
+    if (!res.ok) console.error("[AGENTE TG] sendMessage fallo:", res.description);
+  }
+}
+
+export async function setAgentWebhook(url: string): Promise<string> {
+  const { secret } = getAgentBotConfig();
+  const data = await agentApi("setWebhook", {
+    url,
+    secret_token: secret,
+    allowed_updates: ["message", "edited_message"],
+    drop_pending_updates: false,
+  });
+  return data.ok
+    ? `Webhook activo en ${url}`
+    : `[TELEGRAM ERROR] setWebhook fallo: ${data.description}`;
+}
+
+export async function deleteAgentWebhook(): Promise<string> {
+  const data = await agentApi("deleteWebhook", { drop_pending_updates: false });
+  return data.ok
+    ? "Webhook eliminado (el bot vuelve a modo polling local)"
+    : `[TELEGRAM ERROR] deleteWebhook fallo: ${data.description}`;
+}
+
+export async function getAgentWebhookInfo(): Promise<string> {
+  const data = await agentApi("getWebhookInfo");
+  if (!data.ok) return `[TELEGRAM ERROR] getWebhookInfo fallo: ${data.description}`;
+  const r = data.result as {
+    url?: string;
+    pending_update_count?: number;
+    last_error_message?: string;
+    last_error_date?: number;
+  };
+  const partes = [
+    `url=${r.url || "(sin webhook — polling local)"}`,
+    `pendientes=${r.pending_update_count ?? 0}`,
+  ];
+  if (r.last_error_message) {
+    partes.push(
+      `ultimo_error=${r.last_error_message} (${r.last_error_date ? new Date(r.last_error_date * 1000).toISOString() : "?"})`,
+    );
+  }
+  return partes.join(" | ");
 }

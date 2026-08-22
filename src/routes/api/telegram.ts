@@ -1,5 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { sendTelegramMessage, sendTelegramSignal, telegramGetBotInfo, telegramGetUpdates, getTelegramConfig, formatSignalForTelegram } from "@/lib/telegram.server";
+import {
+  sendTelegramMessage,
+  sendTelegramSignal,
+  telegramGetBotInfo,
+  telegramGetUpdates,
+  getTelegramConfig,
+  formatSignalForTelegram,
+  agentGetMe,
+  setAgentWebhook,
+  deleteAgentWebhook,
+  getAgentWebhookInfo,
+} from "@/lib/telegram.server";
 
 export const Route = createFileRoute("/api/telegram")({
   server: {
@@ -8,6 +19,34 @@ export const Route = createFileRoute("/api/telegram")({
         const url = new URL(request.url);
         const action = url.searchParams.get("action") ?? "estado";
         const { token, chatIds, enabled } = getTelegramConfig();
+
+        // --- Bot agente (@fpxbs777_bot) ---
+        if (action === "webhook") {
+          const target = url.searchParams.get("url");
+          if (!target || !/^https:\/\//.test(target)) {
+            return Response.json(
+              {
+                error:
+                  "Pasa la URL publica completa del webhook: ?action=webhook&url=https://TU-APP.vercel.app/api/telegram/webhook",
+              },
+              { status: 400 },
+            );
+          }
+          return Response.json({ ok: true, resultado: await setAgentWebhook(target) });
+        }
+        if (action === "delwebhook" || action === "unwebhook") {
+          return Response.json({ ok: true, resultado: await deleteAgentWebhook() });
+        }
+        if (action === "agente" || action === "agent") {
+          return Response.json({
+            ok: true,
+            bot: "@fpxbs777_bot",
+            me: await agentGetMe(),
+            webhook: await getAgentWebhookInfo(),
+          });
+        }
+
+        // --- Bot de senales (@coronar_inversiones_bot) ---
         if (action === "estado") {
           const info = await telegramGetBotInfo();
           const updates = await telegramGetUpdates();
@@ -41,7 +80,13 @@ export const Route = createFileRoute("/api/telegram")({
           });
           return Response.json({ preview: sample });
         }
-        return Response.json({ error: "action no valida: usa ?action=estado|updates|preview" }, { status: 400 });
+        return Response.json(
+          {
+            error:
+              "action no valida: usa ?action=estado|updates|preview|agente|webhook&url=|delwebhook",
+          },
+          { status: 400 },
+        );
       },
 
       POST: async ({ request }) => {
@@ -67,12 +112,17 @@ export const Route = createFileRoute("/api/telegram")({
 
         if (action === "mensaje" || action === "message") {
           if (!body.text?.trim()) return Response.json({ error: "Falta text" }, { status: 400 });
-          const result = await sendTelegramMessage({ text: body.text, chatId: body.chatId, parseMode: "HTML" });
+          const result = await sendTelegramMessage({
+            text: body.text,
+            chatId: body.chatId,
+            parseMode: "HTML",
+          });
           return Response.json({ ok: true, result });
         }
 
         if (action === "senal" || action === "signal") {
-          if (!body.ticker?.trim() || !body.senal?.trim()) return Response.json({ error: "Falta ticker y senal" }, { status: 400 });
+          if (!body.ticker?.trim() || !body.senal?.trim())
+            return Response.json({ error: "Falta ticker y senal" }, { status: 400 });
           const result = await sendTelegramSignal({
             ticker: body.ticker,
             senal: body.senal,
