@@ -9,10 +9,12 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   vite: {
     define: {
-      // Polyfill para `process` en cliente: server code usa `process.env` y se cuela al bundle cliente
-      // via studio.functions → studio.server. En server usa el real, en cliente fallback vacío.
-      process: "globalThis.process ?? { env: {} }",
+      // Polyfill para `process` en cliente: server code usa `process.env`/`process.cwd()` y se cuela al bundle cliente
+      // via studio.functions → studio.server. En server usa el real, en cliente fallback vacío pero definido.
+      process: "globalThis.process ?? { env: {}, cwd: () => '/', platform: 'browser', version: '', nextTick: (cb) => setTimeout(cb, 0) }",
       "process.env": "(globalThis.process?.env ?? {})",
+      "process.cwd": "((globalThis.process ?? { cwd: () => '/' }).cwd)",
+      "process.platform": "((globalThis.process ?? { platform: 'browser' }).platform)",
     },
   },
   tanstackStart: {
