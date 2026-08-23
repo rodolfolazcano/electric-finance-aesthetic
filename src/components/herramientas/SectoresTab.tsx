@@ -94,6 +94,7 @@ import { MurphyIntermarketPanel } from "@/components/sectores/MurphyIntermarketP
 import { SectorImpactSimulator } from "@/components/sectores/SectorImpactSimulator";
 import { DecouplingMonitor } from "@/components/herramientas/DecouplingMonitor";
 import { IntermarketRatiosPanel } from "@/components/herramientas/IntermarketRatiosPanel";
+import { MatrizUniversoPanel } from "@/components/herramientas/MatrizUniversoPanel";
 import {
   LineChart,
   Line,
@@ -534,122 +535,6 @@ function PanelFull({
         </span>
       </div>
     </div>
-  );
-}
-
-// ── Matriz con selector métrica ──
-function MatrizPanelFull({ sectorFilter }: { sectorFilter: string }) {
-  const [sector, setSector] = useState(SECTORES[0] ?? "Technology");
-  const [metric, setMetric] = useState<"correlation" | "beta" | "rSquared">("correlation");
-  useEffect(() => {
-    if (sectorFilter) setSector(sectorFilter);
-  }, [sectorFilter]);
-  const tickers = useMemo(() => {
-    const data = SECTORES_DATA[sector] ?? {};
-    const all: TickerJson[] = [];
-    for (const ind of Object.keys(data))
-      for (const t of data[ind]) if (!all.find((x) => x.ticker === t.ticker)) all.push(t);
-    return all.slice(0, 12);
-  }, [sector]);
-  const fn = useServerFn(getSectorEtfFit);
-  const q = useQuery({
-    queryKey: ["matriz-etf-fit", sector],
-    queryFn: () => fn({ data: { sector, tickers } }),
-    enabled: tickers.length >= 2,
-    staleTime: 30 * 60_000,
-  });
-  if (q.isPending) return <Skeleton className="h-64 w-full" />;
-  if (q.isError)
-    return (
-      <Card>
-        <CardContent className="p-6 text-[13px] text-muted-foreground">
-          Matriz no disponible.
-        </CardContent>
-      </Card>
-    );
-  const rows = (q.data as any)?.etfResults as EtfFitResult[] | undefined;
-  if (!rows || rows.length === 0)
-    return (
-      <Card>
-        <CardContent className="p-6 text-[13px] text-muted-foreground">Sin datos.</CardContent>
-      </Card>
-    );
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="text-[14px] flex items-center gap-2">
-            <Grid3x3 className="h-4 w-4 text-primary" /> Matriz — {sector}
-          </CardTitle>
-          <p className="text-[13px] text-muted-foreground">
-            Corr/Beta/R² vs ETFs sectoriales · 1Y retornos diarios
-          </p>
-        </div>
-        <select
-          value={metric}
-          onChange={(e) => setMetric(e.target.value as any)}
-          className="rounded border bg-background px-2 py-1 text-[11px]"
-        >
-          <option value="correlation">Correlación</option>
-          <option value="beta">Beta</option>
-          <option value="rSquared">R²</option>
-        </select>
-      </CardHeader>
-      <CardContent>
-        <select
-          value={sector}
-          onChange={(e) => setSector(e.target.value)}
-          className="mb-3 w-full max-w-xs rounded border bg-background px-2 py-1.5 text-[12px]"
-        >
-          {SECTORES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ETF</TableHead>
-                <TableHead className="text-right">Corr</TableHead>
-                <TableHead className="text-right">Beta</TableHead>
-                <TableHead className="text-right">R²</TableHead>
-                <TableHead>Nombre</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.slice(0, 12).map((r) => (
-                <TableRow key={r.etf}>
-                  <TableCell className="font-mono font-medium">{r.etf}</TableCell>
-                  <TableCell
-                    className={cn(
-                      "text-right font-mono",
-                      metric === "correlation" && "bg-primary/10",
-                    )}
-                  >
-                    {r.correlation?.toFixed(3) ?? "s/d"}
-                  </TableCell>
-                  <TableCell
-                    className={cn("text-right font-mono", metric === "beta" && "bg-primary/10")}
-                  >
-                    {r.beta?.toFixed(2) ?? "s/d"}
-                  </TableCell>
-                  <TableCell
-                    className={cn("text-right font-mono", metric === "rSquared" && "bg-primary/10")}
-                  >
-                    {r.rSquared?.toFixed(3) ?? "s/d"}
-                  </TableCell>
-                  <TableCell className="text-[11px] text-muted-foreground">
-                    {(r as any).name ?? r.etf}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 
@@ -1365,14 +1250,12 @@ function IntermarketFull() {
 export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
   // Reorden metodológico (corpus pt): Panorama Murphy → Análisis Pascale →
   // Valuación relativa → Estructura Bustamante → Cartera Elbaum
-  const valid = ["panorama", "analisis", "valuacion", "cartera"];
+  const valid = ["panorama", "intermarket", "analisis", "valuacion", "matriz", "cartera"];
   const LEGACY_MAP: Record<string, string> = {
     performance: "panorama",
-    intermarket: "panorama",
     panel: "analisis",
     etfFit: "analisis",
     "etf-fit": "analisis",
-    matriz: "cartera",
     benchmarks: "cartera",
     valuacion: "valuacion",
     oportunidades: "valuacion",
@@ -1563,17 +1446,9 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
 
   return (
     <div className="space-y-8 w-full">
-      <div>
-        <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight">
-          Análisis sectorial
-        </h2>
-        <p className="text-[17px] leading-relaxed text-muted-foreground mt-1 lg:text-[19px]">
-          Rotación sectorial con ETFs SPDR, valuación relativa, correlaciones, benchmarks y
-          screeners. Fuentes: Yahoo Finance · BCRA · Delay 15-20’ · Metodología John Murphy / Pring
-        </p>
-        <div aria-hidden className="electric-line mt-6 max-w-3xl" />
-      </div>
-
+      {/* INPUTS SIEMPRE PRIMERO — visibles solo donde aplican */}
+      {(tab === "analisis" || tab === "cartera") && (
+        <>
       {/* Selector compartido Clarity parity */}
       <div className="flex flex-wrap items-start gap-3">
         <div className="glass p-3 flex-1 min-w-[220px] border rounded-lg bg-background/40">
@@ -1746,28 +1621,33 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
             </p>
           )}
         </div>
+        )}
+        </>
       )}
 
-      <Tabs value={tab} onValueChange={setTab} className="w-full">
-        <TabsList className="flex-wrap h-auto gap-1 p-1 w-full justify-start">
-          <TabsTrigger value="panorama" className="text-[12px] px-3 py-1.5">
-            1 · Panorama
-          </TabsTrigger>
-          <TabsTrigger value="analisis" className="text-[12px] px-3 py-1.5">
-            2 · Análisis
-          </TabsTrigger>
-          <TabsTrigger value="valuacion" className="text-[12px] px-3 py-1.5">
-            3 · Valuación
-          </TabsTrigger>
-          <TabsTrigger value="cartera" className="text-[12px] px-3 py-1.5">
-            4 · Cartera
-          </TabsTrigger>
-        </TabsList>
+      {/* Título después de los inputs */}
+      <div>
+        <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight">
+          Análisis sectorial
+        </h2>
+        <p className="text-[17px] leading-relaxed text-muted-foreground mt-1 lg:text-[19px]">
+          Rotación sectorial con ETFs SPDR, valuación relativa, correlaciones, benchmarks y
+          screeners. Fuentes: Yahoo Finance · BCRA · Delay 15-20’ · Metodología John Murphy / Pring.
+          Navegación por las secciones del panel lateral.
+        </p>
+        <div aria-hidden className="electric-line mt-6 max-w-3xl" />
+      </div>
 
-        {/* 2 · ANÁLISIS — Pascale U4: fundamentales comparables + caminos + ETF fit */}
-        {/* 1 · PANORAMA — Murphy intermarket: rotación, fuerza relativa, régimen */}
+      <Tabs value={tab} onValueChange={setTab} className="w-full">
+        {/* Navegación por subtabs: panel lateral (SidebarHerramientas) */}
+
+        {/* 1 · PANORAMA — Rotación sectorial y fuerza relativa (Murphy, rotación) */}
         <TabsContent value="panorama" className="mt-4 space-y-6">
           <PerformanceFullPanel sectorFilter={sectorFilter} tickersFromFilter={tickersFromFilter} />
+        </TabsContent>
+
+        {/* 2 · INTERMARKET — Murphy: régimen CRB/Bonds, 12 ratios, Pring/Stovall, decoupling */}
+        <TabsContent value="intermarket" className="mt-4">
           <IntermarketFull />
         </TabsContent>
 
@@ -1816,10 +1696,14 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
           <OportunidadesPanel2 />
         </TabsContent>
 
-        {/* 4 · CARTERA — Elbaum: correlaciones/benchmarks como diversificación */}
+        {/* 4 · MATRIZ — dinámica: activos/industrias/sectores, corr/beta/alpha/R² */}
+        <TabsContent value="matriz" className="mt-4">
+          <MatrizUniversoPanel sectorFilter={sectorFilter} />
+        </TabsContent>
+
+        {/* 5 · CARTERA — Elbaum: correlaciones/benchmarks como diversificación */}
         <TabsContent value="cartera" className="mt-4 space-y-6">
           <BenchmarksPanel sectorFilter={sectorFilter} />
-          <MatrizPanelFull sectorFilter={sectorFilter} />
         </TabsContent>
       </Tabs>
     </div>
