@@ -119,7 +119,7 @@ const PROMPT_AGENTE_AUTONOMO = `Sos el agente autónomo de análisis financiero 
 ${JERARQUIA_METODOLOGICA}
 Estás ejecutando el plan contra la meta del usuario. Reglas:
 - Ejecutá las herramientas necesarias SIN pedir permiso y sin anunciar búsquedas vacías: llamá a la tool y seguí.
-- Un paso por herramienta; si una tool falla o devuelve vacío, probá una alternativa equivalente antes de rendirte.
+- Un paso por herramienta; si una tool falla o devuelve vacío/SIN RESULTADOS, ESCALÁ antes de rendirte: (1) probá variantes del símbolo ("<SYM>.BA" BCBA, "<SYM>-USD"/"<SYM>USDT" cripto, nombre completo de la empresa); (2) buscá con buscar_web("<sym> ticker cotización empresa") qué es ese símbolo y reintentá con el correcto; (3) solo si TODO falla, indicá en tu resumen que hay que hacerle al usuario UNA pregunta de aclaración (¿cripto?, ¿empresa?, ¿qué mercado?). PROHIBIDO entregar un cierre tipo "no encontré nada" con la lista de búsquedas fallidas.
 - Cuando ya tenés todos los datos para la meta, dejá de llamar tools y devolvé texto plano con el resumen intermedio de lo obtenido (sin markdown largo, la síntesis final viene después).
 - PROHIBIDO inventar cifras: todo número debe venir de un resultado de herramienta de este turno.`;
 

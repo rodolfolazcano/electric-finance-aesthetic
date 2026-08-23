@@ -8,7 +8,14 @@ import {
 } from "@/lib/agents/orquestador";
 import type { FuenteMercado } from "@/lib/mercado.server";
 
-const MAX_RONDAS_TOOLS = 5;
+const MAX_RONDAS_TOOLS = 6;
+
+function esResultadoVacio(texto: string): boolean {
+  const t = (texto ?? "").trim();
+  if (t.length < 60) return true;
+  if (/^(ERROR|error)/.test(t)) return true;
+  return /SIN RESULTADOS|sin datos|no se encontr[oó]|not found/i.test(t.slice(0, 500));
+}
 
 export async function respuestaDirecta(
   opts: OpcionesOrquestador,
@@ -88,6 +95,7 @@ export async function respuestaDirecta(
         "Ya ejecutaste herramientas en este turno: cuando redactes la respuesta final, basate ÚNICAMENTE en esos resultados citando la fuente. PROHIBIDO sugerirle al usuario que revise noticias/análisis por su cuenta o derivarlo a otros servicios para un dato que ya podés dar vos. Si falta un dato, invocá otra herramienta ahora.",
     });
 
+    let todaVacia = true;
     for (const tc of toolCalls) {
       const name = String(tc?.function?.name ?? "");
       const argsRaw =
@@ -101,6 +109,7 @@ export async function respuestaDirecta(
         const out = await ejecutarTool(name, argsRaw, baseUrl, sessionId);
         for (const ev of out.eventos ?? []) enviar(ev);
         fuentes.push(...(out.fuentes ?? []));
+        if (!esResultadoVacio(out.texto)) todaVacia = false;
         mensajes.push({
           role: "tool",
           tool_call_id: idTool,
@@ -115,6 +124,14 @@ export async function respuestaDirecta(
           content: `ERROR ejecutando ${name}: ${err instanceof Error ? err.message : String(err)}`,
         });
       }
+    }
+
+    if (todaVacia && ronda < MAX_RONDAS_TOOLS - 1) {
+      mensajes.push({
+        role: "system",
+        content:
+          "Los últimos intentos devolvieron vacío o SIN RESULTADOS. Antes de rendirte ESCALÁ: (1) probá variantes del símbolo ('<SYM>.BA' BCBA, '<SYM>-USD'/'<SYM>USDT' cripto, nombre completo de la empresa); (2) usá buscar_web('<sym> ticker cotización empresa') para identificar qué es ese símbolo y reintentá con el correcto; (3) solo si TODO falla, respondé al usuario con UNA pregunta breve de aclaración (¿cripto?, ¿empresa?, ¿qué mercado?). PROHIBIDO entregar un 'no encontré' con la lista de búsquedas fallidas como cuerpo de la respuesta.",
+      });
     }
   }
 

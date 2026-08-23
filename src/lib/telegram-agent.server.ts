@@ -46,6 +46,7 @@ export type TgUpdate = {
 
 // Estado en memoria del módulo (best-effort en serverless: se resetea con cold start).
 const historias = new Map<string, Msg[]>();
+const chatsAuto = new Set<string>();
 const procesados = new Map<number, number>();
 
 const HISTORIA_MAX = 16;
@@ -129,19 +130,18 @@ async function consultarAgente(
   const historia = (historias.get(sessionId) ?? []).slice(-HISTORIA_MAX);
   const mensajes = [...historia, { role: "user" as const, content: pregunta }];
 
-  // MODO AUTOMÁTICO por Telegram: mismo pipeline que la UI. El toggle de la UI
-  // no existe acá, así que se activa cuando el mensaje pide una tarea completa
-  // (misma detección esTareaAutonoma que usa /api/chat como fallback) o con
-  // los comandos /auto y /modo automatico.
+  // VÍA DIRECTA RÁPIDA por defecto (~10-20s): el modelo elegido responde directo
+  // con TODAS las herramientas. El flujo autónomo pesado solo se activa con el
+  // comando explícito del usuario (/auto, /modo, "modo automático"). El análisis
+  // completo F0→F10 sigue disponible: el modelo invoca analisis_completo().
   let modoAutomaticoTg = false;
   try {
-    const { esTareaAutonoma } = await import("@/lib/agents/autonomo");
     modoAutomaticoTg =
-      esTareaAutonoma(pregunta) ||
+      chatsAuto.has(sessionId) ||
       /^\/(auto|modo)\b/i.test(pregunta) ||
-      /modo\s+(autom[aá]tico|autonomo)/i.test(pregunta);
+      /modo\s+(autom[aá]tico|auton[oó]mo)/i.test(pregunta);
   } catch {
-    /* fallback: sin flag, /api/chat aplica su propia detección */
+    /* fallback: sin flag, /api/chat aplica vía directa */
   }
 
   // Vercel (Fluid) y local: 300s cubre el modo autónomo completo.
@@ -339,7 +339,7 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
         "",
         "Soy la misma IA que el chat lateral de la web. Escribime en lenguaje natural:",
         '- "como esta el dolar blue"',
-        '- "analisis completo de GGAL" (flujo autónomo: macro, fundamental, valuación, riesgo y validación)',
+        '- "analisis completo de GGAL" (pipeline F0→F10: macro, fundamental, valuación, riesgo y validación)',
         '- "por que subio GGAL hoy?"',
         '- "pairs trading entre YPF y PAM"',
         '- "enviá la señal de AAPL al canal de inversores"',
@@ -348,6 +348,7 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
         "Comandos:",
         "/help - ayuda",
         "/reset - empieza conversacion nueva",
+        "/auto - activa el modo autónomo pesado (1-3 min) solo para el próximo análisis",
       ].join("\n"),
     );
     return;
@@ -385,6 +386,7 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
 
   if (low.startsWith("/reset") || low.startsWith("/nuevo")) {
     historias.delete(sessionId);
+    chatsAuto.delete(sessionId);
     try {
       await fetch(`${base}/api/chat?sessionId=${encodeURIComponent(sessionId)}`, {
         method: "DELETE",
@@ -394,6 +396,23 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
       /* sin memoria del lado servidor que limpiar */
     }
     await sendAgentMessage(chatId, "Memoria borrada. Conversacion nueva lista.");
+    return;
+  }
+
+  if (low.startsWith("/auto")) {
+    if (/\boff\b/i.test(low)) {
+      chatsAuto.delete(sessionId);
+      await sendAgentMessage(
+        chatId,
+        "Modo autónomo desactivado. Volvimos a la vía rápida (~10-20s por consulta).",
+      );
+    } else {
+      chatsAuto.add(sessionId);
+      await sendAgentMessage(
+        chatId,
+        "Modo autónomo pesado ACTIVADO para este chat (1-3 min por análisis, validación multi-agente).\nMandá tu pedido de análisis completo.\n/auto off para volver a la vía rápida.",
+      );
+    }
     return;
   }
 
