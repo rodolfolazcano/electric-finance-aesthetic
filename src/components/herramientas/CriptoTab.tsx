@@ -5,6 +5,8 @@ import { BinancePairsPanel } from "./BinancePairsPanel";
 import { ArbitrajeP2PPanel } from "./ArbitrajeP2PPanel";
 import { BinanceAccountPanel } from "./BinanceAccountPanel";
 import { EstrategiasPanel } from "./cripto/EstrategiasPanel";
+import { QuantLabPanel } from "./cripto/QuantLabPanel";
+import { PairsCryptoPanel } from "./cripto/PairsCryptoPanel";
 
 export function CriptoTab() {
   const [subTab, setSubTab] = useState("pares");
@@ -36,6 +38,18 @@ export function CriptoTab() {
         >
           Estrategias
         </TabsTrigger>
+        <TabsTrigger
+          value="quantlab"
+          className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+        >
+          Quant Lab
+        </TabsTrigger>
+        <TabsTrigger
+          value="pairs"
+          className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+        >
+          Pairs Crypto
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="pares" className="mt-4">
         <BinancePairsPanel />
@@ -48,6 +62,12 @@ export function CriptoTab() {
       </TabsContent>
       <TabsContent value="estrategias" className="mt-4">
         <EstrategiasPanel />
+      </TabsContent>
+      <TabsContent value="quantlab" className="mt-4">
+        <QuantLabPanel />
+      </TabsContent>
+      <TabsContent value="pairs" className="mt-4">
+        <PairsCryptoPanel />
       </TabsContent>
     </Tabs>
   );

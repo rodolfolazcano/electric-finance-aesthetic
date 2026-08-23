@@ -1316,10 +1316,11 @@ export async function ejecutarAnalisisCompleto(
       const sema = await analizarSemaforo(simbolo);
       if (!sema.error) {
         // textoSemaforo no exportado aquí, se sintetiza
-        if (sema.clasificacion && ficha) {
-          const esCompra = /COMPRA/i.test(sema.clasificacion);
+        const clasif = sema.clasificacionJerarquica;
+        if (clasif && clasif !== "SIN DATOS" && ficha) {
+          const esCompra = /COMPRA/i.test(clasif);
           const esVenta = /VENTA/i.test(ficha.decision_final) || /VENDER/i.test(tri?.decision_final ?? "");
-          if (esCompra && esVenta) amarillo.push(`Incoherencia semáforo (${sema.clasificacion}) vs valuación (${ficha.decision_final}) — señalar al cliente`);
+          if (esCompra && esVenta) amarillo.push(`Incoherencia semáforo (${clasif}) vs valuación (${ficha.decision_final}) — señalar al cliente`);
         }
       }
     } catch {}
@@ -2550,11 +2551,11 @@ export async function ejecutarGraficoChat(argsRaw: string): Promise<ResultadoToo
     const closes = res?.indicators?.quote?.[0]?.close ?? [];
     const ts = res?.timestamp ?? [];
     puntos = ts
-      .map((t, i) => ({
+      .map((t: number, i: number) => ({
         f: new Date(t * 1000).toISOString().slice(0, 10),
         v: closes[i] as number,
       }))
-      .filter((p) => isFinite(p.v));
+      .filter((p: { v: number }) => isFinite(p.v));
     unidad = unidad || res?.meta?.currency || "";
     tituloFinal = tituloFinal || res?.meta?.longName || res?.meta?.shortName || simbolo;
     if (!puntos.length)
@@ -3991,7 +3992,7 @@ export async function ejecutarCadenaOpciones(argsRaw: string): Promise<Resultado
     L.push(`Cadena de opciones BCBA — ${simbolo} — ${cadena.length} strikes`);
     L.push(`Skew puts>calls: ${j.sesgo ?? j.skew ?? "s/d"} (sesgo bajista si puts IV > calls IV)`);
     // Tabla strikes
-    const rows = cadena.slice(0, 12).map((r: any) => `| ${r.strike} | ${r.tipo ?? r.type ?? ""} | ${r.prima ?? r.premium ?? ""} | ${(r.iv*100 ?? 0).toFixed(1)}% | Δ${(r.delta ?? 0).toFixed(2)} | Γ${(r.gamma ?? 0).toFixed(3)} | VaR${r.var ?? ""} |`);
+    const rows = cadena.slice(0, 12).map((r: any) => `| ${r.strike} | ${r.tipo ?? r.type ?? ""} | ${r.prima ?? r.premium ?? ""} | ${(r.iv != null ? (r.iv * 100).toFixed(1) : "s/d")}% | Δ${(r.delta ?? 0).toFixed(2)} | Γ${(r.gamma ?? 0).toFixed(3)} | VaR${r.var ?? ""} |`);
     L.push(`| Strike | Tipo | Prima | IV | Delta | Gamma | VaR |\n|---|---|---|---|---|---|---|\n` + rows.join("\n"));
     const interp = j.interpretacion ?? (j.sesgo && j.sesgo > 0 ? "skew puts>calls = sesgo bajista" : "skew neutro");
     L.push(`Interpretación: ${interp}`);
@@ -4164,4 +4165,165 @@ Interpretación metodológica (Elbaum Cap 10 + prototipo Labadie): la T de cada 
     ],
     ok: true,
   };
+}
+
+
+// ---------------------------------------------------------------------------
+// CRYPTO QUANT — port de trading_bots_unificado (Labadie sobre Binance futures)
+// ---------------------------------------------------------------------------
+
+function nfCrypto(n: number | null | undefined, dec = 2): string {
+  return typeof n === "number" && isFinite(n) ? n.toFixed(dec) : "s/d";
+}
+
+/** Walk-Forward BB+RSI 5m (anti-overfitting, métrica OOS). */
+export async function ejecutarWalkForwardBbRsi(argsRaw: string): Promise<{ texto: string; fuentes: import("@/lib/mercado.server").FuenteMercado[]; ok: boolean }> {
+  let symbol = "BTCUSDT", dias = 135, trainDias = 30, testDias = 15;
+  try {
+    const a = JSON.parse(argsRaw) as { simbolo?: string; dias?: number; trainDias?: number; testDias?: number };
+    if (a.simbolo) symbol = String(a.simbolo).toUpperCase();
+    if (typeof a.dias === "number") dias = a.dias;
+    if (typeof a.trainDias === "number") trainDias = a.trainDias;
+    if (typeof a.testDias === "number") testDias = a.testDias;
+  } catch {}
+  try {
+    const { runWalkForward } = await import("@/lib/cripto/backtest.functions");
+    const r: any = await runWalkForward({ data: { symbol, interval: "5m", days: dias, trainDays: trainDias, testDays: testDias } });
+    const L: string[] = [`WALK-FORWARD BB+RSI 5m — ${symbol} · ${r.klinesCount} velas · ${dias}d · train ${trainDias}d → test ${testDias}d rodante · grid ${r.gridCombos} combos`];
+    for (const f of r.folds) {
+      if (f.skip) { L.push(`- Fold ${f.fold}: ${f.skip}`); continue; }
+      L.push(`- Fold ${f.fold}: ${f.params} | IS WR ${nfCrypto(f.isWr,1)}% exp ${nfCrypto(f.isExp,3)}% (${f.isTrades}) → OOS WR ${nfCrypto(f.oosWr,1)}% PF ${nfCrypto(f.oosPf)} ret ${nfCrypto(f.oosRet,2)}% (${f.oosTrades})`);
+    }
+    if (r.oos) {
+      L.push(`\nRESULTADO OUT-OF-SAMPLE AGREGADO (lo único que cuenta):`);
+      L.push(`- Trades ${r.oos.notional.trades} · WR ${nfCrypto(r.oos.notional.winRate,1)}% · PF ${nfCrypto(r.oos.notional.profitFactor)} · expectancia ${nfCrypto(r.oos.notional.expectancyPct,4)}% · retorno ${nfCrypto(r.oos.notional.returnPct,2)}% · MaxDD ${nfCrypto(r.oos.notional.maxDrawdownPct,2)}%`);
+      L.push(`- Cuenta (lev x10): ret ${nfCrypto(r.oos.cuenta?.returnPct ?? 0,2)}% · PF ${nfCrypto(r.oos.cuenta?.profitFactor ?? 0)}`);
+      L.push(`- Salidas: ${Object.entries(r.oos.reasons || {}).map(([k,v]) => `${k}: ${v}`).join(" · ")}`);
+      if (r.veredicto) {
+        L.push(`\nVEREDICTO SOBREAJUSTE: ${r.veredicto} (decaimiento IS→OOS expectancia ${nfCrypto(r.decaimiento,4)}%)`);
+        if (r.veredicto !== "ACEPTABLE") L.push("Los params optimizados NO se sostienen fuera de muestra. Acciones: reducir grid, más datos, menos reglas.");
+      }
+    } else {
+      L.push("\nSin trades OOS: más días o grid menos estricto.");
+    }
+    return { texto: L.join("\n"), fuentes: [{ dominio: "binance.com", url: "https://fapi.binance.com", title: "Binance Futures API" }], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS walkforward_bb_rsi: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
+  }
+}
+
+/** Market-Making Avellaneda-Stoikov simplificado sobre klines 1m. */
+export async function ejecutarMMInventario(argsRaw: string): Promise<{ texto: string; fuentes: import("@/lib/mercado.server").FuenteMercado[]; ok: boolean }> {
+  let symbol = "BTCUSDT", dias = 10, grid = false;
+  try {
+    const a = JSON.parse(argsRaw) as { simbolo?: string; dias?: number; grid?: boolean };
+    if (a.simbolo) symbol = String(a.simbolo).toUpperCase();
+    if (typeof a.dias === "number") dias = a.dias;
+    if (typeof a.grid === "boolean") grid = a.grid;
+  } catch {}
+  try {
+    const { runMMInventory } = await import("@/lib/cripto/quant-lab.functions");
+    const r: any = await runMMInventory({ data: { symbol, days: dias, grid } });
+    const m = r.modo === "grid" ? r.oos : r.base;
+    const qty = r.bestParams?.qtyUsdt ?? 500;
+    const L: string[] = [`MARKET-MAKING con control de inventario (Avellaneda-Stoikov/Fodra-Labadie) — ${symbol} klines 1m · ${r.velas} velas · ${dias}d${r.modo === "grid" ? " · GRID 64 combos train 60%→OOS 40%" : ""}`];
+    if (r.modo === "grid") {
+      L.push(`Params óptimos TRAIN por PnL: ψ_min ${r.bestParams.psiMinBps}bps · skew ${r.bestParams.invSkew} · Δ ${r.bestParams.deltaCoef} · maxQ ${r.bestParams.maxInventory}`);
+      for (const t of r.top5) L.push(`  · ψ=${t.psi} skew=${t.skew} maxQ=${t.maxQ} → PnL ${nfCrypto(t.pnl)} USDT · fills ${t.fills} · Sharpe ${nfCrypto(t.sharpe)}`);
+      L.push(`\nOUT-OF-SAMPLE (40% final):`);
+    }
+    L.push(`- PnL total ${nfCrypto(m.pnlUsdt)} USDT · fills ${m.fills} (buy ${m.nBuy}/sell ${m.nSell})`);
+    L.push(`- PnL/fill ${nfCrypto(m.pnlPerFillUsdt,4)} USDT (${nfCrypto((m.pnlPerFillUsdt / qty) * 1e4,3)} bps)`);
+    L.push(`- Sharpe(1m anualizado) ${nfCrypto(m.sharpeMin)} · MaxDD ${nfCrypto(m.maxDdUsdt)} USDT · inv final ${m.finalQ} lotes · bloqueos ${m.blocked}`);
+    L.push(`- VEREDICTO: ${m.pnlUsdt > 0 ? "RENTABLE" : "NO RENTABLE"}`);
+    L.push(`Modelo: bid=r−ψ/2 ask=r+ψ/2, r=S(1+Δ)(1−skew·q·σ²), fills si low≤bid/high≥ask, fee maker 2bps.`);
+    return { texto: L.join("\n"), fuentes: [{ dominio: "binance.com", url: "https://fapi.binance.com", title: "Binance Futures API" }], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS mm_inventario_sim: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
+  }
+}
+
+/** Ejecución óptima AC vs TWAP vs naive (IS en bps). */
+export async function ejecutarEjecucionOptimaCrypto(argsRaw: string): Promise<{ texto: string; fuentes: import("@/lib/mercado.server").FuenteMercado[]; ok: boolean }> {
+  let symbol = "BTCUSDT", horizonMin = 60, notionalUsdt = 100000, dias = 20;
+  try {
+    const a = JSON.parse(argsRaw) as { simbolo?: string; horizonteMin?: number; notionalUsdt?: number; dias?: number };
+    if (a.simbolo) symbol = String(a.simbolo).toUpperCase();
+    if (typeof a.horizonteMin === "number") horizonMin = a.horizonteMin;
+    if (typeof a.notionalUsdt === "number") notionalUsdt = a.notionalUsdt;
+    if (typeof a.dias === "number") dias = a.dias;
+  } catch {}
+  try {
+    const { runOptimalExecution } = await import("@/lib/cripto/quant-lab.functions");
+    const r: any = await runOptimalExecution({ data: { symbol, days: dias, horizonMin, notionalUsdt } });
+    const s = r.resumen;
+    const L: string[] = [
+      `EJECUCIÓN ÓPTIMA (COMPRA ${nfCrypto(notionalUsdt,0)} USDT en ${r.horizonMin}min) — ${symbol} · ${r.ventanas} ventanas`,
+      `Impacto h(v)=σ√steps(v/V)^${r.gamma} · spread ${r.halfSpreadBps}bps · IS en bps (menor=mejor):`,
+      `- NAIVE (1 market order): IS medio ${nfCrypto(s.naive.mean,3)} · std ${nfCrypto(s.naive.std,3)} · J(λ=0.5) ${nfCrypto(s.naive.j,3)}`,
+      `- TWAP: IS medio ${nfCrypto(s.twap.mean,3)} · std ${nfCrypto(s.twap.std,3)} · J ${nfCrypto(s.twap.j,3)} · ahorra ${nfCrypto(s.ahorroTwapBps,3)} bps vs naive en ${nfCrypto(s.beatTwapPct,0)}% de ventanas`,
+      `- ALMGREN-CHRISS: IS medio ${nfCrypto(s.ac.mean,3)} · std ${nfCrypto(s.ac.std,3)} · J ${nfCrypto(s.ac.j,3)} · ahorra ${nfCrypto(s.ahorroAcBps,3)} bps vs naive en ${nfCrypto(s.beatAcPct,0)}% de ventanas`,
+      `VEREDICTO: ${s.veredicto}`,
+      `(Paper: la ejecución renta minimizando impacto+riesgo; no genera alpha direccional.)`,
+    ];
+    return { texto: L.join("\n"), fuentes: [{ dominio: "binance.com", url: "https://fapi.binance.com", title: "Binance Futures API" }], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS ejecucion_optima_crypto: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
+  }
+}
+
+/** Escáner de cointegración entre perps Binance. */
+export async function ejecutarPairsCryptoScan(argsRaw: string): Promise<{ texto: string; fuentes: import("@/lib/mercado.server").FuenteMercado[]; ok: boolean }> {
+  let topN = 15, intervalo = "1h", dias = 30;
+  try {
+    const a = JSON.parse(argsRaw) as { topN?: number; intervalo?: string; dias?: number };
+    if (typeof a.topN === "number") topN = a.topN;
+    if (a.intervalo) intervalo = String(a.intervalo);
+    if (typeof a.dias === "number") dias = a.dias;
+  } catch {}
+  try {
+    const { scanPairsCrypto } = await import("@/lib/cripto/pairs-crypto.functions");
+    const r: any = await scanPairsCrypto({ data: { topN, interval: intervalo, days: dias } });
+    const L: string[] = [
+      `ESCÁNER COINTEGRACIÓN CRYPTO — top ${r.scanned} perps USDT por volumen · ${r.pairs} pares testeados (${intervalo}, ${dias}d) · Engle-Granger proxy (OLS + ADF residuos):`,
+    ];
+    for (const p of r.top.slice(0, 10)) {
+      L.push(`- ${p.a}/${p.b}: p-value ${nfCrypto(p.pValue,4)} ${p.pValue < 0.05 ? "✅ cointegrado" : ""} · corr retornos ${nfCrypto(p.corr,3)} · β hedge ${nfCrypto(p.beta,4)}`);
+    }
+    L.push(`\nUsar pairs_crypto_analizar(simboloA, simboloB) para backtest + validación IS/OOS del par elegido.`);
+    return { texto: L.join("\n"), fuentes: [{ dominio: "binance.com", url: "https://fapi.binance.com", title: "Binance Futures API" }], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS pairs_crypto_scan: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
+  }
+}
+
+/** Análisis stat-arb de un par crypto con validación IS/OOS. */
+export async function ejecutarPairsCryptoAnalizar(argsRaw: string): Promise<{ texto: string; fuentes: import("@/lib/mercado.server").FuenteMercado[]; ok: boolean }> {
+  let a_ = "", b_ = "", method = "rolling_ratio_mean", exitM = "zscore_band", intervalo = "1h", dias = 60;
+  try {
+    const a = JSON.parse(argsRaw) as { simboloA?: string; simboloB?: string; hedgeRatioMethod?: string; exitMethod?: string; intervalo?: string; dias?: number };
+    a_ = String(a.simboloA ?? "").toUpperCase();
+    b_ = String(a.simboloB ?? "").toUpperCase();
+    if (a.hedgeRatioMethod) method = String(a.hedgeRatioMethod);
+    if (a.exitMethod) exitM = String(a.exitMethod);
+    if (a.intervalo) intervalo = String(a.intervalo);
+    if (typeof a.dias === "number") dias = a.dias;
+  } catch {}
+  if (!a_ || !b_) {
+    return { texto: "SIN RESULTADOS: pairs_crypto_analizar requiere simboloA y simboloB (ej. BTCUSDT y ETHUSDT).", fuentes: [], ok: false };
+  }
+  try {
+    const { analyzePairCrypto } = await import("@/lib/cripto/pairs-crypto.functions");
+    const r: any = await analyzePairCrypto({ data: { simboloA: a_, simboloB: b_, interval: intervalo, days: dias, hedgeRatioMethod: method, exitMethod: exitM } });
+    const L: string[] = [
+      `STAT-ARB CRYPTO ${r.par} — ${intervalo} ${dias}d · método ${r.metodo} · salida ${r.salida} · ${r.velas} velas alineadas`,
+      `Cointegración: ADF ${nfCrypto(r.adfStat,2)} · p-value ${nfCrypto(r.pValue,4)} → ${r.cointegrado ? "COINTEGRADO al 5%" : "NO cointegrado"} · β hedge ${nfCrypto(r.beta,4)}`,
+      `Backtest completo ($1000): trades ${r.metricas.trades} · WR ${nfCrypto(r.metricas.winRate,1)}% · PF ${nfCrypto(r.metricas.profitFactor)} · expectancy ${nfCrypto(r.metricas.expectancyPct,4)}% · PnL ${nfCrypto(r.metricas.totalPnlUsd)} USD · MaxDD ${nfCrypto(r.metricas.maxDrawdownUsd)} USD`,
+      `In-Sample 70%: trades ${r.is.trades} · WR ${nfCrypto(r.is.winRate,1)}% · exp ${nfCrypto(r.is.expectancyPct,4)}%`,
+      `Out-of-Sample 30%: trades ${r.oos.trades} · WR ${nfCrypto(r.oos.winRate,1)}% · exp ${nfCrypto(r.oos.expectancyPct,4)}% ${r.robusto ? "✅ ROBUSTO" : "⚠️ la expectancia NO se sostiene fuera de muestra"}`,
+    ];
+    return { texto: L.join("\n"), fuentes: [{ dominio: "binance.com", url: "https://fapi.binance.com", title: "Binance Futures API" }], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS pairs_crypto_analizar: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
+  }
 }

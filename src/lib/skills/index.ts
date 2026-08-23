@@ -597,6 +597,22 @@ const SKILLS: Skill[] = [
 - REGLA DE EJECUCIÓN: tool analisis_completo(simbolo) ejecuta F0→F10 en orden y validar_analisis como gate final. Usar validar.py checks determinísticos; si hay 🔴 bloquear publicación. Citar fuente por número.
 - REUTILIZACIÓN: no crear archivos nuevos; extender funciones existentes (clarity-analysis, ejecutores, mercado.server).`,
   },
+  {
+    id: "crypto-statarb-labadie",
+    nombre: "Crypto Quant — Labadie sobre Binance Futures (trading_bots_unificado)",
+    descripcion:
+      "Metodologías del repo trading_bots_unificado portadas a la app: walk-forward BB+RSI 5m anti-overfitting, market-making Avellaneda-Stoikov con control de inventario, ejecución óptima Almgren-Chriss vs TWAP vs naive, y stat-arb/pairs crypto con Engle-Granger + validación OOS.",
+    instrucciones: `[SKILL · Crypto Quant Labadie — port de trading_bots_unificado]
+- TRIGGER: crypto, binance, perps USDT, BTCUSDT/ETHUSDT, walk-forward, sobreajuste WR, market-making/Avellaneda-Stoikov, "spread óptimo MM", ejecución de orden grande crypto, pares cointegrados crypto, stat-arb Binance.
+- HERRAMIENTAS (ejecutar SIEMPRE antes de responder, datos reales fapi.binance.com):
+  · walkforward_bb_rsi(simbolo, dias?, trainDias?, testDias?) → valida si el WR>80% de BB+RSI 5m sobrevive OUT-OF-SAMPLE. La única métrica válida es el agregado OOS; si el veredicto es SOBREAJUSTADO (decaimiento IS→OOS de expectancia alto), decilo sin rodeos.
+  · mm_inventario_sim(simbolo, dias?, grid?) → Avellaneda-Stoikov simplificado a klines 1m: r = S(1+Δ)(1−skew·q·σ²), ψ = ψ_min + 2α + vol·|q|·σ, fills si vela toca bid/ask. Con grid=true optimiza 64 combos train→OOS. Reportar PnL/fill en bps y Sharpe anualizado por minuto.
+  · ejecucion_optima_crypto(simbolo, horizonteMin?, notionalUsdt?) → AC vs TWAP vs naive, Implementation Shortfall en bps, J(λ=0.5). El paper: la ejecución renta minimizando impacto+riesgo, NO genera alpha direccional — nunca lo presentes como señal de compra/venta.
+  · pairs_crypto_scan(topN?) → top pares cointegrados entre perps líquidos (Engle-Granger proxy: β OLS + ADF residuos).
+  · pairs_crypto_analizar(simboloA, simboloB) → motor unificado: hedge ratio rolling_ratio_mean | cointegration_static × salida zscore_band | mean_cross_with_stop, backtest neto de comisiones + IS/OOS 70/30. Si la expectancia OOS se derrumba vs IS: par NO robusto, decilo.
+- METODOLOGÍA (corpus): stat-arb Labadie 5 principios + backtesting 5 etapas (prototipo MC → espacio params → IS/OOS split → optimización → validación OOS); HFT market-making con inventario (martingala = peor escenario; fee se traslada 1:1 al spread); Almgren-Chriss impacto cóncavo γ≈0.5.
+- GUARDRAILS: demo futures (demo-fapi.binance.com), no recomendación de inversión; el WR in-sample miente — citá siempre el número OOS; correlación ≠ cointegración (reportar ambas).`,
+  },
 ];
 
 const POR_ID = new Map(SKILLS.map((s) => [s.id, s]));

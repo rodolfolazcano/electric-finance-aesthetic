@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
-import { runBacktest, runAnalyzer, checkLiveSignal } from "@/lib/cripto/backtest.functions"
+import { runBacktest, runAnalyzer, checkLiveSignal, runWalkForward } from "@/lib/cripto/backtest.functions"
 import { notifySignal, sendTelegram } from "@/lib/notify.functions"
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter } from "recharts"
 
@@ -24,13 +24,82 @@ export function EstrategiasPanel() {
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="backtest" className="text-[11px]">Backtest</TabsTrigger>
+          <TabsTrigger value="walkforward" className="text-[11px]">Walk-Forward</TabsTrigger>
           <TabsTrigger value="analisis" className="text-[11px]">Análisis</TabsTrigger>
           <TabsTrigger value="bot" className="text-[11px]">Bot Vivo + Señales</TabsTrigger>
         </TabsList>
         <TabsContent value="backtest" className="mt-3"><BacktestTab /></TabsContent>
+        <TabsContent value="walkforward" className="mt-3"><WalkForwardTab /></TabsContent>
         <TabsContent value="analisis" className="mt-3"><AnalisisTab /></TabsContent>
         <TabsContent value="bot" className="mt-3"><BotTab /></TabsContent>
       </Tabs>
+    </div>
+  )
+}
+
+function WalkForwardTab(){
+  const [symbol,setSymbol]=useState("BTCUSDT")
+  const [days,setDays]=useState(135)
+  const [trainDays,setTrainDays]=useState(30)
+  const [testDays,setTestDays]=useState(15)
+  const [minTrades,setMinTrades]=useState(6)
+  const [data,setData]=useState<any>(null)
+  const [loading,setLoading]=useState(false)
+  const [err,setErr]=useState<string|null>(null)
+  const fn=useServerFn(runWalkForward)
+  const run=async()=>{
+    setLoading(true); setErr(null)
+    try{ const r=await fn({ data:{ symbol, days, trainDays, testDays, minTrades } as any }); setData(r) } catch(e:any){ setErr(e.message) } finally{ setLoading(false) }
+  }
+  useEffect(()=>{ run() },[])
+  const oos=data?.oos
+  return (
+    <div className="space-y-3">
+      <div>
+        <p className="text-[11px] text-muted-foreground">Port de <code>walkforward.py</code>: ventanas rodantes TRAIN (optimiza grid de 12 combos por expectancia, mín {minTrades} trades) → TEST fuera de muestra. <b>La única métrica que cuenta es el agregado OOS</b>. Decaimiento IS→OOS alto = sobreajuste.</p>
+      </div>
+      <Card className="border-border/40 bg-background/30"><CardContent className="p-3 flex flex-wrap gap-3 items-end">
+        <div className="flex flex-col gap-1"><Label className="text-[10px]">Símbolo</Label><Input value={symbol} onChange={e=>setSymbol(e.target.value.toUpperCase())} className="h-7 text-xs w-28" /></div>
+        <div className="flex flex-col gap-1"><Label className="text-[10px]">Histórico</Label><select value={days} onChange={e=>setDays(parseInt(e.target.value))} className="h-7 rounded border bg-background px-2 text-xs"><option value={90}>90d</option><option value={135}>135d</option><option value={180}>180d</option></select></div>
+        <div className="flex flex-col gap-1"><Label className="text-[10px]">Train días</Label><Input type="number" value={trainDays} onChange={e=>setTrainDays(parseInt(e.target.value)||30)} className="h-7 text-xs w-20" /></div>
+        <div className="flex flex-col gap-1"><Label className="text-[10px]">Test días</Label><Input type="number" value={testDays} onChange={e=>setTestDays(parseInt(e.target.value)||15)} className="h-7 text-xs w-20" /></div>
+        <div className="flex flex-col gap-1"><Label className="text-[10px]">Mín trades train</Label><Input type="number" value={minTrades} onChange={e=>setMinTrades(parseInt(e.target.value)||6)} className="h-7 text-xs w-20" /></div>
+        <Button onClick={run} disabled={loading} className="h-7 text-xs">{loading?"Walk-forward en curso (puede tardar ~1 min)…":"Ejecutar Walk-Forward"}</Button>
+      </CardContent></Card>
+      {err && <div className="rounded border border-red-500/30 bg-red-500/10 p-2 text-xs text-red-400">{err}</div>}
+      {loading && <Skeleton className="h-64 w-full" />}
+      {data && (
+        <>
+          {data.veredicto && (
+            <div className={`rounded border p-3 text-xs ${data.veredicto==="ACEPTABLE"?"bg-emerald-500/10 border-emerald-500/20 text-emerald-400":"bg-red-500/10 border-red-500/20 text-red-400"}`}>
+              VEREDICTO OOS: <b>{data.veredicto}</b> · Decaimiento IS→OOS expectancia: {fmt(data.decaimiento,4)}%
+              {data.veredicto!=="ACEPTABLE" && " — los params optimizados NO se sostienen fuera de muestra: reducir grid, más datos o menos reglas."}
+            </div>
+          )}
+          {oos && (
+            <div className="grid gap-3 md:grid-cols-3">
+              <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[12px]">OOS Notional (lo único que cuenta)</CardTitle></CardHeader><CardContent className="font-mono text-[11px] space-y-0.5">
+                <div>Trades: {oos.notional.trades}</div>
+                <div>WR: {fmt(oos.notional.winRate,1)}%</div>
+                <div>PF: {fmt(oos.notional.profitFactor,2)}</div>
+                <div>Expectancy: {fmt(oos.notional.expectancyPct,4)}%</div>
+                <div>Retorno: {fmt(oos.notional.returnPct,2)}%</div>
+                <div>MaxDD: {fmt(oos.notional.maxDrawdownPct,2)}%</div>
+              </CardContent></Card>
+              <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[12px]">OOS Cuenta (lev x10)</CardTitle></CardHeader><CardContent className="font-mono text-[11px] space-y-0.5">
+                <div>Retorno: {fmt(oos.cuenta?.returnPct ?? 0,2)}%</div>
+                <div>PF: {fmt(oos.cuenta?.profitFactor ?? 0,2)}</div>
+                <div>WR: {fmt(oos.cuenta?.winRate ?? 0,1)}%</div>
+              </CardContent></Card>
+              <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[12px]">Salidas OOS</CardTitle></CardHeader><CardContent className="font-mono text-[11px] space-y-0.5">
+                {Object.entries(oos.reasons||{}).map(([k,v])=>(<div key={k}>{k}: {v}</div>))}
+                <div className="text-muted-foreground pt-1">{data.klinesCount} velas · grid {data.gridCombos} combos · {data.folds.length} folds</div>
+              </CardContent></Card>
+            </div>
+          )}
+          <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[11px]">Folds (params elegidos in-sample vs resultado out-of-sample)</CardTitle></CardHeader><CardContent className="overflow-x-auto"><table className="w-full text-[10px] font-mono"><thead className="text-muted-foreground"><tr><th>Fold</th><th className="text-left">Params IS</th><th>IS WR%</th><th>IS Exp%</th><th>OOS WR%</th><th>OOS PF</th><th>OOS Ret%</th><th>OOS T</th></tr></thead><tbody>{data.folds.map((f:any,i:number)=>(<tr key={i} className="border-t border-border/10">{f.skip?<td colSpan={8} className="text-muted-foreground">{f.fold}: {f.skip}</td>:<><td>{f.fold}</td><td className="text-left">{f.params}</td><td>{fmt(f.isWr,1)}</td><td>{fmt(f.isExp,3)}</td><td className={f.oosWr>=50?"text-emerald-400":"text-red-400"}>{fmt(f.oosWr,1)}</td><td>{fmt(f.oosPf,2)}</td><td className={f.oosRet>=0?"text-emerald-400":"text-red-400"}>{fmt(f.oosRet,2)}</td><td>{f.oosTrades}</td></>}</tr>))}</tbody></table></CardContent></Card>
+        </>
+      )}
     </div>
   )
 }

@@ -39,7 +39,7 @@ export const TOOLS: ToolSpec[] = [
     function: {
       name: "consultar_mercado",
       description:
-        "Consulta cotizaciones y datos de mercado actuales del mercado argentino desde fuentes públicas y APIs oficiales: CriptoYa, ArgentinaDatos, BCRA (Estadísticas Cambiarias y Estadísticas v4 con token) y, como fallback para lo que no está en las APIs, la web (panel de cauciones de PPI/BYMA). Incluye: dólar (oficial, blue, MEP, CCL, mayorista, tarjeta, ahorro), riesgo país, UVA, inflación, letras del Tesoro (LECAP/BONCAP), tasas de plazo fijo, rendimiento de fondos comunes de inversión, cotización de otras monedas (euro, real, libra), tasas oficiales del BCRA (BADLAR, TM20, depósitos a 30 días, LELIQ, pases a 1 día) y la tasa de caución a 30 días. Usar siempre que se pidan cotizaciones, tasas o valores actuales. NO usar para acciones o bonos puntuales (ej. AL30).",
+        "Consulta cotizaciones y datos de mercado actuales del mercado argentino desde fuentes públicas y APIs oficiales: CriptoYa, ArgentinaDatos, BCRA (Estadísticas Cambiarias y Estadísticas v4 con token) y, como fallback para lo que no está en las APIs, la web (panel de cauciones de PPI/BYMA). Incluye: dólar (oficial, blue, MEP, CCL, mayorista, tarjeta, ahorro), riesgo país, UVA, inflación, letras del Tesoro (LECAP/BONCAP), tasas de plazo fijo, rendimiento de fondos comunes de inversión, cotización de otras monedas (euro, real, libra), tasas oficiales del BCRA (BADLAR, TM20, depósitos a 30 días, LELIQ, pases a 1 día) y la tasa de caución a 30 días. Usar siempre que se pidan cotizaciones, tasas o valores actuales. Para YTM/TIR/precio de un bono puntual (AL30, GD35...) usar calcular_ytm_bono; para acciones/CEDEARs usar datos_financieros(fuente=\"yfinance\").",
       parameters: {
         type: "object",
         properties: {
@@ -1832,6 +1832,104 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  // -------------------------------------------------------------------------
+  // CRYPTO QUANT (port de trading_bots_unificado — Labadie sobre Binance futures)
+  // -------------------------------------------------------------------------
+  {
+    type: "function",
+    function: {
+      name: "walkforward_bb_rsi",
+      description:
+        "WALK-FORWARD de la estrategia BB+RSI Scalping 5m sobre futuros Binance (port de bb_rsi_scalper/walkforward.py): ventanas rodantes TRAIN→TEST; en cada TRAIN optimiza un grid de 12 combos (RSI oversold/overbought × TP) por expectancia con mínimo de trades y aplica los params ganadores al TEST inmediato fuera de muestra. Devuelve folds IS vs OOS y el AGREGADO OUT-OF-SAMPLE (la única métrica válida) + veredicto de sobreajuste por decaimiento de expectancia. Para '¿el WR 80% de BTCUSDT es real o sobreajustado?', 'walk-forward de la BB+RSI', 'validá la estrategia scalping'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: { type: "string", description: "Par de futuros Binance (default BTCUSDT)." },
+          dias: { type: "number", description: "Histórico total 5m (90-180, default 135)." },
+          trainDias: { type: "number", description: "Ventana de entrenamiento (default 30)." },
+          testDias: { type: "number", description: "Ventana de test OOS rodante (default 15)." },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "mm_inventario_sim",
+      description:
+        "Simulación MARKET-MAKING con control de inventario sobre klines 1m de futuros Binance (Avellaneda-Stoikov / Fodra-Labadie, port de metodologias/mm_inventory.py): precio de reserva r = S(1+Δ)(1−skew·q·σ²), spread ψ_bps = ψ_min + 2α + vol·|q|·σ, fills cuando la vela toca bid/ask. Modo grid: 64 combos optimizados en TRAIN 60% y validados OOS 40%. Devuelve PnL USDT, fills, PnL/fill en bps, Sharpe anualizado por minuto, MaxDD e inventario final. Para '¿renta el market-making en BTC?', 'simulá Avellaneda-Stoikov', 'spread óptimo market maker'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: { type: "string", description: "Par de futuros (default BTCUSDT)." },
+          dias: { type: "number", description: "Días de velas 1m (5-30, default 10)." },
+          grid: { type: "boolean", description: "true = optimiza 64 combos train/OOS (default false = simulación base)." },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "ejecucion_optima_crypto",
+      description:
+        "EJECUCIÓN ÓPTIMA Almgren-Chriss vs TWAP vs naive sobre futuros Binance (port de metodologias/optimal_execution.py): impacto h(v)=σ√steps·(v/V)^γ con γ=0.5, métrica Implementation Shortfall en bps para una COMPRA de notional dado en un horizonte de minutos, κ elegido por ventana en grid (0.005-0.1). Devuelve IS medio/std/funcional J(λ=0.5) por ejecutor, % de ventanas donde cada uno gana al naive y veredicto. Para 'cómo ejecuto una orden grande de BTC', 'AC vs TWAP', 'impacto de mercado crypto'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: { type: "string", description: "Par de futuros (default BTCUSDT)." },
+          horizonteMin: { type: "number", description: "Horizonte de ejecución en minutos (default 60)." },
+          notionalUsdt: { type: "number", description: "Tamaño de la orden en USDT (default 100000)." },
+          dias: { type: "number", description: "Historia de velas 1m para las ventanas (default 20)." },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "pairs_crypto_scan",
+      description:
+        "ESCÁNER de cointegración entre los perps USDT más líquidos de Binance (port de scan_cointegration.py + pairs_trading/scanner.py): descarga klines alineadas por timestamp, calcula correlación de retornos log y Engle-Granger proxy (OLS beta + ADF de residuos) para todos los pares, devuelve los top ordenados por p-value ascendente. Para 'qué pares crypto están cointegrados', 'buscá pares stat-arb Binance'.",
+      parameters: {
+        type: "object",
+        properties: {
+          topN: { type: "number", description: "Cantidad de perps top por volumen a incluir (10-20, default 15)." },
+          intervalo: { type: "string", description: "'15m' o '1h' (default 1h)." },
+          dias: { type: "number", description: "Historia (14-30, default 30)." },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "pairs_crypto_analizar",
+      description:
+        "ANÁLISIS STAT-ARB de un PAR de cripto sobre futuros Binance (motor unificado port de pairs_trading/engine.py): hedge ratio rolling_ratio_mean | cointegration_static (β OLS + ADF residuos), z-score del spread con bandas de entrada/salida (zscore_band) o cruce de media con stop-loss y timeout (mean_cross_with_stop), backtest completo neto de comisiones + split In-Sample 70%/Out-of-Sample 30% con robustez. Para 'analizá el par BTC/ETH', 'está cointegrado SOL con BNB', 'stat-arb crypto'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simboloA: { type: "string", description: "Primer perp (ej. 'BTCUSDT')." },
+          simboloB: { type: "string", description: "Segundo perp (ej. 'ETHUSDT')." },
+          hedgeRatioMethod: { type: "string", description: "'rolling_ratio_mean' (default) o 'cointegration_static'." },
+          exitMethod: { type: "string", description: "'zscore_band' (default) o 'mean_cross_with_stop'." },
+          intervalo: { type: "string", description: "'15m' o '1h' (default 1h)." },
+          dias: { type: "number", description: "Historia (30-90, default 60)." },
+        },
+        required: ["simboloA", "simboloB"],
+        additionalProperties: false,
+      },
+    },
+  },
 ];
 
 export type EstadoHerramienta =
@@ -1953,6 +2051,12 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
       return "valoracion";
     case "validar_analisis":
       return "valoracion";
+    case "walkforward_bb_rsi":
+    case "mm_inventario_sim":
+    case "ejecucion_optima_crypto":
+    case "pairs_crypto_scan":
+    case "pairs_crypto_analizar":
+      return "portafolio";
     default:
       return "searching";
   }

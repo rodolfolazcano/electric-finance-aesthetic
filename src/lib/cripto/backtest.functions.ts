@@ -25,6 +25,118 @@ async function fetchKlinesRange(symbol: string, interval: string, days: number) 
   return all
 }
 
+export { fetchKlinesRange }
+
+const INTERVAL_MS: Record<string, number> = { "1m": 60000, "5m": 300000, "15m": 900000, "1h": 3600000 }
+
+// ---------------------------------------------------------------------------
+// WALK-FORWARD BB+RSI (port de bb_rsi_scalper/walkforward.py)
+// Ventanas rodantes TRAIN (optimiza grid chico por expectancia) -> TEST (OOS).
+// Métrica real = agregado SOLO de trades out-of-sample. Decaimiento IS->OOS
+// alto => estrategia sobreajustada.
+// ---------------------------------------------------------------------------
+
+const WF_GRID = [
+  { rsiOversold: 25, rsiOverbought: 70, tpPct: 0.8 }, { rsiOversold: 25, rsiOverbought: 70, tpPct: 1.0 }, { rsiOversold: 25, rsiOverbought: 70, tpPct: 1.2 },
+  { rsiOversold: 25, rsiOverbought: 75, tpPct: 0.8 }, { rsiOversold: 25, rsiOverbought: 75, tpPct: 1.0 }, { rsiOversold: 25, rsiOverbought: 75, tpPct: 1.2 },
+  { rsiOversold: 30, rsiOverbought: 70, tpPct: 0.8 }, { rsiOversold: 30, rsiOverbought: 70, tpPct: 1.0 }, { rsiOversold: 30, rsiOverbought: 70, tpPct: 1.2 },
+  { rsiOversold: 30, rsiOverbought: 75, tpPct: 0.8 }, { rsiOversold: 30, rsiOverbought: 75, tpPct: 1.0 }, { rsiOversold: 30, rsiOverbought: 75, tpPct: 1.2 },
+]
+const WF_WARMUP = 60
+
+export const runWalkForward = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({
+    symbol: z.string().default("BTCUSDT"),
+    interval: z.string().default("5m"),
+    days: z.number().default(135),
+    trainDays: z.number().default(30),
+    testDays: z.number().default(15),
+    minTrades: z.number().default(6),
+  }).parse(d))
+  .handler(async ({ data }) => {
+    const { symbol, interval, days, trainDays, testDays, minTrades } = data
+    const raw = await fetchKlinesRange(symbol, interval, days)
+    if (raw.length < 1000) throw new Error("Sin datos suficientes de Binance para walk-forward")
+    const klines = raw.map((k: any) => ({
+      datetime: k[0], open: parseFloat(k[1]), high: parseFloat(k[2]), low: parseFloat(k[3]), close: parseFloat(k[4]), volume: parseFloat(k[5]),
+    }))
+    const intervalMs = INTERVAL_MS[interval] ?? 300000
+    const candlesPerDay = Math.floor(86400000 / intervalMs)
+    const trainN = Math.max(candlesPerDay, Math.round(trainDays * candlesPerDay))
+    const testN = Math.max(candlesPerDay, Math.round(testDays * candlesPerDay))
+    const warm = WF_WARMUP
+
+    const folds: any[] = []
+    const oosTrades: any[] = []
+    let start = warm
+    let foldI = 0
+    while (start + trainN + testN <= klines.length) {
+      foldI++
+      const trLo = start - warm
+      const trHi = start + trainN
+      const teHi = Math.min(start + trainN + testN, klines.length)
+
+      const dfTrain = klines.slice(Math.max(trLo, 0), trHi)
+      const dfTest = klines.slice(Math.max(start + trainN - warm, 0), teHi)
+
+      // --- Optimización IN-SAMPLE ---
+      let best: { score: [number, number, number]; g: any; m: any } | null = null
+      for (const g of WF_GRID) {
+        const prm: ScalpParams = { ...defaultScalpParams, rsiOversold: g.rsiOversold, rsiOverbought: g.rsiOverbought, rsiOverboughtMax: g.rsiOverbought + 10, tpPct: g.tpPct }
+        const trs = backtestBBRSI(dfTrain as any, prm)
+        if (!trs.length) continue
+        const m = tradeMetrics(trs, "pnlPct")
+        if (m.trades < minTrades) continue
+        const score: [number, number, number] = [m.expectancyPct, m.profitFactor, m.winRate]
+        if (!best || score[0] > best.score[0]) best = { score, g, m }
+      }
+      if (!best) {
+        folds.push({ fold: foldI, skip: "sin params válidos en train" })
+        start += testN
+        continue
+      }
+      const { g } = best
+      const mIs = best.m
+
+      // --- Validación OUT-OF-SAMPLE ---
+      const prmOos: ScalpParams = { ...defaultScalpParams, rsiOversold: g.rsiOversold, rsiOverbought: g.rsiOverbought, rsiOverboughtMax: g.rsiOverbought + 10, tpPct: g.tpPct }
+      const trsOosAll = backtestBBRSI(dfTest as any, prmOos)
+      const trsOos = trsOosAll.filter((t: any) => t.entryIdx >= warm)
+      const mOos = trsOos.length ? tradeMetrics(trsOos, "pnlPct") : { trades: 0, winRate: 0, profitFactor: 0, returnPct: 0, expectancyPct: 0, maxDrawdownPct: 0 }
+      for (const t of trsOos) (t as any).fold = foldI
+      oosTrades.push(...trsOos)
+
+      folds.push({
+        fold: foldI,
+        params: `RSI ${g.rsiOversold}/${g.rsiOverbought}-${g.rsiOverbought + 10} TP ${g.tpPct}%`,
+        isWr: mIs.winRate, isExp: mIs.expectancyPct, isTrades: mIs.trades,
+        oosWr: mOos.winRate, oosExp: mOos.expectancyPct,
+        oosRet: mOos.returnPct ?? 0, oosPf: mOos.profitFactor, oosTrades: mOos.trades,
+      })
+      start += testN
+    }
+
+    const mOosAgg = oosTrades.length ? tradeMetrics(oosTrades, "pnlPct") : null
+    const mOosAcc = oosTrades.length ? tradeMetrics(oosTrades, "pnlAccountPct") : null
+    const isExps = folds.filter((f) => typeof f.isExp === "number").map((f) => f.isExp)
+    let decay: number | null = null
+    let veredicto: string | null = null
+    if (mOosAgg && isExps.length) {
+      const avgIs = isExps.reduce((a, b) => a + b, 0) / isExps.length
+      decay = avgIs - mOosAgg.expectancyPct
+      veredicto = decay < Math.max(0.05, Math.abs(avgIs) * 0.6) ? "ACEPTABLE" : "SOBREAJUSTADO"
+    }
+    const reasons: Record<string, number> = {}
+    for (const t of oosTrades) reasons[t.reason] = (reasons[t.reason] || 0) + 1
+
+    return {
+      symbol, interval, days, klinesCount: klines.length,
+      gridCombos: WF_GRID.length, folds,
+      oos: mOosAgg ? { notional: mOosAgg, cuenta: mOosAcc, reasons } : null,
+      decaimiento: decay, veredicto,
+    }
+  })
+
 export const runBacktest = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({
     symbol: z.string().default("BTCUSDT"),

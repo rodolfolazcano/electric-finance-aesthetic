@@ -230,6 +230,53 @@ function esPreguntaVerificacionCNV(pregunta: string): boolean {
   );
 }
 
+export type ConsultaDirecta = {
+  herramienta: string;
+  argumentos: Record<string, unknown>;
+};
+
+/**
+ * VÍA RÁPIDA: detecta consultas PUNTUALES que una única herramienta
+ * determinística resuelve completa (ej. "calcula la TIR del AL30", "dólar blue hoy").
+ * Esas consultas NO deben pasar por multi-agente + coordinador + redacción
+ * multi-ronda (1-3 minutos): se ejecuta la tool y se redacta una vez (~segundos).
+ * Devuelve null si la consulta es compuesta, analítica o conceptual.
+ */
+export function detectarViaRapida(pregunta: string): ConsultaDirecta | null {
+  const p = (pregunta ?? "").trim();
+  if (!p || p.length > 160) return null;
+  const lp = p.toLowerCase();
+  // Consultas compuestas o de análisis: requieren orquestación completa.
+  if (
+    /\b(y\s+tambi[eé]n|adem[aá]s|aparte|compara|compar[aá]|analiz[ií]|analiz[aá]|informe|informe\s+completo|gr[aá]fic|se[ñn]al|portafolio|cartera|pipeline|ficha)\b/.test(
+      lp,
+    )
+  ) {
+    return null;
+  }
+  // Conceptuales ("¿qué es un bono AL30?"): agente de conocimiento, no cálculo.
+  if (/qu[eé]\s+(es|son)\b|c[oó]mo\s+funciona|expl[ií]came|explicame\b/.test(lp)) return null;
+
+  // 1) Bono argentino puntual + TIR/YTM/rendimiento/precio → cálculo directo.
+  const mBono = lp.match(/\b(al|gd|ae|tx)\s?(\d{2})\b/);
+  if (mBono && /\b(tir|ytm|tasa\s+interna|rendimiento|rentabilidad|precio|cotiza|cu[aá]nto)/.test(lp)) {
+    const ticker = `${mBono[1]!.toUpperCase()}${mBono[2]}`;
+    return { herramienta: "calcular_ytm_bono", argumentos: { ticker } };
+  }
+
+  // 2) Dato de mercado puntual (dólar, riesgo país, UVA, tasas...) → consultar_mercado.
+  const temaMercado =
+    /\b(d[oó]lar|blue|mep|ccl|riesgo\s+pa[íi]s|uva|inflaci[oó]n|badlar|leliq|tm20|cauci[oó]n|plazo\s+fijo)\b/.test(
+      lp,
+    );
+  const accionConsulta =
+    /\b(cu[aá]nto|hoy|est[aá]|valor|cotiza|tasa|dame|decime|pasame|calcul|dec[íi])/i.test(p);
+  if (temaMercado && (accionConsulta || p.length <= 48)) {
+    return { herramienta: "consultar_mercado", argumentos: { query: p } };
+  }
+  return null;
+}
+
 /** Router: qué agentes especializados corresponden a la pregunta. */
 export function enrutar(pregunta: string): Set<RolAgente> {
   const p = pregunta.toLowerCase();
@@ -557,6 +604,7 @@ const GRUPOS_HERRAMIENTAS: Record<string, string[]> = {
   senalUnificada: ["generar_senal_unificada", "generar_senales_unificadas", "telegram_enviar_senal", "telegram_enviar_mensaje"],
   rentaFija: ["calcular_ytm_bono", "consultar_curva_etti", "calcular_yield_call", "calcular_total_return", "calcular_stripped_yield", "consultar_semaforo_riesgo_bono", "calcular_tir_portafolio"],
   opciones: ["analizar_opciones_completo"],
+  cripto: ["walkforward_bb_rsi", "mm_inventario_sim", "ejecucion_optima_crypto", "pairs_crypto_scan", "pairs_crypto_analizar"],
 };
 
 function agregarGrupoHerramientas(nombres: Set<string>, grupo: string): void {
@@ -649,6 +697,11 @@ export function filtrarToolsParaPregunta(pregunta: string, roles: RolAgente[]): 
     agregarGrupoHerramientas(nombres, "macro");
     agregarGrupoHerramientas(nombres, "cuantitativo");
   }
+  // Pedidos de envío/notificación por Telegram: sin esto el modelo recibe un
+  // prompt que le promete telegram_enviar_* pero las tools no están en la lista.
+  if (/telegram|avis[aá](me)?\s+(al|el)\s+bot|notifi(c|qu)e|mand[aá](me)?\s+(la\s+)?(se[ñn]al|mensaje)/i.test(p)) {
+    agregarGrupoHerramientas(nombres, "senalUnificada");
+  }
   if (/ytm|tir\b|tasa\s+interna|bono\s+[a-z0-9]{2,6}|al30|gd30|al35|gd35|ae38|gd38|tx26|tx28|etti|curva\s+spot|curva\s+soberana|forward\s+impl[ií]cito|forma\s+de\s+la\s+curva|stripped|yield\s+to\s+call|ytc|ytw|yield\s+to\s+worst|total\s+return|reinversi[oó]n\s+de\s+cupones|semaforo.*riesgo|riesgo.*bono|tir.*portafolio|tir.*cartera/i.test(p)) {
     agregarGrupoHerramientas(nombres, "rentaFija");
   }
@@ -657,6 +710,13 @@ export function filtrarToolsParaPregunta(pregunta: string, roles: RolAgente[]): 
     agregarGrupoHerramientas(nombres, "rentaFija");
     agregarGrupoHerramientas(nombres, "opciones");
     agregarGrupoHerramientas(nombres, "labadie");
+  }
+  if (
+    /crypto|cripto|binance|perp\b|btcusdt|ethusdt|bnbusdt|solusdt|futuros binance|walk.?forward|sobreajust|market.?making.*crypto|avellaneda|stoikov|pairs? crypto|stat.?arb crypto|cointegra.*(binance|crypto)|ejecuci[oó]n.*(btc|crypto|binance)/.test(
+      p,
+    )
+  ) {
+    agregarGrupoHerramientas(nombres, "cripto");
   }
 
   for (const skill of detectarIntencionSkill(pregunta ?? "")) {
@@ -730,6 +790,9 @@ export async function llamarModelo(
     chat_template_kwargs: { enable_thinking: opts.enableThinking ?? false },
     stream: false,
   };
+  if (opts.enableThinking && opts.reasoningBudget) {
+    body["reasoning_budget"] = opts.reasoningBudget;
+  }
   if (tools && tools.length) {
     const disponibles = TOOLS.filter((t) => tools.includes(t.function.name));
     if (disponibles.length) {
@@ -1188,10 +1251,25 @@ export async function ejecutarTool(
         const res = await ejecutarValidarAnalisis(argsRaw);
         return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
       }
-      case "predecir_direccion": {
-        const { ejecutarPrediccionSubyacente } = await import("@/lib/agents/ejecutores");
-        const res = await ejecutarPrediccionSubyacente(argsRaw);
-        return { texto: res.texto, fuentes: res.fuentes, ok: true };
+      case "walkforward_bb_rsi": {
+        const { ejecutarWalkForwardBbRsi } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarWalkForwardBbRsi(argsRaw)) };
+      }
+      case "mm_inventario_sim": {
+        const { ejecutarMMInventario } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarMMInventario(argsRaw)) };
+      }
+      case "ejecucion_optima_crypto": {
+        const { ejecutarEjecucionOptimaCrypto } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarEjecucionOptimaCrypto(argsRaw)) };
+      }
+      case "pairs_crypto_scan": {
+        const { ejecutarPairsCryptoScan } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarPairsCryptoScan(argsRaw)) };
+      }
+      case "pairs_crypto_analizar": {
+        const { ejecutarPairsCryptoAnalizar } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarPairsCryptoAnalizar(argsRaw)) };
       }
       case "analizar_opciones": {
         const { ejecutarCadenaOpciones } = await import("@/lib/agents/ejecutores");
@@ -1225,7 +1303,9 @@ async function trabajarAgente(
 ): Promise<AgentResult> {
   const agente = obtenerAgente(rol);
   enviar({ t: "status", v: agente.status, q: pregunta });
-  const esAnalisis = rol === "valoracion" || rol === "semaforo" || rol === "noticias";
+  // Solo valoración y semáforo justifican modelo de razonamiento (cálculo).
+  // Noticias es búsqueda+reporte: rapidez sin thinking (latencia real, misma calidad).
+  const esAnalisis = rol === "valoracion" || rol === "semaforo";
   const modeloAgente = esAnalisis ? orquestacion.modeloPlanner : MODELO_AGENTES;
   const mensajes: ApiMsg[] = [
     { role: "system", content: agente.sistema },
@@ -1238,7 +1318,10 @@ async function trabajarAgente(
   const ctxMemoria = memoria.contextoMemoria();
   if (ctxMemoria) mensajes.push({ role: "system", content: ctxMemoria });
   if (ragMsg) mensajes.push(ragMsg);
-  mensajes.push(...historial.map((m) => ({ role: m.role, content: m.content })), {
+  // El historial ya trae el último mensaje del usuario: evitar duplicarlo.
+  const ultimo = historial[historial.length - 1];
+  const base = ultimo?.role === "user" && ultimo.content === pregunta ? historial.slice(0, -1) : historial;
+  mensajes.push(...base.map((m) => ({ role: m.role, content: m.content })), {
     role: "user",
     content: pregunta,
   });
@@ -1442,10 +1525,71 @@ function extraerTickerPregunta(pregunta: string): string | null {
     "TOP",
     "MEJOR",
     "MEJORES",
+    // Jerga financiera y stopwords que NO son tickers (sin esto, "YTM del AL30"
+    // devolvía "YTM" como ticker y el cálculo fallaba).
+    "YTM",
+    "YTC",
+    "YTW",
+    "TIR",
+    "TEA",
+    "TNA",
+    "TEM",
+    "VAN",
+    "CCL",
+    "MEP",
+    "BCRA",
+    "BYMA",
+    "ETF",
+    "FCI",
+    "UVA",
+    "USD",
+    "ARS",
+    "DEL",
+    "EL",
+    "UN",
+    "UNA",
+    "TU",
+    "SU",
+    "ES",
+    "ESTA",
+    "ESTE",
+    "CON",
+    "QUE",
+    "CUALES",
+    "CUAL",
+    "CUANTO",
+    "CUANTA",
+    "DONDE",
+    "BONO",
+    "BONOS",
+    "LETRA",
+    "LETRAS",
+    "SOBERANO",
+    "SOBERANA",
+    "ACCION",
+    "ACCIONES",
+    "CEDEAR",
+    "CEDEARS",
+    "RENDIMIENTO",
+    "PRECIO",
+    "COTIZACION",
+    "HOY",
+    "DIA",
+    "ACTUAL",
+    "VER",
+    "MIRA",
+    "DECIME",
+    "PASAME",
+    "VALE",
+    "TICKER",
   ]);
   const limpio = normalizarSinAcentos(pregunta).replace(/[¿?¡!.,;:()]/g, " ");
   const tokens = limpio.match(/\b([A-Z][A-Z0-9]{0,7}(?:\.[A-Z]{1,4})?)\b/g) ?? [];
   const candidatos = tokens.filter((t) => !RUIDOS.has(t));
+  // 1) Tickers de bonos soberanos argentinos (AL30, GD35, AE38, TX26...): máxima
+  //    prioridad porque son ambiguos con pocas palabras y el patrón es inequívoco.
+  const bono = candidatos.find((c) => /^(AL|GD|AE|TX)\d{2}$/.test(c));
+  if (bono) return bono;
   const conSufijo = candidatos.find((c) => c.includes("."));
   const simbolo = conSufijo ?? candidatos.find((c) => c.length >= 2) ?? candidatos[0] ?? null;
   if (!simbolo) return null;
@@ -1515,6 +1659,87 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   // Herramientas relevantes para ESTA pregunta (menos prefill por ronda).
   const toolsTurno = filtrarToolsParaPregunta(pregunta, roles);
   const nombresHerramientasTurno = toolsTurno.map((t) => t.function.name);
+
+  // ---- VÍA RÁPIDA: consulta puntual → tool determinística + UNA redacción ----
+  // Optimización rapidez/inteligencia: "calcula la TIR del AL30" o "dólar blue"
+  // no necesitan agentes paralelos ni coordinador. Dato real en segundos.
+  const viaRapida = detectarViaRapida(pregunta);
+  if (viaRapida) {
+    enviar({
+      t: "status",
+      v: estadoDeHerramienta(viaRapida.herramienta),
+      q: String(Object.values(viaRapida.argumentos)[0] ?? "").slice(0, 60),
+    });
+    const mensajesRapidos: ApiMsg[] = [
+      { role: "system", content: systemPrompt },
+      { role: "system", content: siteContext },
+    ];
+    if (orquestacion.promptSkillsSalida) {
+      mensajesRapidos.push({ role: "system", content: orquestacion.promptSkillsSalida });
+    }
+    const ctxMemoriaRapida = memoria.contextoMemoria();
+    if (ctxMemoriaRapida) mensajesRapidos.push({ role: "system", content: ctxMemoriaRapida });
+    if (ragMsg) mensajesRapidos.push(ragMsg);
+    mensajesRapidos.push(...historial.map((m) => ({ role: m.role, content: m.content })));
+    const callIdRapido = `rapida_${Date.now()}`;
+    const argsRawRapido = JSON.stringify(viaRapida.argumentos);
+    mensajesRapidos.push({
+      role: "assistant",
+      content: "",
+      tool_calls: [
+        { id: callIdRapido, function: { name: viaRapida.herramienta, arguments: argsRawRapido } },
+      ],
+    });
+    let textoDato = "";
+    try {
+      const ej = await ejecutarTool(viaRapida.herramienta, argsRawRapido, baseUrl, sessionId);
+      textoDato = ej.texto;
+      fuentes.push(...ej.fuentes);
+      if (ej.fuentes.length) enviar({ t: "sources", v: ej.fuentes });
+      enviarEventos(enviar, ej.eventos);
+      mensajesRapidos.push({
+        role: "tool",
+        tool_call_id: callIdRapido,
+        name: viaRapida.herramienta,
+        content: `Datos reales de ${viaRapida.herramienta} (fuentes externas):\n\n${textoDato}`,
+      });
+    } catch (e) {
+      mensajesRapidos.push({
+        role: "tool",
+        tool_call_id: callIdRapido,
+        name: viaRapida.herramienta,
+        content: `La herramienta falló (${e instanceof Error ? e.message : "error"}). Informalo con honestidad y ofrecé reintentar.`,
+      });
+    }
+    enviar({ t: "status", v: "searching" });
+    let finalRapido = "";
+    try {
+      // Redacción única SIN thinking y sin más tools: rapidez con dato real.
+      const resRapido = await llamarModelo(
+        apiKey,
+        orquestacion.modeloSalida.id,
+        mensajesRapidos,
+        null,
+        { maxTokens: Math.min(orquestacion.modeloSalida.maxTokens, 2048), enableThinking: false },
+      );
+      if (resRapido.ok) {
+        const dRapido = (await resRapido.json()) as {
+          choices?: Array<{ message?: { content?: string } }>;
+        };
+        finalRapido = (dRapido.choices?.[0]?.message?.content ?? "").trim();
+      }
+    } catch {
+      /* fallback determinístico abajo */
+    }
+    const datoValido = textoDato.trim() && !/^SIN RESULTADOS/i.test(textoDato.trim());
+    const final =
+      finalRapido ||
+      (datoValido
+        ? `${textoDato.slice(0, 1500)}`
+        : "No pude obtener el dato en este momento. Reintentá en unos segundos.");
+    memoria.escribirPizarra({ desde: "via_rapida", hacia: "coord", texto: final.slice(0, 400) });
+    return { final, fuentes };
+  }
 
   // 2) Despacho en paralelo a través de la cola de tareas.
   if (roles.length > 1) enviar({ t: "status", v: "cola", q: roles.length });
@@ -2439,11 +2664,15 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
     if (modeloSalida.reasoningBudget !== undefined) {
       opcionesInfladas["reasoningBudget"] = modeloSalida.reasoningBudget;
     }
+    // Último intento SIN herramientas: obliga al redactor a redactar la respuesta
+    // con los datos ya obtenidos en vez de quedarse pidiendo más llamadas
+    // (antes, si agotaba los 3 intentos con tool_calls, la respuesta salía vacía).
+    const esUltimoIntento = intento === 2;
     const res = await llamarModelo(
       apiKey,
       modeloSalida.id,
       messages,
-      nombresHerramientasTurno,
+      esUltimoIntento ? null : nombresHerramientasTurno,
       opcionesInfladas,
     );
     if (!res.ok) {

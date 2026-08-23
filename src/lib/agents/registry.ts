@@ -66,6 +66,13 @@ const HERRAMIENTAS_POR_ROL: Record<RolAgente, string[]> = {
     "buscar_web",
     "consultar_mercado",
     "datos_financieros",
+    "calcular_ytm_bono",
+    "consultar_curva_etti",
+    "calcular_yield_call",
+    "calcular_total_return",
+    "calcular_stripped_yield",
+    "consultar_semaforo_riesgo_bono",
+    "calcular_tir_portafolio",
   ],
   semaforo: ["analisis_completo", "analizar_semaforo", "analisis_tecnico", "score_sectorial", "analizar_riesgo", "validar_analisis", "buscar_noticias", "buscar_web"],
   cuantitativo: [
@@ -93,6 +100,11 @@ const HERRAMIENTAS_POR_ROL: Record<RolAgente, string[]> = {
     "matriz_benchmarks",
     "analisis_industria",
     "ranking_valuacion_sectores",
+    "walkforward_bb_rsi",
+    "mm_inventario_sim",
+    "ejecucion_optima_crypto",
+    "pairs_crypto_scan",
+    "pairs_crypto_analizar",
     "buscar_web",
     "datos_financieros",
   ],
@@ -154,6 +166,7 @@ export const AGENTES: Record<RolAgente, AgenteDef> = {
     sistema: `Sos el Agente de Valoración de IA, asistente del mercado de capitales argentino.
 - Para "haceme el análisis completo de X / análisis integral / ficha coronar / pipeline maestro F0→F10": usá SIEMPRE analisis_completo(simbolo) — pipeline jerárquico coronar bases/pt en orden F0 macro ampliado (BCRA v4: Badlar, reservas, base, circulante, TC serie 90d + CriptoYa + ArgentinaDatos) → F1 cualitativo 6D gate 5.0 → F1 cuantitativo 15 ratios → F2 cálculo (YTM/TIR) → F3 valuación triangulada DCF+múltiplos+APV con WACC CAPM+riesgo país+size → F4 sectores score+benchmarks → F5/F6 CAPM/factores/riesgo → F7 renta fija ETTI → F8 derivados → F9 quant → F10 ficha con MOS calibrado → T validación determinística. Luego validar_analisis(simbolo) como gate final. Es el flujo completo; no pidas supuestos.
 - Para "cuánto vale X", "valor real de X", "DCF de X" o "ficha de decisión de X": usá SIEMPRE ficha_de_decision(simbolo) — ejecuta contexto macro + cualitativo + cuantitativo + WACC + triangulación (DCF, múltiplos, valor libro/APV) y devuelve la decisión final con margen de seguridad, todo con datos en vivo de Yahoo Finance. No pidas supuestos al usuario.
+- BONOS soberanos/corporativos argentinos (AL30, GD30, AL35, GD35, AE38, TX26...): para YTM/TIR/precio usá calcular_ytm_bono(ticker) EN ESTE TURNO; curva soberana spot/forward → consultar_curva_etti; duración/riesgo → consultar_semaforo_riesgo_bono. PROHIBIDO decir que "no hay fuente" para el AL30 o pedirle al usuario qué herramienta usar: ejecutá el cálculo y reportá el número.
 - Si el usuario pide explícitamente un método puntual: valor_por_metodos(simbolo) para la triangulación DCF+múltiplos+valor libro, calcular_wacc(simbolo) para el costo de capital, analizar_fundamental(simbolo) para cualitativo+cuantitativo.
 - Usá valor_intrinseco_real(simbolo) o calcular_dcf(simbolo) SOLO como alternativa/verificación cruzada o cuando el usuario aporte supuestos propios para probar un escenario puntual.
 - Tenés acceso a todas las herramientas del sistema (mercado, noticias, base de conocimiento y búsqueda web) para complementar el análisis con el dato actual y las noticias de sustento.
