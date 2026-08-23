@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { getOportunidadesOrquestadas } from "@/lib/herramientas/oportunidades-orquestadas.functions";
+import { getOportunidadesOrquestadas, interpretarOportunidadesConIA } from "@/lib/herramientas/oportunidades-orquestadas.functions";
 
 export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: string } = {}) {
   const fn = useServerFn(getOportunidadesOrquestadas);
@@ -24,6 +24,10 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
   const fase3 = data?.fase3;
   const fase4 = data?.fase4;
   const fase5 = data?.fase5;
+  const fnInterp = useServerFn(interpretarOportunidadesConIA);
+  const [interp, setInterp] = useState<string | null>(null);
+  const [interpModelo, setInterpModelo] = useState<string | null>(null);
+  const [interpLoading, setInterpLoading] = useState(false);
 
   return (
     <div className="space-y-6 w-full">
@@ -234,6 +238,47 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
                   </ul>
                 </details>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Interpretación IA orquestada — Fundamentación por resultado */}
+          <Card className="border-primary/20">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-[13px] flex items-center justify-between">
+                <span>Interpretación del Agente IA — Por qué es / no es oportunidad</span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={q.isFetching || interpLoading}
+                  onClick={async () => {
+                    if (!data) return;
+                    setInterpLoading(true);
+                    try {
+                      const r: any = await fnInterp({ data: { payload: data } });
+                      setInterp(r?.interpretacion ?? "");
+                      setInterpModelo(r?.modelo ?? "");
+                    } catch (e: any) {
+                      setInterp(`Error al interpretar: ${e?.message ?? String(e)}`);
+                    } finally {
+                      setInterpLoading(false);
+                    }
+                  }}
+                >
+                  {interpLoading ? "Interpretando..." : "Interpretar con IA"}
+                </Button>
+              </CardTitle>
+              <p className="text-[11px] text-muted-foreground">El agente explica cada oportunidad y cada descarte citando método, umbral y dato vivo. Sin prometer rendimientos.</p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {!interp ? (
+                <p className="text-[13px] text-muted-foreground">Hacé clic en "Interpretar con IA" para generar la fundamentación metodológica de esta corrida. El agente citará: Intermarket (Murphy/Pring), Macro (BCRA/Fisher + gate), Cuantitativo (R²/Hurst Labadie), Fundamental (Pascale 6D + MOS + alertas), Técnico (score/Rvol/R/R) y Catalizador (upgrade/earnings/margen).</p>
+              ) : (
+                <div className="space-y-2">
+                  <div className="prose prose-invert max-w-none text-[13px] leading-relaxed whitespace-pre-wrap break-words">{interp}</div>
+                  {interpModelo && <p className="text-[10px] text-muted-foreground">Modelo: {interpModelo}</p>}
+                </div>
+              )}
+              <div className="text-[10px] text-muted-foreground">Tip: también podés preguntarle al chat: "interpretá las oportunidades de Energía" — el agente orquestado usa las mismas herramientas y el mismo pipeline.</div>
             </CardContent>
           </Card>
         </>

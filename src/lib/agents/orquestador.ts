@@ -619,6 +619,7 @@ const GRUPOS_HERRAMIENTAS: Record<string, string[]> = {
   rentaFija: ["calcular_ytm_bono", "consultar_curva_etti", "calcular_yield_call", "calcular_total_return", "calcular_stripped_yield", "consultar_semaforo_riesgo_bono", "calcular_tir_portafolio"],
   opciones: ["analizar_opciones_completo"],
   cripto: ["walkforward_bb_rsi", "mm_inventario_sim", "ejecucion_optima_crypto", "pairs_crypto_scan", "pairs_crypto_analizar"],
+  oportunidades: ["interpretar_oportunidades"],
 };
 
 function agregarGrupoHerramientas(nombres: Set<string>, grupo: string): void {
@@ -691,6 +692,9 @@ export function filtrarToolsParaPregunta(pregunta: string, roles: RolAgente[]): 
     )
   ) {
     agregarGrupoHerramientas(nombres, "mercadoExtra");
+  }
+  if (/interpretar.*oportunidades|fundament.*oportunidad|por qu.*(es|no).*oportunidad|explic.*oportunidad|por que.*(oportunidad|no.*oportunidad)/i.test(p)) {
+    agregarGrupoHerramientas(nombres, "oportunidades");
   }
   if (
     /opci[oó]n(es)?\b|\bstrikes?\b|\bprimas?\b|griegas|\bdelta\b|\bgamma\b|\btheta\b|\bvega\b|black.?scholes|sonrisa\s+de\s+vol/.test(
@@ -1308,6 +1312,10 @@ export async function ejecutarTool(
       case "pairs_crypto_analizar": {
         const { ejecutarPairsCryptoAnalizar } = await import("@/lib/agents/ejecutores");
         return { ...(await ejecutarPairsCryptoAnalizar(argsRaw)) };
+      }
+      case "interpretar_oportunidades": {
+        const { ejecutarInterpretarOportunidades } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarInterpretarOportunidades(argsRaw)) };
       }
       case "analizar_opciones": {
         const { ejecutarCadenaOpciones } = await import("@/lib/agents/ejecutores");

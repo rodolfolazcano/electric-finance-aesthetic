@@ -257,3 +257,56 @@ export const getOportunidadesOrquestadas = createServerFn({ method: "POST" })
       };
     });
   });
+
+export const interpretarOportunidadesConIA = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => z.object({ payload: z.any() }).parse(input as any))
+  .handler(async ({ data }): Promise<{ interpretacion: string; modelo: string }> => {
+    const payload: any = (data as any)?.payload ?? {};
+    // Fallback rule-based if LLM not available
+    const senales: any[] = payload?.fase5?.senales ?? [];
+    const rechazados: any[] = payload?.fase4?.rechazados ?? [];
+    const pipeline: any[] = payload?.pipeline ?? [];
+    const regimenMacro: string = payload?.regimenMacro ?? "NEUTRO";
+    const fmt = (v: any, d = 2) => (typeof v === "number" && isFinite(v) ? v.toFixed(d) : "s/d");
+    const buildFallback = (): string => {
+      const lines: string[] = [];
+      lines.push(`### Fundamentación — ${senales.length} oportunidad(es) y ${rechazados.length} descartados`);
+      lines.push(`Pipeline: ${pipeline.map((p: any) => `${p.fase} ${p.ok ? "✓" : "✗"}`).join(" → ")} | Régimen: ${regimenMacro}`);
+      if (senales.length) {
+        lines.push(`\n#### Por qué SÍ`);
+        for (const s of senales.slice(0, 6)) {
+          const ups = s?.detalles?.ficha?.margen_seguridad?.upside_pct;
+          const mos = s?.detalles?.ficha?.margen_seguridad?.mos_aplicado_pct;
+          lines.push(`- **${s.ticker}** ${s.senal} score ${fmt(s.scoreTotal, 1)} upside ${fmt(ups, 1)}% vs MOS ${fmt(mos, 0)}% ${s.catalizadorMotivo ? `· ${s.catalizadorMotivo}` : ""}`);
+        }
+      }
+      if (rechazados.length) {
+        lines.push(`\n#### Por qué NO`);
+        for (const r of rechazados.slice(0, 8)) lines.push(`- **${r.ticker}**: ${r.motivo}`);
+      }
+      return lines.join("\n");
+    };
+    try {
+      const apiKey = process.env["NVIDIA_API_KEY"] ?? "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";
+      const resumen = senales.slice(0, 6).map((s: any) => `${s.ticker} ${s.senal} score ${s.scoreTotal} upside ${s?.detalles?.ficha?.margen_seguridad?.upside_pct ?? "s/d"}`).join("\n");
+      const res = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: "nvidia/nemotron-nano-9b-v2",
+          messages: [
+            { role: "system", content: "Sos analista financiero riguroso. Respondes conciso citando método y umbral." },
+            { role: "user", content: `Fundamentá oportunidades (${senales.length}) y descartados (${rechazados.length}). Pipeline: ${pipeline.map((p: any) => p.fase).join(" | ")}. Señales:\n${resumen}` },
+          ],
+          max_tokens: 1200,
+          temperature: 0.35,
+        }),
+      });
+      if (res.ok) {
+        const j: any = await res.json();
+        const txt: string = j?.choices?.[0]?.message?.content ?? "";
+        if (txt.trim().length > 60) return { interpretacion: txt.trim(), modelo: "nvidia/nemotron-nano-9b-v2" };
+      }
+    } catch {}
+    return { interpretacion: buildFallback(), modelo: "rule-based-fallback" };
+  });

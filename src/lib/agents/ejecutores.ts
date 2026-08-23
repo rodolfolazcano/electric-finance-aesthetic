@@ -4330,3 +4330,34 @@ export async function ejecutarPairsCryptoAnalizar(argsRaw: string): Promise<{ te
     return { texto: `SIN RESULTADOS pairs_crypto_analizar: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
   }
 }
+
+
+/** Interpretación IA de oportunidades — fundamentación metodológica por resultado. */
+export async function ejecutarInterpretarOportunidades(argsRaw: string): Promise<{ texto: string; fuentes: import("@/lib/mercado.server").FuenteMercado[]; ok: boolean }> {
+  let sector: string | undefined = undefined;
+  try {
+    const a = JSON.parse(argsRaw) as { sector?: string };
+    if (a.sector) sector = String(a.sector);
+  } catch {}
+  try {
+    const { getOportunidadesOrquestadas, interpretarOportunidadesConIA } = await import("@/lib/herramientas/oportunidades-orquestadas.functions");
+    // Obtener payload vivo (usa cache 15m, lotes paralelos)
+    const payload: any = await (getOportunidadesOrquestadas as any)({ data: { sector, topN: 8, maxTickers: 30 } });
+    // Si el wrapper createServerFn devuelve { data: ... } o directo, normalizar
+    const realPayload = payload?.data ?? payload;
+    const interp: any = await (interpretarOportunidadesConIA as any)({ data: { payload: realPayload } });
+    const txt: string = interp?.interpretacion ?? interp?.data?.interpretacion ?? "";
+    const modelo: string = interp?.modelo ?? interp?.data?.modelo ?? "rule-based-fallback";
+    if (!txt) throw new Error("Interpretación vacía");
+    return { texto: txt + `\n\n[Modelo: ${modelo}]`, fuentes: [], ok: true };
+  } catch (e) {
+    // Fallback: intentar interpretar sin payload (usa fallback rule-based interno)
+    try {
+      const { interpretarOportunidadesConIA } = await import("@/lib/herramientas/oportunidades-orquestadas.functions");
+      const interp: any = await (interpretarOportunidadesConIA as any)({ data: { payload: { fase1: {}, fase2: {}, fase4: {}, fase5: { senales: [] }, pipeline: [], regimenMacro: "NEUTRO" } } });
+      const txt: string = interp?.interpretacion ?? "";
+      if (txt) return { texto: txt, fuentes: [], ok: true };
+    } catch {}
+    return { texto: `SIN RESULTADOS interpretar_oportunidades: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
+  }
+}
