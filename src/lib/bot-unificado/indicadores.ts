@@ -131,3 +131,58 @@ export function retornosDiarios(serie: number[]): number[] {
   }
   return out;
 }
+
+// ── Labadie Stat-Arb: ADF + half-life ────────────────────────────────────
+
+/** Regresión OLS Δs_t = α + φ·s_{t-1} + ε — devuelve φ y su t-stat. */
+function regresionDeltaSpread(spread: number[]): { phi: number | null; tStat: number | null; sePhi: number | null } {
+  if (spread.length < 30) return { phi: null, tStat: null, sePhi: null };
+  const n = spread.length - 1;
+  const y: number[] = []; // Δs
+  const x: number[] = []; // s_{t-1}
+  for (let i = 1; i < spread.length; i++) {
+    y.push(spread[i]! - spread[i - 1]!);
+    x.push(spread[i - 1]!);
+  }
+  const mx = media(x);
+  const my = media(y);
+  let sxx = 0, sxy = 0;
+  for (let i = 0; i < n; i++) {
+    sxx += (x[i]! - mx) ** 2;
+    sxy += (x[i]! - mx) * (y[i]! - my);
+  }
+  if (sxx === 0) return { phi: null, tStat: null, sePhi: null };
+  const phi = sxy / sxx;
+  // α = my - phi*mx (no necesario para half-life)
+  // Error estándar de phi
+  let rss = 0;
+  for (let i = 0; i < n; i++) {
+    const yHat = (my - phi * mx) + phi * x[i]!;
+    rss += (y[i]! - yHat) ** 2;
+  }
+  const sigma2 = rss / (n - 2);
+  const se = Math.sqrt(sigma2 / sxx);
+  const t = se > 0 ? phi / se : null;
+  return { phi, tStat: t, sePhi: se };
+}
+
+/** ADF simplificado (sin lags): H0 = no cointegración (phi=0). Rechaza si p<0.05. */
+export function adfTest(spread: number[]): { estadistico: number | null; pValue: number | null; rechazaH0_5pct: boolean } {
+  const { tStat } = regresionDeltaSpread(spread);
+  if (tStat == null) return { estadistico: null, pValue: null, rechazaH0_5pct: false };
+  // Aproximación p-value vía normal (conservadora): crítico Dickey-Fuller 5% ≈ -2.86
+  const critico = -2.86;
+  const rechaza = tStat < critico;
+  // p-value aproximado con normal CDF (muy rough pero útil como filtro)
+  const pApprox = tStat < -3.5 ? 0.01 : tStat < -2.86 ? 0.04 : tStat < -2.57 ? 0.08 : 0.2;
+  return { estadistico: tStat, pValue: pApprox, rechazaH0_5pct: rechaza };
+}
+
+/** Half-life de reversión: H = -ln(2)/ln(1+phi)  con phi de Δs = phi·s_{t-1}. 5 < H < 60 días válido. */
+export function halfLife(spread: number[]): number | null {
+  const { phi } = regresionDeltaSpread(spread);
+  if (phi == null || phi >= 0 || phi <= -1) return null;
+  const hl = -Math.log(2) / Math.log(1 + phi);
+  if (!isFinite(hl) || hl <= 0) return null;
+  return hl;
+}

@@ -10,9 +10,11 @@
 
 import { enLotes, fundamentalesDe, serieDe } from "./datos";
 import {
+  adfTest,
   atrAproximado,
   correlacion,
   donchian,
+  halfLife,
   macd,
   media,
   rsi,
@@ -46,6 +48,11 @@ export const escanearPares: Scanner = async () => {
       const corr = correlacion(ca.map(Math.log).slice(-60), cb.map(Math.log).slice(-60));
       const z = zScoreUltimo(spread, 60);
       if (z == null || corr == null || corr < 0.5) continue;
+      // Labadie: cointegración Engle-Granger + half-life 5-60d — evita pares correlacionados que nunca revierten
+      const adf = adfTest(spread);
+      if (!adf.rechazaH0_5pct) continue;
+      const hl = halfLife(spread);
+      if (hl == null || hl < 5 || hl > 60) continue;
       const precioA = a.ultimoPrecio!;
       const precioB = b.ultimoPrecio!;
       // |z| >= 2: el spread se estiró — se opera hacia la media (Labadie: entrada mu±a·sigma, a=2)
@@ -59,7 +66,7 @@ export const escanearPares: Scanner = async () => {
           nivel: `par ${symA}/${symB}: stop si spread supera z=3; objetivo z=0.5`,
           prob: clampProb(0.55 + Math.min(z - 2, 1.5) * 0.06),
           motivo: `Spread ${symA}/${symB} (${etiqueta}) en z=${z.toFixed(2)} sobre su media de 60 días (corr ${(corr * 100).toFixed(0)}%): ${symB} barata relativa vs ${symA}.`,
-          metricas: { zSpread: Number(z.toFixed(2)), correlacionLog: Number(corr.toFixed(2)), ratioActual: Number(spread[spread.length - 1]!.toFixed(4)) },
+          metricas: { zSpread: Number(z.toFixed(2)), correlacionLog: Number(corr.toFixed(2)), ratioActual: Number(spread[spread.length - 1]!.toFixed(4)), adfStat: adf.estadistico != null ? Number(adf.estadistico.toFixed(2)) : null, halfLifeDias: hl != null ? Number(hl.toFixed(1)) : null },
         });
       } else if (z <= -2 && candidatos.length < MAX_CANDIDATOS_ESTRATEGIA) {
         candidatos.push({
@@ -71,7 +78,7 @@ export const escanearPares: Scanner = async () => {
           nivel: `par ${symA}/${symB}: stop si spread supera z=-3; objetivo z=-0.5`,
           prob: clampProb(0.55 + Math.min(-z - 2, 1.5) * 0.06),
           motivo: `Spread ${symA}/${symB} (${etiqueta}) en z=${z.toFixed(2)} bajo su media de 60 días (corr ${(corr * 100).toFixed(0)}%): ${symA} barata relativa vs ${symB}.`,
-          metricas: { zSpread: Number(z.toFixed(2)), correlacionLog: Number(corr.toFixed(2)), ratioActual: Number(spread[spread.length - 1]!.toFixed(4)) },
+          metricas: { zSpread: Number(z.toFixed(2)), correlacionLog: Number(corr.toFixed(2)), ratioActual: Number(spread[spread.length - 1]!.toFixed(4)), adfStat: adf.estadistico != null ? Number(adf.estadistico.toFixed(2)) : null, halfLifeDias: hl != null ? Number(hl.toFixed(1)) : null },
         });
       }
     } catch {
@@ -335,9 +342,9 @@ async function titulosNoticias(): Promise<string[]> {
   if (cacheNoticias && Date.now() - cacheNoticias.fecha < 10 * 60 * 1000) return cacheNoticias.titulos;
   try {
     const { getMarketNews } = await import("@/lib/market-news.functions");
-    const res: any = await (getMarketNews as any)();
+    const res = await (getMarketNews as unknown as () => Promise<{ items?: Array<{ title?: string; summary?: string }> }>)();
     const items = res?.items ?? [];
-    const titulos = items.slice(0, 15).map((it: any) => String(it.title ?? ""));
+    const titulos = items.slice(0, 15).map((it) => String(it?.title ?? ""));
     cacheNoticias = { titulos, fecha: Date.now() };
     return titulos;
   } catch {

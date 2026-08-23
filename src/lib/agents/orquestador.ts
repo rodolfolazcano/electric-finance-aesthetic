@@ -15,6 +15,7 @@ import { ColaDeTareas } from "@/lib/agents/queue";
 import { MemoriaDeSesion } from "@/lib/agents/memory";
 import { AGENTES, obtenerAgente, type RolAgente } from "@/lib/agents/registry";
 import { TOOLS, estadoDeHerramienta, type ToolSpec } from "@/lib/agents/herramientas";
+import { instrumentTool as relayInstrumentTool, instrumentLLM as relayInstrumentLLM } from "@/lib/nemo-relay";
 import {
   ejecutarMercado,
   ejecutarNoticias,
@@ -242,6 +243,11 @@ export function enrutar(pregunta: string): Set<RolAgente> {
   ) {
     activos.add("noticias");
   }
+  // Informe matutino "Lo que hay que saber esta mañana" -> necesita mercado + noticias
+  if (/informe\s+matutino|lo\s+que\s+hay\s+que\s+saber|resumen\s+matutino|agenda\s+del\s+d[ií]a.*hoy|radar\s+internacional|radar\s+local/i.test(p)) {
+    activos.add("mercado");
+    activos.add("noticias");
+  }
   if (
     /qu[eé]\s*es|qu[eé]\s*son|c[oó]mo\s+funciona|qu[eé]\s*es\s+un|c[oó]mo\s+.*invertir|c[oó]mo\s+empiezo|servicio|instrumento|broker|cedear|adr|bono|acci[oó]n|obligaci[oó]n\s+negociable|perfil\s+de\s+riesgo|estafa|matr[íi]cula|cnv|diferencia\s+entre|portafolio|cartera/.test(
       p,
@@ -257,6 +263,24 @@ export function enrutar(pregunta: string): Set<RolAgente> {
   }
   if (esPreguntaCuantitativa(pregunta)) {
     activos.add("cuantitativo");
+  }
+  // Motor unificado: señal 4 capas necesita TODOS los agentes especializados
+  if (
+    /se[ñn]al\s+unificada|se[ñn]ales\s+unificadas|motor\s+unificado|qu[eé]\s+compro\s+hoy|qu[eé]\s+comprar|top\s+se[ñn]ales|generar.*se[ñn]al|analiz[aá]\s+(?:complet[ao]|unificad)/i.test(
+      p,
+    )
+  ) {
+    activos.add("valoracion");
+    activos.add("semaforo");
+    activos.add("cuantitativo");
+    activos.add("mercado");
+    activos.add("conocimiento");
+    activos.add("noticias");
+  }
+  if (/ytm|tir\b|tasa\s+interna|bono\s+[a-z0-9]{2,6}|bono\s+soberano|al30|gd30|al35|gd35|ae38/i.test(p)) {
+    activos.add("valoracion");
+    activos.add("mercado");
+    activos.add("conocimiento");
   }
   if (activos.size === 0) {
     activos.add("conocimiento");
@@ -379,6 +403,13 @@ function detectarIntencionSkill(pregunta: string): string[] {
   ) {
     skills.push("cedear-signals");
   }
+  // Motor unificado CORONAR: señal 4 capas intermarket→fundamental→tecnico→cuantitativo
+  if (
+    /se[ñn]al\s+unificada|se[ñn]ales\s+unificadas|motor\s+unificado|qu[eé]\s+compro\s+hoy|qu[eé]\s+comprar|top\s+se[ñn]ales|se[ñn]al\s+de\s+(compra|venta)\b.*(?:unificad|completa|4\s*capas)|analiz[aá]\s+(?:complet[ao]|unificad)/i.test(p) ||
+    /generar.*se[ñn]al|comprar\s+o\s+vender\s+.*(?:ggal|ypf|pamp|aapl|meli)/i.test(p)
+  ) {
+    skills.push("senal-unificada");
+  }
   if (
     /opci[oó]n(es)?\b|\bstrikes?\b|\bprimas?\b|griegas?|\bdelta\b|\bgamma\b|\btheta\b|\bvega\b|volatilidad impl[ií]cita|monte ?carlo|\bitm\b|black.?scholes|sonrisa de (la )?volatilidad/.test(p)
   ) {
@@ -388,6 +419,16 @@ function detectarIntencionSkill(pregunta: string): string[] {
     /patrimonio total|mis tenencias|pegu[eé] mi (portafolio|cartera|cuenta)/.test(p)
   ) {
     skills.push("portfolio-paste-parser");
+  }
+  if (
+    /capital de trabajo|tesorer[íi]a|financiamiento|cr[eé]dito comercial|ciclo de conversi[oó]n|inventario eoq|scoring tesorer[íi]a|d[oó]nde invertir caja|colocar excedentes|costo efectivo financiamiento|pol[íi]tica de cr[eé]dito|punto de reorden/.test(p)
+  ) {
+    skills.push("alonso-capital-trabajo");
+  }
+  if (
+    /bono|renta fija|duration|convexidad|dv01|curva spot|forward|ipd|spread de equilibrio|covenants|an[aá]lisis de bono|ytm|tir.*bono|riesgo pa[íi]s.*cuadro|cuadro de signos|probabilidad de default|gs-ess|curva argentina|bootstrapping/.test(p)
+  ) {
+    skills.push("elbaum-renta-fija");
   }
 
   return skills;
@@ -463,6 +504,8 @@ const GRUPOS_HERRAMIENTAS: Record<string, string[]> = {
     "consultar_agenda_economica",
     "generar_senales_cedear",
   ],
+  senalUnificada: ["generar_senal_unificada", "generar_senales_unificadas"],
+  rentaFija: ["calcular_ytm_bono", "consultar_curva_etti", "calcular_yield_call", "calcular_total_return", "calcular_stripped_yield", "consultar_semaforo_riesgo_bono", "calcular_tir_portafolio"],
   opciones: ["analizar_opciones_completo"],
 };
 
@@ -475,6 +518,7 @@ const SKILL_A_GRUPO: Record<string, string> = {
   "ejecucion-optima-labadie": "labadie",
   "options-analysis": "opciones",
   "cedear-signals": "mercadoExtra",
+  "senal-unificada": "senalUnificada",
   "portfolio-paste-parser": "iol",
   "orquestacion-fuentes-datos": "salida",
 };
@@ -530,7 +574,7 @@ export function filtrarToolsParaPregunta(pregunta: string, roles: RolAgente[]): 
     agregarGrupoHerramientas(nombres, "labadie");
   }
   if (
-    /oportunidades|cierre\s+de\s+mercado|c[óo]mo\s+(cerr[óo]|cerraron)|agenda|calendario|se[ñn]ales?\b|cedear|movers|qu[ée]\s+(subi[oó]|baj[oó])/.test(
+    /oportunidades|cierre\s+de\s+mercado|c[óo]mo\s+(cerr[óo]|cerraron)|agenda|calendario|se[ñn]ales?\b|cedear|movers|qu[ée]\s+(subi[oó]|baj[oó])|informe\s+matutino|lo\s+que\s+hay\s+que\s+saber|resumen\s+matutino/.test(
       p,
     )
   ) {
@@ -542,6 +586,21 @@ export function filtrarToolsParaPregunta(pregunta: string, roles: RolAgente[]): 
     )
   ) {
     agregarGrupoHerramientas(nombres, "opciones");
+  }
+  if (
+    /se[ñn]al\s+unificada|se[ñn]ales\s+unificadas|motor\s+unificado|qu[eé]\s+compro\s+hoy|qu[eé]\s+comprar|top\s+se[ñn]ales|se[ñn]al\s+de\s+(compra|venta)\b.*(?:unificad|completa|4\s*capas)|generar.*se[ñn]al|analiz[aá]\s+(?:complet[ao]|unificad)/i.test(
+      p,
+    )
+  ) {
+    agregarGrupoHerramientas(nombres, "senalUnificada");
+    // También necesita valoracion/semaforo/macro para contexto del redactor
+    agregarGrupoHerramientas(nombres, "valoracion");
+    agregarGrupoHerramientas(nombres, "semaforo");
+    agregarGrupoHerramientas(nombres, "macro");
+    agregarGrupoHerramientas(nombres, "cuantitativo");
+  }
+  if (/ytm|tir\b|tasa\s+interna|bono\s+[a-z0-9]{2,6}|al30|gd30|al35|gd35|ae38|gd38|tx26|tx28|etti|curva\s+spot|curva\s+soberana|forward\s+impl[ií]cito|forma\s+de\s+la\s+curva|stripped|yield\s+to\s+call|ytc|ytw|yield\s+to\s+worst|total\s+return|reinversi[oó]n\s+de\s+cupones|semaforo.*riesgo|riesgo.*bono|tir.*portafolio|tir.*cartera/i.test(p)) {
+    agregarGrupoHerramientas(nombres, "rentaFija");
   }
 
   for (const skill of detectarIntencionSkill(pregunta ?? "")) {
@@ -622,7 +681,7 @@ export async function llamarModelo(
       body["tool_choice"] = "auto";
     }
   }
-  return postCompletionsResiliente(apiKey, body);
+  return relayInstrumentLLM(modelId, () => postCompletionsResiliente(apiKey, body));
 }
 
 function extraerDatosTool(argsRaw: string): { query: string; periodo: string; simbolo: string } {
@@ -650,6 +709,7 @@ export async function ejecutarTool(
   baseUrl?: string,
   sessionId = "anon",
 ): Promise<{ texto: string; fuentes: FuenteMercado[]; ok: boolean; eventos?: EventoChat[] }> {
+  return relayInstrumentTool(name, async () => {
   const { query, periodo, simbolo } = extraerDatosTool(argsRaw);
   // Nunca volcar credenciales de IOL al log del servidor.
   const argsParaLog = name === "iol_login" ? "<credenciales ocultas>" : argsRaw.slice(0, 220);
@@ -879,7 +939,7 @@ export async function ejecutarTool(
       }
       case "generar_informe_matutino": {
         const res = await ejecutarInformeMatutino(argsRaw);
-        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok, eventos: (res as any).eventos };
       }
       case "consultar_agenda_economica": {
         const res = await ejecutarAgendaEconomica(argsRaw);
@@ -900,9 +960,137 @@ export async function ejecutarTool(
         const res = await ejecutarOpcionesCompleto(argsRaw);
         return { texto: res.texto, fuentes: res.fuentes, ok: res.ok, eventos: (res as any).eventos };
       }
+      case "generar_senal_unificada": {
+        const { ejecutarSenalUnificada } = await import("@/lib/agents/ejecutores");
+        const res = await ejecutarSenalUnificada(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok, eventos: (res as any).eventos };
+      }
+      case "generar_senales_unificadas": {
+        const { ejecutarSenalesUnificadas } = await import("@/lib/agents/ejecutores");
+        const res = await ejecutarSenalesUnificadas(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok, eventos: (res as any).eventos };
+      }
+      case "calcular_ytm_bono": {
+        const { ejecutarYTM } = await import("@/lib/agents/ejecutores");
+        const res = await ejecutarYTM(argsRaw, sessionId);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok, eventos: (res as any).eventos };
+      }
+      case "consultar_curva_etti": {
+        try {
+          const { getCurvaETTI } = await import("@/lib/herramientas/etti.functions");
+          const args = argsRaw.trim() ? JSON.parse(argsRaw) as any : {};
+          const res: any = await (getCurvaETTI as any)({ data: { tickers: args.tickers, sessionId, fechaLiquidacion: args.fechaLiquidacion } });
+          const r = res as any;
+          // Si es Response, intentar json
+          const data = r?.puntos ? r : r;
+          const txt = [
+            `Curva ETTI spot soberana al ${data.fechaLiquidacion ?? ""} — forma ${data.forma} (${data.justificacionForma})`,
+            ...data.puntos.map((p: any) => `${p.ticker} ${p.vencimiento} (${p.diasAlVencimiento}d) spot TEA ${(p.spotTEA!=null?(p.spotTEA*100).toFixed(2)+"%":"N/D")} TIR ${(p.tir!=null?(p.tir*100).toFixed(2)+"%":"N/D")} precio ${p.precioClean ?? "N/D"}`),
+            ...data.forwards.map((f: any) => `Forward ${f.desde}→${f.hasta} ${f.diasForward}d ${f.forwardTEA!=null?(f.forwardTEA*100).toFixed(2)+"%":"N/D"} (${f.formula})`),
+            ...(data.advertencias?.length ? [`Advertencias: ${data.advertencias.join("; ")}`] : []),
+          ].join("\n");
+          return { texto: txt, fuentes: [], ok: true };
+        } catch (e) {
+          return { texto: `SIN RESULTADOS: consultar_curva_etti falló (${e instanceof Error ? e.message : String(e)})`, fuentes: [], ok: false };
+        }
+      }
+      case "calcular_yield_call": {
+        try {
+          const { calcularYieldToCall } = await import("@/lib/herramientas/bonos-callable.functions");
+          const args = argsRaw.trim() ? JSON.parse(argsRaw) as any : {};
+          const res: any = await (calcularYieldToCall as any)({ data: { ticker: args.ticker, precioPorCada100VN: args.precioPorCada100VN, sessionId, fechaLiquidacion: args.fechaLiquidacion, calls: args.calls } });
+          const r = res as any;
+          const txt = [
+            `YTC/YTM ${r.ticker} ${r.descripcion} vto ${r.vencimiento} liq ${r.fechaLiquidacion} precio ${r.precioClean}`,
+            `YTM TEA ${r.teaVencimiento!=null?(r.teaVencimiento*100).toFixed(2)+"%":"N/D"} TIR ${r.tirVencimiento!=null?(r.tirVencimiento*100).toFixed(2)+"%":"N/D"}`,
+            ...r.ytc.map((y: any) => `YTC call ${y.fechaCall} @${y.precioCall} ${y.diasAlCall}d TEA ${y.teaCall!=null?(y.teaCall*100).toFixed(2)+"%":"N/D"}`),
+            `Yield to Worst ${r.yieldToWorst.tipo} ${r.yieldToWorst.fecha ?? ""} ${(r.yieldToWorst.valor!=null?(r.yieldToWorst.valor*100).toFixed(2)+"%":"N/D")}`,
+            ...(r.advertencias?.length ? [`Notas: ${r.advertencias.join("; ")}`] : []),
+          ].join("\n");
+          return { texto: txt, fuentes: [], ok: true };
+        } catch (e) {
+          return { texto: `SIN RESULTADOS: calcular_yield_call falló (${e instanceof Error ? e.message : String(e)})`, fuentes: [], ok: false };
+        }
+      }
+      case "calcular_total_return": {
+        try {
+          const { calcularTotalReturn } = await import("@/lib/herramientas/bonos-callable.functions");
+          const args = argsRaw.trim() ? JSON.parse(argsRaw) as any : {};
+          const res: any = await (calcularTotalReturn as any)({ data: { ticker: args.ticker, horizonteDias: args.horizonteDias ?? 365, precioPorCada100VN: args.precioPorCada100VN, tasaReinversionTEA: args.tasaReinversionTEA, sessionId, fechaLiquidacion: args.fechaLiquidacion } });
+          const r = res as any;
+          const txt = [
+            `Total Return ${r.ticker} horizonte ${r.horizonteDias}d → ${r.horizonteFecha} liq ${r.fechaLiquidacion} precioIni ${r.precioInicial}`,
+            `Precio teórico al horizonte ${r.precioFinalTeorico ?? "N/D"} cupones ${r.cuponesCobrados} reinversión ${r.reinversionAcumulada.toFixed(2)} (TEA ${(r.tasaReinversion*100).toFixed(2)}%)`,
+            `Valor total ${r.valorTotal.toFixed(2)} TR ${(r.totalReturn!=null?(r.totalReturn*100).toFixed(2)+"%":"N/D")} anualizado ${(r.totalReturnAnualizado!=null?(r.totalReturnAnualizado*100).toFixed(2)+"%":"N/D")}`,
+            ...r.detalleFlujos.slice(0,8).map((d: any) => `  ${d.fecha} ${d.monto} → reinv ${d.reinvertido.toFixed(2)} (${d.dias}d)`),
+          ].join("\n");
+          return { texto: txt, fuentes: [], ok: true };
+        } catch (e) {
+          return { texto: `SIN RESULTADOS: calcular_total_return falló (${e instanceof Error ? e.message : String(e)})`, fuentes: [], ok: false };
+        }
+      }
+      case "calcular_stripped_yield": {
+        try {
+          const { calcularStrippedYield } = await import("@/lib/herramientas/bonos-callable.functions");
+          const args = argsRaw.trim() ? JSON.parse(argsRaw) as any : {};
+          const res: any = await (calcularStrippedYield as any)({ data: { ticker: args.ticker, precioPorCada100VN: args.precioPorCada100VN, sessionId, fechaLiquidacion: args.fechaLiquidacion } });
+          const r = res as any;
+          const txt = [
+            `Stripped yield ${r.ticker} liq ${r.fechaLiquidacion} precio ${r.precioClean}`,
+            ...r.stripped.map((s: any) => `${s.fecha} t=${s.anos.toFixed(2)}y zero TEA ${s.zeroTEA!=null?(s.zeroTEA*100).toFixed(2)+"%":"N/D"}`),
+            ...(r.advertencias?.length ? [`Notas: ${r.advertencias.join("; ")}`] : []),
+          ].join("\n");
+          return { texto: txt, fuentes: [], ok: true };
+        } catch (e) {
+          return { texto: `SIN RESULTADOS: calcular_stripped_yield falló (${e instanceof Error ? e.message : String(e)})`, fuentes: [], ok: false };
+        }
+      }
+      case "consultar_semaforo_riesgo_bono": {
+        try {
+          const { getSemaforoRiesgoBono } = await import("@/lib/herramientas/riesgo-bono.functions");
+          const args = argsRaw.trim() ? JSON.parse(argsRaw) as any : {};
+          const res: any = await (getSemaforoRiesgoBono as any)({ data: { ticker: args.ticker, sessionId, precioPorCada100VN: args.precioPorCada100VN } });
+          const r = res as any;
+          const txt = [
+            `Semáforo riesgos ${r.ticker} ${r.descripcion} vto ${r.vencimiento} precio ${r.precio} TIR ${(r.tir!=null?(r.tir*100).toFixed(2)+"%":"N/D")} Dur.Mod ${r.durationMod?.toFixed(2) ?? "N/D"} — ${r.semaforo} (score ${r.scoreProm}/5)`,
+            ...r.factores.map((f: any) => `${f.nombre}: ${f.nivel}/5 ${f.valor ?? ""} — ${f.justificacion}`),
+          ].join("\n");
+          return { texto: txt, fuentes: [], ok: true };
+        } catch (e) {
+          return { texto: `SIN RESULTADOS: semáforo riesgo bono falló (${e instanceof Error ? e.message : String(e)})`, fuentes: [], ok: false };
+        }
+      }
+      case "calcular_tir_portafolio": {
+        try {
+          const { calcularTIRPortafolio } = await import("@/lib/herramientas/portafolio-tir.functions");
+          const args = argsRaw.trim() ? JSON.parse(argsRaw) as any : {};
+          const res: any = await (calcularTIRPortafolio as any)({ data: { posiciones: args.posiciones, sessionId, horizonteDias: args.horizonteDias, tasaReinversionTEA: args.tasaReinversionTEA } });
+          const r = res as any;
+          const txt = [
+            `TIR portafolio RF total USD ${r.totalValor.toFixed(2)} pctConTIR ${(r.pctConTIR*100).toFixed(1)}%`,
+            `Agregados TEA ${(r.agregados.teaPonderada!=null?(r.agregados.teaPonderada*100).toFixed(2)+"%":"N/D")} TIR ${(r.agregados.tirPonderada!=null?(r.agregados.tirPonderada*100).toFixed(2)+"%":"N/D")} Dur ${r.agregados.durationPonderada?.toFixed(2) ?? "N/D"}`,
+            ...r.posiciones.map((p: any) => `${p.ticker} ${p.cantidad} VN peso ${(p.peso*100).toFixed(1)}% TIR ${(p.tir!=null?(p.tir*100).toFixed(2)+"%":"N/D")} precio ${p.precio}`),
+            `Composición por tipo: ${r.composicion.porTipo.map((x: any)=>`${x.nombre} ${(x.pct*100).toFixed(1)}%`).join(", ")}`,
+          ].join("\n");
+          return { texto: txt, fuentes: [], ok: true };
+        } catch (e) {
+          return { texto: `SIN RESULTADOS: TIR portafolio falló (${e instanceof Error ? e.message : String(e)})`, fuentes: [], ok: false };
+        }
+      }
+      case "predecir_direccion": {
+        const { ejecutarPrediccionSubyacente } = await import("@/lib/agents/ejecutores");
+        const res = await ejecutarPrediccionSubyacente(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: true };
+      }
+      case "analizar_opciones": {
+        const { ejecutarCadenaOpciones } = await import("@/lib/agents/ejecutores");
+        const res = await ejecutarCadenaOpciones(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: true };
+      }
       default:
       return { ...(await ejecutarBusqueda(query)), ok: true };
   }
+  });
 }
 
 /** Envía al chat los eventos (gráficos / informes) que produjo una herramienta. */
@@ -1111,12 +1299,44 @@ function extraerTickerPregunta(pregunta: string): string | null {
     "CARTERA",
     "DATOS",
     "INDICADORES",
+    "GENERA",
+    "GENERAR",
+    "GENERAME",
+    "SENAL",
+    "SENALES",
+    "UNIFICADA",
+    "UNIFICADAS",
+    "MANDA",
+    "MANDAME",
+    "MANDALE",
+    "MANDAR",
+    "ENVIAME",
+    "ENVIAR",
+    "TELEGRAM",
+    "QUIERO",
+    "NECESITO",
+    "QUERES",
+    "DALE",
+    "AHORA",
+    "HOY",
+    "PORFAVOR",
+    "FAVOR",
+    "CORONAR",
+    "INVERSIONES",
+    "MOTOR",
+    "CAPAS",
+    "COMPRO",
+    "COMPRAR",
+    "VENDER",
+    "TOP",
+    "MEJOR",
+    "MEJORES",
   ]);
   const limpio = normalizarSinAcentos(pregunta).replace(/[¿?¡!.,;:()]/g, " ");
   const tokens = limpio.match(/\b([A-Z][A-Z0-9]{0,7}(?:\.[A-Z]{1,4})?)\b/g) ?? [];
   const candidatos = tokens.filter((t) => !RUIDOS.has(t));
   const conSufijo = candidatos.find((c) => c.includes("."));
-  const simbolo = conSufijo ?? candidatos[0] ?? null;
+  const simbolo = conSufijo ?? candidatos.find((c) => c.length >= 2) ?? candidatos[0] ?? null;
   if (!simbolo) return null;
   return simbolo.length <= 24 ? simbolo : null;
 }
@@ -1165,11 +1385,17 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   } = opts;
 
   const fuentes: FuenteMercado[] = [];
+  // NeMo Relay adaptive tuning: paralelismo basado en latencias previas
+  let adaptiveHint: { toolParallelism: string; maxParallel: number; reason: string } | undefined;
+  try {
+    const { getAdaptiveHint } = await import("@/lib/nemo-relay");
+    adaptiveHint = getAdaptiveHint();
+  } catch { /* sin relay */ }
   // Registra si en este turno se obtuvo contenido REAL de noticias (no el
   // marcador "SIN RESULTADOS"). Sin esto, una pregunta de causa no se puede
   // responder con honestidad y se fuerza el fallback determinístico.
   let huboDatoNoticias = false;
-  const cola = new ColaDeTareas(3);
+  const cola = new ColaDeTareas(adaptiveHint?.maxParallel ?? 3);
 
   // 1) Router: qué agentes convocar.
   const activos = enrutar(pregunta);
@@ -1400,6 +1626,7 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   const yaHayDatoMercado = fuentes.some((f) =>
     MARKET_DOMINIOS.some((d) => f.dominio?.toLowerCase().includes(d)),
   );
+  let mercadoTextoForzado = "";
   if (esPreguntaMercado && !yaHayDatoMercado) {
     const callId = `mercado_forzado_${Date.now()}`;
     const args = JSON.stringify({ query: pregunta });
@@ -1411,6 +1638,7 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
     enviar({ t: "status", v: "mercado", q: pregunta });
     console.log(`[TOOL] consultar_mercado (red-seguridad) ${args.slice(0, 160)}`); // TEMP PASO4
     const resultado = await ejecutarMercado(pregunta);
+    mercadoTextoForzado = resultado.texto;
     fuentes.push(...resultado.fuentes);
     if (resultado.fuentes.length) enviar({ t: "sources", v: resultado.fuentes });
     messages.push({
@@ -1418,6 +1646,240 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
       tool_call_id: callId,
       name: "consultar_mercado",
       content: `Datos reales de consultar_mercado (fuentes externas):\n\n${resultado.texto}`,
+    });
+    enviar({ t: "status", v: "searching" });
+  }
+
+  // ---- Red de seguridad: gráfico pedido y no ejecutado → forzar grafico_chat ----
+  const esPreguntaGrafico = /gr[aá]fico|chart|tradingview|velas|visualiz|hist[oó]rico.*(?:riesgo|dolar|merval)|pasame.*grafico/i.test(pregunta);
+  const yaHayGrafico = messages.some(
+    (m) => typeof m.content === "string" && m.content.includes("Gráfico de") && (m.name === "grafico_chat" || m.content.includes("grafico_chat")),
+  ) || fuentes.some(() => false); // placeholder, chart no usa fuentes
+  // Check tool calls in messages
+  const yaLlamoGrafico = messages.some((m: any) => m.tool_calls?.some((c: any) => c.function?.name === "grafico_chat"));
+  if (esPreguntaGrafico && !yaLlamoGrafico) {
+    // Prioridad: riesgo país histórico es caso especial, no ticker extraíble
+    let simboloGrafico: string | null = null;
+    if (/riesgo\s*pa[ií]s/i.test(pregunta)) simboloGrafico = "riesgo_pais";
+    else simboloGrafico = extraerTickerPregunta(pregunta);
+    if (simboloGrafico) {
+      // Mapear "1 AÑO", "1 año", "6M", etc. a rango Yahoo
+      let rangoRaw = "1y";
+      const mRango = pregunta.match(/(\d+)\s*(año|ano|anios|años|mes|meses|m)\b/i);
+      if (mRango) {
+        const n = parseInt(mRango[1]!, 10);
+        const unit = mRango[2]!.toLowerCase();
+        if (unit.startsWith("año") || unit.startsWith("ano")) rangoRaw = n === 1 ? "1y" : n === 5 ? "5y" : n === 2 ? "2y" : "1y";
+        else if (unit.startsWith("mes")) rangoRaw = n === 1 ? "1mo" : n === 3 ? "3mo" : n === 6 ? "6mo" : "1y";
+        else if (unit === "m") rangoRaw = "1mo";
+      } else if (/1\s*año/i.test(pregunta)) rangoRaw = "1y";
+      else if (/6\s*mes/i.test(pregunta)) rangoRaw = "6mo";
+      const callId = `grafico_forzado_${Date.now()}`;
+      let argsGrafico: string;
+      if (simboloGrafico === "riesgo_pais") {
+        try {
+          const { argentinaDatosConsulta } = await import("@/lib/fuentes.server");
+          const serie = await (argentinaDatosConsulta as any)("finanzas/indices/riesgo-pais");
+          let puntos = Array.isArray(serie) ? serie.slice(-365).map((p: any) => ({ f: String(p.fecha ?? p.date ?? "").slice(0,10), v: Number(p.valor ?? p.value) })).filter((p:any)=>isFinite(p.v)) : [];
+          // Muestreo ultra-agresivo para QuickChart GET (evita "Invalid token" 1:1282 por URL >2k) — 20 pts máx
+          if (puntos.length > 20) {
+            const step = Math.ceil(puntos.length / 20);
+            puntos = puntos.filter((_, i) => i % step === 0);
+          }
+          if (puntos.length) {
+            argsGrafico = JSON.stringify({ tipo: "linea", titulo: "Riesgo país histórico (EMBI) — 20 pts", serie: puntos, unidad: "bps" });
+          } else {
+            throw new Error("serie vacía");
+          }
+        } catch {
+          // Fallback: sin serie histórica, asegurar dato actual de mercado para que el redactor pueda responder
+          try {
+            const { ejecutarMercado } = await import("@/lib/agents/ejecutores");
+            const rMercado = await ejecutarMercado("riesgo país");
+            const callIdMercado = `mercado_riesgo_fallback_${Date.now()}`;
+            messages.push({
+              role: "assistant",
+              content: "",
+              tool_calls: [{ id: callIdMercado, function: { name: "consultar_mercado", arguments: JSON.stringify({ query: "riesgo país" }) } }],
+            });
+            enviar({ t: "status", v: "mercado", q: "riesgo país" });
+            fuentes.push(...rMercado.fuentes);
+            if (rMercado.fuentes.length) enviar({ t: "sources", v: rMercado.fuentes });
+            messages.push({
+              role: "tool",
+              tool_call_id: callIdMercado,
+              name: "consultar_mercado",
+              content: `Datos reales de consultar_mercado (fuentes externas):\n\n${rMercado.texto}\n\nSerie histórica completa: https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais`,
+            });
+            const m = rMercado.texto.match(/(\d+)\s*(?:pts|puntos)/i);
+            if (m) {
+              const v = parseInt(m[1], 10);
+              argsGrafico = JSON.stringify({ tipo: "linea", titulo: "Riesgo país (valor actual)", serie: [{ f: new Date().toISOString().slice(0,10), v }], unidad: "bps" });
+            } else {
+              argsGrafico = JSON.stringify({ tipo: "linea", titulo: "Riesgo país histórico", serie: [], unidad: "bps" });
+            }
+          } catch {
+            argsGrafico = JSON.stringify({ tipo: "linea", titulo: "Riesgo país histórico", serie: [], unidad: "bps" });
+          }
+        }
+      } else if (/tradingview/i.test(pregunta)) {
+        // Usuario pidió explícitamente TradingView -> forzar evento tradingview con exchange
+        let tvSymbol = simboloGrafico;
+        // Mapeo simple a exchange: si ya trae ":", respetar; si termina en .BA, usar BCBA:
+        if (!tvSymbol.includes(":")) {
+          if (tvSymbol.endsWith(".BA")) tvSymbol = `BCBA:${tvSymbol.replace(".BA", "")}`;
+          else if (/^[A-Z]{1,5}$/.test(tvSymbol)) tvSymbol = `NASDAQ:${tvSymbol}`;
+          else tvSymbol = `NASDAQ:${tvSymbol}`;
+        }
+        const intervalo = /1\s*min|1m\b/i.test(pregunta) ? "1" : /5\s*min/i.test(pregunta) ? "5" : /15\s*min/i.test(pregunta) ? "15" : /60|1h/i.test(pregunta) ? "60" : "D";
+        argsGrafico = JSON.stringify({ tipo: "tradingview", simbolo: tvSymbol, intervalo, titulo: tvSymbol });
+      } else {
+        argsGrafico = JSON.stringify({ tipo: "linea", simbolo: simboloGrafico, rango: rangoRaw });
+      }
+      messages.push({
+        role: "assistant",
+        content: "",
+        tool_calls: [{ id: callId, function: { name: "grafico_chat", arguments: argsGrafico } }],
+      });
+      enviar({ t: "status", v: "grafico", q: simboloGrafico });
+      const { ejecutarGraficoChat } = await import("@/lib/agents/ejecutores");
+      const rGraf = await ejecutarGraficoChat(argsGrafico);
+      if (rGraf.eventos?.length) enviarEventos(enviar, rGraf.eventos as any);
+      messages.push({
+        role: "tool",
+        tool_call_id: callId,
+        name: "grafico_chat",
+        content: rGraf.ok ? `Gráfico generado: ${rGraf.texto}` : `No se pudo generar gráfico: ${rGraf.texto}`,
+      });
+      enviar({ t: "status", v: "searching" });
+    }
+  }
+
+  // ---- Red de seguridad: gráfico riesgo país falló (tool SIN GRÁFICO) → inyectar mercado actual ----
+  {
+    const esGraficoRiesgo = /riesgo\s*pa[ií]s/i.test(pregunta) && /gr[aá]fico|historico|evoluci[oó]n/i.test(pregunta);
+    const ultimoGraficoFallo = [...messages].reverse().find((m) => typeof m.content === "string" && m.content.includes("No se pudo generar gráfico"));
+    const yaTieneMercadoRiesgo = messages.some((m) => typeof m.content === "string" && m.content.toLowerCase().includes("riesgo país") && m.content.includes("Datos reales de consultar_mercado"));
+    if (esGraficoRiesgo && ultimoGraficoFallo && !yaTieneMercadoRiesgo) {
+      try {
+        const { ejecutarMercado } = await import("@/lib/agents/ejecutores");
+        const rMercado = await ejecutarMercado("riesgo país");
+        const callIdMercado = `mercado_riesgo_recupero_${Date.now()}`;
+        messages.push({
+          role: "assistant",
+          content: "",
+          tool_calls: [{ id: callIdMercado, function: { name: "consultar_mercado", arguments: JSON.stringify({ query: "riesgo país" }) } }],
+        });
+        enviar({ t: "status", v: "mercado", q: "riesgo país" });
+        fuentes.push(...rMercado.fuentes);
+        if (rMercado.fuentes.length) enviar({ t: "sources", v: rMercado.fuentes });
+        messages.push({
+          role: "tool",
+          tool_call_id: callIdMercado,
+          name: "consultar_mercado",
+          content: `Datos reales de consultar_mercado (fuentes externas):\n\n${rMercado.texto}\n\nSerie histórica: https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais`,
+        });
+        // También generar un gráfico sintético con el valor actual para que el evento chart no quede vacío
+        const m = rMercado.texto.match(/(\d+)\s*(?:pts|puntos)/i);
+        if (m) {
+          const v = parseInt(m[1], 10);
+          const serie = [{ f: new Date().toISOString().slice(0, 10), v }];
+          const argsGraficoRecupero = JSON.stringify({ tipo: "linea", titulo: "Riesgo país (valor actual)", serie, unidad: "bps" });
+          const callIdGraf = `grafico_riesgo_recupero_${Date.now()}`;
+          messages.push({
+            role: "assistant",
+            content: "",
+            tool_calls: [{ id: callIdGraf, function: { name: "grafico_chat", arguments: argsGraficoRecupero } }],
+          });
+          const { ejecutarGraficoChat } = await import("@/lib/agents/ejecutores");
+          const rGraf2 = await ejecutarGraficoChat(argsGraficoRecupero);
+          if (rGraf2.eventos?.length) enviarEventos(enviar, rGraf2.eventos as any);
+          messages.push({
+            role: "tool",
+            tool_call_id: callIdGraf,
+            name: "grafico_chat",
+            content: `Gráfico generado (recupero): ${rGraf2.texto}`,
+          });
+        }
+        enviar({ t: "status", v: "searching" });
+      } catch {}
+    }
+  }
+
+  // ---- Red de seguridad: YTM/TIR de bono pedido y no ejecutado → forzar calcular_ytm_bono ----
+  {
+    const esPreguntaYTM = /ytm|tir\b|tasa\s+interna.*retorno|rendimiento.*bono/i.test(pregunta) && /al30|gd30|al35|gd35|ae38|gd38|tx26|bono/i.test(pregunta);
+    const yaLlamoYTM = messages.some((m: any) => m.tool_calls?.some((c: any) => c.function?.name === "calcular_ytm_bono" || c.function?.name === "calcular_tir_bono"));
+    if (esPreguntaYTM && !yaLlamoYTM) {
+      const tickerYTM = extraerTickerPregunta(pregunta) || "AL30";
+      const callId = `ytm_forzado_${Date.now()}`;
+      const argsYTM = JSON.stringify({ ticker: tickerYTM });
+      messages.push({
+        role: "assistant",
+        content: "",
+        tool_calls: [{ id: callId, function: { name: "calcular_ytm_bono", arguments: argsYTM } }],
+      });
+      enviar({ t: "status", v: "valoracion", q: tickerYTM });
+      try {
+        const { ejecutarYTM } = await import("@/lib/agents/ejecutores");
+        const rYTM = await ejecutarYTM(argsYTM, sessionId);
+        if (rYTM.fuentes.length) enviar({ t: "sources", v: rYTM.fuentes });
+        if ((rYTM as any).eventos?.length) enviarEventos(enviar, (rYTM as any).eventos);
+        messages.push({
+          role: "tool",
+          tool_call_id: callId,
+          name: "calcular_ytm_bono",
+          content: `YTM/TIR real de ${tickerYTM} (RENTA_FIJA_COMPLETA.json + IOL en vivo, Newton-Raphson ACT/365):\n\n${rYTM.texto}`,
+        });
+      } catch (e) {
+        messages.push({
+          role: "tool",
+          tool_call_id: callId,
+          name: "calcular_ytm_bono",
+          content: `Error calculando YTM de ${tickerYTM}: ${e instanceof Error ? e.message : String(e)}`,
+        });
+      }
+      enviar({ t: "status", v: "searching" });
+    }
+  }
+
+  // ---- Red de seguridad: mapeo JSON unificado pedido y no ejecutado → forzar ----
+  const esMapeoJson = /mapea.*json|json\s+unificado|estructura.*json|muestra.*json|mapea el json/i.test(pregunta);
+  const yaMapeoJson = messages.some((m: any) => m.tool_calls?.some((c: any) => c.function?.name === "consultar_catalogo" || c.function?.name === "consultar_base_conocimiento") && String(m.content ?? "").toLowerCase().includes("unificado"));
+  // También check si ya hay tool result de catalogo
+  const yaHayCatalogo = messages.some((m) => typeof m.content === "string" && m.content.includes("activos encontrados en el catálogo"));
+  if (esMapeoJson && !yaHayCatalogo) {
+    const callId = `json_mapeo_${Date.now()}`;
+    const argsJson = JSON.stringify({ criterio: "a" }); // trae muestra amplia
+    messages.push({
+      role: "assistant",
+      content: "",
+      tool_calls: [{ id: callId, function: { name: "consultar_catalogo", arguments: argsJson } }],
+    });
+    enviar({ t: "status", v: "searching", q: "mapeo unificado_completo.json" });
+    const { ejecutarCatalogo } = await import("@/lib/agents/ejecutores");
+    const rCat = await ejecutarCatalogo(argsJson);
+    // Además, agregar resumen directo del JSON (sectores, industrias, tickers)
+    let resumenJson = "";
+    try {
+      const data: any = await import("@/data/unificado_completo.json").then((m: any) => m.default ?? m);
+      const sectores = Object.keys(data.sectores ?? data ?? {}).length;
+      const totalTickers = (() => {
+        let c = 0;
+        const sec = (data.sectores ?? data) as Record<string, any>;
+        for (const s of Object.values(sec)) {
+          const inds = (s as any).industrias ?? {};
+          for (const tickers of Object.values(inds)) if (Array.isArray(tickers)) c += tickers.length;
+        }
+        return c;
+      })();
+      resumenJson = `Estructura unificado_completo.json v${data.version ?? "?"}: ${sectores} sectores, ~${totalTickers} tickers. Sectores: ${Object.keys((data.sectores ?? {})).slice(0, 6).join(", ")}...`;
+    } catch {}
+    messages.push({
+      role: "tool",
+      tool_call_id: callId,
+      name: "consultar_catalogo",
+      content: `Mapeo unificado_completo.json (fuente: @/data/unificado_completo.json):\n${resumenJson}\n\nMuestra catálogo (criterio "a"):\n${rCat.texto.slice(0, 3000)}\n\nUsá consultar_catalogo con criterio específico (ej. "GGAL", "Tecnología", "Energy") para detalle por ticker/sector.`,
     });
     enviar({ t: "status", v: "searching" });
   }
@@ -1702,6 +2164,65 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
     enviar({ t: "status", v: "searching" });
   }
 
+  // ---- Red de seguridad 8: señal unificada (4 capas) pedida y no ejecutada → forzar ----
+  const esPreguntaSenalUnificada =
+    /se[ñn]al\s+unificada|se[ñn]ales\s+unificadas|motor\s+unificado|qu[eé]\s+compro\s+hoy|qu[eé]\s+comprar|top\s+se[ñn]ales|generar.*se[ñn]al|analiz[aá]\s+(?:complet[ao]|unificad)/i.test(
+      pregunta,
+    );
+  const yaHaySenalUnificada = messages.some(
+    (m) =>
+      typeof m.content === "string" &&
+      (m.content.includes("SEÑAL UNIFICADA CORONAR") || m.content.includes("SEÑALES UNIFICADAS CORONAR")),
+  );
+  if (esPreguntaSenalUnificada && !yaHaySenalUnificada) {
+    const tickerExtraido = extraerTickerPregunta(pregunta);
+    const esBatch = /se[ñn]ales|top\s+\d+|qu[eé]\s+compro\s+hoy|universo|todos/i.test(pregunta) && !tickerExtraido;
+    if (tickerExtraido && !esBatch) {
+      const callId = `senal_unificada_${Date.now()}`;
+      const argsSenal = JSON.stringify({ simbolo: tickerExtraido });
+      messages.push({
+        role: "assistant",
+        content: "",
+        tool_calls: [{ id: callId, function: { name: "generar_senal_unificada", arguments: argsSenal } }],
+      });
+      enviar({ t: "status", v: "portafolio", q: tickerExtraido });
+      console.log(`[TOOL] generar_senal_unificada (red-seguridad) ${argsSenal}`);
+      const { ejecutarSenalUnificada } = await import("@/lib/agents/ejecutores");
+      const r = await ejecutarSenalUnificada(argsSenal);
+      if (r.fuentes.length) enviar({ t: "sources", v: r.fuentes });
+      enviarEventos(enviar, (r as any).eventos);
+      messages.push({
+        role: "tool",
+        tool_call_id: callId,
+        name: "generar_senal_unificada",
+        content: r.ok
+          ? `Señal unificada CORONAR (Intermarket Pring + Fundamental Pascale gate + Semaforo + CAPM/Riesgo) con datos reales:\n\n${r.texto}`
+          : `No se pudo generar señal unificada: ${r.texto}`,
+      });
+      enviar({ t: "status", v: "searching" });
+    } else {
+      // Batch
+      const callId = `senales_unificadas_${Date.now()}`;
+      const argsBatch = JSON.stringify({ simbolos: [], topN: 6, filtro: "todos" });
+      messages.push({
+        role: "assistant",
+        content: "",
+        tool_calls: [{ id: callId, function: { name: "generar_senales_unificadas", arguments: argsBatch } }],
+      });
+      enviar({ t: "status", v: "portafolio", q: "señales unificadas batch" });
+      console.log(`[TOOL] generar_senales_unificadas (red-seguridad) ${argsBatch}`);
+      const { ejecutarSenalesUnificadas } = await import("@/lib/agents/ejecutores");
+      const r = await ejecutarSenalesUnificadas(argsBatch);
+      messages.push({
+        role: "tool",
+        tool_call_id: callId,
+        name: "generar_senales_unificadas",
+        content: r.ok ? `Señales unificadas CORONAR (batch 4 capas):\n\n${r.texto}` : `No se pudo generar batch: ${r.texto}`,
+      });
+      enviar({ t: "status", v: "searching" });
+    }
+  }
+
   // El enfoque del coordinador llega al redactor como guía.
   if (enfoque.trim()) {
     messages.push({ role: "user", content: `[Guía del análisis previo] ${enfoque.trim()}` });
@@ -1824,6 +2345,116 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   if (esPreguntaDeCausa(pregunta) && !huboDatoNoticias) {
     const activo = extraerActivo(pregunta);
     final = `Busqué en las fuentes de noticias y no encontré una razón puntual confirmada para ${activo} en las últimas horas. No te voy a inventar una causa. Si querés, puedo ampliar el período, consultarte por otro activo o pasarte el contacto de Cintia por WhatsApp para revisarlo en detalle.`;
+  }
+
+  // Fix incoherencia: si es pregunta de mercado y el modelo pidió permiso en vez de usar el dato, lo corregimos autónomamente
+  if (
+    esPreguntaMercado &&
+    /te gustar|quer[eé]s que|quieres que|deseas que|te parece|me dec[ií]s si|¿te gustar[ií]a|consultar la herramienta/i.test(final)
+  ) {
+    let textoMercado = mercadoTextoForzado;
+    if (!textoMercado) {
+      // Buscar último resultado de consultar_mercado en messages (ya ejecutado por agentes paralelos)
+      const msgMercado = [...messages].reverse().find(
+        (m) => typeof m.content === "string" && m.content.includes("Datos reales de consultar_mercado"),
+      );
+      if (msgMercado) textoMercado = String(msgMercado.content).replace(/^Datos reales de consultar_mercado.*?:\n\n/, "").slice(0, 1400);
+      // Si tampoco hay, ejecutar ahora mismo (autónomo, sin pedir permiso)
+      if (!textoMercado) {
+        try {
+          const r = await ejecutarMercado(pregunta);
+          textoMercado = r.texto;
+          if (r.fuentes.length) fuentes.push(...r.fuentes);
+        } catch {}
+      }
+    }
+    if (textoMercado) {
+      final = `${textoMercado.slice(0, 1200)}\n\nFuentes consultadas en este turno. ¿Te sirve otro dato (blue, MEP, CCL, riesgo país)?`;
+    }
+  }
+
+  // Fix: mapeo JSON e imagen — si el modelo se negó con "no es válida", lo corregimos con el resultado del safety net
+  if (/no es (una pregunta que requiera|v[aá]lida para ser resuelta)|no existe un JSON|no se puede mapear.*json|no hay.*herramienta aplicable.*mapea/i.test(final) && /mapea.*json|json.*unificado/i.test(pregunta)) {
+    const msgCatalogo = [...messages].reverse().find((m) => typeof m.content === "string" && m.content.includes("Mapeo unificado_completo.json"));
+    if (msgCatalogo) final = String(msgCatalogo.content).slice(0, 3500);
+    else final = "Listo — mapeo del `unificado_completo.json` disponible. Tiene sectores → industrias → tickers con tipo/moneda/mercado/país. Decime qué querés mapear (ej. 'mapea GGAL', 'mapea el sector Tecnología', 'muestra todos los tickers de Energy') y te devuelvo la estructura con `consultar_catalogo`. ¿Quieres un resumen por sector o el detalle de un ticker?";
+  }
+  if (/no (es una pregunta que requiera|se proporciona ninguna imagen|existe una imagen asociada|hay.*imagen.*proporcionada)/i.test(final) && /que dice la imagen|analiza.*imagen|describe.*imagen|lee.*imagen|interpreta.*imagen/i.test(pregunta)) {
+    final = "Para analizar una imagen, por favor subila como archivo adjunto (foto, captura o gráfico) y decime qué querés que analice (ej. 'analiza este gráfico de GGAL' o 'qué dice esta captura de mi portfolio'). Acepto imágenes de portfolios, gráficos de TradingView, comprobantes y documentos.\n\nEn Telegram: enviá la foto con un caption. En el chat web: usá el botón de adjuntar (clip) o arrastrá la imagen al chat. Luego la proceso con visión IA y te doy el análisis.";
+  }
+  // Fix alucinación señales: si la pregunta es "qué compro hoy" y el final usa generar_senales_cedear con tickers hallucinated (GGAL->AAPL), priorizar motor unificado
+  if (/qu[eé]\s+compro\s+hoy|top\s+\d+\s+se[ñn]ales|se[ñn]ales de hoy/i.test(pregunta) && /generar_senales_cedear|GGAL.*Apple|PAMP.*Caterpillar/i.test(final)) {
+    const msgUnificado = [...messages].reverse().find((m) => typeof m.content === "string" && m.content.includes("SEÑALES UNIFICADAS CORONAR"));
+    if (msgUnificado) final = String(msgUnificado.content).slice(0, 4000);
+  }
+
+  // Fix markdown QuickChart roto (Invalid token 1:1282) — la URL con 365 labels excede parser MD. Para riesgo país, el gráfico ya se renderiza como ChartBox SVG arriba.
+  if (/https:\/\/quickchart\.io\/chart\?c=/.test(final)) {
+    // Para riesgo país, el SVG nativo ya está arriba como evento chart — no repetir markdown largo
+    if (/riesgo\s*pa[ií]s/i.test(pregunta)) {
+      final = final.replace(/!\[.*?\]\(https:\/\/quickchart\.io\/chart\?c=[^\)]+\)/g, "");
+      // Limpiar doble salto si quedó
+      final = final.replace(/\n{3,}/g, "\n\n").trim();
+    } else if (final.length > 2500) {
+      final = final.replace(/!\[.*?\]\(https:\/\/quickchart\.io\/chart\?c=[^\)]+\)/g, "[Gráfico histórico renderizado arriba como imagen interactiva — usa el gráfico SVG para descargar]");
+    }
+  }
+  // Fix YTM deflectivo: si el modelo pidió que indiques herramienta en vez de calcular YTM de AL30, usar el safety net
+  if (/No dispongo del dato actual de la Yield.*YTM.*del bono AL30|No dispongo.*YTM.*AL30|indícame cuál.*herramienta.*consultar_mercado.*YTM|No dispongo.*YTM/i.test(final) && /ytm|tir.*al30|bono.*al30|al30.*ytm|al30.*tir/i.test(pregunta)) {
+    const msgYTM = [...messages].reverse().find((m) => typeof m.content === "string" && m.content.includes("YTM/TIR real de"));
+    if (msgYTM) final = String(msgYTM.content).replace(/^YTM\/TIR real.*?:\n\n/, "").slice(0, 3500);
+    else {
+      try {
+        const { ejecutarYTM } = await import("@/lib/agents/ejecutores");
+        const r = await ejecutarYTM(JSON.stringify({ ticker: extraerTickerPregunta(pregunta) || "AL30" }), sessionId);
+        if (r.ok) final = r.texto.slice(0, 3500);
+      } catch {}
+    }
+  }
+
+  // Fix TradingView: si pidió tradingview y el final dio fallback genérico sin chart, reemplazar por link correcto
+  if (/tradingview/i.test(pregunta) && /No dispongo de un enlace directo a un gr[aá]fico de TradingView|Fuentes donde pod[eé]s verlo:\s*- TradingView/i.test(final)) {
+    const m = [...messages].reverse().find((mm) => typeof mm.content === "string" && mm.content.includes("Gráfico de TradingView generado para"));
+    const chTrading = [...messages].reverse().find((mm: any) => mm.tool_calls?.some((c: any) => c.function?.name === "grafico_chat" && String(c.function.arguments ?? "").includes("tradingview")));
+    let simboloTV = "NASDAQ:AAPL";
+    try {
+      const argsStr = (chTrading as any)?.tool_calls?.find((c: any) => c.function?.name === "grafico_chat")?.function?.arguments ?? "";
+      const j = JSON.parse(argsStr);
+      if (j?.simbolo) simboloTV = String(j.simbolo);
+    } catch {}
+    // Si el safety net aún no generó chart tradingview, generar ahora
+    if (!chTrading) {
+      const t = extraerTickerPregunta(pregunta) ?? "AAPL";
+      let tv = t.includes(":") ? t : (/^[A-Z]{1,5}$/.test(t) ? `NASDAQ:${t}` : `NASDAQ:${t}`);
+      if (t.endsWith(".BA")) tv = `BCBA:${t.replace(".BA","")}`;
+      const argsTV = JSON.stringify({ tipo: "tradingview", simbolo: tv, intervalo: "D", titulo: tv });
+      try {
+        const { ejecutarGraficoChat } = await import("@/lib/agents/ejecutores");
+        const rTV = await ejecutarGraficoChat(argsTV);
+        if (rTV.eventos?.length) enviarEventos(enviar, rTV.eventos as any);
+        messages.push({ role: "assistant", content: "", tool_calls: [{ id: `grafico_tv_fix_${Date.now()}`, function: { name: "grafico_chat", arguments: argsTV } }] });
+        messages.push({ role: "tool", tool_call_id: `grafico_tv_fix_${Date.now()}`, name: "grafico_chat", content: `Gráfico generado: ${rTV.texto}` });
+        simboloTV = tv;
+      } catch {}
+    }
+    final = `Acá tenés el gráfico de TradingView para **${simboloTV}** embebido arriba (velas interactivas). Si querés cambiar temporalidad decime (1, 5, 15, 60, D, W) o pedime indicadores. Link directo: https://www.tradingview.com/chart/?symbol=${encodeURIComponent(simboloTV)}`;
+  }
+
+  // Fix gráfico riesgo país: si el final es fallback/deflectivo pero hay dato de mercado de riesgo país, usarlo (cubre todas las variantes deflectivas)
+  if (/gr[aá]fico.*riesgo|riesgo.*gr[aá]fico|historico.*riesgo|evoluci[oó]n.*riesgo/i.test(pregunta) && /(No pude generar una respuesta confiable|No tengo un gráfico del riesgo país|No tengo.*gráfico.*disponible|no devuelven el gráfico|En este momento no dispongo de un gráfico|no dispongo de un gráfico visual|No dispongo.*gráfico)/i.test(final)) {
+    const msgMercadoRiesgo = [...messages].reverse().find((m) => typeof m.content === "string" && m.content.toLowerCase().includes("riesgo país") && m.content.includes("Datos reales"));
+    if (msgMercadoRiesgo) {
+      final = String(msgMercadoRiesgo.content).replace(/^Datos reales de consultar_mercado.*?:\n\n/, "").slice(0, 2000) + "\n\nGráfico histórico: serie diaria disponible en https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais y https://mercados.ambito.com/riesgo-pais — si querés, te genero el gráfico con los últimos 30/90 días.";
+    } else {
+      // Fallback: intentar mercado directo
+      try {
+        const { ejecutarMercado } = await import("@/lib/agents/ejecutores");
+        const r = await ejecutarMercado("riesgo país");
+        if (r.texto && !r.texto.includes("SIN RESULTADOS")) {
+          final = r.texto.slice(0, 2000) + "\n\nSerie histórica: https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais";
+        }
+      } catch {}
+    }
   }
 
   if (!final) {

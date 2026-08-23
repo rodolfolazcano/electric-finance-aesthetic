@@ -613,6 +613,63 @@ export const TOOLS: ToolSpec[] = [
     },
   },
   // -------------------------------------------------------------------------
+  // Ética y Asesoramiento Financiero — principios de conducta profesional
+  // -------------------------------------------------------------------------
+  {
+    type: "function",
+    function: {
+      name: "consultar_principios_etico",
+      description:
+        "Consulta los principios éticos y de asesoramiento financiero basados en los manuales AFC 2022 (Códigos de Conducta IAEF/IEAF, Ética Manual, Asesoramiento Financiero). Úsalo para conocer los principios que deben guiar el comportamiento del asesor financiero: integridad, independencia, conflictos de interés, confidencialidad, cumplimiento normativo, conocimiento del cliente y asesoramiento financiero. El agente debe actuar siempre bajo estos principios.",
+      parameters: {
+        type: "object",
+        properties: {
+          categoria: {
+            type: "string",
+            description:
+              "Categoría de principios a consultar (opcional). Opciones: 'Integridad y Honestidad', 'Independencia y Objetividad', 'Conflictos de Interés', 'Confidencialidad', 'Cumplimiento Normativo', 'Conocimiento del Cliente', 'Asesoramiento Financiero'. Si no se especifica, devuelve todos los principios.",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "verificar_cumplimiento_etico",
+      description:
+        "Verifica si una recomendación o respuesta del agente cumple con los principios éticos del asesoramiento financiero. Detecta violaciones como: promesas de rendimiento garantizado, falta de advertencia de riesgos, falta de consideración del perfil del cliente, o conflicto de intereses. El agente debe usar esta herramienta antes de emitir recomendaciones de inversión para asegurar que su respuesta es éticamente adecuada.",
+      parameters: {
+        type: "object",
+        properties: {
+          recomendacion: {
+            type: "string",
+            description:
+              "Texto de la recomendación o respuesta del agente que se quiere verificar desde el punto de vista ético.",
+          },
+        },
+        required: ["recomendacion"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "obtener_guia_comportamiento",
+      description:
+        "Obtiene la guía completa de comportamiento ético para el agente, con instrucciones específicas sobre cómo aplicar cada principio ético en la práctica. El agente debe consultar esta guía para asegurar que su comportamiento y respuestas cumplen con los estándares profesionales del asesoramiento financiero según los manuales AFC 2022.",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  // -------------------------------------------------------------------------
   // IOL (InvertirOnline) — cuenta personal vía API oficial con login.
   // -------------------------------------------------------------------------
   {
@@ -1375,6 +1432,272 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "analizar_opciones_completo",
+      description:
+        "Análisis completo de opciones BYMA/BCBA con Black-Scholes, griegas (Delta Gamma Theta Vega Rho), volatilidad implícita (Newton-Raphson), Monte Carlo 10k paths (Euler GBM), histograma, sonrisa IV vs strike, prob ITM/profit vs strike. Genera tabla Strike|Prima|BS|IV|Delta|Gamma|ProbITM + gráficos sonrisa, Monte Carlo hist, BS. Usa yfinance/IOL para spot y cadena, Labadie Options para BS. Para 'opciones GGAL', 'GGAL 5700 2026-03-11 Call'.",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: {
+            type: "string",
+            description: "Ticker subyacente, ej GGAL.BA, GGAL, PAMP.BA",
+          },
+          strike: {
+            type: "number",
+            description: "Strike de la opción, ej 5700",
+          },
+          vencimiento: {
+            type: "string",
+            description: "Fecha vencimiento YYYY-MM-DD, ej 2026-03-11. Si no se da, usa 3 meses.",
+          },
+          tipo: {
+            type: "string",
+            enum: ["Call", "Put"],
+            description: "Tipo de opción Call/Put, default Call",
+          },
+        },
+        required: ["ticker"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "calcular_tir_bono",
+      description:
+        "Calcula TIR/TEM/TNA real de un bono argentino desde RENTA_FIJA_COMPLETA.json + precio vivo IOL (usa credenciales harcodeadas boosandr97@gmail.com si no hay sesión del usuario). Lee flujo_fondos, aplica Newton-Raphson ACT/365, convierte precio ARS→USD vía CCL para hard dollar. Para 'TIR de AL30', 'YTM de GD30', 'rendimiento de AE38', 'TIR del Bonar 2030'. Devuelve TIR anual, TEM, TNA, precio, CCL, flujos y gráfico.",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: { type: "string", description: "Ticker del bono (ej. AL30, GD30, AE38, GD38, AL35, GD29, AL30D)" },
+          precioManual: { type: "number", description: "Precio manual opcional (si no, fetchea de IOL bCBA)" },
+        },
+        required: ["ticker"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "generar_senal_unificada",
+      description:
+        "MOTOR UNIFICADO CORONAR — Señal de compra/venta para 1 ticker con orquestación estricta 4 capas: 1) Intermarket (Pring/Stovall 6 etapas + contexto macro BCRA/CriptoYa, metodología pt/Pascale-Blanchard) → 2) Fundamental (gate cualitativo 5.0 + ficha DCF/múltiplos/libro, Pascale/Elbaum) → 3) Técnico (semaforo RSI14/MACD/SMA20-50-200 + soporte/resistencia) → 4) Cuantitativo (Sharpe/VaR/CAPM beta/Hurst). Usa unificado_completo.json como universo. Devuelve COMPRA/COMPRA CON CAUTELA/MANTENER/REDUCIR/VENTA con score 0-10, confianza 0.50-0.85, precio, stops y motivo con las 4 capas citadas. Para 'señal de GGAL', 'analizá GGAL completa', 'comprar o vender YPF'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description: "Ticker a analizar (ej. 'GGAL.BA', 'YPF', 'AAPL', 'MELI', 'PAMP.BA').",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "generar_senales_unificadas",
+      description:
+        "MOTOR UNIFICADO CORONAR — Batch de señales para N tickers (universo unificado_completo.json). Ejecuta en lotes de 3 el pipeline 4 capas (Intermarket → Fundamental → Técnico → Cuantitativo) y devuelve topN ordenado por scoreTotal. Para 'señales de hoy', 'qué comprar hoy', 'top 6 señales', 'señales CEDEARs unificadas', 'armá la cartera del día'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolos: {
+            type: "array",
+            items: { type: "string" },
+            description: "Lista de tickers (ej. ['GGAL.BA','YPF','PAMP.BA','AAPL']). Si vacío, usa top líquidos + rotación sectorial.",
+          },
+          topN: { type: "number", description: "Cuántas señales devolver ordenadas por score (1-15, default 6)." },
+          filtro: {
+            type: "string",
+            enum: ["todos", "solo_compras"],
+            description: "Filtra solo señales compradoras o todas. Default todos.",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "calcular_ytm_bono",
+      description:
+        "Calcula YTM/TIR real de un bono argentino usando RENTA_FIJA_COMPLETA.json (flujo_fondos, fechas, cupones) + precio de cotización EN VIVO de IOL (usa sesión del usuario o fallback hardcodeado boosandr97@gmail.com). Método Newton-Raphson ACT/365. Devuelve TIR anual, TEM, TNA, precio usado, flujos futuros y diagnóstico. Para 'YTM de AL30', 'TIR de GD30', 'rendimiento de AL35', 'bono soberano'.",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: {
+            type: "string",
+            description: "Ticker del bono (ej. AL30, GD30, AL35, AE38, GD29, TX26, etc. — sin sufijo D/C si es especie Pesos)",
+          },
+        },
+        required: ["ticker"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "consultar_curva_etti",
+      description:
+        "ETTI soberana: curva spot (AL30/GD30/AE38/GD35/AL35/GD38/AL41/GD41) con TIR/TEA por vencimiento, forma de curva (normal/plana/invertida/jorobada/oscilante) y forwards implícitos entre tramos. Metodología Elbaum U4. Para 'curva ETTI', 'curva spot soberana', 'forwards implícitos', 'forma de la curva', 'pendiente de la curva'.",
+      parameters: {
+        type: "object",
+        properties: {
+          tickers: {
+            type: "array",
+            items: { type: "string" },
+            description: "Tickers soberanos a incluir (default soberanos AL30/GD30/AE38/GD35/AL35/GD38/AL41/GD41/GD46).",
+          },
+          fechaLiquidacion: { type: "string", description: "Fecha liquidación YYYY-MM-DD (default T+1)." },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "calcular_yield_call",
+      description:
+        "Yield to Call / Yield to Worst de un bono con opción de rescate anticipado. Calcula YTM y YTC para cada call (fecha+precio) y el YTW = min(YTM,YTCs). Para 'yield to call de AL30', 'YTW', 'bono callable', 'rescate anticipado', 'yield to worst'.",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: { type: "string", description: "Ticker del bono (ej. AL30, GD30, AE38)." },
+          precioPorCada100VN: { type: "number", description: "Precio clean por 100 VN (si no, usa precio vivo IOL)." },
+          calls: {
+            type: "array",
+            items: { type: "object", properties: { fecha: { type: "string" }, precio: { type: "number" } }, required: ["fecha", "precio"] },
+            description: "Schedule de calls [{fecha:'YYYY-MM-DD',precio:100}, ...]. Si no se pasa y no hay en bonos.json, solo devuelve YTM.",
+          },
+          fechaLiquidacion: { type: "string", description: "Fecha liquidación YYYY-MM-DD." },
+        },
+        required: ["ticker"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "calcular_total_return",
+      description:
+        "Total Return de un bono con horizonte y reinversión de cupones: valor total (precio al horizonte + cupones reinvertidos a TEA dada), TR y TR anualizado. Metodología Elbaum U4. Para 'total return de GD30 a 1 año', 'holding period return', 'reinversión de cupones'.",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: { type: "string", description: "Ticker del bono." },
+          horizonteDias: { type: "number", description: "Horizonte en días (1-3650, default 365)." },
+          precioPorCada100VN: { type: "number", description: "Precio clean inicial (si no, vivo IOL)." },
+          tasaReinversionTEA: { type: "number", description: "TEA reinversión 0.25=25% (default 0.25)." },
+          fechaLiquidacion: { type: "string", description: "Fecha liquidación YYYY-MM-DD." },
+        },
+        required: ["ticker"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "calcular_stripped_yield",
+      description:
+        "Stripped yield / bootstrapping: curva zero por cupón (un stripped por flujo) vía precio del bono. Para 'stripped yield de AL30', 'curva zero', 'bootstrapping', 'zero por cupón'.",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: { type: "string", description: "Ticker del bono." },
+          precioPorCada100VN: { type: "number", description: "Precio clean (si no, vivo IOL)." },
+          fechaLiquidacion: { type: "string", description: "Fecha liquidación YYYY-MM-DD." },
+        },
+        required: ["ticker"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "consultar_semaforo_riesgo_bono",
+      description:
+        "Semáforo de riesgos por bono Elbaum U4: 6 factores (tasa/duration, reinversión cupón, downgrade/ley, iliquidez volumen, FX, inflación/CER) con niveles 1-5 y semáforo VERDE/AMARILLO/NARANJA/ROJO. Usa BONOS_DB unificada + volumen + duración. Para 'riesgo de AL30', 'semáforo de GD30', 'qué riesgo tiene AE38'.",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: { type: "string", description: "Ticker del bono (ej. AL30, GD30, TX26)." },
+          precioPorCada100VN: { type: "number", description: "Precio clean (si no, vivo IOL)." },
+        },
+        required: ["ticker"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "calcular_tir_portafolio",
+      description:
+        "TIR/TEA/TNA y duration ponderada de un portafolio RF: valoriza cada bono con TIR viva (renta-fija.functions) y pondera por valorMercado, con composición por tipo/moneda. Incluye % con TIR y TR agregada opcional con horizonte. Para 'TIR de mi cartera RF', 'rendimiento de mi portafolio de bonos', 'qué TIR tiene mi cartera'.",
+      parameters: {
+        type: "object",
+        properties: {
+          posiciones: {
+            type: "array",
+            items: { type: "object", properties: { ticker: { type: "string" }, cantidad: { type: "number" }, precioPorCada100VN: { type: "number" } }, required: ["ticker", "cantidad"] },
+            description: "Posiciones [{ticker,cantidad,precioPorCada100VN?}] nominal VN.",
+          },
+          horizonteDias: { type: "number", description: "Horizonte para TR agregada (1-3650)." },
+          tasaReinversionTEA: { type: "number", description: "TEA reinversión 0.25=25%." },
+        },
+        required: ["posiciones"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "predecir_direccion",
+      description:
+        "Predicción ML Labadie 05 — Logistic/Ridge/NN + walk-forward sobre 15 features (returns, vol, spread, RSI, MACD, BB). Llama POST localhost:5000/api/prediccion. Devuelve probabilidad dirección, umbral óptimo, CV/test/walk-forward accuracies, feature-importance y decisión Call/Put con strike. GUARDRAILS: si wf_acc < 0.55 o regla_oro_ok=false → responder 'modelo sin ventaja predictiva verificada' (anti-alucinación cuantitativa). Para 'predicción GGAL', 'dirección de YPF', 'probabilidad de suba'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: { type: "string", description: "Ticker BCBA/CEDEAR (ej. GGAL.BA, YPF, PAMP.BA, BMA.BA)." },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "analizar_opciones",
+      description:
+        "Cadena de opciones BCBA — llama POST /api/opciones/cadena. Devuelve tabla strikes con IV/griegas/VaR, gráfico smile/skew OTM y señal→estrategia. INTERPRETACIÓN: skew puts>calls = sesgo bajista (Bustamante: dato→interpretación→implicancia). Para 'opciones GGAL', 'cadena GGAL.BA', 'smile GGAL'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: { type: "string", description: "Ticker subyacente BCBA (ej. GGAL.BA, PAMP.BA, COME.BA)." },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
 ];
 
 export type EstadoHerramienta =
@@ -1473,6 +1796,25 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
       return "mercado";
     case "analizar_portfolio_pegado":
       return "portafolio";
+    case "analizar_opciones_completo":
+      return "valoracion";
+    case "calcular_tir_bono":
+    case "calcular_ytm_bono":
+      return "valoracion";
+    case "consultar_curva_etti":
+    case "calcular_yield_call":
+    case "calcular_total_return":
+    case "calcular_stripped_yield":
+    case "consultar_semaforo_riesgo_bono":
+    case "calcular_tir_portafolio":
+      return "valoracion";
+    case "generar_senal_unificada":
+    case "generar_senales_unificadas":
+      return "portafolio";
+    case "predecir_direccion":
+      return "portafolio";
+    case "analizar_opciones":
+      return "valoracion";
     default:
       return "searching";
   }

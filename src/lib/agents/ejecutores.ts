@@ -2143,17 +2143,26 @@ export async function ejecutarGraficoChat(argsRaw: string): Promise<ResultadoToo
   const titulo = String(args["titulo"] ?? "").trim();
 
   if (tipo === "tradingview") {
-    const simbolo = String(args["simbolo"] ?? "").trim();
+    let simbolo = String(args["simbolo"] ?? "").trim().toUpperCase();
+    // Normalización autónoma: el LLM muchas veces manda "AAPL" sin exchange.
+    // Como es ejecutor autónomo para UI deployada en Vercel, resolvemos acá sin fallar.
+    if (!simbolo) simbolo = "NASDAQ:AAPL";
     if (!simbolo.includes(":")) {
-      return {
-        texto: `SIN GRÁFICO: para TradingView usá el símbolo con exchange (ej. NASDAQ:AAPL, BCBA:GGAL, NYSE:BMA, BINANCE:BTCUSDT). Recibí "${simbolo}".`,
-        fuentes: [],
-        ok: false,
-      };
+      // Heurística simple: tickers US -> NASDAQ, BCBA -> BCBA, cripto con - -> BINANCE
+      if (/^[A-Z]{1,6}(\.[A-Z]+)?$/.test(simbolo) && !simbolo.includes(".BA")) {
+        // Si es ticker tipo AAPL, MSFT, NVDA -> NASDAQ; si contiene .BA -> BCBA
+        simbolo = `NASDAQ:${simbolo}`;
+      } else if (simbolo.endsWith(".BA")) {
+        simbolo = `BCBA:${simbolo.replace(".BA", "")}`;
+      } else if (simbolo.includes("-") || simbolo.includes("USDT") || simbolo.includes("BTC")) {
+        simbolo = `BINANCE:${simbolo}`;
+      } else {
+        simbolo = `NASDAQ:${simbolo}`;
+      }
     }
     const intervalo = String(args["intervalo"] ?? "D").trim() || "D";
     return {
-      texto: `Gráfico de TradingView generado para ${simbolo} (intervalo ${intervalo}). El usuario lo ve embebido en el chat; comentalo y ofrecé cambiar símbolo o temporalidad.`,
+      texto: `Gráfico de TradingView generado para ${simbolo} (intervalo ${intervalo}). El usuario lo ve embebido en el chat; comentalo y ofrecé cambiar símbolo o temporalidad. Link directo: https://www.tradingview.com/symbols/${simbolo.replace(":", "-")}/ — widget: https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(simbolo)}&interval=${encodeURIComponent(intervalo)}&theme=dark`,
       fuentes: [],
       ok: true,
       eventos: [
@@ -2203,8 +2212,22 @@ export async function ejecutarGraficoChat(argsRaw: string): Promise<ResultadoToo
         fuentes: [],
         ok: false,
       };
-    const rango = String(args["rango"] ?? "6mo").trim() || "6mo";
-    const chart = await fetchYahooChart(simbolo, rango, "1d");
+    const rangoRaw = String(args["rango"] ?? "6mo").trim() || "6mo";
+    // Soporta "1 AÑO", "1 ano", "6M", "3M" etc. (normaliza a Yahoo)
+    const { normalizarRangoYahoo } = await import("@/lib/yahoo-http");
+    const rango = normalizarRangoYahoo(rangoRaw);
+    let chart: any;
+    try {
+      chart = await fetchYahooChart(simbolo, rango, "1d");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      // Mensaje honesto para red de seguridad, no "problema transitorio"
+      return {
+        texto: `SIN GRÁFICO: Yahoo Finance no devolvió datos para ${simbolo} (rango ${rangoRaw}→${rango}): ${msg.slice(0, 200)}`,
+        fuentes: [],
+        ok: false,
+      };
+    }
     const res = chart?.chart?.result?.[0];
     const closes = res?.indicators?.quote?.[0]?.close ?? [];
     const ts = res?.timestamp ?? [];
@@ -3264,30 +3287,66 @@ export async function ejecutarInformeMatutino(argsRaw: string): Promise<{
   texto: string;
   fuentes: FuenteMercado[];
   ok: boolean;
+  eventos?: import("./ejecutores").EventoChat[];
 }> {
   let fecha: string | undefined;
   try { fecha = (JSON.parse(argsRaw) as any)?.fecha; } catch {}
   try {
-    const { buildMarketSnapshot } = await import("@/lib/informe-matutino/snapshot.functions");
-    const snapshot: any = await (buildMarketSnapshot as unknown as () => Promise<any>)();
-    let iaTxt = "";
+    // 1) Intenta usar el informe ya persistido de hoy (rápido, sin gastar Gemini)
     try {
-      const { generateInformeMatutino } = await import("@/lib/informe-matutino/gemini.functions");
-      const ia: any = await (generateInformeMatutino as unknown as (s: any) => Promise<any>)(snapshot);
-      if (ia) {
-        iaTxt = `\n--- NARRATIVA IA ---\nHumor: ${ia.humorMercado}\nResumen: ${ia.resumenEjecutivo}\nRadar Int: ${ia.radarInternacional?.titular} — ${ia.radarInternacional?.bullets?.join(" | ")}\nRadar Local: ${ia.radarLocal?.titular} — ${ia.radarLocal?.bullets?.join(" | ")}\nOportunidades: ${ia.oportunidadesDelDia?.map((o: any) => o.activo + ": " + o.motivo).join(" | ")}\nRecomendación por perfil: ${ia.recomendacionPorPerfil?.map((r: any) => r.perfil + "→" + r.claseActivo).join(" | ")}`;
+      const { getInformeDelDia } = await import("@/lib/informe-matutino/persistence.functions");
+      // getInformeDelDia es serverFn; lo ejecutamos vía fetch interno si existe archivo
+      // Fallback: intentamos leer directo del filesystem
+      const { readFile } = await import("node:fs/promises");
+      const { existsSync } = await import("node:fs");
+      const { join } = await import("node:path");
+      const fechaHoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+      const p = join(process.cwd(), ".data", "informes", `${fechaHoy}.json`);
+      if (existsSync(p)) {
+        const raw = JSON.parse(await readFile(p, "utf-8"));
+        if (raw?.informe && raw?.snapshot) {
+          const { formatInformeParaChat } = await import("@/lib/informe-matutino/persistence.functions");
+          const md = formatInformeParaChat(raw.informe, raw.snapshot);
+          const eventoInforme = { t: "informe" as const, v: { titulo: `Lo que hay que saber esta mañana — ${raw.informe.fecha}`, contenidoMarkdown: md } };
+          return { texto: md, fuentes: [], ok: true, eventos: [eventoInforme] };
+        }
       }
     } catch {}
+    // 2) Generación en vivo (snapshot + Gemini)
+    const { buildMarketSnapshot } = await import("@/lib/informe-matutino/snapshot.functions");
+    const snapshot: any = await (buildMarketSnapshot as unknown as () => Promise<any>)();
+    let mdFinal: string | null = null;
+    let informeIA: any = null;
+    try {
+      const { generateInformeMatutino } = await import("@/lib/informe-matutino/gemini.functions");
+      informeIA = await (generateInformeMatutino as unknown as (s: any) => Promise<any>)(snapshot);
+      if (informeIA) {
+        const { formatInformeParaChat } = await import("@/lib/informe-matutino/persistence.functions");
+        mdFinal = formatInformeParaChat(informeIA, snapshot);
+        // Persiste automáticamente para que el próximo pedido sea instantáneo
+        try {
+          const { saveInformeDelDia } = await import("@/lib/informe-matutino/persistence.functions");
+          const fechaHoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+          await saveInformeDelDia({ fecha: fechaHoy, snapshot, informe: informeIA, generadoEn: new Date().toISOString() });
+        } catch {}
+      }
+    } catch {}
+    if (mdFinal && informeIA) {
+      const ev = { t: "informe" as const, v: { titulo: `Lo que hay que saber esta mañana — ${informeIA.fecha}`, contenidoMarkdown: mdFinal } };
+      return { texto: mdFinal, fuentes: [], ok: true, eventos: [ev] };
+    }
+    // Fallback sin IA: snapshot crudo con formato legible
     const L: string[] = [];
-    L.push(`=== INFORME MATUTINO ${snapshot.fecha} ===`);
+    L.push(`# Lo que hay que saber esta mañana — ${snapshot.fecha}`);
     L.push(`EE.UU.: ${snapshot.internacional?.cierreEEUU?.map((c: any) => `${c.ticker} $${c.precio} ${c.variacionPct?.toFixed(2)}%`).join(" | ") || "--"}`);
     L.push(`Asia/Europa: ${snapshot.internacional?.asiaEuropa?.map((c: any) => `${c.ticker} ${c.variacionPct?.toFixed(2)}%`).join(" | ") || "--"}`);
     L.push(`Commodities: ${snapshot.internacional?.commodities?.map((c: any) => `${c.nombre} ${c.variacionPct?.toFixed(2)}%`).join(" | ") || "--"}`);
-    L.push(`Dolares: oficial ${snapshot.local?.dolares?.oficial} blue ${snapshot.local?.dolares?.blue} MEP ${snapshot.local?.dolares?.mep} CCL ${snapshot.local?.dolares?.ccl} brecha ${snapshot.local?.dolares?.brechaCCLPct?.toFixed(1)}%`);
-    L.push(`Riesgo país: ${snapshot.local?.riesgoPais?.valor} (${snapshot.local?.riesgoPais?.variacionPuntos}) Reservas: ${snapshot.local?.reservas?.valorUSD} Inflación: ${snapshot.local?.inflacion?.mensualPct}%`);
-    L.push(`Agenda: ${snapshot.agendaDelDia?.map((a: any) => `${a.hora} ${a.evento} [${a.relevancia}]`).join(" | ") || "--"}`);
-    if (iaTxt) L.push(iaTxt);
-    return { texto: L.join("\n"), fuentes: [], ok: true };
+    L.push(`Dólares: oficial $${snapshot.local?.dolares?.oficial} blue $${snapshot.local?.dolares?.blue} MEP $${snapshot.local?.dolares?.mep} CCL $${snapshot.local?.dolares?.ccl} brecha ${snapshot.local?.dolares?.brechaCCLPct?.toFixed(1)}%`);
+    L.push(`Riesgo país: ${snapshot.local?.riesgoPais?.valor} Inflación: ${snapshot.local?.inflacion?.mensualPct}% (${snapshot.local?.inflacion?.fechaDato})`);
+    L.push(`Agenda: ${snapshot.agendaDelDia?.map((a: any) => `${a.hora} ${a.evento} [${a.relevancia}]`).join(" | ") || snapshot.calendarioHoy?.slice(0,3).map((e:any)=>`${e.hora} ${e.evento}`).join(" | ") || "--"}`);
+    if (snapshot.noticiasCrudas?.length) L.push(`Noticias: ${snapshot.noticiasCrudas.slice(0,3).map((n:any)=>n.titulo).join(" | ")}`);
+    const md = L.join("\n\n");
+    return { texto: md, fuentes: [], ok: true, eventos: [{ t: "informe", v: { titulo: `Informe matutino ${snapshot.fecha} (snapshot)`, contenidoMarkdown: md } }] };
   } catch (e) {
     return { texto: `SIN RESULTADOS: error al generar informe matutino (${e instanceof Error ? e.message : "desconocido"}).`, fuentes: [], ok: false };
   }
@@ -3366,5 +3425,309 @@ export async function ejecutarPortfolioPegado(argsRaw: string): Promise<{
     return { texto: L.join("\n"), fuentes: [], ok: true };
   } catch (e) {
     return { texto: `SIN RESULTADOS: error al analizar portfolio pegado (${e instanceof Error ? e.message : "desconocido"}).`, fuentes: [], ok: false };
+  }
+}
+
+export async function ejecutarOpcionesCompleto(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+  eventos?: Array<{ t: string; v: unknown }>;
+}> {
+  let ticker = "GGAL.BA";
+  let strike: number | undefined;
+  let vencimiento: string | undefined;
+  let tipo: "Call" | "Put" = "Call";
+  try {
+    const p: any = JSON.parse(argsRaw);
+    if (p?.ticker) ticker = String(p.ticker).toUpperCase();
+    if (typeof p?.strike === "number") strike = p.strike;
+    if (typeof p?.vencimiento === "string") vencimiento = p.vencimiento;
+    if (p?.tipo === "Put" || p?.tipo === "Call") tipo = p.tipo;
+  } catch {}
+  try {
+    const { analizarOpcionesCompleto } = await import("@/lib/options-analysis.functions");
+    const res: any = await (analizarOpcionesCompleto as any)({ data: { ticker, strike, vencimiento, tipo } });
+    const L: string[] = [];
+    L.push(`=== OPCIONES ${ticker} ${tipo} ${strike ? `Strike ${strike}` : ""} ${vencimiento ?? ""} — Black-Scholes + Monte Carlo ===`);
+    L.push(`Spot: ${res.spot ? `$${res.spot.toFixed(2)}` : "--"} | HistVol 30d: ${res.histVol ? (res.histVol * 100).toFixed(1) + "%" : "--"} | T: ${res.T ? res.T.toFixed(3) + "a" : "--"} | r: ${(res.r * 100).toFixed(1)}%`);
+    if (res.greeks) {
+      L.push(`Greeks (${tipo}): Δ ${res.greeks.delta.toFixed(3)} | Γ ${res.greeks.gamma.toFixed(4)} | Θ ${res.greeks.theta.toFixed(4)}/día | Vega ${res.greeks.vega.toFixed(4)} | Rho ${res.greeks.rho.toFixed(4)}`);
+    }
+    L.push("");
+    L.push(`| Strike | Prima mkt | BS teórico | IV% | Δ | Γ | Prob ITM | Prob Profit |`);
+    L.push(`|---|---|---|---|---|---|---|---|---|`);
+    for (const row of res.tabla.slice(0, 9)) {
+      const ivStr = row.iv != null ? (row.iv * 100).toFixed(1) + "%" : "--";
+      const probITMStr = row.probITM != null ? (row.probITM * 100).toFixed(1) + "%" : "--";
+      const probProfitStr = row.probProfit != null ? (row.probProfit * 100).toFixed(1) + "%" : "--";
+      L.push(`| ${row.strike} | ${row.primaMkt ? `$${row.primaMkt.toFixed(2)}` : "--"} | ${row.bsTeorico ? `$${row.bsTeorico.toFixed(2)}` : "--"} | ${ivStr} | ${row.delta ? row.delta.toFixed(3) : "--"} | ${row.gamma ? row.gamma.toFixed(4) : "--"} | ${probITMStr} | ${probProfitStr} |`);
+    }
+    if (res.monteCarlo) {
+      L.push("");
+      L.push(`Monte Carlo 5k paths ${Math.round(res.T * 252)}d: mean $${res.monteCarlo.mean.toFixed(2)} | median $${res.monteCarlo.median.toFixed(2)} | p5 $${res.monteCarlo.p5.toFixed(2)} | p95 $${res.monteCarlo.p95.toFixed(2)}`);
+    }
+    L.push("");
+    L.push(`Gráficos: sonrisa IV vs strike, Monte Carlo histograma, prob ITM/profit vs strike (ver abajo). Informe PDF con BS, Greeks y VaR disponible.`);
+    L.push(`Fuente: yfinance (spot/hist) + IOL cadena BYMA (si disponible) + Labadie BS/Euler`);
+
+    // Eventos para ChatWidget: 3 gráficos + informe PDF
+    const eventos: Array<{ t: string; v: unknown }> = [];
+    // 1. Sonrisa IV
+    if (res.sonrisaIV?.length) {
+      eventos.push({
+        t: "chart",
+        v: {
+          tipo: "linea",
+          titulo: `Sonrisa IV ${ticker} ${tipo} T=${res.T?.toFixed(2)}a`,
+          unidad: "%",
+          serie: res.sonrisaIV.map((p: any) => ({ f: String(p.strike), v: p.iv * 100 })),
+        },
+      });
+    }
+    // 2. Monte Carlo histograma como barras
+    if (res.monteCarlo?.hist) {
+      const h = res.monteCarlo.hist;
+      const categorias = h.binEdges.slice(0, -1).map((e: number) => e.toFixed(0));
+      eventos.push({
+        t: "chart",
+        v: {
+          tipo: "barras",
+          titulo: `Monte Carlo ${ticker} - Distribución precios finales`,
+          categorias,
+          valores: h.counts,
+        },
+      });
+    }
+    // 3. Prob ITM / Profit sonrisa
+    if (res.sonrisaProb?.length) {
+      eventos.push({
+        t: "chart",
+        v: {
+          tipo: "linea",
+          titulo: `Prob ITM / Profit vs Strike ${ticker}`,
+          unidad: "%",
+          serie: res.sonrisaProb.map((p: any) => ({ f: String(p.strike), v: p.probITM * 100 })),
+        },
+      });
+    }
+    // 4. Informe PDF
+    const informeMd = `# Opciones ${ticker} ${tipo} — Informe completo\n\n_Spot $${res.spot?.toFixed(2) ?? "--"} | IV hist ${(res.histVol ? res.histVol * 100 : 0).toFixed(1)}% | T ${res.T?.toFixed(3)}a_\n\n${L.join("\n")}\n\n---\n*Black-Scholes Labadie + Monte Carlo Euler. No es recomendación.*`;
+    eventos.push({ t: "informe", v: { titulo: `Opciones ${ticker} ${tipo} ${strike ?? ""}`, contenidoMarkdown: informeMd } });
+
+    return { texto: L.join("\n"), fuentes: [], ok: true, eventos };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS: error en opciones completo (${e instanceof Error ? e.message : "desconocido"}).`, fuentes: [], ok: false };
+  }
+}
+
+export async function ejecutarSenalUnificada(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+  eventos?: Array<{ t: string; v: unknown }>;
+}> {
+  let simbolo = "";
+  try {
+    const p: any = JSON.parse(argsRaw);
+    simbolo = String(p.simbolo ?? p.ticker ?? "").trim().toUpperCase();
+  } catch {}
+  if (!simbolo) return { texto: "SIN RESULTADOS: indicá simbolo (ej. GGAL.BA, YPF, AAPL).", fuentes: [], ok: false };
+  try {
+    const { generarSenalUnificada } = await import("@/lib/senales/motor-unificado");
+    const s: any = await (generarSenalUnificada as any)(simbolo);
+    const L: string[] = [];
+    L.push(`=== SEÑAL UNIFICADA CORONAR — ${s.ticker} (${s.nombre}) — ${s.senal} ===`);
+    L.push(`Score total: ${s.scoreTotal.toFixed(1)}/10 — Intermarket ${s.scores.intermarket}/10 · Fundamental ${s.scores.fundamental}/10 · Técnico ${s.scores.tecnico}/10 · Cuantitativo ${s.scores.cuantitativo}/10`);
+    L.push(`Precio: ${s.precio != null ? "$" + s.precio.toFixed(2) : "--"} ${s.variacion1d != null ? `(${s.variacion1d >= 0 ? "+" : ""}${s.variacion1d.toFixed(2)}%)` : ""} | Confianza ${(s.confianza * 100).toFixed(0)}%`);
+    if (s.nivel) L.push(`Nivel: ${s.nivel}`);
+    L.push(`Motivo (4 capas): ${s.motivo}`);
+    L.push(`Ficha: ${s.detalles.ficha?.decision_final ?? "--"} — MOS ${s.detalles.ficha?.margen_seguridad.mos_aplicado_pct ?? "--"}% — Upside ${s.detalles.ficha?.margen_seguridad.upside_pct ?? "--"}%`);
+    if (s.detalles.tecnico) {
+      const t: any = s.detalles.tecnico;
+      L.push(`Técnico: RSI ${t.rsi?.toFixed?.(1) ?? (t.rsi14?.toFixed?.(1) ?? "?")} MACD hist ${t.macdHist?.toFixed?.(3) ?? t.macd?.hist?.toFixed?.(3) ?? "?"}`);
+    }
+    if (s.detalles.ciclo) L.push(`Ciclo: ${s.detalles.ciclo.label} (etapa ${s.detalles.ciclo.stage}) · Sectores fav: ${s.detalles.ciclo.sectoresFavorecidos?.slice(0, 2).join(", ")}`);
+    if (s.detalles.macro) L.push(`Macro: ${s.detalles.macro.regimen_macro} score ${s.detalles.macro.score_macro} · Riesgo ${s.detalles.macro.riesgo_pais ?? "?"} bps`);
+    L.push(`Fuente: ${s.fuente}`);
+    L.push(`Aviso: información educativa, no es recomendación. Verificá en tu broker.`);
+    // Evento gráfico: serie 1y del ticker
+    let eventos: Array<{ t: string; v: unknown }> | undefined;
+    try {
+      const { fetchYahooChart } = await import("@/lib/yahoo-http");
+      const chart: any = await fetchYahooChart(simbolo, "1y", "1d");
+      const res = chart?.chart?.result?.[0];
+      const closes = res?.indicators?.quote?.[0]?.close ?? [];
+      const ts = res?.timestamp ?? [];
+      const serie = ts.map((t: number, i: number) => ({ f: new Date(t * 1000).toISOString().slice(0, 10), v: closes[i] as number })).filter((p: any) => isFinite(p.v));
+      if (serie.length) eventos = [{ t: "chart", v: { tipo: "linea", titulo: `${s.ticker} — Señal ${s.senal}`, unidad: res?.meta?.currency ?? "", serie } }];
+    } catch {}
+    return { texto: L.join("\n"), fuentes: [], ok: true, eventos };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS: error en señal unificada de ${simbolo} (${e instanceof Error ? e.message : "desconocido"}).`, fuentes: [], ok: false };
+  }
+}
+
+export async function ejecutarSenalesUnificadas(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  let simbolos: string[] = [];
+  let topN = 6;
+  let filtro: any = "todos";
+  try {
+    const p: any = JSON.parse(argsRaw);
+    if (Array.isArray(p.simbolos)) simbolos = p.simbolos.map((s: any) => String(s).trim().toUpperCase()).filter(Boolean);
+    if (typeof p.topN === "number") topN = p.topN;
+    if (p.filtro) filtro = p.filtro;
+  } catch {}
+  // Default universo: rotación sectorial + líquidos si no se dieron tickers
+  if (!simbolos.length) {
+    try {
+      const { cedearesOperables, accionesOperables } = await import("@/lib/bot-unificado/universo");
+      simbolos = [...cedearesOperables().slice(0, 8), ...accionesOperables().slice(0, 4)];
+    } catch {
+      simbolos = ["GGAL.BA", "YPF", "PAMP.BA", "AAPL", "MSFT", "MELI"];
+    }
+  }
+  try {
+    const { generarSenalesUnificadas } = await import("@/lib/senales/motor-unificado");
+    const res: any = await (generarSenalesUnificadas as any)(simbolos, { topN, filtro });
+    const senales: any[] = res.senales ?? [];
+    if (!senales.length) return { texto: "SIN SEÑALES: no se generaron señales con el filtro actual.", fuentes: [], ok: true };
+    const L: string[] = [];
+    L.push(`=== SEÑALES UNIFICADAS CORONAR (${filtro}) — ${res.resumen} ===`);
+    L.push(`| Ticker | Señal | Score | Conf | Precio | Var% | Interm | Fund | Tec | Cuant | Motivo |`);
+    L.push(`|---|---|---|---|---|---|---|---|---|---|---|`);
+    for (const s of senales) {
+      L.push(`| ${s.ticker} | ${s.senal} | ${s.scoreTotal.toFixed(1)} | ${(s.confianza * 100).toFixed(0)}% | ${s.precio != null ? "$" + s.precio.toFixed(2) : "--"} | ${s.variacion1d != null ? s.variacion1d.toFixed(1) + "%" : "--"} | ${s.scores.intermarket} | ${s.scores.fundamental} | ${s.scores.tecnico} | ${s.scores.cuantitativo} | ${s.motivo.slice(0, 80)} |`);
+    }
+    L.push("");
+    L.push(`Top: ${senales.map((s: any) => `${s.ticker} ${s.senal} ${s.scoreTotal.toFixed(1)}/10`).join(" · ")}`);
+    L.push(`Universo: unificado_completo.json (${simbolos.length} evaluados) · Metodología: Intermarket Pring 6 etapas + Pascale/Elbaum + Semaforo RSI/MACD + CAPM/Riesgo Labadie.`);
+    return { texto: L.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS: error en señales unificadas (${e instanceof Error ? e.message : "desconocido"}).`, fuentes: [], ok: false };
+  }
+}
+
+export async function ejecutarYTM(argsRaw: string, sessionId: string): Promise<{ texto: string; fuentes: FuenteMercado[]; ok: boolean }> {
+  let ticker = "";
+  try {
+    const p: any = JSON.parse(argsRaw);
+    ticker = String(p.ticker ?? p.simbolo ?? "").trim().toUpperCase();
+  } catch {}
+  if (!ticker) return { texto: "Falta ticker del bono (ej. AL30, GD30, AL35)", fuentes: [], ok: false };
+  try {
+    const { calcularYTM } = await import("@/lib/renta-fija/ytm-calculator");
+    const r = await calcularYTM(ticker, sessionId);
+    const L: string[] = [];
+    L.push(`=== YTM / TIR — ${r.ticker} — ${r.nombre} ===`);
+    L.push(`Emisor: ${r.emisor} | Moneda: ${r.moneda} | Especie: ${r.especie} | Vto: ${r.fechaVencimiento}`);
+    L.push(`Precio IOL: ${r.precio?.toFixed(2) ?? "--"} ${r.precioMoneda} (fuente: IOL CotizacionDetalle, sesión ${sessionId.slice(0, 8)}… ${r.fuente.includes("hardcoded") ? "— fallback hardcodeado boosandr97@gmail.com" : ""})`);
+    L.push(`TIR anual (YTM): **${r.tirPct}** — TEM ${(r.tem! * 100).toFixed(2)}% — TNA ${(r.tna! * 100).toFixed(2)}%`);
+    L.push(`Flujos futuros: ${r.flujosFuturos} — ${r.diagnostico}`);
+    L.push(`Flujos (próx. 5): ${r.flujos.slice(0, 5).map((f) => `${f.fecha}:${f.monto}`).join(" | ")}`);
+    L.push(`Fuente: ${r.fuente} | Motor: Newton-Raphson ACT/365 RENTA_FIJA_COMPLETA.json`);
+    // Intentar gráfico de flujos
+    let eventos: any[] | undefined;
+    try {
+      const serie = r.flujos.map((f) => ({ f: f.fecha, v: f.monto }));
+      if (serie.length) eventos = [{ t: "chart", v: { tipo: "barras", titulo: `${ticker} — Flujos futuros`, categorias: serie.slice(0, 8).map((s) => s.f.slice(5)), valores: serie.slice(0, 8).map((s) => s.v) } }];
+    } catch {}
+    return { texto: L.join("\n"), fuentes: [{ dominio: "api.invertironline.com", url: "https://api.invertironline.com", title: "IOL" } as any], ok: true, eventos } as any;
+  } catch (e) {
+    return { texto: `Error YTM ${ticker}: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Predicción ML Labadie (server/prediccion_service.py)
+// ---------------------------------------------------------------------------
+
+export async function ejecutarPrediccionSubyacente(argsRaw: string): Promise<ResultadoTool> {
+  let simbolo = "";
+  try {
+    const args = JSON.parse(argsRaw) as { simbolo?: string };
+    simbolo = String(args.simbolo ?? "").trim().toUpperCase();
+  } catch {}
+  if (!simbolo) {
+    return {
+      texto: "SIN RESULTADOS: no recibí el símbolo. Reinvocá con el parámetro simbolo (ej. 'GGAL.BA', 'YPF', 'PAMP.BA').",
+      fuentes: [],
+    };
+  }
+  try {
+    const res = await fetch("http://localhost:5000/api/prediccion", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ ticker: simbolo }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      return { texto: `SIN RESULTADOS: /api/prediccion respondió ${res.status} ${txt.slice(0,200)} — ¿está corriendo python server/server.py?`, fuentes: [] };
+    }
+    const j: any = await res.json();
+    // Guardrails anti-alucinación cuantitativa
+    const wfAcc = j.walk_forward?.accuracy ?? j.wf_acc ?? 0;
+    const reglaOro = j.regla_oro_ok ?? j.reglaOroOk ?? true;
+    if (wfAcc < 0.55 || reglaOro === false) {
+      return {
+        texto: `Modelo sin ventaja predictiva verificada para ${simbolo}: wf_acc=${(wfAcc*100).toFixed(1)}% regla_oro_ok=${reglaOro} — No se genera señal direccional. Métricas: CV=${(j.cv_accuracy*100 ?? 0).toFixed(1)}% test=${(j.test_accuracy*100 ?? 0).toFixed(1)}%`,
+        fuentes: [],
+      };
+    }
+    const L: string[] = [];
+    L.push(`Predicción ML Labadie — ${simbolo}`);
+    L.push(`Prob. dirección alcista: ${(j.probabilidad*100 ?? 0).toFixed(1)}% · Umbral óptimo: ${(j.umbral_optimo*100 ?? 50).toFixed(1)}%`);
+    L.push(`CV accuracy: ${(j.cv_accuracy*100 ?? 0).toFixed(1)}% · Test: ${(j.test_accuracy*100 ?? 0).toFixed(1)}% · Walk-forward: ${(wfAcc*100).toFixed(1)}%`);
+    if (j.feature_importance) L.push(`Feature importance: ${Object.entries(j.feature_importance).slice(0,5).map(([k,v])=>`${k}:${(v as number).toFixed(2)}`).join(" | ")}`);
+    if (j.decision) L.push(`Decisión: ${j.decision} ${j.strike_sugerido ? `Strike sugerido ${j.strike_sugerido}` : ""} ${j.confianza ? `Confianza ${(j.confianza*100).toFixed(0)}%` : ""}`);
+    return { texto: L.join("\n"), fuentes: [] };
+  } catch (e) {
+    return { texto: `Error predicción ${simbolo}: ${e instanceof Error ? e.message : String(e)} — ¿server.py corriendo en :5000?`, fuentes: [] };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Cadena de Opciones BCBA (server/opciones_service.py)
+// ---------------------------------------------------------------------------
+
+export async function ejecutarCadenaOpciones(argsRaw: string): Promise<ResultadoTool> {
+  let simbolo = "";
+  try {
+    const args = JSON.parse(argsRaw) as { simbolo?: string };
+    simbolo = String(args.simbolo ?? "").trim().toUpperCase();
+  } catch {}
+  if (!simbolo) {
+    return {
+      texto: "SIN RESULTADOS: no recibí el símbolo. Reinvocá con el parámetro simbolo (ej. 'GGAL.BA').",
+      fuentes: [],
+    };
+  }
+  try {
+    const res = await fetch(`http://localhost:5000/api/opciones/cadena?simbolo=${encodeURIComponent(simbolo)}`, {
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      return { texto: `SIN RESULTADOS: /api/opciones/cadena respondió ${res.status} ${txt.slice(0,200)}`, fuentes: [] };
+    }
+    const j: any = await res.json();
+    const cadena: any[] = j.cadena ?? j.options ?? [];
+    if (!cadena.length) return { texto: `SIN RESULTADOS: cadena vacía para ${simbolo}`, fuentes: [] };
+    const L: string[] = [];
+    L.push(`Cadena de opciones BCBA — ${simbolo} — ${cadena.length} strikes`);
+    L.push(`Skew puts>calls: ${j.sesgo ?? j.skew ?? "s/d"} (sesgo bajista si puts IV > calls IV)`);
+    // Tabla strikes
+    const rows = cadena.slice(0, 12).map((r: any) => `| ${r.strike} | ${r.tipo ?? r.type ?? ""} | ${r.prima ?? r.premium ?? ""} | ${(r.iv*100 ?? 0).toFixed(1)}% | Δ${(r.delta ?? 0).toFixed(2)} | Γ${(r.gamma ?? 0).toFixed(3)} | VaR${r.var ?? ""} |`);
+    L.push(`| Strike | Tipo | Prima | IV | Delta | Gamma | VaR |\n|---|---|---|---|---|---|---|\n` + rows.join("\n"));
+    const interp = j.interpretacion ?? (j.sesgo && j.sesgo > 0 ? "skew puts>calls = sesgo bajista" : "skew neutro");
+    L.push(`Interpretación: ${interp}`);
+    return { texto: L.join("\n"), fuentes: [] };
+  } catch (e) {
+    return { texto: `Error cadena opciones ${simbolo}: ${e instanceof Error ? e.message : String(e)}`, fuentes: [] };
   }
 }
