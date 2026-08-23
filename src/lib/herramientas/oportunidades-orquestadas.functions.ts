@@ -112,6 +112,26 @@ export const getOportunidadesOrquestadas = createServerFn({ method: "POST" })
         });
       }
 
+      // Labadie p=1/Hurst: mean-reversion (H<0.45) = +0.3 al score
+      try {
+        const { computeHurst } = await import("@/lib/math/stats");
+        const { getHistory } = await import("@/lib/history-cache.server").catch(() => ({ getHistory: null as any }));
+        if (getHistory) {
+          for (const s of senalesOrdenadas.slice(0, 12)) {
+            try {
+              const hist: any[] = await getHistory(String(s.ticker).toUpperCase().replace(/\.BA$/, ""), 180).catch(() => []);
+              const closesArr = (hist ?? []).map((h: any) => h.close).filter((c: any) => typeof c === "number" && isFinite(c));
+              if (closesArr.length >= 60) {
+                const rets: number[] = [];
+                for (let i2 = 1; i2 < closesArr.length; i2++) rets.push(Math.log(closesArr[i2]! / closesArr[i2-1]!));
+                const H = computeHurst(rets);
+                s.hurstExponent = Math.round(H * 1000) / 1000;
+                if (H < 0.45) { s.scoreTotal = Math.round((s.scoreTotal + 0.3) * 10) / 10; s.hurstBonus = "+0.3 mean-reversion"; }
+              }
+            } catch {}
+          }
+        }
+      } catch {}
       // FUNDAMENTAL SOLO SOBRE SUBYACENTE EE.UU.: descartar BCBA/CEDEAR del análisis
       // (Yahoo trae estados contables completos solo de NYSE/NASDAQ)
       try {

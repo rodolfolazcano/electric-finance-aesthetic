@@ -128,9 +128,35 @@ export async function orquestarSectorial(opts: { topN?: number; filtro?: "todos"
   } catch { noticiasResumen = "Sin noticias externas — usar contexto macro local"; }
 
   // Ratios intermarket Murphy: dólar vs commodities opuesto, bonos vs commodities opuesto, bonos vs stocks mismo sentido (excepto suelos)
-  const ratiosTxt = `Ciclo Pring etapa ${ciclo?.stage ?? "?"} ${ciclo?.label ?? ""} · Macro ${macro?.regimen_macro ?? "?"} score ${macro?.score_macro ?? 0} · Riesgo país ${macro?.riesgo_pais ?? "?"} · Perf sectorial ${perf ? JSON.stringify(perf).slice(0,300) : "s/d"}`;
-  const razonamientoFase1 = `Geopolítica + intermarket: ${noticiasResumen.slice(0,400)} | ${ratiosTxt} — Principios Murphy: dólar/commodities inverso, bonos/commodities inverso, bonos/stocks co-direccional salvo techos/suelos. Esto define sectores favorecidos.`;
-
+  // Murphy extendido (corpus): oro/dolar inverso + yield 10Y direccion
+  let murphyExt = "";
+  try {
+    const { fetchYahooChart } = await import("@/lib/yahoo-http");
+    const closes = (r: any) => (r?.chart?.result?.[0]?.indicators?.quote?.[0]?.close ?? []).filter((v: any) => typeof v === "number" && isFinite(v));
+    const [gld, dxy, tnx] = await Promise.all([
+      fetchYahooChart("GLD", "6mo", "1d").then((r: any) => closes(r)).catch(() => [] as number[]),
+      fetchYahooChart("DX-Y.NYB", "6mo", "1d").then((r: any) => closes(r)).catch(() => [] as number[]),
+      fetchYahooChart("^TNX", "1mo", "1d").then((r: any) => closes(r)).catch(() => [] as number[]),
+    ]);
+    if (gld.length > 20 && dxy.length > 20) {
+      const deltaPct = ((gld[gld.length-1]! / dxy[dxy.length-1]!) / (gld[gld.length-21]! / dxy[dxy.length-21]!) - 1) * 100;
+      murphyExt += ` | Oro/Dolar ${deltaPct.toFixed(1)}% 20d (${deltaPct > 0 ? "oro lidera=refugio/inflacion" : "dolar lidera=restrictivo"})`;
+    }
+    if (tnx.length > 5) {
+      const dir = tnx[tnx.length-1]! - tnx[0]!;
+      murphyExt += ` | Yield 10Y ${dir >= 0 ? "sube" : "baja"} ${Math.abs(dir).toFixed(2)}pp (tasas ${dir >= 0 ? "presionan growth/bonos" : "alivian=ciclicos/growth"})`;
+    }
+  } catch {}
+  const ratiosTxt = `Ciclo Pring etapa ${ciclo?.stage ?? "?"} ${ciclo?.label ?? ""} | Macro ${macro?.regimen_macro ?? "?"} score ${macro?.score_macro ?? 0} | Riesgo pais ${macro?.riesgo_pais ?? "?"}${murphyExt} | Perf sectorial ${perf ? JSON.stringify(perf).slice(0,300) : "s/d"}`;
+  // Blanchard U3/U4: canal de transmision explicito tasa real -> sector
+  const tasaReal = macro?.tasa_real_anual_fisher;
+  const canalBlanchard =
+    tasaReal != null && tasaReal > 5
+      ? `Blanchard: tasa real ${tasaReal.toFixed(1)}% alta -> favorece defensivos/caucion, castiga growth apalancado`
+      : tasaReal != null && tasaReal < 0
+        ? `Blanchard: tasa real negativa -> liquidez favorece growth/ciclicos`
+        : "";
+  const razonamientoFase1 = `Geopolitica + intermarket: ${noticiasResumen.slice(0,400)} | ${ratiosTxt} ${canalBlanchard} | Principios Murphy: dolar/commodities inverso, bonos/commodities inverso, bonos/stocks co-direccional salvo techos/suelos. Esto define sectores favorecidos.`;
   // FASE 2 — Sectores favorecidos
   let sectoresFav: string[] = [];
   let industriasFav: string[] = [];
