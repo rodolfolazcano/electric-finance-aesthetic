@@ -3,12 +3,12 @@ import { SITE_CONTEXT } from "@/lib/site-context";
 import { orquestarModelos } from "@/lib/model-orchestration";
 import { construirPromptSkills } from "@/lib/skills";
 import {
-  orquestarTurno,
   detectarIntencionSkill,
   type Msg,
   type ApiMsg,
 } from "@/lib/agents/orquestador";
-import { esTareaAutonoma, orquestarTurnoAutonomo } from "@/lib/agents/autonomo";
+import { orquestarTurnoAutonomo } from "@/lib/agents/autonomo";
+import { respuestaDirecta } from "@/lib/agents/directo";
 import { MemoriaDeSesion } from "@/lib/agents/memory";
 import { esAcademico, type ResultadoConocimiento } from "@/lib/agents/ejecutores";
 import { NVIDIA_API_KEY } from "@/lib/agents/nvidia-key";
@@ -304,14 +304,14 @@ export const Route = createFileRoute("/api/chat")({
         orquestacion.promptSkillsSalida = promptSkillsSalidaFinal;
         orquestacion.promptSkillsPlanner = promptSkillsPlannerFinal;
 
-        // Arranque paralelo: RAG (lento) se lanza YA, en paralelo a preparar memoria.
-        // Se resuelve dentro del stream sin bloquear la carga del chat lateral.
+        // RAG en vuelo paralelo. En manual va liviano (sin rerank ni rewrite:
+        // cada uno es una llamada extra de modelo que retrasa la respuesta).
         const ragPromise: Promise<ApiMsg | undefined> = (async (): Promise<ApiMsg | undefined> => {
           try {
             const contextoRag: ResultadoConocimiento[] = (await retrieveHybrid(pregunta, {
-              topK: 6,
-              enableRerank: true,
-              enableQueryRewrite: true,
+              topK: modoAutomatico ? 6 : 4,
+              enableRerank: modoAutomatico,
+              enableQueryRewrite: modoAutomatico,
               baseUrl,
             })) as unknown as ResultadoConocimiento[];
             if (!contextoRag.length) return undefined;
@@ -371,14 +371,14 @@ export const Route = createFileRoute("/api/chat")({
                 sessionId,
                 ...(ragMsg ? { ragMsg } : {}),
               };
-              // Modo Automático del chat: cuando el toggle está activo, SIEMPRE usa orquestación autónoma
-              // (razona la instrucción natural, propone instrucciones, asigna rol y orquesta funciones).
-              // Si está desactivado, solo activa autónomo para tareas que lo piden explícitamente ("análisis completo").
-              const usarAutonomo = modoAutomatico || esTareaAutonoma(pregunta);
-              if (usarAutonomo) send({ t: "status", v: "autonomo", q: modoAutomatico ? "Modo Automático: orquestación autónoma activa" : "Análisis completo detectado" });
+              // Manual (toggle off): NUNCA orquesta — el modelo elegido responde
+              // directo con TODAS las herramientas disponibles (vía directa).
+              // Auto (toggle on): orquestación autónoma completa.
+              const usarAutonomo = modoAutomatico;
+              if (usarAutonomo) send({ t: "status", v: "autonomo", q: "Modo Automático: orquestación autónoma activa" });
               resultado = usarAutonomo
                 ? await orquestarTurnoAutonomo(optsTurno)
-                : await orquestarTurno(optsTurno);
+                : await respuestaDirecta(optsTurno);
               recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "success", durationMs: Date.now() - t0 });
             } catch (err) {
               console.error("chat error", err);
