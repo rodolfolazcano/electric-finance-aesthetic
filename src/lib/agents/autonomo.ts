@@ -37,10 +37,35 @@ export function esTareaAutonoma(pregunta: string): boolean {
   );
 }
 
+/**
+ * Detecta saludos o mensajes sin tarea accionable (hola, ¿qué pods hacer?, etc.).
+ * Con Modo Automático activado, estos NO deben entrar al pipeline plan→ejecutar:
+ * obligarlos por la estructura de síntesis genera alucinaciones para "llenar el molde".
+ */
+export function esSmallTalkOConsultaSinMeta(pregunta: string): boolean {
+  const p = (pregunta ?? "").trim();
+  if (!p || p.length > 140) return false;
+  const n = p.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const saludoPuro =
+    /^(hola+|holis|buenas(\s+(tardes|noches|dias|dia))?|buen\s*dia|buenos\s*dias|hey|hi|hello|que\s*tal\??|como\s+andas?\??|todo\s+bien\??|chau|hasta\s+luego|gracias[\s!.]*|dale|ok(ay)?[\s!.]*|jaja+)[\s!.?¿¡]*$/;
+  if (saludoPuro.test(n)) return true;
+  // Consultas de capacidades sin ningún activo/ticker/dato detectable
+  const capacidad =
+    /(que\s+(podes|puedes|hace[sz])\s+hacer|quien\s+sos|que\s+es\s+(esto|el\s+(chat|agente))|como\s+funciona(s)?\s+(esto|el\s+(chat|agente|modo))|para\s+que\s+servis|necesito\s+ayuda|^ayuda$|^help$)/.test(
+      n,
+    );
+  const hayActivo =
+    /\b(ggal|ypf|ypfd|pamp|meli|bma|alua|come|txar|aapl|msft|nvda|tsla|amzn|googl|meta|spy|qqq|al30|gd30|al35|gd35|ae38|gd38|tx26|lecap|boncap)\b|\b[a-z]{1,5}\.ba\b|\b\d+\s*(usd|ars|pesos|dolares?)\b|dolar|blue\b|mep\b|ccl\b|uva\b|inflacion|riesgo pais|portafolio|cartera|bono|cedear|accion|opcion|fci|caucion/i.test(
+      p,
+    );
+  return capacidad && !hayActivo;
+}
+
 const JERARQUIA_METODOLOGICA = `
 Jerarquía metodológica del análisis financiero completo (orden recomendado):
 F0 Macro: contexto_macro, ciclo_economico
 F1-F3 Contable/valuación: analizar_fundamental, calcular_wacc, calcular_dcf, valor_por_metodos, valor_intrinseco_real, ficha_de_decision
+PIPELINE MAESTRO (si la meta es un análisis completo/integral): analisis_completo(simbolo) ejecuta F0→F10 en orden con validación T incluida; reforzar con validar_analisis(simbolo).
 F4 Sectores: score_sectorial, analisis_industria, matriz_benchmarks, ranking_valuacion_sectores, performance_sectorial, valuacion_sectorial
 F5-F6 Cartera/riesgo: estadisticas_retornos, analizar_riesgo, distribucion_riesgo, analizar_capm, matriz_capm, capm_auto, analizar_factores, optimizar_portafolio, optimizar_cartera_avanzada, backtest_optimizacion, calcular_cobertura
 F7 Renta fija: calcular_tir_bono, calcular_ytm_bono, consultar_curva_etti, calcular_stripped_yield, calcular_yield_call, consultar_semaforo_riesgo_bono
@@ -49,6 +74,8 @@ F9 Cuantitativo: pairs_trading_labadie, curva_ejecucion_labadie
 Transversal datos: consultar_mercado, buscar_noticias, buscar_web, consultar_catalogo, consultar_base_conocimiento, analisis_tecnico, analizar_semaforo
 Cierre: generar_informe, grafico_chat, oportunidades_diarias
 Operativa (solo si el usuario lo pide explícitamente): iol_login, iol_cuenta, iol_mercado, iol_operar (NUNCA sin confirmación explícita del usuario), telegram_enviar_senal, telegram_enviar_mensaje
+
+MAPEO DE JERGA INTERNA (crítico): nombres como RazonesFinancierasTab, "toggle moneda constante", resolverTIRConRestricciones son paneles/UI, NO herramientas tuyas. Traducilos a tools reales (analizar_fundamental para razones; calcular_ytm_bono para TIR de bonos) y ejecutá esas. PROHIBIDO fabricar sus salidas o citarlas como ejecutadas. NUNCA inventes flujos de fondos, ratios ni TIRs: solo datos textuales de resultados de tools.
 `;
 
 const PROMPT_PLANIFICADOR = `Sos el agente autónomo de análisis financiero. El usuario te dio una META en lenguaje natural.
@@ -173,6 +200,22 @@ export async function orquestarTurnoAutonomo(opts: OpcionesOrquestador): Promise
   const fuentes: ResultadoTurno["fuentes"] = [];
   const ejecutadas: LlamadaEjecutada[] = [];
   let totalCalls = 0;
+
+  // GUARD: saludo / mensaje sin meta accionable → respuesta conversacional corta.
+  // Sin esto, el Modo Automático fuerza la estructura de síntesis (macro→datos→
+  // valuación→riesgos) sobre un "hola" y el modelo FABRICA un análisis para llenarla.
+  if (esSmallTalkOConsultaSinMeta(pregunta)) {
+    enviar({ t: "status", v: "autonomo", q: "Saludo/consulta sin meta: respuesta directa sin pipeline" });
+    const finalSaludo =
+      "¡Hola! Soy IA, tu asistente de mercado. Con el **Modo Automático** activo me hablás en lenguaje natural y yo orquesto las funciones de la app. Ejemplos de lo que puedo ejecutar ahora mismo:\n\n" +
+      "- \"análisis completo de GGAL\" — pipeline F0→F10 con macro, fundamental, técnico, cuantitativo y validación\n" +
+      "- \"señal unificada de YPF\" — señal 4 capas del motor unificado\n" +
+      "- \"curva ETTI soberana\" o \"YTM de AL30\" — renta fija en vivo\n" +
+      "- \"mi portafolio de IOL\" — iniciá sesión desde el chat y lo analizo\n" +
+      "- \"dólar MEP hoy\" o \"riesgo país\" — datos al instante con fuente\n\n" +
+      "¿Qué analizamos?";
+    return { final: finalSaludo, fuentes };
+  }
 
   // ---------- FASE 1: PLANIFICACIÓN ----------
   const pasoAutonomo = (texto: string) => enviar({ t: "status", v: "autonomo", q: texto });
@@ -349,7 +392,7 @@ Ejecutá estos pasos ahora con las herramientas y continuá.`,
     {
       role: "system",
       content:
-        "Sos el redactor final del análisis financiero en MODO AUTOMÁTICO. Recibís la meta del usuario (en lenguaje natural humano) y los datos REALES obtenidos por las herramientas orquestadas autónomamente (ya validados por un agente validador). Razonás la instrucción como humano: inferís intención, activo, horizonte y preguntas implícitas. Asumís el rol de la base de conocimiento (55 PDFs Pascale/Fowler Newton/Dumrauf/Blanchard/Biondi + corpus Labadie + regulación CNV/BCRA) y sabés qué rol asignarte (Mercado/Valoración/Semáforo/Cuantitativo/Conocimiento/Motor Unificado) según la instrucción; si hay múltiples capas, orquestás y citás todas. Redactás la respuesta definitiva en español rioplatense, formato markdown de chat: directo, con cifras citadas tal cual fueron obtenidas, señalando explícitamente qué falló o no pudo obtenerse (honestidad ante todo). Estructura: contexto macro breve → datos clave del activo/tema → valuación/cuantitativo si corresponde → riesgos → conclusión práctica y próximo paso. Al cierre, proponé SIEMPRE 2-3 instrucciones siguientes inteligentes en lenguaje natural humano como sugerencias (ej. '¿Querés que lo compare con YPF y PAMP?', '¿Te armo un gráfico TradingView con soportes?', '¿Lo envío a Telegram?') para que el usuario haga clic. PROHIBIDO inventar cifras o prometer rendimientos. No repitas el plan técnico ni nombres de herramientas.",
+        "Sos el redactor final del análisis financiero en MODO AUTOMÁTICO. Recibís la meta del usuario (en lenguaje natural humano) y los datos REALES obtenidos por las herramientas orquestadas autónomamente (ya validados por un agente validador). Razonás la instrucción como humano: inferís intención, activo, horizonte y preguntas implícitas. Asumís el rol de la base de conocimiento (55 PDFs Pascale/Fowler Newton/Dumrauf/Blanchard/Biondi + corpus Labadie + regulación CNV/BCRA) y sabés qué rol asignarte (Mercado/Valoración/Semáforo/Cuantitativo/Conocimiento/Motor Unificado) según la instrucción; si hay múltiples capas, orquestás y citás todas. Redactás la respuesta definitiva en español rioplatense, formato markdown de chat: directo, con cifras citadas tal cual fueron obtenidas, señalando explícitamente qué falló o no pudo obtenerse (honestidad ante todo). Al cierre, proponé SIEMPRE 2-3 instrucciones siguientes inteligentes en lenguaje natural humano como sugerencias para que el usuario haga clic. PROHIBIDO inventar cifras o prometer rendimientos. No repitas el plan técnico ni nombres de herramientas.\n\n[ESTRUCTURA CONDICIONAL — NO ES UN MOLDE OBLIGATORIO]\nLa estructura 'contexto macro → datos clave → valuación → riesgos → conclusión' SOLO aplica si hay DATOS REALES de herramientas sobre un activo/tema concreto en DATOS REALES OBTENIDOS. Si el bloque viene vacío o '(no se obtuvieron datos)': respondé BREVE y conversacional reconociendo que no pudiste ejecutar nada, pedí el dato que falta o sugerí qué analizar; NUNCA rellenes la estructura con un análisis inventado, ni cambies de tema para justificar el molde.\n\n[ATRIBUCIONES — PROHIBIDO FABRICAR FUENTES INSTITUCIONALES]\nNunca atribuyas 'estudios', datos ni conclusiones a Cintia Boos, universidades (ej. Universidad de La Plata), institutos ni organismos si esa atribución no aparece textualmente en los resultados de herramientas de este turno. El corpus académico es tu marco metodológico interno para INTERPRETAR resultados: citá el documento/archivo cuando aporte teoría, jamás como fuente numérica de un activo puntual.\n\nREGLA ANTI-ALUCINACIÓN TERMINANTE: el bloque DATOS REALES OBTENIDOS es tu ÚNICA fuente de cifras. Si la meta pide algo que no está en ese bloque (ej. flujos de fondos proyectados, TIR con restricciones, razones en moneda constante sin datos IPC), NO lo fabriques ni armes ejemplos ilustrativos con números inventados: declará explícitamente 'no se pudo calcular X con datos confirmados en este turno'.",
     },
     ...historial.slice(-4).map((m) => ({ role: m.role, content: m.content })),
     {

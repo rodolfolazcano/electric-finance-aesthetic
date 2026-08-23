@@ -1917,6 +1917,59 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
     }
   }
 
+  // ---- Red de seguridad: análisis completo pedido y NO ejecutado → forzar analisis_completo ----
+  // Evita que el redactor fabrique flujos/ratios/TIR cuando ningún agente ejecutó el pipeline.
+  {
+    const esPedidoAnalisisCompleto =
+      /analisis\s+completo|an[áa]lisis\s+(completo|integral)|ficha\s+coronar|pipeline\s+maestro|f0.*f10|analiz[aá]\s+\w+\s+completa|valuaci[óo]n\s+integral/i.test(
+        pregunta,
+      );
+    const yaLlamoAnalisis = messages.some(
+      (m: any) =>
+        m.tool_calls?.some(
+          (c: any) => c.function?.name === "analisis_completo" || c.function?.name === "ficha_de_decision",
+        ) ||
+        (typeof m.content === "string" && m.content.includes("Resultado real de analisis_completo")),
+    );
+    if (esPedidoAnalisisCompleto && !yaLlamoAnalisis) {
+      // Extraer ticker de la pregunta (misma lógica que YTM)
+      let simboloPipeline: string | null = extraerTickerPregunta(pregunta);
+      if (!simboloPipeline) {
+        const mNombre = pregunta.match(/de\s+([A-Za-z][A-Za-z0-9.]{1,11})/i);
+        if (mNombre) simboloPipeline = mNombre[1]!.toUpperCase();
+      }
+      if (simboloPipeline) {
+        const callIdPipe = `analisis_completo_forzado_${Date.now()}`;
+        const argsPipe = JSON.stringify({ simbolo: simboloPipeline });
+        messages.push({
+          role: "assistant",
+          content: "",
+          tool_calls: [{ id: callIdPipe, function: { name: "analisis_completo", arguments: argsPipe } }],
+        });
+        enviar({ t: "status", v: "valoracion", q: `Pipeline F0→F10 ${simboloPipeline}` });
+        try {
+          const rPipe = await ejecutarAnalisisCompleto(argsPipe, sessionId);
+          fuentes.push(...rPipe.fuentes);
+          if ((rPipe as any).eventos?.length) enviarEventos(enviar, (rPipe as any).eventos);
+          messages.push({
+            role: "tool",
+            tool_call_id: callIdPipe,
+            name: "analisis_completo",
+            content: `Resultado REAL del pipeline F0→F10 para ${simboloPipeline} (única fuente de verdad; PROHIBIDO inventar flujos, ratios o TIRs que no estén acá):\n\n${rPipe.texto.slice(0, 24000)}`,
+          });
+        } catch (e) {
+          messages.push({
+            role: "tool",
+            tool_call_id: callIdPipe,
+            name: "analisis_completo",
+            content: `El pipeline F0→F10 falló (${e instanceof Error ? e.message : "error"}). Decilo con honestidad y NO inventes datos.`,
+          });
+        }
+        enviar({ t: "status", v: "searching" });
+      }
+    }
+  }
+
   // ---- Red de seguridad: YTM/TIR de bono pedido y no ejecutado → forzar calcular_ytm_bono ----
   {
     const esPreguntaYTM = /ytm|tir\b|tasa\s+interna.*retorno|rendimiento.*bono/i.test(pregunta) && /al30|gd30|al35|gd35|ae38|gd38|tx26|bono/i.test(pregunta);

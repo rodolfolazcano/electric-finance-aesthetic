@@ -117,11 +117,26 @@ async function consultarAgente(
   const historia = (historias.get(sessionId) ?? []).slice(-HISTORIA_MAX);
   const mensajes = [...historia, { role: "user" as const, content: pregunta }];
 
+  // MODO AUTOMÁTICO por Telegram: mismo pipeline que la UI. El toggle de la UI
+  // no existe acá, así que se activa cuando el mensaje pide una tarea completa
+  // (misma detección esTareaAutonoma que usa /api/chat como fallback) o con
+  // los comandos /auto y /modo automatico.
+  let modoAutomaticoTg = false;
+  try {
+    const { esTareaAutonoma } = await import("@/lib/agents/autonomo");
+    modoAutomaticoTg =
+      esTareaAutonoma(pregunta) ||
+      /^\/(auto|modo)\b/i.test(pregunta) ||
+      /modo\s+(autom[aá]tico|autonomo)/i.test(pregunta);
+  } catch {
+    /* fallback: sin flag, /api/chat aplica su propia detección */
+  }
+
   // Vercel (Fluid) y local: 300s cubre el modo autónomo completo.
   const res = await fetch(`${base}/api/chat`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ messages: mensajes, sessionId }),
+    body: JSON.stringify({ messages: mensajes, sessionId, modoAutomatico: modoAutomaticoTg }),
     signal: AbortSignal.timeout(300_000),
   });
   if (!res.ok || !res.body) {
