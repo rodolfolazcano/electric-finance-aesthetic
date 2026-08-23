@@ -34,6 +34,7 @@ import type {
   SectorAnalysisResult,
   EtfFitResult,
 } from "@/lib/herramientas/sector-analysis.functions";
+import { getEtfMeta, interpretarFitLabdie } from "@/lib/etf-descriptions";
 import { getSectorValuationRanking } from "@/lib/herramientas/sector-valuation-ranking.functions";
 import type { SectorValuationRow } from "@/lib/herramientas/sector-valuation-ranking.functions";
 import { getSectorDailyPerformance } from "@/lib/herramientas/sector-performance.functions";
@@ -69,7 +70,10 @@ const COHORTES: Record<CohorteKey, { label: string; corto: string }> = {
 
 // Meta por ticker desde unificado_completo.json (una sola vez)
 const META_TICKER = new Map<string, { tipo?: string; moneda?: string; mercado?: string }>(
-  getFlatTickerList().map((t) => [t.ticker.toUpperCase(), { tipo: t.tipo, moneda: t.moneda, mercado: t.mercado }]),
+  getFlatTickerList().map((t) => [
+    t.ticker.toUpperCase(),
+    { tipo: t.tipo, moneda: t.moneda, mercado: t.mercado },
+  ]),
 );
 
 export function clasificarCohorte(ticker: string): CohorteKey {
@@ -359,7 +363,7 @@ function PanelFull({
                           {t.fundScore?.toFixed(1) ?? "s/d"}
                         </TableCell>
                         <TableCell className="text-[11px] text-muted-foreground">
-{t.industry ?? result.industry}
+                          {t.industry ?? result.industry}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -496,7 +500,9 @@ function PanelFull({
       <details className="group rounded-lg border border-border/60 bg-background/40">
         <summary className="flex cursor-pointer items-center justify-between px-4 py-2.5 text-[13px] font-medium text-foreground">
           <span>Lectura estructural antes de confiar en el múltiplo (Bustamante, corpus pt)</span>
-          <span className="text-muted-foreground transition-transform group-open:rotate-180">▾</span>
+          <span className="text-muted-foreground transition-transform group-open:rotate-180">
+            ▾
+          </span>
         </summary>
         <div className="border-t border-border/50 px-4 py-3 text-[13px] leading-relaxed text-muted-foreground">
           Antes de rankear por P/E o score, caracterizar la industria en 5 pasos:{" "}
@@ -1261,7 +1267,9 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
     oportunidades: "valuacion",
     estructura: "analisis",
   };
-  const inicial = initialTab ? (LEGACY_MAP[initialTab] ?? (valid.includes(initialTab) ? initialTab : undefined)) : undefined;
+  const inicial = initialTab
+    ? (LEGACY_MAP[initialTab] ?? (valid.includes(initialTab) ? initialTab : undefined))
+    : undefined;
   const [tab, setTab] = useState(inicial ?? "panorama");
   useEffect(() => {
     if (initialTab) {
@@ -1312,7 +1320,10 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
   const [cohorteActiva, setCohorteActiva] = useState<string | null>(null);
   // Cohorte efectiva: la elegida o, por defecto, la más numerosa
   useEffect(() => {
-    if (!cohortes.length) { setCohorteActiva(null); return; }
+    if (!cohortes.length) {
+      setCohorteActiva(null);
+      return;
+    }
     if (!cohortes.find((c) => c.key === cohorteActiva)) {
       const mayor = [...cohortes].sort((a, b) => b.tickers.length - a.tickers.length)[0];
       setCohorteActiva(mayor.key);
@@ -1320,7 +1331,10 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
   }, [cohortes]);
   const cohorteSel = cohortes.find((c) => c.key === cohorteActiva) ?? null;
   const tickersHomogeneos = useMemo(
-    () => (cohorteSel ? tickersFromFilter.filter((t) => clasificarCohorte(t.ticker) === cohorteSel.key) : []),
+    () =>
+      cohorteSel
+        ? tickersFromFilter.filter((t) => clasificarCohorte(t.ticker) === cohorteSel.key)
+        : [],
     [cohorteSel, tickersFromFilter],
   );
 
@@ -1449,179 +1463,188 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
       {/* INPUTS SIEMPRE PRIMERO — visibles solo donde aplican */}
       {(tab === "analisis" || tab === "cartera") && (
         <>
-      {/* Selector compartido Clarity parity */}
-      <div className="flex flex-wrap items-start gap-3">
-        <div className="glass p-3 flex-1 min-w-[220px] border rounded-lg bg-background/40">
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              value={sectorFilter}
-              onChange={(e) => {
-                setSectorFilter(e.target.value);
-                setIndustryFilter("");
-                setResult(null);
-              }}
-              className="flex-1 min-w-[160px] bg-background border border-border/60 text-foreground text-xs rounded-md px-2 py-1.5"
-            >
-              <option value="">Seleccionar sector</option>
-              {sectorList
-                .filter((s) => s !== "No disponible")
-                .map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-            </select>
-            {sectorFilter && (
-              <select
-                value={industryFilter}
-                onChange={(e) => {
-                  setIndustryFilter(e.target.value);
-                  setResult(null);
-                }}
-                className="flex-1 min-w-[160px] bg-background border border-border/60 text-foreground text-xs rounded-md px-2 py-1.5"
-              >
-                <option value="">Todas las industrias (sector completo)</option>
-                {industryList.map((ind) => (
-                  <option key={ind} value={ind}>
-                    {ind}
-                  </option>
-                ))}
-              </select>
-            )}
-            {tickersFromFilter.length >= 2 && (
-              <Button onClick={handleRun} disabled={loading} size="sm" className="h-8 text-[11px]">
-                {loading ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  <Search className="h-3 w-3" />
-                )}{" "}
-                Analizar
-              </Button>
-            )}
-            {loading && (
-              <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                <Loader2 className="h-3 w-3 animate-spin" />
-                Analizando…
-              </span>
-            )}
-          </div>
-          {tickersFromFilter.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1">
-              {tickersFromFilter.slice(0, 30).map((t) => (
-                <span
-                  key={t.ticker}
-                  className="font-mono text-[10px] px-2 py-0.5 rounded border border-primary/20 bg-primary/5"
+          {/* Selector compartido Clarity parity */}
+          <div className="flex flex-wrap items-start gap-3">
+            <div className="glass p-3 flex-1 min-w-[220px] border rounded-lg bg-background/40">
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={sectorFilter}
+                  onChange={(e) => {
+                    setSectorFilter(e.target.value);
+                    setIndustryFilter("");
+                    setResult(null);
+                  }}
+                  className="flex-1 min-w-[160px] bg-background border border-border/60 text-foreground text-xs rounded-md px-2 py-1.5"
                 >
-                  {t.ticker}
-                </span>
-              ))}
-              {tickersFromFilter.length > 30 && (
-                <span className="text-[10px] text-muted-foreground">
-                  +{tickersFromFilter.length - 30} más
-                </span>
-              )}
-            </div>
-          )}
-          {error && (
-            <div className="mt-2 p-2 rounded bg-danger/10 border border-danger/30 text-xs text-danger">
-              {error}
-            </div>
-          )}
-        </div>
-        <div className="glass p-3 flex-1 min-w-[220px] border rounded-lg bg-background/40">
-          <button
-            onClick={() => setComparacionAbierta((v) => !v)}
-            aria-expanded={comparacionAbierta}
-            className="w-full flex items-center justify-between gap-2 rounded-md px-2 py-1.5 -mx-2 text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
-          >
-            <span className="flex items-center gap-2">
-              Comparar
-              {comparacionSectores.length > 0 && (
-                <span className="font-mono text-[10px] normal-case tracking-normal rounded-full bg-primary/10 text-primary border border-primary/20 px-2 py-0.5">
-                  {comparacionSectores.length} seleccionado
-                  {comparacionSectores.length === 1 ? "" : "s"}
-                </span>
-              )}
-            </span>
-            <ChevronDown
-              className={`h-4 w-4 transition-transform duration-200 ${comparacionAbierta ? "rotate-180" : ""}`}
-            />
-          </button>
-          {comparacionAbierta && (
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <select
-                multiple
-                value={comparacionSectores}
-                onChange={(e) =>
-                  setComparacionSectores(Array.from(e.target.selectedOptions, (o) => o.value))
-                }
-                className="flex-1 min-w-[120px] bg-background border border-border/60 text-[11px] rounded px-2 py-1.5"
-                size={3}
-              >
-                {sectorList
-                  .filter((s) => s !== "No disponible")
-                  .map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-              </select>
-              <Button
-                onClick={handleCompararSectores}
-                disabled={comparacionSectores.length < 2 || comparacionLoading}
-                size="sm"
-                className="h-8 text-[11px]"
-              >
-                {comparacionLoading ? "Cargando…" : `Comparar (${comparacionSectores.length})`}
-              </Button>
-              {comparacionError && (
-                <p className="text-[10px] text-amber-400 mt-1 w-full">{comparacionError}</p>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Segmentación por cohorte homogénea — nunca cruzar tipo/moneda/mercado */}
-      {cohortes.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-              Cohorte homogénea:
-            </span>
-            {cohortes.map((c) => (
-              <button
-                key={c.key}
-                type="button"
-                onClick={() => setCohorteActiva(c.key)}
-                className={cn(
-                  "rounded-full border px-3 py-1 text-[11px] font-mono transition-colors",
-                  c.key === cohorteActiva
-                    ? "border-primary/60 bg-primary/15 text-primary"
-                    : "border-border/60 bg-background/50 text-muted-foreground hover:text-foreground",
+                  <option value="">Seleccionar sector</option>
+                  {sectorList
+                    .filter((s) => s !== "No disponible")
+                    .map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                </select>
+                {sectorFilter && (
+                  <select
+                    value={industryFilter}
+                    onChange={(e) => {
+                      setIndustryFilter(e.target.value);
+                      setResult(null);
+                    }}
+                    className="flex-1 min-w-[160px] bg-background border border-border/60 text-foreground text-xs rounded-md px-2 py-1.5"
+                  >
+                    <option value="">Todas las industrias (sector completo)</option>
+                    {industryList.map((ind) => (
+                      <option key={ind} value={ind}>
+                        {ind}
+                      </option>
+                    ))}
+                  </select>
                 )}
+                {tickersFromFilter.length >= 2 && (
+                  <Button
+                    onClick={handleRun}
+                    disabled={loading}
+                    size="sm"
+                    className="h-8 text-[11px]"
+                  >
+                    {loading ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Search className="h-3 w-3" />
+                    )}{" "}
+                    Analizar
+                  </Button>
+                )}
+                {loading && (
+                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Analizando…
+                  </span>
+                )}
+              </div>
+              {tickersFromFilter.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {tickersFromFilter.slice(0, 30).map((t) => (
+                    <span
+                      key={t.ticker}
+                      className="font-mono text-[10px] px-2 py-0.5 rounded border border-primary/20 bg-primary/5"
+                    >
+                      {t.ticker}
+                    </span>
+                  ))}
+                  {tickersFromFilter.length > 30 && (
+                    <span className="text-[10px] text-muted-foreground">
+                      +{tickersFromFilter.length - 30} más
+                    </span>
+                  )}
+                </div>
+              )}
+              {error && (
+                <div className="mt-2 p-2 rounded bg-danger/10 border border-danger/30 text-xs text-danger">
+                  {error}
+                </div>
+              )}
+            </div>
+            <div className="glass p-3 flex-1 min-w-[220px] border rounded-lg bg-background/40">
+              <button
+                onClick={() => setComparacionAbierta((v) => !v)}
+                aria-expanded={comparacionAbierta}
+                className="w-full flex items-center justify-between gap-2 rounded-md px-2 py-1.5 -mx-2 text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
               >
-                {c.corto} · {c.tickers.length}
+                <span className="flex items-center gap-2">
+                  Comparar
+                  {comparacionSectores.length > 0 && (
+                    <span className="font-mono text-[10px] normal-case tracking-normal rounded-full bg-primary/10 text-primary border border-primary/20 px-2 py-0.5">
+                      {comparacionSectores.length} seleccionado
+                      {comparacionSectores.length === 1 ? "" : "s"}
+                    </span>
+                  )}
+                </span>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-200 ${comparacionAbierta ? "rotate-180" : ""}`}
+                />
               </button>
-            ))}
+              {comparacionAbierta && (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <select
+                    multiple
+                    value={comparacionSectores}
+                    onChange={(e) =>
+                      setComparacionSectores(Array.from(e.target.selectedOptions, (o) => o.value))
+                    }
+                    className="flex-1 min-w-[120px] bg-background border border-border/60 text-[11px] rounded px-2 py-1.5"
+                    size={3}
+                  >
+                    {sectorList
+                      .filter((s) => s !== "No disponible")
+                      .map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                  </select>
+                  <Button
+                    onClick={handleCompararSectores}
+                    disabled={comparacionSectores.length < 2 || comparacionLoading}
+                    size="sm"
+                    className="h-8 text-[11px]"
+                  >
+                    {comparacionLoading ? "Cargando…" : `Comparar (${comparacionSectores.length})`}
+                  </Button>
+                  {comparacionError && (
+                    <p className="text-[10px] text-amber-400 mt-1 w-full">{comparacionError}</p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-          {cohorteSel && cohortes.length > 1 && (
-            <p className="text-[11px] leading-relaxed text-amber-400/90">
-              ⚠️ El sector mezcla activos de distinto tipo, moneda y mercado. Por coherencia
-              metodológica (Fowler Newton: moneda homogénea · Pascale: comparables homogéneos) el
-              análisis y la comparación corren <b>solo</b> sobre{" "}
-              <b>{cohorteSel.label}</b> ({cohorteSel.tickers.length} activos). Un CEDEAR replica a su
-              subyacente: no es comparable ni con la acción local ni con la original de EE.UU.
-            </p>
+
+          {/* Segmentación por cohorte homogénea — nunca cruzar tipo/moneda/mercado */}
+          {cohortes.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                  Cohorte homogénea:
+                </span>
+                {cohortes.map((c) => (
+                  <button
+                    key={c.key}
+                    type="button"
+                    onClick={() => setCohorteActiva(c.key)}
+                    className={cn(
+                      "rounded-full border px-3 py-1 text-[11px] font-mono transition-colors",
+                      c.key === cohorteActiva
+                        ? "border-primary/60 bg-primary/15 text-primary"
+                        : "border-border/60 bg-background/50 text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {c.corto} · {c.tickers.length}
+                  </button>
+                ))}
+              </div>
+              {cohorteSel && cohortes.length > 1 && (
+                <p className="text-[11px] leading-relaxed text-amber-400/90">
+                  ⚠️ El sector mezcla activos de distinto tipo, moneda y mercado. Por coherencia
+                  metodológica (Fowler Newton: moneda homogénea · Pascale: comparables homogéneos)
+                  el análisis y la comparación corren <b>solo</b> sobre <b>{cohorteSel.label}</b> (
+                  {cohorteSel.tickers.length} activos). Un CEDEAR replica a su subyacente: no es
+                  comparable ni con la acción local ni con la original de EE.UU.
+                </p>
+              )}
+              {cohorteSel && tickersHomogeneos.length > 0 && (
+                <p className="font-mono text-[10px] text-muted-foreground">
+                  Analizando:{" "}
+                  {tickersHomogeneos
+                    .map((t) => t.ticker)
+                    .slice(0, 24)
+                    .join(" · ")}
+                  {tickersHomogeneos.length > 24 ? ` · +${tickersHomogeneos.length - 24} más` : ""}
+                </p>
+              )}
+            </div>
           )}
-          {cohorteSel && tickersHomogeneos.length > 0 && (
-            <p className="font-mono text-[10px] text-muted-foreground">
-              Analizando: {tickersHomogeneos.map((t) => t.ticker).slice(0, 24).join(" · ")}
-              {tickersHomogeneos.length > 24 ? ` · +${tickersHomogeneos.length - 24} más` : ""}
-            </p>
-          )}
-        </div>
-        )}
         </>
       )}
 
@@ -1698,7 +1721,7 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
 
         {/* 4 · MATRIZ — dinámica: activos/industrias/sectores, corr/beta/alpha/R² */}
         <TabsContent value="matriz" className="mt-4">
-          <MatrizUniversoPanel sectorFilter={sectorFilter} />
+          <MatrizUniversoPanel sectorFilter={sectorFilter} cohorteFiltro={clasificarCohorte} />
         </TabsContent>
 
         {/* 5 · CARTERA — Elbaum: correlaciones/benchmarks como diversificación */}
@@ -1709,4 +1732,3 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
     </div>
   );
 }
-
