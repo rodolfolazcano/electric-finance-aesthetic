@@ -113,7 +113,7 @@ export function PlanificacionFinancieraTab() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           Planificación financiera de corto plazo · caso Pascale (Cap. 37)
         </p>
@@ -308,7 +308,7 @@ export function PlanificacionFinancieraTab() {
       </div>
 
       {/* PER */}
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           PER · Presupuesto del estado de resultados
         </p>
@@ -337,7 +337,7 @@ export function PlanificacionFinancieraTab() {
       </div>
 
       {/* PES */}
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           PES · Presupuesto del estado de situación
         </p>
@@ -389,7 +389,7 @@ export function PlanificacionFinancieraTab() {
       </div>
 
       {/* PFC */}
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           PFC · Presupuesto del fluir de caja
         </p>
@@ -421,7 +421,7 @@ export function PlanificacionFinancieraTab() {
       </div>
 
       {/* Ratios forward */}
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           Razones forward (estados proyectados)
         </p>
@@ -474,7 +474,7 @@ export function PlanificacionFinancieraTab() {
 
       {/* Observaciones */}
       {resultado.observaciones.length > 0 && (
-        <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+        <div className="rounded-md border border-border/40 bg-background/60 p-4">
           <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
             Observaciones del plan
           </p>
@@ -490,7 +490,7 @@ export function PlanificacionFinancieraTab() {
       )}
 
       {/* Informe (Biondi Cap. 7) */}
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           Informe profesional ({informe.empresa})
         </p>

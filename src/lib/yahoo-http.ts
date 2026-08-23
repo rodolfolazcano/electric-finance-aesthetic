@@ -326,6 +326,24 @@ export async function fetchYahooChart(
   const cached = getCached<any>(cacheKey, YAHOO_CACHE_TTL);
   if (cached) return cached;
 
+  // Capa disco: histórico completo local + merge incremental del delta.
+  // Solo para intervalos diarios/semanales/mensuales (no intradía corto).
+  const usaDisco = !/^(1m|2m|5m|15m|30m|60m|90m|1h)$/.test(interval) && /^(1d|1wk|1mo)$/.test(interval);
+  if (usaDisco) {
+    try {
+      const { obtenerChartConDisco } = await import("./cache/historico-disco.server");
+      const disco = await obtenerChartConDisco(symbol, range, interval, (r, iv) =>
+        withConcurrencyLimit(() => yahooChartInner(symbol, r, iv, yahooCacheKey("chart", symbol, r, iv), false)),
+      );
+      if (disco) {
+        setCache(cacheKey, disco);
+        return disco;
+      }
+    } catch {
+      // cae al fetch directo
+    }
+  }
+
   return withConcurrencyLimit(() => yahooChartInner(symbol, range, interval, cacheKey, false));
 }
 
@@ -388,7 +406,6 @@ export function normalizarRangoYahoo(raw: string): string {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, " ");
   const map: Record<string, string> = {
-    "1 dia": "1d",
     "1 dia": "1d",
     "1d": "1d",
     "1 mes": "1mo",

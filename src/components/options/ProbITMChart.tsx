@@ -106,7 +106,7 @@ export function ProbITMChart({ options, spot }: ProbITMChartProps) {
 
   if (grupos.length === 0) {
     return (
-      <Card className="p-4 border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="p-4 border border-border/40 bg-background/80 backdrop-blur-sm">
         <p className="text-[9px] font-mono text-muted-foreground">
           Sin datos de probabilidad ITM para graficar
         </p>
@@ -115,7 +115,7 @@ export function ProbITMChart({ options, spot }: ProbITMChartProps) {
   }
 
   return (
-    <Card className="p-4 border border-border/40 bg-background/40/80 backdrop-blur-sm">
+    <Card className="p-4 border border-border/40 bg-background/80 backdrop-blur-sm">
       <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2">
         Probabilidad de Finalizar ITM — {grupos.length} vencimiento(s)
       </h3>

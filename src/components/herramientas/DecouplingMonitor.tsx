@@ -29,7 +29,7 @@ function fmtPct(n: number | null | undefined, dp = 2): string {
 function ScoreGauge({ score }: { score: CompositeScore | undefined | null }) {
   if (!score) {
     return (
-      <Card className="border-border/40 bg-background/40/40 p-3.5">
+      <Card className="border-border/40 bg-background/40 p-3.5">
         <span className="text-[9px] text-muted-foreground">Score compuesto no disponible</span>
       </Card>
     );
@@ -74,14 +74,14 @@ function ScoreGauge({ score }: { score: CompositeScore | undefined | null }) {
 function SignalCard({ signal }: { signal: DecouplingSignal | undefined | null }) {
   if (!signal) {
     return (
-      <Card className="border-border/40 bg-background/40/40 p-3.5">
+      <Card className="border-border/40 bg-background/40 p-3.5">
         <span className="text-[9px] text-muted-foreground">Señal no disponible</span>
       </Card>
     );
   }
   const cfg = NIVEL_CONFIG[signal.nivel] ?? NIVEL_CONFIG.bajo;
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3.5">
+    <Card className="border-border/40 bg-background/40 p-3.5">
       <div className="flex items-center justify-between mb-2">
         <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-foreground">{signal.label}</span>
         <span className={cn("rounded px-1.5 py-0.5 text-[8px] font-mono border", cfg.color, cfg.border, cfg.bg)}>
@@ -111,14 +111,14 @@ function SignalCard({ signal }: { signal: DecouplingSignal | undefined | null })
 function YieldCurveDetail({ yieldCurve }: { yieldCurve: YieldCurveData & { senal: DecouplingSignal } | undefined | null }) {
   if (!yieldCurve || !yieldCurve.senal) {
     return (
-      <Card className="border-border/40 bg-background/40/40 p-3.5">
+      <Card className="border-border/40 bg-background/40 p-3.5">
         <span className="text-[9px] text-muted-foreground">Curva de rendimientos no disponible</span>
       </Card>
     );
   }
   const cfg = NIVEL_CONFIG[yieldCurve.senal.nivel] ?? NIVEL_CONFIG.bajo;
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3.5">
+    <Card className="border-border/40 bg-background/40 p-3.5">
       <div className="flex items-center justify-between mb-2">
         <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-foreground">Curva de Rendimientos</span>
         <span className={cn("rounded px-1.5 py-0.5 text-[8px] font-mono border", cfg.color, cfg.border, cfg.bg)}>
@@ -161,7 +161,7 @@ function ResumenTable({ correlacion, crb, cons }: { correlacion: DecouplingSigna
   ];
 
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3.5">
+    <Card className="border-border/40 bg-background/40 p-3.5">
       <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-foreground block mb-2">Resumen de Variables a Monitorear</span>
       <div className="overflow-x-auto w-full">
         <table className="w-full text-[9px] font-mono">

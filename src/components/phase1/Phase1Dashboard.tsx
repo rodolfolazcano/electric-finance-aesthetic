@@ -305,7 +305,7 @@ export function Phase1Dashboard() {
       </div>
 
       {/* Section 1: Regime Badge + Score */}
-      <Card className="border-border/40 bg-background/40/40 p-4 space-y-3">
+      <Card className="border-border/40 bg-background/40 p-4 space-y-3">
         <RegimeBadge regime={regime} />
         <div className="text-[10px] font-mono text-muted-foreground leading-relaxed">
           {regime.description}
@@ -314,7 +314,7 @@ export function Phase1Dashboard() {
       </Card>
 
       {/* Section 2: MacroGauge bars */}
-      <Card className="border-border/40 bg-background/40/40 p-4 space-y-4">
+      <Card className="border-border/40 bg-background/40 p-4 space-y-4">
         <h3 className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
           Macro Snapshot
         </h3>
@@ -364,7 +364,7 @@ export function Phase1Dashboard() {
       </Card>
 
       {/* Section 3: GWR Validation */}
-      <Card className="border-border/40 bg-background/40/40 p-4">
+      <Card className="border-border/40 bg-background/40 p-4">
         <GwrTable gwr={data.gwr_validation} />
       </Card>
     </div>

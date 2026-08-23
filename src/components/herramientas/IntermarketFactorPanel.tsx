@@ -139,7 +139,7 @@ function CategorySection({ name, data }: { name: string; data: CategoryData }) {
   );
 
   return (
-    <Card className="border-border/40 bg-background/40/40 overflow-hidden">
+    <Card className="border-border/40 bg-background/40 overflow-hidden">
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-muted/10"
@@ -181,7 +181,7 @@ function CategorySection({ name, data }: { name: string; data: CategoryData }) {
 
 function SummaryCard({ summary }: { summary: Summary }) {
   return (
-    <Card className="border-border/40 bg-background/40/40 p-4">
+    <Card className="border-border/40 bg-background/40 p-4">
       <div className="mb-2 text-[13px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
         Resumen
       </div>
@@ -225,7 +225,7 @@ function RankingPanel({
   icon: string;
 }) {
   return (
-    <Card className="border-border/40 bg-background/40/40 p-4">
+    <Card className="border-border/40 bg-background/40 p-4">
       <div className="mb-2 flex items-center gap-2">
         <span>{icon}</span>
         <span className="text-[13px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
@@ -351,7 +351,7 @@ export function IntermarketFactorPanel() {
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <Card className="border-border/40 bg-background/40/40 p-4">
+      <Card className="border-border/40 bg-background/40 p-4">
         <form onSubmit={handleSearch} className="flex flex-wrap items-end gap-3">
           <div className="flex-1 min-w-[200px]">
             <label className="mb-1 block text-[13px] font-mono uppercase tracking-wider text-muted-foreground">

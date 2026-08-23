@@ -1,10 +1,8 @@
 import { cn } from "@/lib/utils";
 import {
   BarChart3,
-  Sparkles,
   ArrowLeftRight,
   Building2,
-  Layers,
   Calculator,
   Briefcase,
   TrendingUp,
@@ -15,6 +13,9 @@ import {
   ChevronRight,
   Menu,
   X,
+  LineChart,
+  Landmark,
+  Bitcoin,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
@@ -87,7 +88,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
         value: "cuantitativo",
         label: "04 · Cuantitativo",
         shortLabel: "Cuantitativo",
-        icon: Layers,
+        icon: LineChart,
         subTabs: [
           { value: "optimizador", label: "Optimizador" },
           { value: "riesgo", label: "Riesgo" },
@@ -95,6 +96,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
           { value: "cobertura", label: "Cobertura" },
           { value: "clasificacion", label: "Clasificación" },
           { value: "statarb", label: "Stat Arb" },
+          { value: "labadie", label: "Labadie" },
           { value: "estimaciones", label: "Estimaciones" },
         ],
       },
@@ -105,7 +107,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     id: "instrumentos",
     title: "INSTRUMENTOS",
     items: [
-      { value: "renta-fija", label: "06 · Renta Fija", shortLabel: "Renta Fija", icon: BarChart3 },
+      { value: "renta-fija", label: "06 · Renta Fija", shortLabel: "Renta Fija", icon: Landmark },
       { value: "opciones", label: "07 · Opciones", shortLabel: "Opciones", icon: Percent },
       {
         value: "arbitrador",
@@ -113,7 +115,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
         shortLabel: "Arbitrador",
         icon: ArrowLeftRight,
       },
-      { value: "cripto", label: "09 · Cripto", shortLabel: "Cripto", icon: Sparkles },
+      { value: "cripto", label: "09 · Cripto", shortLabel: "Cripto", icon: Bitcoin },
     ],
   },
   {
@@ -351,6 +353,7 @@ export function SidebarHerramientas({
       <div ref={detectionZoneRef} className="fixed left-0 top-16 bottom-0 w-4 z-20" />
       <div
         ref={railRef}
+        // w sincronizado con herramientas.tsx ml-[252px]/ml-[64px] — ver layout-constants.ts
         className={cn(
           "fixed left-0 top-16 bottom-0 z-30 glass border-r border-border/60 flex flex-col transition-all duration-200",
           isVisible ? "translate-x-0" : "-translate-x-full",

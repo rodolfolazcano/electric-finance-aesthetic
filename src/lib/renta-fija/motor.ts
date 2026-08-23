@@ -1,13 +1,12 @@
 // Motor Renta Fija CORONAR — TIR real desde RENTA_FIJA_COMPLETA.json + precio IOL vivo
 // Fuente de verdad: RENTA_FIJA_COMPLETA.json (flujo_fondos, cupon, amortizacion)
-// Precio: API IOL v2 — credenciales vía env IOL_USER/IOL_PASS (fallback demo). Motor: Newton-Raphson ACT/365.
+// Precio: API IOL v2 — credenciales hardcodeadas (repo privado) con fallback env. Motor: Newton-Raphson ACT/365.
 
 import rentaFijaData from "@/../RENTA_FIJA_COMPLETA.json";
 import { iolLogin, iolCotizacion, iolCotizacionDetalle, type FuenteIOL, FUENTE_IOL } from "@/lib/iol.server";
 
-// Sanitizado: credenciales por env (repo privado pero evita hardcode en código)
-const IOL_USER_HARDCODED = process.env.IOL_USER ?? "demo";
-const IOL_PASS_HARDCODED = process.env.IOL_PASS ?? "demo";
+const IOL_USER_HARDCODED = process.env.IOL_USER ?? "boosandr97@gmail.com";
+const IOL_PASS_HARDCODED = process.env.IOL_PASS ?? "Chule348936_";
 const IOL_SESSION_SISTEMA = "renta-fija-sistema";
 
 type FlujoJSON = { fecha: string; tipo: string; monto_por_cien: number; moneda: string };

@@ -461,7 +461,7 @@ export function PortfolioDraftPanel({
       <details
         open={suggestOpen}
         onToggle={(e) => setSuggestOpen((e.target as HTMLDetailsElement).open)}
-        className="rounded border border-border/40 bg-background/40/60"
+        className="rounded border border-border/40 bg-background/60"
       >
         <summary className="px-3 py-2 text-[13px] font-mono text-muted-foreground cursor-pointer hover:text-foreground select-none">
           Sugerir activos por sector/industria

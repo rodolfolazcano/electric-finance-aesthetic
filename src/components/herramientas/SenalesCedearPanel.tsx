@@ -25,7 +25,7 @@ export function SenalesCedearPanel() {
   });
 
   return (
-    <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+    <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="px-4 py-3 border-b border-border/20 flex items-center justify-between gap-2 flex-wrap">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
           Señales CEDEARs / Acciones BCBA — Chat lateral (siempre activo)

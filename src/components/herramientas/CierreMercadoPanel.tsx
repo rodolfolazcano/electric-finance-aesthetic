@@ -142,7 +142,7 @@ export function CierreMercadoPanel() {
 
   if (isLoading) {
     return (
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
         <div className="p-4 space-y-3">
           <Skeleton className="h-6 w-64 rounded-lg" />
           <Skeleton className="h-40 w-full rounded-lg" />
@@ -169,7 +169,7 @@ export function CierreMercadoPanel() {
   return (
     <div className="space-y-4">
       {/* 1. Header */}
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
         <div className="px-4 py-3 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="font-display text-[clamp(1.2rem,2vw,1.5rem)] font-semibold tracking-tight text-foreground">
@@ -187,7 +187,7 @@ export function CierreMercadoPanel() {
       </Card>
 
       {/* 2. Índices de EE.UU. */}
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
         <SectionTitle>Índices de EE.UU.</SectionTitle>
         <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {d.indices.map((r) => (
@@ -197,7 +197,7 @@ export function CierreMercadoPanel() {
       </Card>
 
       {/* 3. Sectores S&P 500 */}
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
         <SectionTitle>Sectores S&P 500 — ordenados por performance HOY</SectionTitle>
         <div className="divide-y divide-border/20">
           {d.sectores.map((s, i) => (
@@ -222,7 +222,7 @@ export function CierreMercadoPanel() {
       </Card>
 
       {/* 4. Top Movers S&P 500 */}
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
         <SectionTitle>Top Movers del día — Ganadores / Perdedores</SectionTitle>
         <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
           {(
@@ -259,13 +259,13 @@ export function CierreMercadoPanel() {
       </Card>
 
       {/* 5. Tasas e Índices */}
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
         <SectionTitle>Tasas e Índices</SectionTitle>
         <SimpleTable rows={d.tasas} />
       </Card>
 
       {/* 6. Renta Fija */}
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
         <SectionTitle>Renta Fija</SectionTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x divide-border/20">
           <div>
@@ -284,7 +284,7 @@ export function CierreMercadoPanel() {
       </Card>
 
       {/* 7 + 8. Global */}
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
         <SectionTitle>Global · Desarrollados / Emergentes</SectionTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x divide-border/20">
           <div>
@@ -303,7 +303,7 @@ export function CierreMercadoPanel() {
       </Card>
 
       {/* 9. Commodities */}
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
         <SectionTitle>Commodities</SectionTitle>
         <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {d.commodities.map((r) => (

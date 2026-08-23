@@ -78,7 +78,7 @@ function ConfianzaBar({ nivel }: { nivel: number }) {
 function RatioCard({ ratio }: { ratio: RatioSignal }) {
   const signalColor = SIGNAL_COLORS[ratio.signal] ?? SIGNAL_COLORS.NEUTRAL;
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3.5">
+    <Card className="border-border/40 bg-background/40 p-3.5">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <TrendArrow trend={ratio.trend} />
@@ -200,7 +200,7 @@ function ArrowsCard({ arrows }: { arrows: ArrowsPhase }) {
 
 function PricingPowerSection() {
   return (
-    <Card className="border-border/40 bg-background/40/40 p-4">
+    <Card className="border-border/40 bg-background/40 p-4">
       <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-foreground block mb-2">
         Pricing Power & Backlogs (2026)
       </span>

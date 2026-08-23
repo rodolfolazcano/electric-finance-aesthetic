@@ -1,7 +1,7 @@
 /**
  * Catálogo unificado de activos operables.
  *
- * Fuente: `src/lib/data/unificado-completo.json` (paneles de sectores →
+ * Fuente canónica: `src/data/unificado_completo.json` (paneles de sectores →
  * industrias → activos). Este módulo normaliza ese JSON y lo convierte en un
  * mapa que el agente puede consultar: por ticker, nombre, sector, industria,
  * tipo/moneda/pais, más la resolución al símbolo real de Yahoo Finance.
@@ -9,7 +9,7 @@
  * Es un módulo de servidor (no se importa desde el cliente web).
  */
 
-import catalogoJson from "@/lib/data/unificado-completo.json";
+import catalogoJson from "@/data/unificado_completo.json";
 
 export type TipoActivo =
   | "accion"

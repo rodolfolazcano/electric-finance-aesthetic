@@ -108,14 +108,14 @@ export function PortafolioFundamentalGrid({
   return (
     <div className="space-y-4">
       {excludedCount > 0 && (
-        <div className="rounded-md border border-border/40 bg-background/40/60 px-4 py-2.5 text-[10px] text-muted-foreground">
+        <div className="rounded-md border border-border/40 bg-background/60 px-4 py-2.5 text-[10px] text-muted-foreground">
           {excludedCount} posición{excludedCount > 1 ? "es" : ""} de renta fija/liquidez no incluida
           {excludedCount > 1 ? "s" : ""} en el análisis fundamental — podés verlas en la sección
           Renta Fija.
         </div>
       )}
 
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <p className="text-[10px] font-semibold text-foreground">Tu cartera fundamental</p>
         <div className="mt-2 flex items-baseline gap-2">
           <span className="font-mono text-lg font-bold text-foreground">{scorePonderado}/100</span>

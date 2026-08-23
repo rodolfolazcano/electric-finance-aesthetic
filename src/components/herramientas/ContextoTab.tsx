@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Compass, Search, Loader2, TrendingUp, Scale } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -187,20 +188,37 @@ function ScreenerSector() {
             ))}
           </div>
 
-          {/* Intermarket Murphy — Fase 1 */}
-          {q.data.intermarket && (
+          {/* Intermarket Murphy — Fase 1 (si el motor lo provee) */}
+          {(q.data as unknown as { intermarket?: { regimenDolar: string; regimenTasas: string; riesgoActivo: string; sectoresFavorecidos: { sector: string; etf: string; ret20: number | null }[]; rotacionDetectada: string } }).intermarket && (
             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-              <Badge variant="outline" className="font-mono">Dólar: {q.data.intermarket.regimenDolar.split(" (")[0]}</Badge>
-              <Badge variant="outline" className="font-mono">Tasas: {q.data.intermarket.regimenTasas.split(" (")[0]}</Badge>
-              <Badge variant={q.data.intermarket.riesgoActivo === "RIESGO-ON" ? "default" : "secondary"}>
-                {q.data.intermarket.riesgoActivo}
+              <Badge variant="outline" className="font-mono">
+                Dólar: {(q.data as unknown as { intermarket: { regimenDolar: string } }).intermarket.regimenDolar.split(" (")[0]}
               </Badge>
-              {q.data.intermarket.sectoresFavorecidos.slice(0, 3).map((s) => (
+              <Badge variant="outline" className="font-mono">
+                Tasas: {(q.data as unknown as { intermarket: { regimenTasas: string } }).intermarket.regimenTasas.split(" (")[0]}
+              </Badge>
+              <Badge
+                variant={
+                  (q.data as unknown as { intermarket: { riesgoActivo: string } }).intermarket.riesgoActivo ===
+                  "RIESGO-ON"
+                    ? "default"
+                    : "secondary"
+                }
+              >
+                {(q.data as unknown as { intermarket: { riesgoActivo: string } }).intermarket.riesgoActivo}
+              </Badge>
+              {(
+                q.data as unknown as {
+                  intermarket: { sectoresFavorecidos: { sector: string; etf: string; ret20: number | null }[] };
+                }
+              ).intermarket.sectoresFavorecidos.slice(0, 3).map((s) => (
                 <Badge key={s.etf} variant="outline" className="border-emerald-500/40 text-emerald-400">
                   {s.sector} +{s.ret20?.toFixed(1)}%
                 </Badge>
               ))}
-              <span className="text-muted-foreground">{q.data.intermarket.rotacionDetectada}</span>
+              <span className="text-muted-foreground">
+                {(q.data as unknown as { intermarket: { rotacionDetectada: string } }).intermarket.rotacionDetectada}
+              </span>
             </div>
           )}
 

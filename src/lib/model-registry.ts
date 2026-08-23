@@ -326,6 +326,16 @@ export const MODELO_PLANNER_POR_DEFECTO: AgentModel =
   RAZONAMIENTO.find((m) => m.puedePlanear && m.maxTokens <= 6144) ??
   RAPIDEZ[1]!;
 
+/**
+ * EJECUTOR RÁPIDO: recibe el plan del modelo de razonamiento y orquesta las
+ * tool calls en paralelo. Lightning 30B A3B (MoE, 3B activos) = la latencia
+ * más baja del catálogo con tool calling confiable; Nano 30B como fallback.
+ */
+export const MODELO_EJECUTOR_POR_DEFECTO: AgentModel =
+  RAPIDEZ.find((m) => m.id === "nvidia/nemotron-3.5-lightning-30b-a3b") ??
+  RAPIDEZ.find((m) => m.puedePlanear) ??
+  RAPIDEZ[0]!;
+
 const POR_ID = new Map(MODELOS_DISPONIBLES.map((m) => [m.id, m]));
 
 export function obtenerModelo(id: string | undefined): AgentModel {

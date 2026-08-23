@@ -303,8 +303,34 @@ export const Route = createFileRoute("/api/chat")({
         orquestacion.promptSkillsSalida = promptSkillsSalidaFinal;
         orquestacion.promptSkillsPlanner = promptSkillsPlannerFinal;
 
+        // Arranque paralelo: RAG (lento) se lanza YA, en paralelo a preparar memoria.
+        // Se resuelve dentro del stream sin bloquear la carga del chat lateral.
+        const ragPromise: Promise<ApiMsg | undefined> = (async (): Promise<ApiMsg | undefined> => {
+          try {
+            const contextoRag: ResultadoConocimiento[] = (await retrieveHybrid(pregunta, {
+              topK: 6,
+              enableRerank: true,
+              enableQueryRewrite: true,
+              baseUrl,
+            })) as unknown as ResultadoConocimiento[];
+            if (!contextoRag.length) return undefined;
+            const contenidoRag = contextoRag
+              .map((r) => {
+                if (esAcademico(r)) return `- [${r.categoria} · ${r.archivo} · pág. ${r.pagina}] ${r.texto}`;
+                return `- ${r.texto}`;
+              })
+              .join("\n");
+            return {
+              role: "system",
+              content: `Contexto recuperado de la base de conocimiento interna del sitio y del material académico indexado (USALO SOLO si responde directamente la pregunta; si no, ignoralo; este contexto NO reemplaza a una herramienta ejecutada en este turno). Si la pregunta pide un dato actual o verificable (cotización, tasa, noticia, valor, matrícula, normativa, regulación CNV, beta, riesgo), la respuesta debe basarse en lo que devuelva la herramienta ejecutada en este mismo turno y NO en este bloque. PROHIBIDO volcar este contexto como respuesta genérica cuando la pregunta espera un dato real:\n${contenidoRag}`,
+            };
+          } catch {
+            return undefined;
+          }
+        })();
+
         const memoria = MemoriaDeSesion.obtener(sessionId);
-        // Espera la carga desde disco antes de mutar estado (evita pisar memoria).
+        // Memoria y RAG corren en paralelo: no bloquear uno con el otro.
         await memoria.preparar();
         memoria.nuevoTurno();
         memoria.agregarTimeline({ rol: "usuario", texto: pregunta });
@@ -321,32 +347,8 @@ export const Route = createFileRoute("/api/chat")({
             const hint = getAdaptiveHint();
             send({ t: "adaptive", v: hint });
 
-            // Pre-RAG: Nemo Retriever hybrid (rag-blueprint + nemotron-retrieval-recipes)
-            let ragMsg: ApiMsg | undefined;
-            try {
-              const contextoRag: ResultadoConocimiento[] = (await retrieveHybrid(pregunta, {
-                topK: 6,
-                enableRerank: true,
-                enableQueryRewrite: true,
-                baseUrl,
-              })) as unknown as ResultadoConocimiento[];
-              if (contextoRag.length) {
-                const contenidoRag = contextoRag
-                  .map((r) => {
-                    if (esAcademico(r)) {
-                      return `- [${r.categoria} · ${r.archivo} · pág. ${r.pagina}] ${r.texto}`;
-                    }
-                    return `- ${r.texto}`;
-                  })
-                  .join("\n");
-                ragMsg = {
-                  role: "system",
-                  content: `Contexto recuperado de la base de conocimiento interna del sitio y del material académico indexado (USALO SOLO si responde directamente la pregunta; si no, ignoralo; este contexto NO reemplaza a una herramienta ejecutada en este turno). Si la pregunta pide un dato actual o verificable (cotización, tasa, noticia, valor, matrícula, normativa, regulación CNV, beta, riesgo), la respuesta debe basarse en lo que devuelva la herramienta ejecutada en este mismo turno y NO en este bloque. PROHIBIDO volcar este contexto como respuesta genérica cuando la pregunta espera un dato real:\n${contenidoRag}`,
-                };
-              }
-            } catch {
-              /* si el embebido falla, se sigue sin contexto RAG */
-            }
+            // RAG ya viene en vuelo; solo se espera aquí (no bloqueó preparar memoria).
+            const ragMsg = await ragPromise;
 
             let resultado: Awaited<ReturnType<typeof orquestarTurno>>;
             try {

@@ -64,7 +64,7 @@ export function GreeksSensitivity({
 
   if (data.length === 0) {
     return (
-      <Card className="p-4 border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="p-4 border border-border/40 bg-background/80 backdrop-blur-sm">
         <p className="text-[9px] font-mono text-muted-foreground">
           Seleccione una opción en la tabla para ver sensibilidad
         </p>
@@ -80,7 +80,7 @@ export function GreeksSensitivity({
   };
 
   return (
-    <Card className="p-4 border border-border/40 bg-background/40/80 backdrop-blur-sm">
+    <Card className="p-4 border border-border/40 bg-background/80 backdrop-blur-sm">
       <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2">
         Sensibilidad de Griegas
       </h3>

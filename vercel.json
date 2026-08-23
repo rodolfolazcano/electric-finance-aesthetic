@@ -21,6 +21,18 @@
       "schedule": "0 13 * * 1-5"
     },
     {
+      "path": "/api/cron/alerta-publicaciones?umbral=6&max=2",
+      "schedule": "30 15,18,21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/oportunidades-publicaciones?tema=cripto&max=4",
+      "schedule": "0 14 * * 1-5"
+    },
+    {
+      "path": "/api/cron/oportunidades-publicaciones?tema=auto&max=5",
+      "schedule": "0 21 * * 1-5"
+    },
+    {
       "path": "/api/cron/actualiza-renta-fija",
       "schedule": "0 21 * * 1-5"
     },

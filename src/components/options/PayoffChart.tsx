@@ -68,7 +68,7 @@ export function PayoffChart({ legs, spotActual }: PayoffChartProps) {
 
   if (legs.length === 0) {
     return (
-      <Card className="p-4 border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="p-4 border border-border/40 bg-background/80 backdrop-blur-sm">
         <p className="text-[9px] font-mono text-muted-foreground">
           Agregue una o más patas para ver el diagrama de payoff
         </p>
@@ -85,7 +85,7 @@ export function PayoffChart({ legs, spotActual }: PayoffChartProps) {
   const formatTooltip = (value: number) => [`$${value.toFixed(2)}`, "Payoff"];
 
   return (
-    <Card className="p-4 border border-border/40 bg-background/40/80 backdrop-blur-sm">
+    <Card className="p-4 border border-border/40 bg-background/80 backdrop-blur-sm">
       <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2">
         Payoff al Vencimiento
       </h3>

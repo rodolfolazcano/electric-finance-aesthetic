@@ -23,6 +23,34 @@ import {
   type ResultadoTurno,
 } from "@/lib/agents/orquestador";
 import { estadoDeHerramienta, NOMBRE_HERRAMIENTAS } from "@/lib/agents/herramientas";
+import { ColaDeTareas } from "@/lib/agents/queue";
+import { getAdaptiveHint } from "@/lib/nemo-relay";
+
+// AMBOS con prioridad y fallback: NeMo Relay adaptive (más importante) → AGENTES_PARALELOS → AUTONOMO_PARALELAS → 5
+// Toma el máximo entre el hint adaptativo y el env, así se respeta el más performante sin perder fallback.
+function paralelismoAutonomo(): number {
+  let hintPar: number | undefined;
+  try {
+    const h = getAdaptiveHint();
+    if (h?.maxParallel && isFinite(h.maxParallel) && h.maxParallel >= 2) hintPar = Math.min(h.maxParallel, 8);
+  } catch { /* sin relay en este contexto */ }
+  let envPar: number | undefined;
+  let envAutoPar: number | undefined;
+  try {
+    if (typeof process !== "undefined") {
+      const rawA = String(process.env.AGENTES_PARALELOS ?? "").trim();
+      const vA = Number(rawA);
+      if (isFinite(vA) && vA >= 2 && vA <= 10) envPar = vA;
+      const rawB = String(process.env.AUTONOMO_PARALELAS ?? "").trim();
+      const vB = Number(rawB);
+      if (isFinite(vB) && vB >= 2 && vB <= 10) envAutoPar = vB;
+    }
+  } catch { /* ignora */ }
+  // AMBOS: prioriza el mayor entre hint y env (más paralelismo = más importante para velocidad)
+  const candidatos = [hintPar, envPar, envAutoPar].filter((v): v is number => typeof v === "number");
+  if (candidatos.length) return Math.max(...candidatos);
+  return 5;
+}
 
 const MAX_RONDAS_EJECUCION = 14;
 const MAX_RONDAS_POST_VALIDACION = 8;
@@ -73,7 +101,7 @@ F8 Derivados: cadena_opciones_bcba, analizar_opciones_completo, predecir_direcci
 F9 Cuantitativo: pairs_trading_labadie, curva_ejecucion_labadie
 Transversal datos: consultar_mercado, buscar_noticias, buscar_web, consultar_catalogo, consultar_base_conocimiento, analisis_tecnico, analizar_semaforo
 Cierre: generar_informe, grafico_chat, oportunidades_diarias
-Operativa (solo si el usuario lo pide explícitamente): iol_login, iol_cuenta, iol_mercado, iol_operar (NUNCA sin confirmación explícita del usuario), telegram_enviar_senal, telegram_enviar_mensaje
+Operativa (solo si el usuario lo pide explícitamente): iol_login, iol_cuenta, iol_mercado, iol_operar (NUNCA sin confirmación explícita del usuario), telegram_enviar_senal, telegram_enviar_mensaje, telegram_enviar_grafico, publicar_slide_mercado, publicar_oportunidades
 
 MAPEO DE JERGA INTERNA (crítico): nombres como RazonesFinancierasTab, "toggle moneda constante", resolverTIRConRestricciones son paneles/UI, NO herramientas tuyas. Traducilos a tools reales (analizar_fundamental para razones; calcular_ytm_bono para TIR de bonos) y ejecutá esas. PROHIBIDO fabricar sus salidas o citarlas como ejecutadas. NUNCA inventes flujos de fondos, ratios ni TIRs: solo datos textuales de resultados de tools.
 `;
@@ -197,6 +225,9 @@ export async function orquestarTurnoAutonomo(opts: OpcionesOrquestador): Promise
   } = opts;
 
   const modelo = orquestacion.modeloPlanner;
+  // AMBOS con prioridad: razonamiento planifica/valida, EJECUTOR RÁPIDO orquesta tools.
+  // Si no hay modeloEjecutor (llamadas viejas), fallback al planner.
+  const modeloRapido = (orquestacion as { modeloEjecutor?: typeof modelo }).modeloEjecutor ?? modelo;
   const fuentes: ResultadoTurno["fuentes"] = [];
   const ejecutadas: LlamadaEjecutada[] = [];
   let totalCalls = 0;
@@ -262,12 +293,13 @@ export async function orquestarTurnoAutonomo(opts: OpcionesOrquestador): Promise
     for (let ronda = 0; ronda < maxRondas && totalCalls < MAX_TOOL_CALLS; ronda++) {
       let salida;
       try {
+        // EJECUCIÓN con el modelo RÁPIDO (sin thinking): latencia mínima por ronda.
         salida = await respuestaModelo(
           apiKey,
-          modelo.id,
+          modeloRapido.id,
           messages,
           NOMBRE_HERRAMIENTAS,
-          modelo.maxTokens,
+          modeloRapido.maxTokens,
           false,
           undefined,
         );
@@ -286,51 +318,49 @@ export async function orquestarTurnoAutonomo(opts: OpcionesOrquestador): Promise
       };
       messages.push(msgAsistente);
 
-      for (const call of salida.tool_calls) {
-        if (totalCalls >= MAX_TOOL_CALLS) break;
-        if (!call.name || !NOMBRE_HERRAMIENTAS.includes(call.name)) {
-          messages.push({
-            role: "tool",
-            tool_call_id: call.id,
-            name: call.name || "desconocida",
-            content: "Herramienta inexistente. Usá exactamente uno de los nombres disponibles.",
-          });
+      // --- Ejecución paralela de todas las tool_calls de la ronda ---
+      // Mantiene el orden lógico para el historial LLM vinculando por tool_call_id.
+      const calls = salida.tool_calls.slice(0, Math.max(0, MAX_TOOL_CALLS - totalCalls));
+      const cola = new ColaDeTareas(paralelismoAutonomo());
+      // Pre-anunciar estado para cada call (sin bloquear carga)
+      for (const c of calls) {
+        if (!c.name || !NOMBRE_HERRAMIENTAS.includes(c.name)) continue;
+        enviar({ t: "status", v: estadoDeHerramienta(c.name), q: pregunta.slice(0, 40) });
+      }
+      pasoAutonomo(`Ronda ${ronda + 1}: ejecutando ${calls.length} herramientas en paralelo…`);
+
+      type ResCall = { idx: number; call: (typeof calls)[number]; texto: string; ok: boolean; fuentes: ResultadoTurno["fuentes"]; eventos?: unknown[]; invalida?: boolean };
+      const resultados: ResCall[] = await Promise.all(
+        calls.map((call, idx) =>
+          cola.enqueue(async (): Promise<ResCall> => {
+            if (!call.name || !NOMBRE_HERRAMIENTAS.includes(call.name)) {
+              return { idx, call, texto: "Herramienta inexistente. Usá exactamente uno de los nombres disponibles.", ok: false, fuentes: [], invalida: true };
+            }
+            const bloqueo = await protegerOperacionReal(call.name, call.arguments, sessionId, baseUrl);
+            if (bloqueo) return { idx, call, texto: bloqueo.texto, ok: false, fuentes: [] };
+            try {
+              const ej = await ejecutarTool(call.name, call.arguments, baseUrl, sessionId);
+              return { idx, call, texto: ej.texto, ok: ej.ok, fuentes: ej.fuentes, eventos: ej.eventos as unknown[] };
+            } catch (err) {
+              return { idx, call, texto: `ERROR ejecutando ${call.name}: ${String(err).slice(0, 300)}`, ok: false, fuentes: [] };
+            }
+          }),
+        ),
+      );
+      // Reensamblar en orden original de la ronda (requisito LLM tool_call_id)
+      resultados.sort((a, b) => a.idx - b.idx);
+      for (const r of resultados) {
+        if (r.invalida) {
+          messages.push({ role: "tool", tool_call_id: r.call.id, name: r.call.name || "desconocida", content: r.texto });
           continue;
         }
         totalCalls++;
-        const idxPaso = Math.min(ejecutadas.length + 1, pasos.length || ejecutadas.length + 1);
-        pasoAutonomo(
-          `Paso ${idxPaso}${pasos.length ? `/${pasos.length}` : ""}: ejecutando ${call.name}…`,
-        );
-        enviar({ t: "status", v: estadoDeHerramienta(call.name), q: pregunta.slice(0, 40) });
-
-        const bloqueo = await protegerOperacionReal(call.name, call.arguments, sessionId, baseUrl);
-        let resultadoTexto = "";
-        let okCall = true;
-        if (bloqueo) {
-          resultadoTexto = bloqueo.texto;
-          okCall = false;
-        } else {
-          try {
-            const ej = await ejecutarTool(call.name, call.arguments, baseUrl, sessionId);
-            resultadoTexto = ej.texto;
-            okCall = ej.ok;
-            fuentes.push(...ej.fuentes);
-            if (ej.fuentes.length) enviar({ t: "sources", v: ej.fuentes });
-            enviarEventosInternos(enviar, ej.eventos);
-          } catch (err) {
-            resultadoTexto = `ERROR ejecutando ${call.name}: ${String(err).slice(0, 300)}`;
-            okCall = false;
-          }
-        }
-        ejecutadas.push({ name: call.name, args: call.arguments, ok: okCall, resumen: resultadoTexto.slice(0, 600) });
-        console.log(`[AUTONOMO][ronda ${ronda}] ${call.name} ok=${okCall}`);
-        messages.push({
-          role: "tool",
-          tool_call_id: call.id,
-          name: call.name,
-          content: `Resultado real de ${call.name}:\n\n${resultadoTexto}`,
-        });
+        fuentes.push(...r.fuentes);
+        if (r.fuentes.length) enviar({ t: "sources", v: r.fuentes });
+        enviarEventosInternos(enviar, r.eventos as never[]);
+        ejecutadas.push({ name: r.call.name, args: r.call.arguments, ok: r.ok, resumen: r.texto.slice(0, 600) });
+        console.log(`[AUTONOMO][ronda ${ronda}] ${r.call.name} ok=${r.ok}`);
+        messages.push({ role: "tool", tool_call_id: r.call.id, name: r.call.name, content: `Resultado real de ${r.call.name}:\n\n${r.texto}` });
       }
       enviar({ t: "status", v: "autonomo", q: `Ronda ${ronda + 1} completa · ${totalCalls} herramientas ejecutadas` });
     }

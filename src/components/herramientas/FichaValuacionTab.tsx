@@ -8,7 +8,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import {
-  AlertTriangle,
   CheckCircle2,
   FileSearch,
   Newspaper,
@@ -27,6 +26,7 @@ import {
   semaforoTickerFn,
   noticiasTickerFn,
 } from "@/lib/herramientas/clara.functions";
+import type { ResultadoFicha } from "@/lib/clarity-analysis";
 import { cn } from "@/lib/utils";
 import { getFlatTickerList, type TickerInfo } from "@/lib/universos";
 
@@ -52,10 +52,7 @@ function buscarUniverso(q: string): TickerInfo[] {
   for (const t of UNIVERSO) {
     const tick = t.ticker.toUpperCase();
     if (tick.startsWith(query)) empiezan.push(t);
-    else if (
-      tick.includes(query) ||
-      sinAcentos(t.nombre.toUpperCase()).includes(query)
-    )
+    else if (tick.includes(query) || sinAcentos(t.nombre.toUpperCase()).includes(query))
       contienen.push(t);
     if (empiezan.length >= 6 && contienen.length >= 4) break;
   }
@@ -81,7 +78,32 @@ function decisionColor(decision: string): string {
   return "border-border bg-accent text-muted-foreground";
 }
 
-function FichaCard({ ticker }: { ticker: string }) {
+/** Métricas fundamentales efectivamente disponibles para el ticker consultado */
+function coberturaFundamental(d: ResultadoFicha): { total: number; lista: string[] } {
+  const m = d.cuantitativo?.metricas ?? {};
+  const items: [string, boolean][] = [
+    ["precio actual", d.precio_actual != null],
+    ["DCF", !!d.valuacion?.vi_dcf],
+    ["múltiplos", !!d.valuacion?.vi_multi],
+    ["valor libro", !!d.valuacion?.vi_libro],
+    ["WACC", d.wacc?.wacc_usd != null],
+    ["ROE", m.M12_roe != null],
+    ["margen neto", m.M6_margen_neto != null],
+    ["Deuda/EBITDA", m.M14_deuda_ebitda != null],
+    ["P/E", m.M15_pe != null],
+    ["EV/EBITDA", m.ev_ebitda != null],
+    ["upside analistas", d.margen_seguridad?.upside_pct != null],
+  ];
+  const ok = items.filter(([, v]) => v);
+  return { total: ok.length, lista: ok.map(([k]) => k) };
+}
+
+/**
+ * Sección fundamental guiada por datos reales:
+ *  - sin datos → no se despliega nada;
+ *  - datos parciales → se muestran únicamente las métricas disponibles.
+ */
+function SeccionFundamental({ ticker }: { ticker: string }) {
   const fn = useServerFn(fichaDecisionFn);
   const q = useQuery({
     queryKey: ["clara-ficha", ticker],
@@ -92,153 +114,212 @@ function FichaCard({ ticker }: { ticker: string }) {
 
   if (q.isPending)
     return (
-      <div className="grid w-full gap-4 md:grid-cols-3">
-        <Skeleton className="h-48" />
-        <Skeleton className="h-48" />
-        <Skeleton className="h-48" />
-      </div>
+      <section className="space-y-3">
+        <EncabezadoFundamental />
+        <div className="grid w-full gap-4 md:grid-cols-3">
+          <Skeleton className="h-48" />
+          <Skeleton className="h-48" />
+          <Skeleton className="h-48" />
+        </div>
+      </section>
     );
-  if (q.isError || !q.data)
-    return (
-      <Card>
-        <CardContent className="flex items-center gap-2 p-6 text-sm text-muted-foreground">
-          <AlertTriangle className="h-4 w-4 text-amber-400" />
-          No se pudo completar el análisis de {ticker}. Verificá el símbolo e intentá de nuevo.
-        </CardContent>
-      </Card>
-    );
+  // Sin respuesta utilizable → la sección no se despliega
+  if (q.isError || !q.data) return null;
 
   const d = q.data;
+  const cob = coberturaFundamental(d);
+  // Ticker sin ningún dato fundamental → sección oculta por completo
+  if (cob.total === 0 || (!d.precio_actual && !d.valuacion?.vi_central)) return null;
+
   const ms = d.margen_seguridad;
+  const datosParciales = d.decision_final === "DATOS INSUFICIENTES";
+
+  // Filas disponibles por bloque
+  const filasValuacion = [
+    !!d.valuacion.vi_dcf && { k: "DCF (FCFF 5 años)", v: fmtUSD(d.valuacion.vi_dcf) },
+    !!d.valuacion.vi_multi && { k: "Múltiplos sectoriales", v: fmtUSD(d.valuacion.vi_multi) },
+    !!d.valuacion.vi_libro && { k: "Valor libro / APV", v: fmtUSD(d.valuacion.vi_libro) },
+    !!d.valuacion.rango && {
+      k: "Rango final",
+      v: `${fmtUSD((d.valuacion.rango as { min?: number }).min)} – ${fmtUSD(
+        (d.valuacion.rango as { max?: number }).max,
+      )}`,
+    },
+  ].filter(Boolean) as { k: string; v: string }[];
+
+  const metricasCuant = (
+    [
+      ["ROE", pct(d.cuantitativo.metricas.M12_roe)],
+      ["Margen neto", pct(d.cuantitativo.metricas.M6_margen_neto)],
+      ["Deuda / EBITDA", x(d.cuantitativo.metricas.M14_deuda_ebitda)],
+      ["P/E", x(d.cuantitativo.metricas.M15_pe)],
+      ["EV/EBITDA", x(d.cuantitativo.metricas.ev_ebitda)],
+    ] as [string, string][]
+  ).filter(([, v]) => v !== "s/d");
+
+  const rojas = d.cuantitativo.alertas.rojas;
+
   return (
-    <div className="space-y-4">
-      {/* Resumen de decisión */}
-      <Card className={cn("border", decisionColor(d.decision_final))}>
-        <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
-          <div>
-            <div className="text-xs tracking-wide text-muted-foreground uppercase">
-              Ficha de decisión · {d.empresa}
-            </div>
-            <div className="mt-1 font-mono text-2xl font-bold">{d.decision_final}</div>
-            <div className="mt-1 text-xs text-muted-foreground">
-              Precio {fmtUSD(d.precio_actual)} · Valor central {fmtUSD(d.valuacion.vi_central)} ·
-              Upside {fmtPctS(ms.upside_pct)}
-            </div>
-          </div>
-          <div className="grid w-full grid-cols-3 gap-4 text-center">
-            <Mini label="Score cuali" value={`${d.cualitativo.score_total.toFixed(1)}/10`} />
-            <Mini
-              label="WACC"
-              value={d.wacc.wacc_usd != null ? `${d.wacc.wacc_usd.toFixed(1)}%` : "s/d"}
-            />
-            <Mini label="MOS" value={`${ms.mos_aplicado_pct.toFixed(0)}%`} />
-          </div>
-        </CardContent>
-      </Card>
-
-      {d.bloqueado_por_cualitativo && (
-        <Card className="border-amber-500/40 bg-amber-500/5">
-          <CardContent className="flex items-start gap-2 p-4 text-sm">
-            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-            Score cualitativo insuficiente (&lt;5.0): el análisis cuantitativo queda bloqueado — no
-            comprar lo que no se entiende.
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="grid w-full gap-4 lg:grid-cols-3">
-        {/* Valuación */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Target className="h-4 w-4 text-primary" /> Triangulación de valor
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <Fila k="DCF (FCFF 5 años)" v={fmtUSD(d.valuacion.vi_dcf)} />
-            <Fila k="Múltiplos sectoriales" v={fmtUSD(d.valuacion.vi_multi)} />
-            <Fila k="Valor libro / APV" v={fmtUSD(d.valuacion.vi_libro)} />
-            <Fila
-              k="Rango final"
-              v={
-                d.valuacion.rango
-                  ? `${fmtUSD(d.valuacion.rango.min)} – ${fmtUSD(d.valuacion.rango.max)}`
-                  : "s/d"
-              }
-            />
-            <Fila k="Perfil" v={d.valuacion.perfil} />
-            <Fila k="Precio máx. entrada" v={fmtUSD(ms.precio_max_entrada)} destacado />
-          </CardContent>
-        </Card>
-
-        {/* Cualitativo */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <FileSearch className="h-4 w-4 text-primary" /> Cualitativo (Buffett)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {Object.entries(d.cualitativo.dimensiones).map(([k, dim]) => (
-              <Fila
-                key={k}
-                k={k.replace(/_/g, " ")}
-                v={`${dim.score.toFixed(1)} · ${(dim.peso * 100).toFixed(0)}%`}
-              />
-            ))}
-            <div className="pt-1">
-              <Badge
-                variant="outline"
-                className={cn(d.cualitativo.continuar ? "text-emerald-400" : "text-amber-400")}
-              >
-                {d.cualitativo.continuar
-                  ? "Círculo de competencia: habilitado"
-                  : "Fuera del círculo"}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Cuantitativo */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <CheckCircle2 className="h-4 w-4 text-primary" /> Cuantitativo clave
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <Fila k="ROE" v={pct(d.cuantitativo.metricas.M12_roe)} />
-            <Fila k="Margen neto" v={pct(d.cuantitativo.metricas.M6_margen_neto)} />
-            <Fila k="Deuda / EBITDA" v={x(d.cuantitativo.metricas.M14_deuda_ebitda)} />
-            <Fila k="P/E" v={x(d.cuantitativo.metricas.M15_pe)} />
-            <Fila k="EV/EBITDA" v={x(d.cuantitativo.metricas.ev_ebitda)} />
-            {d.cuantitativo.alertas.rojas.length > 0 && (
-              <ul className="space-y-1 pt-1 text-xs text-red-400">
-                {d.cuantitativo.alertas.rojas.map((a, i) => (
-                  <li key={i} className="flex items-start gap-1.5">
-                    <XCircle className="mt-0.5 h-3 w-3 shrink-0" /> {a}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+    <section className="space-y-3">
+      <div className="flex items-baseline gap-2">
+        <h3 className="text-[13px] font-semibold tracking-widest text-primary uppercase">
+          Análisis fundamental &amp; valuación
+        </h3>
+        <span className="text-[11px] text-muted-foreground">
+          estados contables · DCF · múltiplos
+          {!datosParciales && " · decisión"}
+          {" · "}
+          {cob.total} métricas disponibles
+        </span>
       </div>
 
-      {d.notas_consistencia.length > 0 && (
-        <Card>
-          <CardContent className="p-4">
-            <div className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              Notas de consistencia
-            </div>
-            <ul className="grid w-full gap-1 text-xs text-muted-foreground md:grid-cols-2">
-              {d.notas_consistencia.map((n, i) => (
-                <li key={i}>• {n}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
+      <div className="space-y-4">
+        {/* Resumen de decisión — solo con datos suficientes */}
+        {!datosParciales ? (
+          <Card className={cn("border", decisionColor(d.decision_final))}>
+            <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
+              <div>
+                <div className="text-xs tracking-wide text-muted-foreground uppercase">
+                  Ficha de decisión · {d.empresa}
+                </div>
+                <div className="mt-1 font-mono text-2xl font-bold">{d.decision_final}</div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  Precio {fmtUSD(d.precio_actual)} · Valor central {fmtUSD(d.valuacion.vi_central)}{" "}
+                  · Upside {fmtPctS(ms.upside_pct)}
+                </div>
+              </div>
+              <div className="grid w-full grid-cols-3 gap-4 text-center">
+                <Mini label="Score cuali" value={`${d.cualitativo.score_total.toFixed(1)}/10`} />
+                <Mini
+                  label="WACC"
+                  value={d.wacc.wacc_usd != null ? `${d.wacc.wacc_usd.toFixed(1)}%` : "s/d"}
+                />
+                <Mini label="MOS" value={`${ms.mos_aplicado_pct.toFixed(0)}%`} />
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-border/40 bg-background/40">
+            <CardContent className="p-4 text-[13px] leading-relaxed text-muted-foreground">
+              Datos parciales para <span className="font-mono text-foreground">{ticker}</span>: se
+              muestran solo las {cob.total} métricas disponibles ({cob.lista.join(", ")}). DCF,
+              decisión y MOS requieren estados contables completos.
+            </CardContent>
+          </Card>
+        )}
+
+        {d.bloqueado_por_cualitativo && (
+          <Card className="border-amber-500/40 bg-amber-500/5">
+            <CardContent className="flex items-start gap-2 p-4 text-sm">
+              <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+              Score cualitativo insuficiente (&lt;5.0): el análisis cuantitativo queda bloqueado —
+              no comprar lo que no se entiende.
+            </CardContent>
+          </Card>
+        )}
+
+        <div className="grid w-full gap-4 lg:grid-cols-3">
+          {/* Valuación — solo si hay al menos un método con valor */}
+          {(filasValuacion.length > 0 || ms.precio_max_entrada > 0) && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <Target className="h-4 w-4 text-primary" /> Triangulación de valor
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {filasValuacion.map((f) => (
+                  <Fila key={f.k} k={f.k} v={f.v} />
+                ))}
+                {ms.precio_max_entrada > 0 && (
+                  <Fila k="Precio máx. entrada" v={fmtUSD(ms.precio_max_entrada)} destacado />
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Cualitativo — solo si Yahoo identifica empresa/sector */}
+          {!!d.cualitativo.sector && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <FileSearch className="h-4 w-4 text-primary" /> Cualitativo (Buffett)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {Object.entries(d.cualitativo.dimensiones).map(([k, dim]) => (
+                  <Fila
+                    key={k}
+                    k={k.replace(/_/g, " ")}
+                    v={`${dim.score.toFixed(1)} · ${(dim.peso * 100).toFixed(0)}%`}
+                  />
+                ))}
+                <div className="pt-1">
+                  <Badge
+                    variant="outline"
+                    className={cn(d.cualitativo.continuar ? "text-emerald-400" : "text-amber-400")}
+                  >
+                    {d.cualitativo.continuar
+                      ? "Círculo de competencia: habilitado"
+                      : "Fuera del círculo"}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Cuantitativo — solo métricas presentes */}
+          {(metricasCuant.length > 0 || rojas.length > 0) && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="h-4 w-4 text-primary" /> Cuantitativo clave
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {metricasCuant.map(([k, v]) => (
+                  <Fila key={k} k={k} v={v} />
+                ))}
+                {rojas.length > 0 && (
+                  <ul className="space-y-1 pt-1 text-xs text-red-400">
+                    {rojas.map((a, i) => (
+                      <li key={i} className="flex items-start gap-1.5">
+                        <XCircle className="mt-0.5 h-3 w-3 shrink-0" /> {a}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {d.notas_consistencia.length > 0 && !datosParciales && (
+          <Card>
+            <CardContent className="p-4">
+              <div className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                Notas de consistencia
+              </div>
+              <ul className="grid w-full gap-1 text-xs text-muted-foreground md:grid-cols-2">
+                {d.notas_consistencia.map((n, i) => (
+                  <li key={i}>• {n}</li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function EncabezadoFundamental() {
+  return (
+    <div className="flex items-baseline gap-2">
+      <h3 className="text-[13px] font-semibold tracking-widest text-primary uppercase">
+        Análisis fundamental &amp; valuación
+      </h3>
+      <span className="text-[11px] text-muted-foreground">estados contables · DCF · múltiplos</span>
     </div>
   );
 }
@@ -509,7 +590,9 @@ export function AnalisisTab({ tickerInicial }: { tickerInicial?: string | null }
                   onMouseEnter={() => setIdxSel(i)}
                   className={cn(
                     "flex w-full items-center justify-between gap-2 px-3 py-2 text-left transition-colors",
-                    i === idxSel ? "bg-primary/20 text-foreground" : "text-foreground hover:bg-primary/10",
+                    i === idxSel
+                      ? "bg-primary/20 text-foreground"
+                      : "text-foreground hover:bg-primary/10",
                   )}
                 >
                   <span className="min-w-0">
@@ -568,64 +651,10 @@ export function AnalisisTab({ tickerInicial }: { tickerInicial?: string | null }
             <NoticiasPanel ticker={ticker} />
           </section>
 
-          {/* ── ANÁLISIS FUNDAMENTAL — solo EE.UU. (Yahoo trae estados contables
-              completos de NYSE/NASDAQ; para BCBA/CEDEAR los datos son parciales y
-              las monedas no son comparables) ── */}
-          <section className="space-y-3">
-            <div className="flex items-baseline gap-2">
-              <h3 className="text-[13px] font-semibold tracking-widest text-primary uppercase">
-                Análisis fundamental &amp; valuación
-              </h3>
-              <span className="text-[11px] text-muted-foreground">
-                estados contables · DCF · múltiplos — empresas de EE.UU.
-              </span>
-            </div>
-            {(() => {
-              const meta = UNIVERSO.find((u) => u.ticker.toUpperCase() === ticker.toUpperCase());
-              const esUS =
-                meta?.mercado === "NYSE/NASDAQ" ||
-                (!ticker.toUpperCase().endsWith(".BA") &&
-                  !meta?.mercado); // tickers US sin meta (ej. KO)
-              if (esUS) return <FichaCard ticker={ticker} />;
-              const subyacente = ticker.toUpperCase().replace(/\.BA$/, "");
-              const subyacenteUS = UNIVERSO.find(
-                (u) =>
-                  u.ticker.toUpperCase() === subyacente &&
-                  (u.mercado ?? "").includes("NYSE"),
-              );
-              return (
-                <Card className="border-amber-500/30 bg-amber-500/5">
-                  <CardContent className="flex flex-col gap-2 p-5 text-sm">
-                    <div className="font-medium text-amber-400">
-                      Fundamental completo no disponible para {ticker}
-                    </div>
-                    <p className="leading-relaxed text-muted-foreground">
-                      {meta?.tipo === "cedear"
-                        ? "Es un CEDEAR: replica una acción extranjera. Su fundamental real es el del subyacente."
-                        : "Es una acción local (BCBA): Yahoo Finance trae estados contables parciales y en moneda distinta, lo que invalida DCF, múltiplos y comparaciones."}
-                    </p>
-                    {subyacenteUS && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-fit"
-                        onClick={() => {
-                          setInput(subyacenteUS.ticker);
-                          setTicker(subyacenteUS.ticker);
-                          navigate({
-                            to: "/herramientas",
-                            search: { tab: "analisis", ticker: subyacenteUS.ticker },
-                          });
-                        }}
-                      >
-                        Analizar el subyacente {subyacenteUS.ticker} ({subyacenteUS.nombre}) →
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })()}
-          </section>
+          {/* ── ANÁLISIS FUNDAMENTAL — se despliega solo con datos reales.
+              Sin fundamentales: no se renderiza nada. Con datos parciales:
+              se muestran únicamente las métricas disponibles. ── */}
+          <SeccionFundamental ticker={ticker} />
         </div>
       )}
     </div>

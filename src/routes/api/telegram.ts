@@ -80,10 +80,19 @@ export const Route = createFileRoute("/api/telegram")({
           });
           return Response.json({ preview: sample });
         }
+        if (action === "grafico" || action === "chart") {
+          const ticker = (url.searchParams.get("ticker") ?? url.searchParams.get("symbol") ?? "AAPL").trim() || "AAPL";
+          const intervalo = (url.searchParams.get("intervalo") ?? url.searchParams.get("interval") ?? "1D").trim() || "1D";
+          const chatId = url.searchParams.get("chatId") ?? url.searchParams.get("chat_id") ?? undefined;
+          const caption = url.searchParams.get("caption") ?? undefined;
+          const { enviarGraficoTradingviewTelegram } = await import("@/lib/telegram-grafico.server");
+          const out = await enviarGraficoTradingviewTelegram(JSON.stringify({ ticker, intervalo, chatId: chatId ?? undefined, caption: caption ?? undefined }));
+          return Response.json({ ok: out.ok, ticker: ticker.toUpperCase(), intervalo, result: out.texto });
+        }
         return Response.json(
           {
             error:
-              "action no valida: usa ?action=estado|updates|preview|agente|webhook&url=|delwebhook",
+              "action no valida: usa ?action=estado|updates|preview|agente|webhook&url=|delwebhook|grafico&ticker=AAPL",
           },
           { status: 400 },
         );
@@ -136,13 +145,22 @@ export const Route = createFileRoute("/api/telegram")({
           return Response.json({ ok: true, result });
         }
 
+        if (action === "grafico" || action === "chart" || action === "telegram_enviar_grafico") {
+          const ticker = String(body.ticker ?? "AAPL").trim() || "AAPL";
+          const intervalo = String((body as unknown as Record<string, unknown>).intervalo ?? (body as unknown as Record<string, unknown>).interval ?? "1D").trim() || "1D";
+          const caption = (body as unknown as Record<string, unknown>).caption as string | undefined;
+          const { enviarGraficoTradingviewTelegram } = await import("@/lib/telegram-grafico.server");
+          const out = await enviarGraficoTradingviewTelegram(JSON.stringify({ ticker, intervalo, chatId: body.chatId ?? undefined, caption: caption ?? undefined }));
+          return Response.json({ ok: out.ok, ticker: ticker.toUpperCase(), intervalo, result: out.texto });
+        }
+
         if (action === "estado" || action === "info") {
           const info = await telegramGetBotInfo();
           const updates = await telegramGetUpdates();
           return Response.json({ ok: true, info, updates });
         }
 
-        return Response.json({ error: "action debe ser senal|mensaje|estado" }, { status: 400 });
+        return Response.json({ error: "action debe ser senal|mensaje|grafico|estado" }, { status: 400 });
       },
     },
   },

@@ -125,7 +125,7 @@ export function StrategyBuilder() {
   }, [data]);
 
   return (
-    <Card className="p-4 border border-border/40 bg-background/40/80 backdrop-blur-sm">
+    <Card className="p-4 border border-border/40 bg-background/80 backdrop-blur-sm">
       <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2">
         Constructor de Estrategias
       </h3>

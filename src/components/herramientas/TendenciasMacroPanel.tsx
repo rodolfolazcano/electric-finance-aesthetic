@@ -42,7 +42,7 @@ function TrendChartCard({
 }) {
   if (data.length === 0) {
     return (
-      <div className="rounded-lg border border-border/40 bg-background/40/40 p-6">
+      <div className="rounded-lg border border-border/40 bg-background/40 p-6">
         <div className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
           {title}
         </div>
@@ -57,7 +57,7 @@ function TrendChartCard({
   const isUp = change != null && change > 0;
 
   return (
-    <div className="rounded-lg border border-border/40 bg-background/40/40 p-6">
+    <div className="rounded-lg border border-border/40 bg-background/40 p-6">
       <div className="flex items-center justify-between mb-2">
         <div className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
           {title}
@@ -137,7 +137,7 @@ function IndicatorCard({
   color?: string;
 }) {
   return (
-    <div className="rounded-lg border border-border/40 bg-background/40/40 p-5">
+    <div className="rounded-lg border border-border/40 bg-background/40 p-5">
       <div className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
         {label}
       </div>

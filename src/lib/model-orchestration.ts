@@ -10,6 +10,7 @@
 
 import {
   type AgentModel,
+  MODELO_EJECUTOR_POR_DEFECTO,
   MODELO_PLANNER_POR_DEFECTO,
   MODELO_POR_DEFECTO,
   obtenerModelo,
@@ -21,6 +22,11 @@ export type ConfiguracionOrquestacion = {
   modeloSalida: AgentModel;
   /** Modelo agente que decide y ejecuta herramientas (planner). */
   modeloPlanner: AgentModel;
+  /**
+   * Modelo EJECUTOR rápido: recibe el plan del razonamiento, orquesta las
+   * tool calls en paralelo por ronda. Razonamiento planifica/valida; rápido ejecuta.
+   */
+  modeloEjecutor: AgentModel;
   /** Prompt adicional con las skills orquestadas (para el modelo de salida). */
   promptSkillsSalida: string;
   /** Prompt adicional con las skills orquestadas (para el planner). */
@@ -43,10 +49,14 @@ export function orquestarModelos(
 
   const modeloSalida = seleccionado;
   const modeloPlanner = esRazonamiento ? seleccionado : MODELO_PLANNER_POR_DEFECTO;
+  // Ejecutor SIEMPRE rápido: el razonamiento no debe gastar tokens de thinking
+  // en rondas de tool calling. Si el usuario eligió rapidez, él mismo ejecuta.
+  const modeloEjecutor = esRazonamiento ? MODELO_EJECUTOR_POR_DEFECTO : seleccionado;
 
   return {
     modeloSalida,
     modeloPlanner,
+    modeloEjecutor,
     promptSkillsSalida: construirPromptSkills(modeloSalida.skills),
     promptSkillsPlanner: construirPromptSkills(modeloPlanner.skills),
   };

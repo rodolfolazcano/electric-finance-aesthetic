@@ -50,7 +50,7 @@ export function MoatDashboard({
 }) {
   if (loading) {
     return (
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
           Ventaja Competitiva (Moat)
         </p>
@@ -66,7 +66,7 @@ export function MoatDashboard({
   const maxPuntosDisplay = moat.maxPuntosPosibles || 100;
 
   return (
-    <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+    <div className="rounded-md border border-border/40 bg-background/60 p-4">
       <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-1">
         Ventaja Competitiva (Moat)
       </p>

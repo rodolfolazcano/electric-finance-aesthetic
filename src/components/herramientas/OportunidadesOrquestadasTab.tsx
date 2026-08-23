@@ -19,6 +19,9 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
     queryKey: ["oportunidades-orquestadas", sector, cohorte],
     queryFn: () => fn({ data: { sector: sector || undefined, cohorte: cohorte || undefined, topN: 8, maxTickers: 30 } }),
     staleTime: 15 * 60_000,
+    // Recarga SIEMPRE al cambiar sector/cohorte (nueva key) o al volver al tab
+    refetchOnMount: "always",
+    refetchOnWindowFocus: false,
   });
 
   const data: any = q.data;
@@ -45,7 +48,7 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
         <CardContent className="p-4 flex flex-wrap items-end gap-3">
           <div>
             <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">Sector</label>
-            <select value={sector} onChange={(e) => setSector(e.target.value)} className="mt-1 w-64 rounded border bg-background px-2 py-1.5 text-[12px]">
+            <select value={sector} onChange={(e) => { setSector(e.target.value); q.refetch(); }} className="mt-1 w-64 rounded border bg-background px-2 py-1.5 text-[12px]">
               <option value="">Auto (sectores favorecidos por Intermarket)</option>
               {SECTORES.map((s) => (
                 <option key={s} value={s}>
@@ -56,7 +59,7 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
           </div>
           <div>
             <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">Cohorte homogénea</label>
-            <select value={cohorte} onChange={(e) => setCohorte(e.target.value as any)} className="mt-1 w-48 rounded border bg-background px-2 py-1.5 text-[12px]">
+            <select value={cohorte} onChange={(e) => { setCohorte(e.target.value as any); q.refetch(); }} className="mt-1 w-48 rounded border bg-background px-2 py-1.5 text-[12px]">
               <option value="">Auto (más numerosa)</option>
               <option value="BCBA_ARS">BCBA ARS</option>
               <option value="CEDear_ARS">CEDEAR ARS</option>

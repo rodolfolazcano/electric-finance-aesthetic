@@ -33,7 +33,7 @@ export function PortafolioFundamentalCard({ item, onClick }: Props) {
   return (
     <button
       onClick={onClick}
-      className="text-left w-full rounded-md border border-border/40 bg-background/40/60 p-3 transition-colors hover:border-primary/40 hover:bg-background/40/80 cursor-pointer"
+      className="text-left w-full rounded-md border border-border/40 bg-background/60 p-3 transition-colors hover:border-primary/40 hover:bg-background/80 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">

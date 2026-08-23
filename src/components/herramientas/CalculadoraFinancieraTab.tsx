@@ -106,7 +106,7 @@ function ResultCard({
   const [expandido, setExpandido] = useState(false);
 
   return (
-    <div className="rounded-md border border-border/40 bg-background/40/60 p-4 space-y-3">
+    <div className="rounded-md border border-border/40 bg-background/60 p-4 space-y-3">
       <div className="flex items-center justify-between">
         <span className="text-[13px] font-semibold text-foreground">{titulo}</span>
         <button
@@ -263,7 +263,7 @@ export function CalculadoraFinancieraTab() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <div className="flex items-center gap-3 mb-3">
           <Calculator className="h-5 w-5 text-emerald-400" />
           <div>
@@ -297,7 +297,7 @@ export function CalculadoraFinancieraTab() {
       {/* Porcentajes */}
       {seccion === "porcentajes" && (
         <div className="space-y-4">
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Cálculo de Porcentajes
             </p>
@@ -326,7 +326,7 @@ export function CalculadoraFinancieraTab() {
             />
           </div>
 
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Importe Neto (con descuento e impuesto)
             </p>
@@ -361,7 +361,7 @@ export function CalculadoraFinancieraTab() {
             />
           </div>
 
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Diferencia Porcentual
             </p>
@@ -392,7 +392,7 @@ export function CalculadoraFinancieraTab() {
       {/* Capitalización */}
       {seccion === "capitalizacion" && (
         <div className="space-y-4">
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Interés Simple
             </p>
@@ -443,7 +443,7 @@ export function CalculadoraFinancieraTab() {
             />
           </div>
 
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Interés Compuesto
             </p>
@@ -494,7 +494,7 @@ export function CalculadoraFinancieraTab() {
       {/* Tasas */}
       {seccion === "tasas" && (
         <div className="space-y-4">
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Tasa Nominal → Tasa Efectiva Anual (TEA)
             </p>
@@ -521,7 +521,7 @@ export function CalculadoraFinancieraTab() {
             />
           </div>
 
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Tasa Efectiva → Tasa Nominal Anual (TNA)
             </p>
@@ -553,7 +553,7 @@ export function CalculadoraFinancieraTab() {
       {/* Rentas */}
       {seccion === "rentas" && (
         <div className="space-y-4">
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Número de Pagos (Préstamo)
             </p>
@@ -588,7 +588,7 @@ export function CalculadoraFinancieraTab() {
             />
           </div>
 
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Valor Actual de Rentas
             </p>
@@ -622,7 +622,7 @@ export function CalculadoraFinancieraTab() {
             />
           </div>
 
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Pago de Préstamo (Cuota)
             </p>
@@ -661,7 +661,7 @@ export function CalculadoraFinancieraTab() {
       {/* VAN y TIR */}
       {seccion === "van-tir" && (
         <div className="space-y-4">
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               VAN y TIR de Flujos de Caja
             </p>
@@ -720,7 +720,7 @@ export function CalculadoraFinancieraTab() {
       {/* Bonos */}
       {seccion === "bonos" && (
         <div className="space-y-4">
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Precio de Bono
             </p>
@@ -766,7 +766,7 @@ export function CalculadoraFinancieraTab() {
       {/* Estadística */}
       {seccion === "estadistica" && (
         <div className="space-y-4">
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Media Aritmética
             </p>
@@ -788,7 +788,7 @@ export function CalculadoraFinancieraTab() {
             )}
           </div>
 
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Media Ponderada
             </p>
@@ -820,7 +820,7 @@ export function CalculadoraFinancieraTab() {
             )}
           </div>
 
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Varianza y Desviación Estándar
             </p>
@@ -842,7 +842,7 @@ export function CalculadoraFinancieraTab() {
             )}
           </div>
 
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <p className="text-[13px] font-semibold text-foreground mb-3">
               Covarianza y Correlación
             </p>
@@ -884,7 +884,7 @@ export function CalculadoraFinancieraTab() {
         </div>
       )}
 
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <div className="flex items-start gap-3">
           <HelpCircle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
           <div className="space-y-2">

@@ -89,7 +89,7 @@ function CorrelationGauge({
     else barColor = "bg-warning";
   }
   return (
-    <Card className="border-border/40 bg-background/40/40 p-4">
+    <Card className="border-border/40 bg-background/40 p-4">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-xs font-mono font-medium text-foreground">{label}</span>
         {infoTooltip && (
@@ -148,7 +148,7 @@ function CorrelationGauge({
 function RelativeStrengthChart({ ratio }: { ratio: RelativeStrengthRatio }) {
   if (ratio.datos.length === 0) {
     return (
-      <Card className="border-border/40 bg-background/40/40 p-4">
+      <Card className="border-border/40 bg-background/40 p-4">
         <div className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
           {ratio.label}
         </div>
@@ -161,7 +161,7 @@ function RelativeStrengthChart({ ratio }: { ratio: RelativeStrengthRatio }) {
   const chartData = ratio.datos.slice(-90);
 
   return (
-    <Card className="border-border/40 bg-background/40/40 p-4">
+    <Card className="border-border/40 bg-background/40 p-4">
       <div className="flex items-center justify-between mb-2">
         <div className="text-[13px] font-mono uppercase tracking-wider text-muted-foreground">
           Relative Strength: {ratio.label}
@@ -237,7 +237,7 @@ function LecturaIntermarketCard({ data }: { data: NonNullable<IntermarketResult>
 
   return (
     <Card
-      className={`border ${regimenBgMap[li.regimen] ?? "bg-background/40/40 border-border/40"} bg-background/40/40 p-4`}
+      className={`border ${regimenBgMap[li.regimen] ?? "bg-background/40 border-border/40"} bg-background/40 p-4`}
     >
       <Collapsible>
         <CollapsibleTrigger className="flex w-full items-center justify-between text-left">
@@ -565,7 +565,7 @@ export function IntermarketPanel() {
 
       {/* Evaluación del lag del dólar */}
       {data.evaluacionLagDolar.correlacion60d != null && (
-        <Card className="border-border/40 bg-background/40/40 p-4">
+        <Card className="border-border/40 bg-background/40 p-4">
           <h4 className="mb-2 font-mono text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">
             Lag del Dólar (evaluación multi-ventana)
           </h4>
@@ -606,7 +606,7 @@ export function IntermarketPanel() {
       )}
 
       {/* Sección 2: Argentina (existente) */}
-      <Card className="border-border/40 bg-background/40/40 p-4">
+      <Card className="border-border/40 bg-background/40 p-4">
         <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Argentina en el contexto global
         </h3>
@@ -647,7 +647,7 @@ export function IntermarketPanel() {
       </div>
 
       {/* Sección 3.5: Stovall Sector Rotation (Cap. 13) */}
-      <Card className="border-border/40 bg-background/40/40 p-4">
+      <Card className="border-border/40 bg-background/40 p-4">
         <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Rotación Sectorial — Modelo de Stovall (Murphy, Cap. 13)
         </h3>
@@ -692,7 +692,7 @@ export function IntermarketPanel() {
       </Card>
 
       {/*  Sección 4: Tavily AI + Clima (análisis enriquecido)  */}
-      <Card className="border-border/40 bg-background/40/40 p-4">
+      <Card className="border-border/40 bg-background/40 p-4">
         <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Análisis enriquecido — Noticias AI + Clima
         </h3>

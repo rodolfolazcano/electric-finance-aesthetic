@@ -1496,7 +1496,7 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
         <>
           {/* Selector compartido Clarity parity */}
           <div className="flex flex-wrap items-start gap-3">
-            <div className="glass p-3 flex-1 min-w-[220px] border rounded-lg bg-background/40">
+            <div className="glass p-3 flex-1 min-w-[220px] border rounded-lg">
               <div className="flex flex-wrap items-center gap-2">
                 <select
                   value={sectorFilter}
@@ -1578,7 +1578,7 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
                 </div>
               )}
             </div>
-            <div className="glass p-3 flex-1 min-w-[220px] border rounded-lg bg-background/40">
+            <div className="glass p-3 flex-1 min-w-[220px] border rounded-lg">
               <button
                 onClick={() => setComparacionAbierta((v) => !v)}
                 aria-expanded={comparacionAbierta}
@@ -1705,7 +1705,7 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
           <IntermarketFull />
         </TabsContent>
 
-        {/* 2 · ANÁLISIS — Pascale U4: fundamentales comparables + caminos + ETF fit */}
+        {/* 3 · ANÁLISIS — Pascale U4: fundamentales comparables + caminos + ETF fit */}
         <TabsContent value="analisis" className="mt-4 space-y-6">
           {!result && !loading && (
             <Card>
@@ -1744,23 +1744,23 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
           <EtfFitPanel sectorFilter={sectorFilter} />
         </TabsContent>
 
-        {/* 3 · VALUACIÓN — Pascale: múltiplos relativos + oportunidades screener */}
+        {/* 4 · VALUACIÓN — Pascale: múltiplos relativos + oportunidades screener */}
         <TabsContent value="valuacion" className="mt-4 space-y-6">
           <ValuacionPanel />
           <OportunidadesPanel2 />
         </TabsContent>
 
-        {/* 4 · MATRIZ — dinámica: activos/industrias/sectores, corr/beta/alpha/R² */}
+        {/* 5 · MATRIZ — dinámica: activos/industrias/sectores, corr/beta/alpha/R² */}
         <TabsContent value="matriz" className="mt-4">
           <MatrizUniversoPanel sectorFilter={sectorFilter} cohorteFiltro={clasificarCohorte} />
         </TabsContent>
 
-        {/* 5 · CARTERA — Elbaum: correlaciones/benchmarks como diversificación */}
+        {/* 6 · CARTERA — Elbaum: correlaciones/benchmarks como diversificación */}
         <TabsContent value="cartera" className="mt-4 space-y-6">
           <BenchmarksPanel sectorFilter={sectorFilter} />
         </TabsContent>
 
-        {/* 6 · OPORTUNIDADES — Orquestado 5 fases (no aislado): Intermarket → Sectores favorecidos → Activos → Cuantitativo R² → Fundamental+Técnico */}
+        {/* 7 · OPORTUNIDADES — Orquestado 5 fases (no aislado): Intermarket → Sectores favorecidos → Activos → Cuantitativo R² → Fundamental+Técnico */}
         <TabsContent value="oportunidades" className="mt-4 space-y-6">
           <OportunidadesOrquestadasTab sectorFilter={sectorFilter} />
         </TabsContent>

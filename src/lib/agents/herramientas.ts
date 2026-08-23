@@ -1079,6 +1079,78 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "telegram_enviar_grafico",
+      description:
+        "Envía al bot de Telegram una IMAGEN PNG del gráfico TradingView del ticker (snapshot real vía chart-img.com + fallback). Usalo cuando el usuario pida 'enviá el gráfico de X a Telegram', 'mandale el chart de AAPL al bot', etc. Genera la imagen y la adjunta como foto con caption.Ticker con exchange opcional (ej. AAPL, NASDAQ:AAPL, BCBA:GGAL, BINANCE:BTCUSDT).",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: {
+            type: "string",
+            description: "Ticker o símbolo con exchange (ej. AAPL, NASDAQ:AAPL, BCBA:GGAL, BINANCE:BTCUSDT).",
+          },
+          intervalo: {
+            type: "string",
+            description: "Intervalo TradingView: 1D (default), W, M, 60, 30, 15, 5, 1.",
+          },
+          caption: { type: "string", description: "Caption opcional para el mensaje de Telegram." },
+          chatId: { type: "string", description: "Chat destino opcional; si falta usa los configurados del bot." },
+        },
+        required: ["ticker"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "publicar_slide_mercado",
+      description:
+        "Genera y publica en el BOT DE PUBLICACIONES de Telegram una PUBLICACIÓN profesional: slide PNG moderno 1080x1080 (precio, variación, sparkline, ratio SHARPE calculado, volatilidad, beta, P/E forward, ROE, upside de analistas + noticias del día) más el texto editorial largo. Usala cuando el usuario pida 'enviá una publicación de X al bot', 'publicá el slide de AAPL con su Sharpe', 'posteá X con noticias'. Cruza datos reales de la app + noticias verificadas.",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: {
+            type: "string",
+            description: "Ticker objetivo (ej. AAPL, GGAL.BA, MELI).",
+          },
+          senal: { type: "string", description: "Lectura/señal breve para el título (ej. 'temporada de balances confirma resiliencia')." },
+          motivo: { type: "string", description: "Síntesis editorial (2-3 líneas) citando solo datos obtenidos." },
+          chatId: { type: "string", description: "Chat destino opcional; si falta usa los chats configurados del bot de publicaciones." },
+        },
+        required: ["ticker"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "publicar_oportunidades",
+      description:
+        "RAZONA sobre el mercado, busca oportunidades y PUBLICA en el bot de publicaciones (@Coronarinversiones777_bot) en formato 🚀 editorial corto con la lista de recomendados, descripción de cada uno y por qué sumarlos. Cruza el motor unificado de señales + datos vivos + catálogo curado. Usala cuando pidan 'buscá oportunidades y publicá', 'publicá oportunidades crypto en CEDEARs', etc.",
+      parameters: {
+        type: "object",
+        properties: {
+          tema: { type: "string", description: "cripto | cedears | argentina | auto (default auto)." },
+          universo: {
+            type: "array",
+            items: { type: "string" },
+            description: "Tickers específicos opcional (ej. ['IBIT','ETHA','COIN','HOOD']). Si falta usa el universo del tema.",
+          },
+          max: { type: "number", description: "Cantidad de recomendados (2-8, default 4)." },
+          titulo: { type: "string", description: "Título 🚀 personalizado opcional." },
+          porQue: { type: "string", description: "Texto 💡 personalizado opcional." },
+          chatId: { type: "string", description: "Chat destino opcional; si falta usa los configurados." },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
   // -------------------------------------------------------------------------
   // Herramientas migradas del tab /herramientas (clarity-dashboard).
   // -------------------------------------------------------------------------
@@ -2061,6 +2133,10 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
     case "pairs_crypto_scan":
     case "pairs_crypto_analizar":
       return "portafolio";
+    case "telegram_enviar_grafico":
+    case "publicar_slide_mercado":
+    case "publicar_oportunidades":
+      return "informe";
     default:
       return "searching";
   }

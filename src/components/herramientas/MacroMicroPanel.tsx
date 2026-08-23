@@ -27,7 +27,7 @@ function IndicatorCard({
   color?: string;
 }) {
   return (
-    <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
+    <div className="rounded-lg border border-border/40 bg-background/40 p-3">
       <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
         {label}
       </div>
@@ -229,7 +229,7 @@ export function MacroMicroPanel() {
       </div>
 
       {/* Micro - Merval movers */}
-      <Card className="border-border/40 bg-background/40/40 p-4">
+      <Card className="border-border/40 bg-background/40 p-4">
         <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Panel Líder Merval · Merval:{" "}
           {micro.mervalIndex != null ? fmtNum(micro.mervalIndex, 0) : "\u2014"}{" "}
@@ -280,7 +280,7 @@ export function MacroMicroPanel() {
       </Card>
 
       {/* Lectura combinada */}
-      <Card className="border-border/40 bg-background/40/40 p-4">
+      <Card className="border-border/40 bg-background/40 p-4">
         <h3 className="mb-2 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Lectura Combinada
         </h3>

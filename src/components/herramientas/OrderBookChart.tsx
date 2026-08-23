@@ -42,7 +42,7 @@ export function OrderBookChart({ orderBook }: { orderBook: OrderBook | null }) {
       </div>
 
       {/* Spread midline */}
-      <div className="border-t border-b border-border/40 my-2 py-1.5 flex justify-between text-[13px] bg-background/40/40 -mx-1 px-2 rounded">
+      <div className="border-t border-b border-border/40 my-2 py-1.5 flex justify-between text-[13px] bg-background/40 -mx-1 px-2 rounded">
         <span className="text-green-400 font-medium">Bid: {fmt(orderBook.bestBid)}</span>
         <span className="text-muted-foreground">Spread: {fmt(orderBook.spreadPct, 3)}%</span>
         <span className="text-red-400 font-medium">Ask: {fmt(orderBook.bestAsk)}</span>

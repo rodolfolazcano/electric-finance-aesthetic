@@ -71,7 +71,7 @@ export function AnalisisCualitativoSemiAutomaticoCard({
 }) {
   if (data.esETF) {
     return (
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <p className="text-[13px] uppercase tracking-widest text-muted-foreground">
           Análisis Cualitativo
         </p>
@@ -81,7 +81,7 @@ export function AnalisisCualitativoSemiAutomaticoCard({
   }
 
   return (
-    <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+    <div className="rounded-md border border-border/40 bg-background/60 p-4">
       <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-3">
         Análisis Cualitativo (Señales Cuantitativas)
       </p>

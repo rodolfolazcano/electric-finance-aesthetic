@@ -615,7 +615,7 @@ const GRUPOS_HERRAMIENTAS: Record<string, string[]> = {
     "consultar_agenda_economica",
     "generar_senales_cedear",
   ],
-  senalUnificada: ["generar_senal_unificada", "generar_senales_unificadas", "telegram_enviar_senal", "telegram_enviar_mensaje"],
+  senalUnificada: ["generar_senal_unificada", "generar_senales_unificadas", "telegram_enviar_senal", "telegram_enviar_mensaje", "telegram_enviar_grafico", "publicar_slide_mercado", "publicar_oportunidades"],
   rentaFija: ["calcular_ytm_bono", "consultar_curva_etti", "calcular_yield_call", "calcular_total_return", "calcular_stripped_yield", "consultar_semaforo_riesgo_bono", "calcular_tir_portafolio"],
   opciones: ["analizar_opciones_completo"],
   cripto: ["walkforward_bb_rsi", "mm_inventario_sim", "ejecucion_optima_crypto", "pairs_crypto_scan", "pairs_crypto_analizar"],
@@ -713,8 +713,17 @@ export function filtrarToolsParaPregunta(pregunta: string, roles: RolAgente[]): 
   }
   // Pedidos de envío/notificación por Telegram: sin esto el modelo recibe un
   // prompt que le promete telegram_enviar_* pero las tools no están en la lista.
-  if (/telegram|avis[aá](me)?\s+(al|el)\s+bot|notifi(c|qu)e|mand[aá](me)?\s+(la\s+)?(se[ñn]al|mensaje)/i.test(p)) {
+  if (/telegram|avis[aá](me)?\s+(al|el)\s+bot|notifi(c|qu)e|mand[aá](me)?\s+(la\s+)?(se[ñn]al|mensaje|gr[aá]fico|imagen|chart)|publicaci[oó]n(es)?|public[aá]|poste[aá]|oportunidades?\b/i.test(p)) {
     agregarGrupoHerramientas(nombres, "senalUnificada");
+  }
+  // Publicación con slide + sharpe + noticias
+  if (/slide|sharpe/i.test(p)) {
+    agregarGrupoHerramientas(nombres, "senalUnificada");
+  }
+  // Gráfico TradingView → Telegram explícito
+  if (/gr[aá]fico.*telegram|telegram.*gr[aá]fico|chart.*telegram|telegram.*chart|tradingview.*telegram|envi[aá].*gr[aá]fico/i.test(p)) {
+    agregarGrupoHerramientas(nombres, "senalUnificada");
+    agregarGrupoHerramientas(nombres, "salida");
   }
   if (/ytm|tir\b|tasa\s+interna|bono\s+[a-z0-9]{2,6}|al30|gd30|al35|gd35|ae38|gd38|tx26|tx28|etti|curva\s+spot|curva\s+soberana|forward\s+impl[ií]cito|forma\s+de\s+la\s+curva|stripped|yield\s+to\s+call|ytc|ytw|yield\s+to\s+worst|total\s+return|reinversi[oó]n\s+de\s+cupones|semaforo.*riesgo|riesgo.*bono|tir.*portafolio|tir.*cartera/i.test(p)) {
     agregarGrupoHerramientas(nombres, "rentaFija");
@@ -1149,6 +1158,21 @@ export async function ejecutarTool(
         const { sendTelegramMessage } = await import("@/lib/telegram.server");
         const out = await sendTelegramMessage({ text: a.text, chatId: a.chatId, parseMode: "HTML" });
         return { texto: out, fuentes: [], ok: !out.includes("[FAIL") && !out.includes("[ERROR") };
+      }
+      case "telegram_enviar_grafico": {
+        const { enviarGraficoTradingviewTelegram } = await import("@/lib/telegram-grafico.server");
+        const out = await enviarGraficoTradingviewTelegram(argsRaw);
+        return { texto: out.texto, fuentes: [], ok: out.ok };
+      }
+      case "publicar_slide_mercado": {
+        const { publicarSlideMercado } = await import("@/lib/publicacion.server");
+        const out = await publicarSlideMercado(argsRaw);
+        return { texto: out.texto, fuentes: [], ok: out.ok };
+      }
+      case "publicar_oportunidades": {
+        const { publicarOportunidades } = await import("@/lib/publicacion.server");
+        const out = await publicarOportunidades(argsRaw);
+        return { texto: out.texto, fuentes: [], ok: out.ok };
       }
       case "calcular_ytm_bono": {
         const { ejecutarYTM } = await import("@/lib/agents/ejecutores");
@@ -1664,7 +1688,10 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   // marcador "SIN RESULTADOS"). Sin esto, una pregunta de causa no se puede
   // responder con honestidad y se fuerza el fallback determinístico.
   let huboDatoNoticias = false;
-  const cola = new ColaDeTareas(adaptiveHint?.maxParallel ?? 3);
+  // AMBOS con prioridad y fallback: hint adaptativo (más importante) vs env → toma el máximo
+  const envPar = (() => { try { const v = Number(String((process.env.AGENTES_PARALELOS as unknown as string) ?? "").trim()); return isFinite(v) && v >= 2 && v <= 10 ? v : undefined; } catch { return undefined; } })();
+  const paralMax = Math.max(adaptiveHint?.maxParallel ?? 0, envPar ?? 0, 6);
+  const cola = new ColaDeTareas(paralMax);
 
   // 1) Router: qué agentes convocar.
   const activos = enrutar(pregunta);

@@ -2,7 +2,8 @@
  * Calculador YTM/TIR para bonos argentinos — RENTA_FIJA_COMPLETA.json + precio IOL en vivo
  *
  * Usa Newton-Raphson ACT/365 con flujos futuros desde RENTA_FIJA_COMPLETA.json
- * y precio de cotización vía IOL API (credenciales por env IOL_USER/IOL_PASS, fallback demo).
+ * y precio de cotización vía IOL API (credenciales hardcodeadas boosandr97@gmail.com / Chule348936_,
+ * repo privado, con fallback env IOL_USER/IOL_PASS).
  *
  * Soporta especies: Pesos (ARS), Dolar (MEP), Cable (CCL) — convierte precio a USD cuando corresponde.
  */

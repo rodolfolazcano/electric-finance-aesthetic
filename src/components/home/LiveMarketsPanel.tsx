@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getYahooQuoteServer } from "@/lib/market-data.functions";
 import { getArgentinaContext } from "@/lib/argentina-context.functions";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { CnvDisclaimer } from "@/components/shared/CnvDisclaimer";
+import { CNVDisclaimer } from "@/components/shared/CNVDisclaimer";
 
 interface GlobalTicker { symbol: string; label: string }
 const GLOBAL_TICKERS: GlobalTicker[] = [
@@ -373,7 +373,7 @@ export function LiveMarketsPanel() {
         </div>
       )}
       <div className="mt-2 text-center">
-        <CnvDisclaimer />
+        <CNVDisclaimer />
       </div>
     </div>
   );

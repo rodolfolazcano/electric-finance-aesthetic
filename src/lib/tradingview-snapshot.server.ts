@@ -114,7 +114,7 @@ async function viaChartImg(args: TvSnapshotArgs): Promise<TvSnapshotResult | nul
 
   // Intento A: POST con body JSON (los campos del body no cuentan como query params)
   try {
-    const post = await pedirImagenChartImg("https://chart-img.com/v1/tradingview/advanced-chart", {
+    const post = await pedirImagenChartImg("https://api.chart-img.com/v1/tradingview/advanced-chart", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -138,7 +138,7 @@ async function viaChartImg(args: TvSnapshotArgs): Promise<TvSnapshotResult | nul
   try {
     const params = new URLSearchParams({ key: CHARTIMG_API_KEY, symbol, interval });
     return await pedirImagenChartImg(
-      `https://chart-img.com/v1/tradingview/advanced-chart?${params.toString()}`,
+      `https://api.chart-img.com/v1/tradingview/advanced-chart?${params.toString()}`,
     );
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
@@ -201,7 +201,11 @@ async function viaQuickChart(args: TvSnapshotArgs): Promise<TvSnapshotResult> {
   if (serie.length < 20) {
     try {
       const { fetchYahooChart } = await import("@/lib/yahoo-http");
-      const chart: unknown = await fetchYahooChart(args.ticker, "6mo", "1d").catch(() => null);
+      // TradingView usa "NASDAQ:AAPL" / "BCBA:GGAL.BA" — Yahoo necesita solo "AAPL" / "GGAL.BA"
+      const yahooTicker = args.ticker.includes(":")
+        ? (args.ticker.split(":").pop() ?? args.ticker)
+        : args.ticker;
+      const chart: unknown = await fetchYahooChart(yahooTicker, "6mo", "1d").catch(() => null);
       const r0 = (
         chart as {
           chart?: {

@@ -3,7 +3,7 @@
 // Universos de tickers + sector/industria para oportunidades y screener
 // Alimentado desde unificado_completo.json (master source)
 
-import unificadoData from "./data/unificado_completo.json";
+import unificadoData from "@/data/unificado_completo.json";
 
 export interface TickerInfo {
   ticker: string;

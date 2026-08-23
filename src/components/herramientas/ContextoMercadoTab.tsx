@@ -98,7 +98,7 @@ function MacroContextoPanel() {
 
   if (isLoading) {
     return (
-      <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+      <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
         <div className="p-4">
           <Skeleton className="h-6 w-full rounded-lg" />
         </div>
@@ -129,7 +129,7 @@ function MacroContextoPanel() {
   const badlarTexto = data.badlar ? `${fmtPct(data.badlar)}` : "--";
 
   return (
-    <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+    <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
       <h3 className="text-[14px] font-semibold uppercase tracking-[0.08em] text-muted-foreground px-4 py-3 border-b border-border/20">
         Contexto Macro — Fuentes: BCRA · IOL · Yahoo Finance
       </h3>
@@ -172,7 +172,7 @@ function RecomendacionesPanel() {
   };
 
   return (
-    <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+    <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="w-full flex items-center justify-between px-4 py-2.5 text-[14px] font-mono uppercase tracking-wider text-foreground"
@@ -205,7 +205,7 @@ function RecomendacionesPanel() {
               {recomendaciones.map((r) => (
                 <div
                   key={r.ticker}
-                  className="rounded-lg border border-border/30 bg-background/40/40 p-2.5"
+                  className="rounded-lg border border-border/30 bg-background/40 p-2.5"
                 >
                   <div className="flex items-center justify-between mb-1">
                     <div>
@@ -315,7 +315,7 @@ function RecomendacionesSchvarzPanel() {
   };
 
   return (
-    <Card className="border border-border/40 bg-background/40/80 backdrop-blur-sm">
+    <Card className="border border-border/40 bg-background/80 backdrop-blur-sm">
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="w-full flex items-center justify-between px-4 py-2.5 text-[14px] font-mono uppercase tracking-wider text-foreground"
@@ -348,7 +348,7 @@ function RecomendacionesSchvarzPanel() {
           </div>
 
           {perfilInfo && (
-            <div className="rounded-lg border border-border/30 bg-background/40/40 p-2.5">
+            <div className="rounded-lg border border-border/30 bg-background/40 p-2.5">
               <p className="text-[14px] font-mono text-foreground mb-1.5">
                 Diversificación sugerida — perfil {perfilLabel[perfilActivo].toLowerCase()}
               </p>
@@ -370,7 +370,7 @@ function RecomendacionesSchvarzPanel() {
           )}
 
           {result?.universo && (
-            <div className="rounded-lg border border-border/30 bg-background/40/40 p-2.5">
+            <div className="rounded-lg border border-border/30 bg-background/40 p-2.5">
               <p className="text-[14px] font-mono text-foreground mb-1.5">
                 Universo analizado · {result.universo.total} tickers
               </p>
@@ -409,7 +409,7 @@ function RecomendacionesSchvarzPanel() {
               {recomendaciones.map((r: RecomendacionSchvarz) => (
                 <div
                   key={r.ticker}
-                  className="rounded-lg border border-border/30 bg-background/40/40 p-2.5"
+                  className="rounded-lg border border-border/30 bg-background/40 p-2.5"
                 >
                   <div className="flex items-center justify-between mb-1">
                     <div>

@@ -794,7 +794,7 @@ export function PairsTradingPanel({
               <h3 className="font-mono text-xs font-medium text-foreground">
                 Precio Normalizado (Base 100)
               </h3>
-              <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
+              <div className="rounded-lg border border-border/40 bg-background/40 p-3">
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart
                     data={result.normalizedPrices}

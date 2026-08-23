@@ -162,9 +162,20 @@ export async function orquestarSectorial(opts: { topN?: number; filtro?: "todos"
   const rechazados: Array<{ticker:string; motivo:string}> = [];
   const detalles: any[] = [];
   const candidatos = tickersDesplegados.slice(0, maxFund);
-  for (const tk of candidatos) {
-    try {
-      const ficha = await claFicha(tk);
+  // Paralelizado en lotes de 6 (antes secuencial: ~30 tickers × 10s = minutos)
+  const LOTE = 6;
+  for (let i = 0; i < candidatos.length; i += LOTE) {
+    const lote = candidatos.slice(i, i + LOTE);
+    const resultados = await Promise.allSettled(
+      lote.map(async (tk) => ({ tk, ficha: await claFicha(tk) })),
+    );
+    for (const r of resultados) {
+      if (r.status !== "fulfilled") {
+        rechazados.push({ticker: "?", motivo: String(r.reason).slice(0,80)});
+        continue;
+      }
+      const tk = r.value.tk;
+      const ficha = r.value.ficha;
       // Gate Pascale 5.0 + margen seguridad Value Investing (50% si score <6, 35% si 6-8, 20% si >8)
       if (!ficha.cualitativo.continuar) { rechazados.push({ticker: tk, motivo: `Gate cualitativo ${ficha.cualitativo.score_total}/10 <5.0`}); continue; }
       const alertasRojas = ficha.cuantitativo.alertas.total_rojas ?? 0;
@@ -181,7 +192,7 @@ export async function orquestarSectorial(opts: { topN?: number; filtro?: "todos"
       } else {
         rechazados.push({ticker: tk, motivo: `Score ${ficha.cualitativo.score_total} upside ${ups?.toFixed(1)}`});
       }
-    } catch (e:any) { rechazados.push({ticker: tk, motivo: e.message?.slice(0,80) ?? "error"}); }
+    }
   }
   // Si aprobados vacío, relajar a top 8 por score cualitativo
   if (!aprobados.length && detalles.length===0) {

@@ -81,16 +81,27 @@ function escaparHtml(s: string): string {
 }
 
 const LINK_RE = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
+const IMAGE_RE = /!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g;
 const BOLD_RE = /\*\*(?!\s)(.+?)\*\*/gs;
 
 /** Markdown simple del modelo -> HTML de Telegram (negritas + links clickeables). */
 function markdownATelegramHtml(md: string): string {
   let s = escaparHtml(md);
+  // Imágenes markdown ![alt](url) -> link clickeable (Telegram no renderiza ![...])
+  s = s.replace(IMAGE_RE, (_m, alt: string, url: string) => `<a href="${url}">${(alt || "imagen").trim()}</a>`);
   s = s.replace(
     LINK_RE,
     (_m, texto: string, url: string) => `<a href="${url}">${texto.trim()}</a>`,
   );
   s = s.replace(BOLD_RE, "<b>$1</b>");
+  // Limpia artefactos de TradingView web: "!AAPL TradingView Chart" sin URL (modelo alucina ![...] sin link)
+  s = s.replace(/^!([A-Z0-9.:-]+\s+TradingView Chart)/gm, "$1");
+  s = s.replace(/!([A-Z0-9.:-]+\s+TradingView Chart)/g, "$1");
+  // Reescribe copy web-específico ("widget embebido / embebido arriba") para Telegram donde la imagen va como adjunto
+  s = s.replace(/>\s*Nota:\s*El enlace anterior muestra el widget embebido[^\n]*\n?/gi, "");
+  s = s.replace(/muestra el widget embebido directamente en el chat/gi, "te lo envío como imagen adjunta a continuación");
+  s = s.replace(/embebido arriba\s*\(velas interactivas\)/gi, "como imagen adjunta (velas diarias)");
+  s = s.replace(/embebido arriba/gi, "como imagen adjunta");
   if (s.includes("|") && s.includes("---")) {
     s = s.replace(/\|/g, " | ");
   }
@@ -410,6 +421,7 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
             const simbolo = String((ch as { simbolo?: string }).simbolo ?? "");
             if (simbolo) {
               let enviadoFotoTv = false;
+              let motivoFallo: string | undefined;
               try {
                 const { fetchTradingViewSnapshot } =
                   await import("@/lib/tradingview-snapshot.server");
@@ -424,11 +436,16 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
                     inlineUrl: urlTv,
                     inlineText: "Abrir interactivo en TradingView",
                   });
+                  if (!enviadoFotoTv) motivoFallo = "sendPhotoBuffer devolvió false";
+                } else {
+                  motivoFallo = snap.error ?? "snapshot sin buffer";
                 }
               } catch (e) {
-                console.error("[AGENTE TG] snapshot TV fallo", e);
+                motivoFallo = e instanceof Error ? e.message : String(e);
+                console.error("[AGENTE TG] snapshot TV fallo", motivoFallo);
               }
               if (!enviadoFotoTv) {
+                if (motivoFallo) console.warn(`[AGENTE TG] TV snapshot fallo para ${simbolo}: ${motivoFallo} — fallback a link`);
                 await sendAgentMessage(
                   chatId,
                   `Gráfico TradingView: <a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(simbolo)}">${escaparHtml(simbolo)}</a> (abrir en web/app para ver velas interactivas)`,

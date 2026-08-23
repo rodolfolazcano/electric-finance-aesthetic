@@ -37,7 +37,7 @@ export function PnLChart({ data }: Props) {
         </span>
       </h3>
       <div
-        className="rounded-lg border border-border/40 bg-background/40/40 p-3"
+        className="rounded-lg border border-border/40 bg-background/40 p-3"
         style={{ overflow: "hidden" }}
       >
         <ResponsiveContainer width="100%" height={200}>

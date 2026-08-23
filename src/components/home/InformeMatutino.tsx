@@ -2,7 +2,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { getInformeDelDia } from "@/lib/informe-matutino/persistence.functions";
-import { CnvDisclaimer } from "@/components/shared/CnvDisclaimer";
+import { CNVDisclaimer } from "@/components/shared/CNVDisclaimer";
 import type { InformeMatutinoIA } from "@/lib/informe-matutino/types";
 import type { SemaforoResult } from "@/lib/finance.functions";
 
@@ -295,7 +295,7 @@ export function InformeMatutino() {
 
         {/* 10. Footer */}
         <div className="space-y-2 border-t border-white/10 pt-4 text-center">
-          <CnvDisclaimer />
+          <CNVDisclaimer />
           {fuenteDatos === "fallback-ayer" && (
             <p className="font-mono text-[9px] text-muted-foreground/40">
               Mostrando el último informe disponible (ayer)

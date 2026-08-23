@@ -17,8 +17,8 @@ const SUBTABS: { key: SubTab; label: string }[] = [
   { key: "capm", label: "CAPM" },
   { key: "cobertura", label: "Cobertura" },
   { key: "clasificacion", label: "Clasificación" },
-  { key: "statarb", label: "Stat-Arb" },
-  { key: "labadie", label: "Labadié" },
+  { key: "statarb", label: "Stat Arb" },
+  { key: "labadie", label: "Labadie" },
   { key: "estimaciones", label: "Estimaciones" },
 ];
 

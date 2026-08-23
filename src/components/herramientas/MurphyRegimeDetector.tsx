@@ -140,7 +140,7 @@ function RelationshipCard({
         ? "text-red-400 border-red-500/30 bg-red-500/10"
         : "text-muted-foreground border-border/30 bg-muted/10";
   return (
-    <Card className="border-border/40 bg-background/40/40 p-4">
+    <Card className="border-border/40 bg-background/40 p-4">
       <div className="mb-1 flex items-center justify-between">
         <span className="text-[13px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
           {title}

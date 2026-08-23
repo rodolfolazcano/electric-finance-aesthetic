@@ -53,7 +53,7 @@ export function SpreadChart({ data, signals, selectedEntry, selectedExit, splitD
       <h3 className="font-mono text-xs font-medium text-foreground">
         Spread y Bandas de Bollinger
       </h3>
-      <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
+      <div className="rounded-lg border border-border/40 bg-background/40 p-3">
         <ResponsiveContainer width="100%" height={200}>
           <ComposedChart data={sorted} margin={{ top: 6, right: 8, bottom: 4, left: 0 }}>
             <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />

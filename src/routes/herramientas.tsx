@@ -2,12 +2,10 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   LineChart,
-  Layers,
   Landmark,
   Bitcoin,
   ArrowLeftRight,
   Calculator,
-  Activity,
   CalendarCheck,
   Percent,
   Compass,
@@ -15,6 +13,8 @@ import {
   X,
   Phone,
   Briefcase,
+  Building2,
+  TrendingUp,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -33,6 +33,7 @@ import { PortfolioComposition } from "@/components/optimizer/PortfolioCompositio
 import { RentaFijaPanel } from "@/components/sections/RentaFijaPanel";
 import { SidebarHerramientas } from "@/components/herramientas/SidebarHerramientas";
 import { ContextoTab } from "@/components/herramientas/ContextoTab";
+import { CNVDisclaimer } from "@/components/shared/CNVDisclaimer";
 import retratoCintia from "@/assets/cintia-boos.png";
 
 const WHATSAPP =
@@ -63,8 +64,8 @@ export const Route = createFileRoute("/herramientas")({
 // Mismo orden que SIDEBAR_GROUPS en SidebarHerramientas (única fuente de verdad del orden)
 const TABS = [
   { id: "contexto", label: "Contexto", icon: Compass, tipo: "core" },
-  { id: "sectores", label: "Sectores", icon: Layers, tipo: "core" },
-  { id: "analisis", label: "Análisis", icon: Activity, tipo: "core" },
+  { id: "sectores", label: "Sectores", icon: Building2, tipo: "core" },
+  { id: "analisis", label: "Análisis", icon: TrendingUp, tipo: "core" },
   { id: "cuantitativo", label: "Cuantitativo", icon: LineChart, tipo: "core" },
   { id: "portafolio", label: "Portafolio", icon: Briefcase, tipo: "core" },
   { id: "renta-fija", label: "Renta Fija", icon: Landmark, tipo: "core" },
@@ -141,6 +142,7 @@ function HerramientasContenido() {
             {/* Back / Forward */}
             <div className="hidden sm:flex items-center gap-1 mr-1">
               <button
+                type="button"
                 onClick={() => window.history.back()}
                 aria-label="Atrás"
                 className="h-8 w-8 inline-flex items-center justify-center rounded-full border border-border/40 hover:bg-muted/30 text-muted-foreground hover:text-foreground transition-colors"
@@ -148,6 +150,7 @@ function HerramientasContenido() {
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <button
+                type="button"
                 onClick={() => window.history.forward()}
                 aria-label="Adelante"
                 className="h-8 w-8 inline-flex items-center justify-center rounded-full border border-border/40 hover:bg-muted/30 text-muted-foreground hover:text-foreground transition-colors"
@@ -203,6 +206,7 @@ function HerramientasContenido() {
               <Phone className="h-4 w-4" />
             </a>
             <button
+              type="button"
               onClick={() => setMenuAbierto((v) => !v)}
               aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={menuAbierto}
@@ -216,12 +220,14 @@ function HerramientasContenido() {
           <nav className="border-t border-border/60 bg-background/70 px-5 pb-6 pt-3 backdrop-blur-xl lg:hidden">
             <div className="flex gap-1 mb-3">
               <button
+                type="button"
                 onClick={() => window.history.back()}
                 className="flex-1 h-9 rounded-full border border-border text-[14px]"
               >
                 ← Atrás
               </button>
               <button
+                type="button"
                 onClick={() => window.history.forward()}
                 className="flex-1 h-9 rounded-full border border-border text-[14px]"
               >
@@ -275,7 +281,7 @@ function HerramientasContenido() {
         onRailStateChange={setRailState}
       />
 
-      {/* Contenido - ocupa todo el ancho y más arriba */}
+      {/* Contenido - ml sincronizado con SidebarHerramientas w-[252px]/w-[64px] — ver layout-constants.ts */}
       <div
         className={cn(
           "transition-all duration-200",
@@ -285,7 +291,7 @@ function HerramientasContenido() {
           railState.isMobile && "ml-0",
         )}
       >
-        <div className={`${CONTAINER} pt-20 pb-4`}>
+        <div className={`${CONTAINER} pt-16 pb-4`}>
           <div className="flex flex-col gap-3">
             <div className="min-w-0">
               <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70">
@@ -319,10 +325,7 @@ function HerramientasContenido() {
             {activo === "calculadora" && <CalculadoraFinancieraTab />}
             {activo === "planificacion" && <PlanificacionPersonalTab initialSubTab={subTab} />}
             {activo === "contexto" && <ContextoTab />}
-            <p className="mt-8 text-[14px] leading-snug text-muted-foreground border-t border-border/20 pt-4">
-              Herramientas informativas con datos de terceros. No constituyen recomendación de
-              inversión. Fuentes: BYMA · IOL · Yahoo Finance · BCRA · Delay 15-20’
-            </p>
+            <CNVDisclaimer className="mt-8" />
           </main>
         </div>
       </div>

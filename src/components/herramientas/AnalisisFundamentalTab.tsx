@@ -63,7 +63,7 @@ import { FundamentalMetricsDataframe } from "@/components/herramientas/Fundament
 import { GovernanceSection } from "@/components/herramientas/GovernanceSection";
 import { DataSourceToggle } from "@/components/shared/DataSourceToggle";
 import type { DataSourceMode } from "@/components/shared/DataSourceToggle";
-import { CnvDisclaimer } from "@/components/shared/CnvDisclaimer";
+import { CNVDisclaimer } from "@/components/shared/CNVDisclaimer";
 
 import { PortafolioFundamentalGrid } from "@/components/fundamental/PortafolioFundamentalGrid";
 import { PortafolioFundamentalFull } from "@/components/fundamental/PortafolioFundamentalFull";
@@ -1092,7 +1092,7 @@ export function AnalisisFundamentalTab({
 
   return (
     <div className="space-y-4">
-      <CnvDisclaimer />
+      <CNVDisclaimer />
 
       {/* Toggle Manual / Portafolio IOL */}
       <DataSourceToggle
@@ -1115,7 +1115,7 @@ export function AnalisisFundamentalTab({
 
       {/* Buscador (solo en modo manual) */}
       {mode === "manual" && (
-        <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+        <div className="rounded-md border border-border/40 bg-background/60 p-4">
           <p className="text-[13px] text-muted-foreground mb-2">
             Ingresar el ticker de Yahoo Finance. Para acciones argentinas usar sufijo .BA (ej:
             GGAL.BA). Para CEDEARs ingresar el ticker del subyacente en USA (ej: AAPL, MSFT, GOOGL).
@@ -1153,7 +1153,7 @@ export function AnalisisFundamentalTab({
 
       {/* Loading */}
       {loading && (
-        <div className="rounded-md border border-border/40 bg-background/40/60 px-4 py-6 text-center text-[13px] text-muted-foreground">
+        <div className="rounded-md border border-border/40 bg-background/60 px-4 py-6 text-center text-[13px] text-muted-foreground">
           Consultando Yahoo Finance y calculando metricas...
         </div>
       )}
@@ -1162,7 +1162,7 @@ export function AnalisisFundamentalTab({
       {result && !loading && (
         <div className="space-y-4">
           {/* Identidad de la empresa */}
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <div className="flex items-start justify-between gap-2 flex-wrap">
               <div>
                 <p className="text-[13px] font-semibold text-foreground">
@@ -1196,7 +1196,7 @@ export function AnalisisFundamentalTab({
 
           {/* Benchmark de referencia — mejor R² de factores disponibles */}
           {result.benchmarkName && (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <div className="mono mb-2 text-[13px] uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-2">
                 Benchmark ·
                 {bestBenchmarksLoading ? (
@@ -1269,7 +1269,7 @@ export function AnalisisFundamentalTab({
 
           {/*  Contexto Macro — Murphy TOP-DOWN  */}
           {ciclo && !result.esETF && (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Contexto Macro · Ciclo Económico
               </p>
@@ -1323,7 +1323,7 @@ export function AnalisisFundamentalTab({
 
           {/* Señal de inversion — bloque principal */}
           {result.esETF ? (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-3">
                 Señal de inversion
               </p>
@@ -1350,7 +1350,7 @@ export function AnalisisFundamentalTab({
                 result.pePercentile,
               );
               return (
-                <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+                <div className="rounded-md border border-border/40 bg-background/60 p-4">
                   <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-3">
                     Señal de inversion
                   </p>
@@ -1418,7 +1418,7 @@ export function AnalisisFundamentalTab({
           )}
 
           {/* - Subtabs: Resumen Actual / Por Año / Por Trimestre */}
-          <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <div className="rounded-md border border-border/40 bg-background/60 p-4">
             <div className="flex gap-1.5 border-b border-border/40 pb-2 mb-3">
               {(["actual", "anual", "trimestral"] as const).map((t) => (
                 <button
@@ -1642,7 +1642,7 @@ export function AnalisisFundamentalTab({
           {/* Score + posicion en rango */}
           <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-4">
             {/* Score fundamental */}
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p
                 className="text-[13px] uppercase tracking-widest text-muted-foreground mb-1"
                 title="Score actual compuesto por 7 metricas con pesos fijos (100 pts total). Se usa para la señal de inversion. Difiere del Health Score histórico, que usa solo 4 metricas y se calcula para cada año fiscal individual."
@@ -1710,7 +1710,7 @@ export function AnalisisFundamentalTab({
             </div>
 
             {/* Score sectorial (per-sector weighted) */}
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Score sectorial
               </p>
@@ -1771,7 +1771,7 @@ export function AnalisisFundamentalTab({
 
           {/*  Beta Propio (calculado vs benchmark)  */}
           {(result.betaPropio != null || result.beta != null) && (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Beta &mdash; Yahoo vs propio
               </p>
@@ -1855,7 +1855,7 @@ export function AnalisisFundamentalTab({
 
           {/*  Revisiones de estimados de analistas  */}
           {result.revisionEstimadosPct != null && (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Momentum de revisiones de analistas
               </p>
@@ -1887,7 +1887,7 @@ export function AnalisisFundamentalTab({
 
           {/*  Actividad de insiders  */}
           {result.insiderNetActivityPct != null && (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Actividad de insiders (neto)
               </p>
@@ -1919,7 +1919,7 @@ export function AnalisisFundamentalTab({
 
           {/*  SEC Filings  */}
           {result.secFilings && result.secFilings.length > 0 && (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Presentaciones SEC (&uacute;ltimas)
               </p>
@@ -1985,7 +1985,7 @@ export function AnalisisFundamentalTab({
 
           {/* P/E historico */}
           {!result.esETF && (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-1">
                 Historial de P/E por año fiscal
               </p>
@@ -2011,7 +2011,7 @@ export function AnalisisFundamentalTab({
 
           {/* Health Score histórico */}
           {!result.esETF && result.healthScoreHistory && result.healthScoreHistory.length >= 2 && (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p
                 className="text-[13px] uppercase tracking-widest text-muted-foreground mb-1"
                 title="Score HECHO (histórico) — calculado con solo 4 metricas (margen neto, ROE, crec. ingresos, crec. ganancias) disponibles en los estados financieros de cada año. Es distinto del Score fundamental detallado actual (7 metricas) que se muestra arriba y que usa datos en tiempo real del modulo financialData de Yahoo Finance."
@@ -2034,7 +2034,7 @@ export function AnalisisFundamentalTab({
           )}
 
           {/* Checklist cualitativo — preguntas pendientes (solo concentración) */}
-          <details className="rounded-md border border-border/40 bg-background/40/60 p-4">
+          <details className="rounded-md border border-border/40 bg-background/60 p-4">
             <summary className="text-[13px] uppercase tracking-widest text-muted-foreground cursor-pointer hover:text-foreground select-none">
               Preguntas cualitativas pendientes
             </summary>
@@ -2057,7 +2057,7 @@ export function AnalisisFundamentalTab({
 
       {/* PASO 2 — Botón comparar con pares del sector/industria */}
       {result && !loading && !multiResults.length && result.sector && result.industry && (
-        <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+        <div className="rounded-md border border-border/40 bg-background/60 p-4">
           {peersInfo && peersInfo.totalEncontrados === 0 ? (
             <p className="text-[13px] text-muted-foreground">
               No se encontraron pares en el universo cargado para {result.industry}.

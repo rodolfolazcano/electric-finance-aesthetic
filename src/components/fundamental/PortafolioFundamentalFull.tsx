@@ -527,7 +527,7 @@ export function PortafolioFundamentalFull() {
 
       {/*  Portfolio summary header  */}
       {portfolioMetrics && (
-        <div className="rounded-lg border border-border/40 bg-background/40/60 p-4">
+        <div className="rounded-lg border border-border/40 bg-background/60 p-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
@@ -561,7 +561,7 @@ export function PortafolioFundamentalFull() {
                 <summary className="text-[9px] text-muted-foreground cursor-pointer hover:text-foreground select-none text-right">
                   Parametros de optimizacion
                 </summary>
-                <div className="mt-2 space-y-2 p-2 rounded border border-border/40 bg-background/40/60">
+                <div className="mt-2 space-y-2 p-2 rounded border border-border/40 bg-background/60">
                   <div className="flex items-center gap-2">
                     <span className="mono text-[9px] uppercase tracking-wider text-muted-foreground whitespace-nowrap">
                       Simulaciones
@@ -833,7 +833,7 @@ export function PortafolioFundamentalFull() {
 
       {/*  Charts de series históricas  */}
       {items.length > 0 && (
-        <details className="rounded-lg border border-border/40 bg-background/40/40">
+        <details className="rounded-lg border border-border/40 bg-background/40">
           <summary className="px-4 py-3 text-[10px] font-mono text-muted-foreground cursor-pointer hover:text-foreground select-none">
             Desempeño histórico — {items.length} activos
           </summary>
@@ -962,7 +962,7 @@ export function PortafolioFundamentalFull() {
           </div>
 
           {optResult.equityCurve && optResult.equityCurve.length > 0 && (
-            <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
+            <div className="rounded-lg border border-border/40 bg-background/40 p-3">
               <h3 className="mb-2 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 Recorrido global normalizado (Base 100)
               </h3>
@@ -1013,7 +1013,7 @@ export function PortafolioFundamentalFull() {
           )}
 
           {optResult.frontier && optResult.frontier.length > 0 && (
-            <div className="rounded-lg border border-border/40 bg-background/40/40 p-3 overflow-hidden">
+            <div className="rounded-lg border border-border/40 bg-background/40 p-3 overflow-hidden">
               <h3 className="mb-2 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 Frontera eficiente
               </h3>

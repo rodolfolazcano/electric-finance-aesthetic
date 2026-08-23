@@ -204,7 +204,7 @@ export function RazonesFinancierasTab({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+      <div className="rounded-md border border-border/40 bg-background/60 p-4">
         <p className="text-[13px] text-muted-foreground mb-2">
           Razones financieras según Weston &amp; Brigham (5 categorías) + descomposición DuPont a
           partir de los estados financieros anuales de Yahoo Finance (22 módulos quoteSummary normalizados).{" "}
@@ -246,7 +246,7 @@ export function RazonesFinancierasTab({
       )}
 
       {loading && (
-        <div className="rounded-md border border-border/40 bg-background/40/60 px-4 py-6 text-center text-[13px] text-muted-foreground">
+        <div className="rounded-md border border-border/40 bg-background/60 px-4 py-6 text-center text-[13px] text-muted-foreground">
           Consultando estados financieros y calculando razones...
         </div>
       )}
@@ -254,7 +254,7 @@ export function RazonesFinancierasTab({
       {activo && !loading && (
         <div className="space-y-4">
           {activo.periods.length > 1 && (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-3">
+            <div className="rounded-md border border-border/40 bg-background/60 p-3">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Período {verReal ? "(moneda constante)" : "(nominal)"}
               </p>
@@ -273,7 +273,7 @@ export function RazonesFinancierasTab({
           )}
 
           {selected && (
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-3">
                 Razones del periodo {selected.label} ({selected.endDate})
               </p>
@@ -282,31 +282,31 @@ export function RazonesFinancierasTab({
           )}
 
           <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Liquidez · interpretación {verReal ? "(real)" : ""}
               </p>
               <InterpList items={activo.interpretaciones.liquidez} />
             </div>
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Actividad · interpretación
               </p>
               <InterpList items={activo.interpretaciones.actividad} />
             </div>
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Endeudamiento · interpretación
               </p>
               <InterpList items={activo.interpretaciones.endeudamiento} />
             </div>
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Rentabilidad + DuPont · interpretación
               </p>
               <InterpList items={activo.interpretaciones.rentabilidad} />
             </div>
-            <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
+            <div className="rounded-md border border-border/40 bg-background/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Valor de mercado · interpretación
               </p>

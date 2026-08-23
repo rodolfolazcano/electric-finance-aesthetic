@@ -49,7 +49,7 @@ export function HistoricoTIRChart({ serie, loading }: HistoricoTIRChartProps) {
   }
 
   return (
-    <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
+    <div className="rounded-lg border border-border/40 bg-background/40 p-3">
       <div className="mono mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         Histórico TIR / Paridad
       </div>

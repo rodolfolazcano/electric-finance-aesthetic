@@ -68,7 +68,7 @@ function RatioCard({ data, title, subtitle }: { data: IntermarketMurphyResult[ke
   const d = data as any;
   if (!d) return null;
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3">
+    <Card className="border-border/40 bg-background/40 p-3">
       <div className="mb-1 flex items-center justify-between">
         <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">{title ?? d.label}</span>
         <TrendBadge trend={d.trend} />
@@ -98,7 +98,7 @@ function RatioCard({ data, title, subtitle }: { data: IntermarketMurphyResult[ke
 
 function YieldCurveCard({ data }: { data: IntermarketMurphyResult["yieldCurve"] }) {
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3 col-span-full lg:col-span-2">
+    <Card className="border-border/40 bg-background/40 p-3 col-span-full lg:col-span-2">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
           Curva de Yields (Murphy Cap. 14) — Señal más temprana del ciclo
@@ -143,7 +143,7 @@ function YieldCurveCard({ data }: { data: IntermarketMurphyResult["yieldCurve"] 
 
 function CycleCard({ data }: { data: IntermarketMurphyResult["cycle"] }) {
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3 col-span-full lg:col-span-2">
+    <Card className="border-border/40 bg-background/40 p-3 col-span-full lg:col-span-2">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
           Ciclo de Pring — Diagnóstico Intermarket (3 Flechas)
@@ -202,7 +202,7 @@ function CycleCard({ data }: { data: IntermarketMurphyResult["cycle"] }) {
 
 function DowTheoryCard({ data }: { data: IntermarketMurphyResult["dowTheory"] }) {
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3 col-span-full lg:col-span-1">
+    <Card className="border-border/40 bg-background/40 p-3 col-span-full lg:col-span-1">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
           Dow Theory (Murphy Cap. 5)
@@ -233,7 +233,7 @@ function DowTheoryCard({ data }: { data: IntermarketMurphyResult["dowTheory"] })
 
 function BondsStocksCard({ data }: { data: IntermarketMurphyResult["bondsStocks"] }) {
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3 col-span-full lg:col-span-2">
+    <Card className="border-border/40 bg-background/40 p-3 col-span-full lg:col-span-2">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
           Relación Bonos / Stocks (Murphy Cap. 13)
@@ -271,7 +271,7 @@ function BondsStocksCard({ data }: { data: IntermarketMurphyResult["bondsStocks"
 
 function LeadLagCard({ data }: { data: IntermarketMurphyResult["leadLag"] }) {
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3 col-span-full lg:col-span-1">
+    <Card className="border-border/40 bg-background/40 p-3 col-span-full lg:col-span-1">
       <div className="mb-2 text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Lead-Lag Analysis</div>
       <div className="space-y-1">
         {data.map((ll, i) => (
@@ -289,7 +289,7 @@ function LeadLagCard({ data }: { data: IntermarketMurphyResult["leadLag"] }) {
 
 function CrossAssetCard({ data }: { data: IntermarketMurphyResult["crossAssetCorrelations"] }) {
   return (
-    <Card className="border-border/40 bg-background/40/40 p-3 col-span-full lg:col-span-2">
+    <Card className="border-border/40 bg-background/40 p-3 col-span-full lg:col-span-2">
       <div className="mb-2 text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Matriz Cross-Asset: DXY vs Sectores</div>
       <p className="mb-2 text-[8px] text-muted-foreground/70 leading-relaxed">Correlación Pearson. Negativa = USD fuerte presiona al sector.</p>
       <div className="space-y-0.5">
@@ -369,7 +369,7 @@ export function MurphyIntermarketPanel() {
         <DowTheoryCard data={data.dowTheory} />
         <LeadLagCard data={data.leadLag} />
         {/* Quick summary */}
-        <Card className="border-border/40 bg-background/40/40 p-3 col-span-full lg:col-span-1">
+        <Card className="border-border/40 bg-background/40 p-3 col-span-full lg:col-span-1">
           <div className="mb-2 text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Resumen Rápido</div>
           <div className="space-y-1 text-[9px]">
             <p>Stage: <span className="font-bold text-foreground">{data.cycle.stage}</span> — {data.cycle.label.split("—")[0].trim()}</p>
@@ -404,7 +404,7 @@ export function MurphyIntermarketPanel() {
       {/*  CROSS-ASSET CORRELATIONS  */}
       <div className="grid gap-3 grid-cols-1 lg:grid-cols-3">
         <CrossAssetCard data={data.crossAssetCorrelations} />
-        <Card className="border-border/40 bg-background/40/40 p-3 col-span-full lg:col-span-1">
+        <Card className="border-border/40 bg-background/40 p-3 col-span-full lg:col-span-1">
           <div className="mb-2 text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Secuencia de Murphy</div>
           <div className="space-y-1 text-[9px] font-mono">
             <p className="text-muted-foreground">El orden canónico de los giros:</p>
