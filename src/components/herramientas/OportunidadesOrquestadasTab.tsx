@@ -198,6 +198,7 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
                       <th className="text-right">Upside</th>
                       <th className="text-right">R/R</th>
                       <th className="text-left">Factor R²</th>
+                      <th className="text-left">Vía BCBA (equivalente)</th>
                     </tr>
                   </thead>
                   <tbody className="font-mono">
@@ -213,6 +214,20 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
                           <td className="text-right">{s.detalles?.ficha?.margen_seguridad?.upside_pct?.toFixed(1) ?? "—"}%</td>
                           <td className="text-right">{s.tecnica?.rrr?.toFixed(2) ?? "—"}</td>
                           <td className="text-right text-muted-foreground">{r2 != null ? r2.toFixed(3) : "—"}</td>
+                          <td className="text-[11px] font-mono">
+                            {s.operableBCBA?.ars || s.operableBCBA?.usd ? (
+                              <>
+                                {s.operableBCBA.ars && (
+                                  <span className="mr-1 rounded border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-primary">{s.operableBCBA.ars} (ARS)</span>
+                                )}
+                                {s.operableBCBA.usd && (
+                                  <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-emerald-400">{s.operableBCBA.usd} (USD)</span>
+                                )}
+                              </>
+                            ) : (
+                              <span className="text-muted-foreground">cuenta EE.UU.</span>
+                            )}
+                          </td>
                         </tr>
                       );
                     })}
