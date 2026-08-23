@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import JavaScriptObfuscator from "javascript-obfuscator";
 
-const activado = process.env.OBFUSCATE === "1" || process.env.VERCEL === "1";
+const activado = process.env.OBFUSCATE === "1";
 if (!activado) {
   console.log("[obfuscate] desactivado (local): omitido");
   process.exit(0);
