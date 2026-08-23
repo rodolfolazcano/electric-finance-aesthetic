@@ -24,12 +24,5 @@
       "path": "/api/cron/tuning-senales",
       "schedule": "0 3 * * 0"
     }
-  ],
-  "functions": {
-    "src/routes/api/telegram/webhook.ts": { "maxDuration": 60 },
-    "src/routes/api/chat.ts": { "maxDuration": 60 },
-    "src/routes/api/cron/contexto-telegram.ts": { "maxDuration": 60 },
-    "src/routes/api/cron/senales-unificadas.ts": { "maxDuration": 60 },
-    "src/routes/api/cron/tuning-senales.ts": { "maxDuration": 60 }
-  }
+  ]
 }
