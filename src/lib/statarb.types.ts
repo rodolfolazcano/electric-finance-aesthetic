@@ -70,6 +70,12 @@ export interface PairConfig {
   executionAlgo?: "pairs" | "tc" | "is";
   /** σ: volatilidad anualizada para el modelo de ejecución óptima */
   volatility?: number;
+  /** Gap 2: perfil U-shape por slice V(n) normalizado Σ=1 (heterogéneo PVol) */
+  volumeProfile?: number[];
+  /** Si true, el server fetchea perfil intradiario real vía yahoo-http fetchVolumeProfile */
+  usarVolumenReal?: boolean;
+  /** Gap 1: inicio deseado 0-0.95 para calibración inversa p=1/H */
+  targetStartPct?: number;
 }
 
 export interface TradeSignal {
@@ -172,11 +178,13 @@ export interface BacktestConfig {
   bMax: number;
   bStep: number;
   metric: "sharpe" | "pnl" | "winrate" | "maxdd" | "psharpe";
-  //  Labadie: p-variance para backtest 
   pValue?: number;
   marketImpactGamma?: number;
   participationRate?: number;
   executionAlgo?: "pairs" | "tc" | "is";
+  volumeProfile?: number[];
+  usarVolumenReal?: boolean;
+  targetStartPct?: number;
 }
 
 export interface BacktestGridResult {

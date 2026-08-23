@@ -1,4 +1,4 @@
-﻿import { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,6 @@ import {
 } from "@/lib/planificacion/presupuesto.functions";
 import { calcularInteresCompuesto } from "@/lib/calculadora-financiera.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const PIE_COLORS = [
@@ -37,7 +36,7 @@ export function CalculadoraPresupuesto() {
   const [gastos, setGastos] = useState<GastoRow[]>([
     { nombre: "Alquiler", monto: 150000 },
     { nombre: "Servicios", monto: 50000 },
-    { nombre: "AlimentaciÃ³n", monto: 100000 },
+    { nombre: "Alimentación", monto: 100000 },
   ]);
   const [result, setResult] = useState<PresupuestoResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -103,7 +102,7 @@ export function CalculadoraPresupuesto() {
               <Input
                 value={g.nombre}
                 onChange={(e) => updateGasto(i, "nombre", e.target.value)}
-                placeholder="CategorÃ­a"
+                placeholder="Categoría"
                 className="h-8 text-xs flex-1"
               />
               <Input
@@ -123,7 +122,7 @@ export function CalculadoraPresupuesto() {
           ))}
         </div>
         <Button onClick={handleCalc} disabled={loading} className="w-full">
-          {loading ? "Calculandoâ€¦" : "Analizar presupuesto"}
+          {loading ? "Calculando…" : "Analizar presupuesto"}
         </Button>
       </div>
 
@@ -173,13 +172,13 @@ export function CalculadoraPresupuesto() {
 
             {result.alerta && (
               <div className="rounded-md border border-danger/30 bg-danger/10 p-3 text-sm text-danger text-center">
-                Tus gastos superan tus ingresos. RevisÃ¡ las categorÃ­as para ajustar.
+                Tus gastos superan tus ingresos. Revisá las categorías para ajustar.
               </div>
             )}
 
             <div className="glass p-5">
               <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
-                DistribuciÃ³n de gastos
+                Distribución de gastos
               </div>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -231,7 +230,6 @@ export function CalculadoraPresupuesto() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="presupuesto" />
       </div>
     </div>
   );

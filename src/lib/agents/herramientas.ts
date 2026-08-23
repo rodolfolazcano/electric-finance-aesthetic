@@ -1403,8 +1403,27 @@ export const TOOLS: ToolSpec[] = [
             description:
               "Volatilidad anual opcional (fracción, ej. 0.25). Si falta se estima de los datos.",
           },
+          usarVolumenReal: { type: "boolean", description: "Si true, usa perfil intradiario U-shape real (Gap 2) vía Yahoo 15m en vez de V uniforme." },
         },
         required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "implied_p_labadie",
+      description: "Calibra la p-varianza implícita desde un tiempo de inicio deseado (Gap 1 §4.3 Fodra-Labadie: p implícita = sup{p : n_inicio(p)=deseado} por bisección H∈[0.25,0.91]). Sobre datos reales Yahoo. Para 'qué p necesito si quiero empezar en 30% del horizonte', 'Hurst implícito de mi ejecución'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: { type: "string", description: "Ticker (ej. 'AAPL', 'GGAL.BA')" },
+          inicioDeseadoPct: { type: "number", description: "Inicio deseado 0-0.95 (ej. 0.3 = 30%)." },
+          participacionMaxima: { type: "number", description: "PVol q 0.01-0.5 default 0.1" },
+          gammaImpacto: { type: "number", description: "gamma 0-1 default 0.5" },
+        },
+        required: ["simbolo","inicioDeseadoPct"],
         additionalProperties: false,
       },
     },
@@ -1951,6 +1970,26 @@ export const TOOLS: ToolSpec[] = [
   {
     type: "function",
     function: {
+      name: "mm_hjb_sim",
+      description:
+        "MARKET-MAKING Fodra-Labadie HJB 1303.7177v2 (§2-§4) con OU Δ + intensidad Poisson + Monte Carlo: fit OU AR(1) sobre precios reales, Δ=(µ−s)(1−e^{−aτ}), cotizaciones óptimas δ±*=1/k±Δ, ψ*=2/k, penalización inventario π̃=ηz+νσ²τ (primer orden §3.6), fee ψ_α*=ψ*+2α y Monte Carlo PnL density (martingala vs OU). Soporta Binance (klines 1m) o Yahoo (acciones/CEDEARs). Para 'cotizaciones óptimas Fodra-Labadie', 'market-making HJB', 'OU mean reversion MM'.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: { type: "string", description: "Ticker/par (BTCUSDT, GGAL.BA, AAPL...)" },
+          fuente: { type: "string", description: "'binance' (default) o 'yahoo' para acciones/CEDEARs" },
+          dias: { type: "number", description: "Días de historia (10-60 default 20)" },
+          epsilon: { type: "number", description: "Aversión inventario ε (default 0.001)" },
+          alphaFee: { type: "number", description: "Fee por share α en precio (default 0.05)" },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "ejecucion_optima_crypto",
       description:
         "EJECUCIÓN ÓPTIMA Almgren-Chriss vs TWAP vs naive sobre futuros Binance (port de metodologias/optimal_execution.py): impacto h(v)=σ√steps·(v/V)^γ con γ=0.5, métrica Implementation Shortfall en bps para una COMPRA de notional dado en un horizonte de minutos, κ elegido por ventana en grid (0.005-0.1). Devuelve IS medio/std/funcional J(λ=0.5) por ejecutor, % de ventanas donde cada uno gana al naive y veredicto. Para 'cómo ejecuto una orden grande de BTC', 'AC vs TWAP', 'impacto de mercado crypto'.",
@@ -2094,6 +2133,7 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
     case "pairs_trading_labadie":
       return "portafolio";
     case "curva_ejecucion_labadie":
+    case "implied_p_labadie":
       return "portafolio";
     case "consultar_cierre_mercado":
     case "generar_informe_matutino":
@@ -2129,6 +2169,7 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
       return "valoracion";
     case "walkforward_bb_rsi":
     case "mm_inventario_sim":
+    case "mm_hjb_sim":
     case "ejecucion_optima_crypto":
     case "pairs_crypto_scan":
     case "pairs_crypto_analizar":

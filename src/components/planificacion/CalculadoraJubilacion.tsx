@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { calcularJubilacion, type JubilacionInput, type JubilacionResult } from "@/lib/planificacion/jubilacion.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const defaultInput: JubilacionInput = {
@@ -97,7 +96,6 @@ export function CalculadoraJubilacion() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="jubilacion" />
       </div>
     </div>
   );

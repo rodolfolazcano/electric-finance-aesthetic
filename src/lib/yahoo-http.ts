@@ -512,3 +512,52 @@ export function resetYahooSessionCache(): void {
   sessionCache = null;
   sessionPromise = null;
 }
+
+// ─── Gap 2: Perfil de volumen intradiario (U-shape) ─────────────────────
+// Promedia volumen por franja horaria de los últimos 5 días en 15m y normaliza.
+// Retorna perfil relativo V(n) de longitud Nsteps, Σ=1. Fallback uniforme si falla.
+export async function fetchVolumeProfile(symbol: string, Nsteps = 26): Promise<number[]> {
+  const fallback = new Array(Nsteps).fill(1 / Nsteps);
+  try {
+    const json: any = await fetchYahooChart(symbol, "5d", "15m");
+    const result = json?.chart?.result?.[0];
+    const timestamps: number[] = result?.timestamp ?? [];
+    const volumes: (number | null)[] = result?.indicators?.quote?.[0]?.volume ?? [];
+    if (!timestamps.length || !volumes.length) return fallback;
+    // Agrupar por hora del día (0-23) con minuto para granularidad 15m
+    const bucketCount = Nsteps;
+    const buckets = new Array(bucketCount).fill(0);
+    const counts = new Array(bucketCount).fill(0);
+    // Mapear cada vela a un bucket por posición intradía (hora*60+min) normalizada
+    // Yahoo 15m para 5d puede tener gaps; distribuimos uniformemente por índice si no hay hora confiable
+    for (let i = 0; i < timestamps.length; i++) {
+      const vol = volumes[i];
+      if (vol == null || !isFinite(vol) || vol <= 0) continue;
+      const d = new Date(timestamps[i] * 1000);
+      const mins = d.getUTCHours() * 60 + d.getUTCMinutes();
+      // Normalizar mins 0-1440 a bucket
+      const idx = Math.min(bucketCount - 1, Math.max(0, Math.floor((mins / 1440) * bucketCount)));
+      buckets[idx] += vol;
+      counts[idx] += 1;
+    }
+    // Promedio por bucket; si un bucket quedó vacío, interpolar
+    const avg = buckets.map((s, i) => (counts[i] > 0 ? s / counts[i] : 0));
+    const hasData = avg.some((v) => v > 0);
+    if (!hasData) return fallback;
+    // Interpolar vacíos linealmente
+    for (let i = 0; i < avg.length; i++) {
+      if (avg[i] === 0) {
+        let l = i - 1; while (l >= 0 && avg[l] === 0) l--;
+        let r = i + 1; while (r < avg.length && avg[r] === 0) r++;
+        const lv = l >= 0 ? avg[l] : avg[r] ?? 0;
+        const rv = r < avg.length ? avg[r] : avg[l] ?? 0;
+        avg[i] = (lv + rv) / 2;
+      }
+    }
+    const sum = avg.reduce((s, x) => s + x, 0);
+    if (sum <= 0) return fallback;
+    return avg.map((x) => x / sum);
+  } catch {
+    return fallback;
+  }
+}

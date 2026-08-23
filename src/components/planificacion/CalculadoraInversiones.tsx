@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { calcularInversiones, type InversionesInput, type InversionesResult } from "@/lib/planificacion/inversiones.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 const defaultInput: InversionesInput = { montoInicial: 1000000, aportePeriodico: 10000, frecuencia: "mensual", tasaEsperada: 10, plazoAnos: 20, tipoInteres: "compuesto" };
@@ -85,7 +84,6 @@ export function CalculadoraInversiones() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="inversiones" />
       </div>
     </div>
   );

@@ -401,6 +401,15 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
               const url = buildQuickChartUrl(titulo, serie, unidad);
               await sendAgentPhoto(chatId, url, `<b>${escaparHtml(titulo)}</b>`);
             }
+          } else if (tipo === "flujo_bono_png") {
+            const titulo = String((ch as { titulo?: string }).titulo ?? "Flujo de bonos");
+            const b64 = String((ch as { pngBase64?: string }).pngBase64 ?? "");
+            if (b64) {
+              const buf = Buffer.from(b64, "base64");
+              await sendAgentPhotoBuffer(chatId, buf, {
+                caption: `<b>${escaparHtml(titulo)}</b>`,
+              });
+            }
           } else if (tipo === "barras") {
             const titulo = String((ch as { titulo?: string }).titulo ?? "Comparativa");
             const cats = (ch as { categorias?: string[] }).categorias ?? [];
@@ -414,7 +423,8 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
                 },
                 options: { title: { display: true, text: titulo } },
               };
-              const url = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(cfg))}&width=800&height=400&backgroundColor=white`;
+              // Barras genéricas siguen por QuickChart oscuro (no blanco)
+              const url = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(cfg))}&width=800&height=400&backgroundColor=%230A0E17`;
               await sendAgentPhoto(chatId, url, `<b>${escaparHtml(titulo)}</b>`);
             }
           } else if (tipo === "tradingview") {

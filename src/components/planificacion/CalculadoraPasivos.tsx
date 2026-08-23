@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { X, Plus } from "lucide-react";
 import { calcularPasivos, type PasivosInput, type PasivosResult, type DeudaInput } from "@/lib/planificacion/pasivos.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface DeudaRow { nombre: string; monto: number; tasa: number; cuotaMinima: number; }
@@ -99,7 +98,6 @@ export function CalculadoraPasivos() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="pasivos" />
       </div>
     </div>
   );

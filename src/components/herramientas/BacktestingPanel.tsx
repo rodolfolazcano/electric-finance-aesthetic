@@ -89,6 +89,8 @@ export function BacktestingPanel({
           marketImpactGamma: config.marketImpactGamma,
           participationRate: config.participationRate,
           executionAlgo: config.executionAlgo,
+          usarVolumenReal: shared.usarVolumenReal,
+          targetStartPct: shared.targetStartPct,
         },
       });
       setResult(res);
@@ -379,6 +381,10 @@ export function BacktestingPanel({
               className="w-full accent-primary"
             />
           </div>
+        </div>
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+          <label className="flex items-center gap-2 font-mono text-[13px] text-muted-foreground"><input type="checkbox" checked={!!shared.usarVolumenReal} onChange={e=>onUpdateShared("usarVolumenReal", e.target.checked)} className="accent-primary" /> Volumen real U-shape</label>
+          <div className="space-y-1"><label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">Inicio deseado: {((shared.targetStartPct ?? 0.3)*100).toFixed(0)}% <InfoTip>Gap 1 p implícita</InfoTip></label><input type="range" min={0} max={95} step={5} value={(shared.targetStartPct ?? 0.3)*100} onChange={e=>onUpdateShared("targetStartPct", parseFloat(e.target.value)/100)} className="w-full accent-primary" /></div>
         </div>
 
         <div className="flex items-center justify-between gap-2">

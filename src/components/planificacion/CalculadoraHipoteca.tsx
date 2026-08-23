@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { calcularHipoteca, type HipotecaInput, type HipotecaResult } from "@/lib/planificacion/hipoteca.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 
 const defaultInput: HipotecaInput = { monto: 100000000, tasaAnual: 8, plazoMeses: 240, sistema: "frances" };
@@ -107,7 +106,6 @@ export function CalculadoraHipoteca() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="hipoteca" />
       </div>
     </div>
   );

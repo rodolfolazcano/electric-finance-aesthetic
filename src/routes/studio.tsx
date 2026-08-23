@@ -644,6 +644,13 @@ function Studio() {
                 setInput(`Analizá este archivo: ${name}. Validá su contenido contra la web y decime si es correcto.`);
                 setTimeout(submit, 100);
               }}
+              onAttachFile={async (file) => {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                await handleUpload(dt.files, "data");
+                setInput(`Analizá la imagen ${file.name} del contexto: qué muestra, cifras visibles y lectura financiera.`);
+                setTimeout(submit, 100);
+              }}
             />
           </div>
         </div>

@@ -580,7 +580,13 @@ export async function downloadAgentFileAsBase64(
           ? "video/mp4"
           : filePath.endsWith(".wav")
             ? "audio/wav"
-            : "image/jpeg";
+            : filePath.endsWith(".png")
+              ? "image/png"
+              : filePath.endsWith(".webp")
+                ? "image/webp"
+                : filePath.endsWith(".heic") || filePath.endsWith(".heif")
+                  ? "image/heic"
+                  : "image/jpeg";
     return { base64, mime, filePath };
   } catch {
     return null;
@@ -592,62 +598,28 @@ export async function describirImagenBase64(
   mime: string,
   promptExtra?: string,
 ): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? "";
-  if (!apiKey)
-    return "[Imagen recibida — sin GEMINI_API_KEY configurada, no puedo describirla. Configurá GEMINI_API_KEY para visión.]";
   try {
-    const { GoogleGenAI } = await import("@google/genai");
-    const client = new GoogleGenAI({ apiKey });
+    const { resilientVision } = await import("@/lib/ai/providers.server");
+    const { VISION_CHAIN } = await import("@/lib/ai/model-catalog");
     const prompt = promptExtra
       ? `Analiza esta imagen. Contexto del usuario: "${promptExtra}". Describe en español rioplatense todo lo visible: texto, números, gráficos, tickers, valores. Si es un gráfico de trading, extrae ticker, precio, tendencia, soportes/resistencias. Si es captura de portfolio, lista posiciones y valorizado. Sé preciso y cita cifras visibles.`
       : "Describe esta imagen en español rioplatense con máximo detalle: todo texto visible, números, gráficos, tickers, tablas. Si es gráfico financiero, extrae ticker, valores, tendencia. Si es portfolio, lista activos y montos. No inventes lo que no ves.";
-    const result: any = await client.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        {
-          role: "user",
-          parts: [
-            { text: prompt },
-            {
-              inlineData: {
-                mimeType: mime.startsWith("image/") ? mime : "image/jpeg",
-                data: base64,
-              },
-            },
-          ],
-        },
-      ],
-    });
-    const text = result?.text ?? result?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-    return text.trim() || "[Imagen recibida pero Gemini no devolvió descripción]";
+    const result = await resilientVision(VISION_CHAIN, base64, mime, prompt);
+    return result.text.trim() || "[Imagen recibida pero no se devolvió descripción]";
   } catch (e) {
     return `[Error describiendo imagen: ${e instanceof Error ? e.message : String(e)}]`;
   }
 }
 
 export async function transcribirAudioBase64(base64: string, mime: string): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? "";
-  if (!apiKey)
-    return "[Audio recibido — sin GEMINI_API_KEY, no puedo transcribir. Configurá GEMINI_API_KEY.]";
   try {
-    const { GoogleGenAI } = await import("@google/genai");
-    const client = new GoogleGenAI({ apiKey });
-    const result: any = await client.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        {
-          role: "user",
-          parts: [
-            {
-              text: "Transcribí este audio/voz en español rioplatense, literal y con puntuación. Si es consulta financiera, transcribí tal cual.",
-            },
-            { inlineData: { mimeType: mime, data: base64 } },
-          ],
-        },
-      ],
-    });
-    const text = result?.text ?? result?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-    return text.trim() || "[Audio recibido pero no se pudo transcribir]";
+    const { resilientAudio } = await import("@/lib/ai/providers.server");
+    const result = await resilientAudio(
+      base64,
+      mime,
+      "Transcribí este audio/voz en español rioplatense, literal y con puntuación. Si es consulta financiera, transcribí tal cual.",
+    );
+    return result.text.trim() || "[Audio recibido pero no se pudo transcribir]";
   } catch (e) {
     return `[Error transcribiendo audio: ${e instanceof Error ? e.message : String(e)}]`;
   }

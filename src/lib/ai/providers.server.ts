@@ -654,6 +654,49 @@ export async function resilientVision(
   });
 }
 
+/** Audio: transcribe/analiza audio en base64 (usa el mismo modelo omni que visión). */
+export async function resilientAudio(
+  base64: string,
+  mime: string,
+  instruction: string,
+): Promise<ResilientResult<string>> {
+  const { VISION_CHAIN } = await import("./model-catalog");
+  return runChain(VISION_CHAIN, [], async (ref, apiKey) => {
+    let text: string | undefined;
+    const res = await fetchWithTimeout(
+      CHAT_ENDPOINT[ref.provider as ProviderId],
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: ref.model,
+          max_tokens: ref.maxTokens ?? 1800,
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: instruction },
+                { type: "input_audio", input_audio: { data: base64, format: mime.includes("ogg") ? "wav" : mime.includes("mp3") ? "mp3" : "wav" } },
+              ],
+            },
+          ],
+        }),
+      },
+      TEXT_TIMEOUT_MS,
+    );
+    if (!res.ok) throw new Error(`${ref.provider} ${res.status}`);
+    const data = (await res.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    text = data.choices?.[0]?.message?.content ?? undefined;
+    if (!text) throw new Error(`${ref.provider}: sin texto`);
+    return text;
+  });
+}
+
 // 
 // AGENTE: variant con tool-calling (devuelve content + tool_calls)
 // 

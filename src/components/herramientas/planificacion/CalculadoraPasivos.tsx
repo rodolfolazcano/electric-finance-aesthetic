@@ -1,4 +1,4 @@
-﻿import { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,6 @@ import {
 } from "@/lib/planificacion/pasivos.functions";
 import { calcularInteresCompuesto } from "@/lib/calculadora-financiera.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface DeudaRow {
@@ -25,7 +24,7 @@ export function CalculadoraPasivos() {
   const fn = useServerFn(calcularPasivos);
   const [deudas, setDeudas] = useState<DeudaRow[]>([
     { nombre: "Tarjeta", monto: 500000, tasa: 55, cuotaMinima: 25000 },
-    { nombre: "PrÃ©stamo personal", monto: 2000000, tasa: 40, cuotaMinima: 80000 },
+    { nombre: "Préstamo personal", monto: 2000000, tasa: 40, cuotaMinima: 80000 },
   ]);
   const [pagoMensual, setPagoMensual] = useState(200000);
   const [estrategia, setEstrategia] = useState<"avalancha" | "bola-nieve">("avalancha");
@@ -138,7 +137,7 @@ export function CalculadoraPasivos() {
                   type="number"
                   value={d.cuotaMinima}
                   onChange={(e) => updateDeuda(i, "cuotaMinima", e.target.value)}
-                  placeholder="Cuota mÃ­n."
+                  placeholder="Cuota mín."
                   className="h-7 text-[13px] w-[32%]"
                 />
               </div>
@@ -146,7 +145,7 @@ export function CalculadoraPasivos() {
           ))}
         </div>
         <Button onClick={handleCalc} disabled={loading} className="w-full">
-          {loading ? "Calculandoâ€¦" : "Calcular estrategia"}
+          {loading ? "Calculando…" : "Calcular estrategia"}
         </Button>
       </div>
 
@@ -168,7 +167,7 @@ export function CalculadoraPasivos() {
               </div>
               <div className="glass p-4 text-center">
                 <div className="text-[13px] text-muted-foreground uppercase tracking-wider">
-                  InterÃ©s total
+                  Interés total
                 </div>
                 <div className="mono text-lg text-warning">
                   ${result.interesTotal.toLocaleString()}
@@ -185,7 +184,7 @@ export function CalculadoraPasivos() {
                   <tr className="border-b border-border/60 text-[13px] uppercase tracking-wider text-muted-foreground">
                     <th className="px-2 py-2 text-left">Deuda</th>
                     <th className="px-2 py-2 text-right">Meses</th>
-                    <th className="px-2 py-2 text-right">InterÃ©s pagado</th>
+                    <th className="px-2 py-2 text-right">Interés pagado</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -218,7 +217,6 @@ export function CalculadoraPasivos() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="pasivos" />
       </div>
     </div>
   );

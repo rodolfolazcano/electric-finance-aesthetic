@@ -23,9 +23,37 @@ function getBinanceConfig() {
   };
 }
 
-function sign(queryString: string, secret: string): string {
+export function sign(queryString: string, secret: string): string {
   return createHmac("sha256", secret).update(queryString).digest("hex");
 }
+
+export async function signedRequest<T>(
+  baseUrl: string,
+  path: string,
+  params: Record<string, string | number>,
+  apiKey: string,
+  secret: string,
+  method: "GET" | "POST" | "DELETE" = "GET",
+): Promise<T> {
+  if (!apiKey || !secret) throw new Error("API credentials missing");
+  if (!lastTimeSync || Date.now() - lastTimeSync > 60000) await syncTime(baseUrl);
+  const timestamp = Date.now() + timeOffset;
+  const queryObj = { ...params, timestamp, recvWindow: "5000" };
+  const qs = new URLSearchParams(Object.entries(queryObj).map(([k, v]) => [k, String(v)])).toString();
+  const signature = sign(qs, secret);
+  const url = `${baseUrl}${path}?${qs}&signature=${signature}`;
+  const res = await fetch(url, { method, headers: { "X-MBX-APIKEY": apiKey } });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Binance ${method} ${path} ${res.status}: ${body}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+export const BINANCE_BASES = {
+  spotTestnet: "https://testnet.binance.vision",
+  futuresDemo: "https://demo-fapi.binance.com",
+} as const;
 
 export async function binanceSignedGet<T>(
   path: string,

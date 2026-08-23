@@ -32,7 +32,7 @@ import { DEFAULT_PAIR_CONFIG, intervalLabel } from "@/lib/statarb.types";
 import { SocialContentPanel } from "@/components/shared/SocialContentPanel";
 import { detectCalculationAnomalies } from "@/lib/social/anomaly-detector";
 import type { InvestorContentInput } from "@/lib/social/social-content-generator";
-import { calcularCurvaOptima } from "@/lib/labadie/execution-curve";
+import { calcularCurvaOptima, estimateExecutionCosts, impliedPFromStartTime } from "@/lib/labadie/execution-curve";
 import { spreadRelativo } from "@/lib/labadie/microstructure";
 
 import type { SharedPairConfig } from "./StatArbTab";
@@ -115,6 +115,8 @@ export function PairsTradingPanel({
           pValue: shared.pValue,
           marketImpactGamma: shared.marketImpactGamma,
           participationRate: shared.participationRate,
+          usarVolumenReal: shared.usarVolumenReal,
+          targetStartPct: shared.targetStartPct,
         },
       });
       setResult(res);
@@ -402,6 +404,17 @@ export function PairsTradingPanel({
               className="w-full accent-primary"
             />
           </div>
+          <div className="space-y-1">
+            <label className="flex items-center gap-2 font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
+              <input type="checkbox" checked={!!config.usarVolumenReal} onChange={(e)=>onUpdateShared("usarVolumenReal", e.target.checked)} className="accent-primary" />
+              Volumen real U-shape (intradía Yahoo 15m)
+              <InfoTip>Gap 2: V(n) heterogéneo del paper §2.6 — PVol por slice q·V(n) con perfil intradiario.</InfoTip>
+            </label>
+            <label className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
+              Inicio deseado: {(Number(config.targetStartPct ?? 0.3) * 100).toFixed(0)}% <InfoTip>Gap 1 §4.3 p implícita = sup{"{p : n_inicio(p)=deseado}"} por bisección H∈[0.25,0.91].</InfoTip>
+            </label>
+            <input type="range" min={0} max={95} step={5} value={(config.targetStartPct ?? 0.3)*100} onChange={(e)=>onUpdateShared("targetStartPct", parseFloat(e.target.value)/100)} className="w-full accent-primary" />
+          </div>
         </div>
 
         <div className="flex items-center justify-between gap-2">
@@ -684,7 +697,7 @@ export function PairsTradingPanel({
               </div>
             )}
 
-            {/*  Labadie §2.3-2.4: Trading curve (TC/IS)  */}
+            {/*  Labadie §2.3-2.4: Trading curve (TC/IS) — Gap 4 costos */}
             {result.tradingCurve && result.tradingCurve.length > 0 && (
               <div className="rounded-lg border border-border/40 p-4">
                 <h3 className="mb-2 font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
@@ -708,6 +721,20 @@ export function PairsTradingPanel({
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
+                {(() => {
+                  try {
+                    const c = estimateExecutionCosts(result.tradingCurve, { sigma: 0.2, hurst: (result as any).hurstExponent ?? 0.5, gamma: config.marketImpactGamma ?? 0.5 });
+                    return <div className="mt-2 font-mono text-[11px] text-muted-foreground">Gap 4 — Impacto {c.expectedImpactBps.toFixed(1)} bps · Riesgo {c.riskAdjustment.toFixed(1)} bps · Total {c.totalCostBps.toFixed(1)} bps</div>;
+                  } catch { return null; }
+                })()}
+                {(() => {
+                  try {
+                    const tgt = (config as any).targetStartPct;
+                    if (tgt==null) return null;
+                    const r = impliedPFromStartTime({ targetStartPct: tgt, T: result.tradingCurve.length, sigma: 0.2, gamma: config.marketImpactGamma ?? 0.5, participationRate: config.participationRate ?? 0.1 });
+                    return <div className="mt-1 font-mono text-[11px] text-muted-foreground">Gap 1 — p implícita para inicio {(tgt*100).toFixed(0)}% : p={r.impliedP.toFixed(2)} H={r.hurst.toFixed(2)} logrado {(r.achievedStartPct*100).toFixed(0)}%</div>;
+                  } catch { return null; }
+                })()}
               </div>
             )}
 

@@ -1658,19 +1658,6 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
         </>
       )}
 
-      {/* Título después de los inputs */}
-      <div>
-        <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight">
-          Análisis sectorial
-        </h2>
-        <p className="text-[17px] leading-relaxed text-muted-foreground mt-1 lg:text-[19px]">
-          Rotación sectorial con ETFs SPDR, valuación relativa, correlaciones, benchmarks y
-          screeners. Fuentes: Yahoo Finance · BCRA · Delay 15-20’ · Metodología John Murphy / Pring.
-          Navegación por las secciones del panel lateral.
-        </p>
-        <div aria-hidden className="electric-line mt-6 max-w-3xl" />
-      </div>
-
       <Tabs value={tab} onValueChange={setTab} className="w-full">
         {/* Navegación por subtabs: panel lateral (SidebarHerramientas) */}
 

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { calcularPatrimonioNeto, type PatrimonioNetoInput, type PatrimonioNetoResult } from "@/lib/planificacion/patrimonio-neto.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const PIE_COLORS = ["#10b981", "#3b82f6", "#fbbf24", "#a855f7"];
@@ -65,7 +64,6 @@ export function CalculadoraPatrimonioNeto() {
             </div>
           </>
         )}
-        <ContactCTA origen="patrimonio-neto" />
       </div>
     </div>
   );

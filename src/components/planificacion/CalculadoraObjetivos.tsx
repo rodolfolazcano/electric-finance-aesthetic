@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { calcularObjetivo, type ObjetivosInput, type ObjetivosResult } from "@/lib/planificacion/objetivos.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const defaultInput: ObjetivosInput = { montoObjetivo: 50000000, plazoMeses: 120, ahorroActual: 5000000, tasaEsperada: 8 };
@@ -71,7 +70,6 @@ export function CalculadoraObjetivos() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="objetivos" />
       </div>
     </div>
   );

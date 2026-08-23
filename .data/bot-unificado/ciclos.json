@@ -1,0 +1,59 @@
+{
+  "ciclos": [
+    {
+      "fecha": "2026-08-23T17:48:21.761Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-23T16:48:20.840Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "basis-cedear-us"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-23T16:18:20.282Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-23T14:47:43.791Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "momentum-tendencia"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-23T13:48:01.504Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "statarb-pares",
+        "basis-cedear-us",
+        "mean-reversion-atr",
+        "value-fundamental",
+        "rotacion-sectorial",
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    }
+  ]
+}

@@ -12,7 +12,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { buildMarketSnapshot } from "../../../lib/informe-matutino/snapshot.functions";
-import { generateInformeMatutino } from "../../../lib/informe-matutino/gemini.functions";
+import { generateInformeMatutino } from "../../../lib/informe-matutino/informe.functions";
 import { saveInformeDelDia } from "../../../lib/informe-matutino/persistence.functions";
 import type { MarketContextSnapshot, InformeMatutinoIA } from "../../../lib/informe-matutino/types";
 import "@/lib/ai/env.server";

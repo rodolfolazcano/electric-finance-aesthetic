@@ -607,7 +607,7 @@ const GRUPOS_HERRAMIENTAS: Record<string, string[]> = {
     "analisis_industria",
     "consultar_catalogo",
   ],
-  labadie: ["pairs_trading_labadie", "curva_ejecucion_labadie"],
+  labadie: ["pairs_trading_labadie", "curva_ejecucion_labadie", "implied_p_labadie"],
   mercadoExtra: [
     "oportunidades_diarias",
     "consultar_cierre_mercado",
@@ -618,7 +618,7 @@ const GRUPOS_HERRAMIENTAS: Record<string, string[]> = {
   senalUnificada: ["generar_senal_unificada", "generar_senales_unificadas", "telegram_enviar_senal", "telegram_enviar_mensaje", "telegram_enviar_grafico", "publicar_slide_mercado", "publicar_oportunidades"],
   rentaFija: ["calcular_ytm_bono", "consultar_curva_etti", "calcular_yield_call", "calcular_total_return", "calcular_stripped_yield", "consultar_semaforo_riesgo_bono", "calcular_tir_portafolio"],
   opciones: ["analizar_opciones_completo"],
-  cripto: ["walkforward_bb_rsi", "mm_inventario_sim", "ejecucion_optima_crypto", "pairs_crypto_scan", "pairs_crypto_analizar"],
+  cripto: ["walkforward_bb_rsi", "mm_inventario_sim", "mm_hjb_sim", "ejecucion_optima_crypto", "pairs_crypto_scan", "pairs_crypto_analizar"],
   oportunidades: ["interpretar_oportunidades"],
 };
 
@@ -1087,6 +1087,11 @@ export async function ejecutarTool(
         const res = await ejecutarCurvaEjecucionLabadie(argsRaw);
         return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
       }
+      case "implied_p_labadie": {
+        const { ejecutarImpliedPLabadie } = await import("@/lib/agents/ejecutores");
+        const res = await ejecutarImpliedPLabadie(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+      }
       case "consultar_cierre_mercado": {
         const res = await ejecutarCierreMercado();
         return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
@@ -1300,6 +1305,10 @@ export async function ejecutarTool(
       case "mm_inventario_sim": {
         const { ejecutarMMInventario } = await import("@/lib/agents/ejecutores");
         return { ...(await ejecutarMMInventario(argsRaw)) };
+      }
+      case "mm_hjb_sim": {
+        const { ejecutarMMHJB } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarMMHJB(argsRaw)) };
       }
       case "ejecucion_optima_crypto": {
         const { ejecutarEjecucionOptimaCrypto } = await import("@/lib/agents/ejecutores");

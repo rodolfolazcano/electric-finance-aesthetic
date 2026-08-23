@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BookmarkPlus, ChevronDown, ChevronRight, Copy, Globe, Loader2, Pen, Plus, Send, Terminal, Trash2, X } from "lucide-react";
+import { BookmarkPlus, ChevronDown, ChevronRight, Copy, Globe, Loader2, Paperclip, Pen, Plus, Send, Terminal, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ChatTurn, PreviewRef, StudioSession, ToolCallTrace } from "@/lib/types";
 
@@ -28,6 +28,7 @@ type Props = {
   onDeleteTurn?: (id: string) => void;
   onCancelQueue?: (index: number) => void;
   onDropFile?: (name: string, text: string, kind: string, segment?: string) => void;
+  onAttachFile?: (file: File) => void;
 };
 
 export function ChatPanel({
@@ -55,9 +56,11 @@ export function ChatPanel({
   onDeleteTurn,
   onCancelQueue,
   onDropFile,
+  onAttachFile,
 }: Props) {
   const scroller = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLTextAreaElement>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => {
@@ -242,6 +245,25 @@ export function ChatPanel({
         />
         <div className="mt-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <input
+              ref={fileInput}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file && onAttachFile) onAttachFile(file);
+                e.target.value = "";
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInput.current?.click()}
+              className="flex items-center gap-1 rounded-full border border-border/60 px-2 py-1 transition-colors hover:text-foreground"
+              title="Adjuntar imagen (PNG, JPG, WebP)"
+            >
+              <Paperclip className="size-3" /> adjuntar
+            </button>
             <button
               type="button"
               onClick={onToggleWeb}

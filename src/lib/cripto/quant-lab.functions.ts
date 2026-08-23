@@ -152,6 +152,107 @@ export const runMMInventory = createServerFn({ method: "POST" })
   })
 
 // ---------------------------------------------------------------------------
+// FODRA-LABADIE HJB §2-§4 — Market-Making con OU Δ + intensidad Poisson + MC
+// ---------------------------------------------------------------------------
+export interface MMHJBParams {
+  source?: "binance" | "yahoo"; // default binance
+  k?: number; A?: number; z?: number; eta?: number; nu?: number; epsilon?: number; alphaFee?: number;
+  maxQ?: number; nPaths?: number;
+}
+
+export const runMMHJB = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({
+    symbol: z.string().default("BTCUSDT"),
+    days: z.number().default(20),
+    source: z.enum(["binance","yahoo"]).default("binance"),
+    k: z.number().default(1), A: z.number().default(100), z: z.number().default(0.5),
+    eta: z.number().default(1), nu: z.number().default(1), epsilon: z.number().default(0.001),
+    alphaFee: z.number().default(0.05), maxQ: z.number().default(50), nPaths: z.number().default(200),
+  }).parse(d))
+  .handler(async ({ data }) => {
+    // — fetch mid-price path(s)
+    const closes: number[] = [];
+    if (data.source === "yahoo") {
+      const { fetchYahooChart } = await import("@/lib/yahoo-http");
+      const ch: any = await fetchYahooChart(data.symbol, "3mo", "1d");
+      const c: number[] = ch?.chart?.result?.[0]?.indicators?.quote?.[0]?.close ?? [];
+      for (const v of c) if (isFinite(v) && v > 0) closes.push(v);
+    } else {
+      const raw = await fetchKlinesRange(data.symbol, "1m", data.days);
+      closes.push(...raw.map((k: any) => parseFloat(k[4])));
+    }
+    if (closes.length < 100) throw new Error("Sin datos suficientes para Fodra-Labadie (≥100 cierres)");
+    const { fitOrnsteinUhlenbeck, quotesFL, runMonteCarloFL } = await import("@/lib/labadie/market-making");
+    const { simularEulerSDE } = await import("@/lib/statarb.math");
+    const ouFit = fitOrnsteinUhlenbeck(closes, 1/1440);
+    const mid0 = closes[closes.length-1]!;
+    // quotes ejemplo sobre último precio
+    const tau = 1; // horizon 1 day
+    const qExample = quotesFL({ s: mid0, q: 0, t: 0, T: tau, k: data.k, A: data.A, z: data.z, sigma: ouFit?.sigma ?? 0.5, eta: data.eta, nu: data.nu, epsilon: data.epsilon, alphaFee: data.alphaFee, ouFit });
+    const qWithInv = quotesFL({ s: mid0, q: 5, t: 0, T: tau, k: data.k, A: data.A, z: data.z, sigma: ouFit?.sigma ?? 0.5, eta: data.eta, nu: data.nu, epsilon: data.epsilon, alphaFee: data.alphaFee, ouFit });
+    // quotePath sobre closes reales (muestra cada ~ n/100 puntos)
+    const { simulateMMIntensity } = await import("@/lib/labadie/market-making");
+    const simReal = simulateMMIntensity(closes.slice(-Math.min(closes.length, 500)), ouFit, { k: data.k, A: data.A, z: data.z, eta: data.eta, nu: data.nu, epsilon: data.epsilon, alphaFee: data.alphaFee, maxQ: data.maxQ, dtHours: 1/60, T: tau });
+    const step = Math.max(1, Math.floor(simReal.steps.length / 100));
+    const quotePath = simReal.steps.filter((_,i)=> i%step===0).map(s=> ({ t: s.t, mid: s.s, bid: s.bid, ask: s.ask, q: s.q }));
+    // sensibilidad ε×α grid 3×3 (q=0)
+    const epsGrid=[0.0005,0.001,0.003], alphaGrid=[0,0.05,0.2];
+    const sensitivity = epsGrid.map(eps=> ({ eps, row: alphaGrid.map(al=> { const q=quotesFL({ s: mid0, q:0, t:0, T:tau, k:data.k, A:data.A, z:data.z, sigma: ouFit?.sigma ?? 0.5, eta:data.eta, nu:data.nu, epsilon:eps, alphaFee:al, ouFit }); return { alpha: al, psiFee: q.psiFee, rStar: q.rStar, gain: q.gainPerSpread }; }) }));
+    // MC: OU paths vs martingale baseline
+    const genOU = (seed: number) => {
+      const a = ouFit?.a ?? 0.1; const mu = ouFit?.mu ?? mid0; const sig = ouFit?.sigma ?? 0.5;
+      return simularEulerSDE(mid0, a, sig, tau, Math.min(closes.length, 1000), "ou", mu);
+    };
+    const mc = runMonteCarloFL(Math.min(data.nPaths, 300), genOU, ouFit, { k: data.k, A: data.A, z: data.z, eta: data.eta, nu: data.nu, epsilon: data.epsilon, alphaFee: data.alphaFee, maxQ: data.maxQ, dtHours: 1/60, T: tau });
+    return { symbol: data.symbol, source: data.source, n: closes.length, ouFit, quotes: { flat: qExample, withInventory: qWithInv }, mc, quotePath, sensitivity };
+  })
+
+export const runMMHJBMulti = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({
+    symbols: z.array(z.string()).min(2).max(4),
+    source: z.enum(["binance","yahoo"]).default("binance"),
+    days: z.number().default(20),
+    k: z.number().default(1), A: z.number().default(100), z: z.number().default(0.5),
+    eta: z.number().default(1), nu: z.number().default(1), epsilon: z.number().default(0.001),
+    alphaFee: z.number().default(0.05), cLevel: z.number().default(2),
+  }).parse(d))
+  .handler(async ({ data }) => {
+    const closesPer: number[][] = [];
+    for(const sym of data.symbols){
+      const arr:number[]=[];
+      if(data.source==="yahoo"){
+        const { fetchYahooChart } = await import("@/lib/yahoo-http");
+        const ch:any = await fetchYahooChart(sym, "3mo","1d"); const c:number[]=ch?.chart?.result?.[0]?.indicators?.quote?.[0]?.close ?? [];
+        for(const v of c) if(isFinite(v)&&v>0) arr.push(v);
+      } else { const raw=await fetchKlinesRange(sym,"1m",data.days); arr.push(...raw.map((k:any)=>parseFloat(k[4]))); }
+      closesPer.push(arr);
+    }
+    const lens = closesPer.map(a=>a.length); if(lens.some(l=>l<50)) throw new Error("Datos insuficientes multi-activo");
+    // covarianza Lambda proxy: correlación de retornos
+    const retsPer = closesPer.map(c=> c.slice(1).map((v,i)=> (v-c[i]!)/c[i]!));
+    const minLen = Math.min(...retsPer.map(r=>r.length));
+    const trimmed = retsPer.map(r=> r.slice(-minLen));
+    const M=data.symbols.length;
+    const Lambda:number[][] = Array.from({length:M}, (_,i)=> Array.from({length:M}, (_,j)=>{
+      if(i===j) return trimmed[i]!.reduce((s,v)=>s+v*v,0)/minLen;
+      const mi=trimmed[i]!.reduce((s,v)=>s+v,0)/minLen, mj=trimmed[j]!.reduce((s,v)=>s+v,0)/minLen;
+      let cov=0; for(let t=0;t<minLen;t++) cov+=(trimmed[i]![t]!-mi)*(trimmed[j]![t]!-mj); cov/=minLen;
+      return cov;
+    }));
+    const midPer = closesPer.map(c=> c[c.length-1]!);
+    const { fitOrnsteinUhlenbeck } = await import("@/lib/labadie/market-making");
+    const fits = closesPer.map(c=> fitOrnsteinUhlenbeck(c, 1/1440));
+    const { multiAssetQuotes, isoRiskEllipse } = await import("@/lib/labadie/market-making");
+    const assets = data.symbols.map((sym,i)=> ({ s: midPer[i]!, q: 0, k: data.k, A: data.A, z: data.z, sigma: fits[i]?.sigma ?? 0.5, alphaFee: data.alphaFee, ouFit: fits[i] }));
+    const Omega = Lambda.map((row,i)=> row.map((_,j)=> i===j? 0.5 : 0.2*Lambda[i]![j]! / Math.sqrt((Lambda[i]![i]??1)*(Lambda[j]![j]??1))));
+    const { perAsset, piTilde } = multiAssetQuotes({ assets, Omega, Lambda, t:0, T:1, eta:data.eta, nu:data.nu, epsilon:data.epsilon });
+    const ellipse0 = isoRiskEllipse({ Omega, c: data.cLevel, rhoOverride: 0 });
+    const rhoAvg = M>=2? Omega[0]![1]! / Math.sqrt((Omega[0]![0]??1)*(Omega[1]![1]??1)) : 0;
+    const ellipseRho = isoRiskEllipse({ Omega, c: data.cLevel, rhoOverride: rhoAvg });
+    return { symbols: data.symbols, fits, perAsset, piTilde, Lambda, Omega, ellipse0, ellipseRho, cLevel: data.cLevel };
+  })
+
+// ---------------------------------------------------------------------------
 // EJECUCIÓN ÓPTIMA (optimal_execution.py): AC vs TWAP vs naive, IS en bps
 // ---------------------------------------------------------------------------
 

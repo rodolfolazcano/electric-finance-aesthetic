@@ -30,6 +30,9 @@ export { analizarCAPM } from "../capm-engine";
 
 // Nuevos módulos Labadié (extensiones ordenadas)
 export * from "./execution-curve";
+export * from "./execution-scheduling";
 export * from "./microstructure";
 export * from "./spectral";
 export * from "./validation";
+export * from "./market-making";
+export * from "./mc-pricing";

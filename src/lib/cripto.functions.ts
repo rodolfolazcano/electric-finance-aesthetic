@@ -32,10 +32,34 @@ export const fetchBinanceKlines = createServerFn({ method: "POST" })
   });
 
 export const fetchBinanceCommissions = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ symbol: z.string().min(1).max(20) }).parse(input))
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        symbol: z.string().min(1).max(20),
+        apiKey: z.string().optional(),
+        apiSecret: z.string().optional(),
+      })
+      .parse(input),
+  )
   .handler(async ({ data }): Promise<{ maker: number; taker: number }> => {
+    const { symbol, apiKey, apiSecret } = data as any;
+    // si hay keys, usar endpoint firmado (spot testnet) para fees reales — fix del bug 401
+    if (apiKey && apiSecret) {
+      try {
+        const BASE_URL = "https://testnet.binance.vision";
+        const params: Record<string, string> = { symbol: symbol.toUpperCase(), timestamp: Date.now().toString(), recvWindow: "5000" };
+        const qs = new URLSearchParams(params).toString();
+        const sig = createHmac("sha256", apiSecret).update(qs).digest("hex");
+        const url = `${BASE_URL}/api/v3/account?${qs}&signature=${sig}`;
+        const res = await fetch(url, { headers: { "X-MBX-APIKEY": apiKey } });
+        if (res.ok) {
+          const j: any = await res.json();
+          return { maker: (j.makerCommission ?? 10) / 10000, taker: (j.takerCommission ?? 10) / 10000 };
+        }
+      } catch {}
+    }
     try {
-      const url = `https://api.binance.com/api/v3/account/commission?symbol=${data.symbol.toUpperCase()}`;
+      const url = `https://api.binance.com/api/v3/account/commission?symbol=${symbol.toUpperCase()}`;
       const res = await fetch(url);
       if (!res.ok) return { maker: 0.001, taker: 0.001 };
       const json: any = await res.json();

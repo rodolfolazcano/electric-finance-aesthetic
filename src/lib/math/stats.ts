@@ -488,6 +488,36 @@ export function ci95(arr: number[]): [number, number] {
   return [m - d, m + d];
 }
 
+// IC95 para la media muestral: x̄ ± 1.96·σ/√n (seminario_geometry §1)
+export function ci95Mean(arr: number[]): [number, number] {
+  if (arr.length === 0) return [0, 0];
+  const m = mean(arr);
+  const s = std(arr);
+  const se = s / Math.sqrt(arr.length);
+  const d = 1.96 * se;
+  return [m - d, m + d];
+}
+
+// Jarque-Bera: JB = n/6·(S² + (K−3)²/4) vs χ²(2) — test de normalidad (pt/market_data.py distribution)
+export function jarqueBera(arr: number[]): { jb: number; pValue: number; isNormal: boolean; skewness: number; kurtosis: number } {
+  const n = arr.length;
+  if (n < 8) return { jb: 0, pValue: 1, isNormal: true, skewness: 0, kurtosis: 3 };
+  const m = mean(arr);
+  const s = std(arr, false); // poblacional para momentos
+  if (s === 0) return { jb: 0, pValue: 1, isNormal: true, skewness: 0, kurtosis: 3 };
+  let m3 = 0, m4 = 0;
+  for (const v of arr) {
+    const d = (v - m) / s;
+    m3 += d ** 3;
+    m4 += d ** 4;
+  }
+  m3 /= n;
+  m4 /= n;
+  const jb = (n / 6) * (m3 * m3 + ((m4 - 3) * (m4 - 3)) / 4);
+  const pValue = 1 - chi2CDF(jb, 2);
+  return { jb, pValue, isNormal: pValue > 0.05, skewness: m3, kurtosis: m4 };
+}
+
 // Demo pt/01_rv_sim.py — 6 distribuciones con randomNormal() existente
 export function runRvSim(n = 10000): {
   normal: number[];

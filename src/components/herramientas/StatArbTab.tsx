@@ -19,6 +19,8 @@ export interface SharedPairConfig {
   pValue: number;
   marketImpactGamma: number;
   participationRate: number;
+  usarVolumenReal?: boolean;
+  targetStartPct?: number;
 }
 
 const DEFAULT_SHARED: SharedPairConfig = {
@@ -35,6 +37,8 @@ const DEFAULT_SHARED: SharedPairConfig = {
   pValue: 2,
   marketImpactGamma: 0.5,
   participationRate: 0.1,
+  usarVolumenReal: false,
+  targetStartPct: 0.3,
 };
 
 export function StatArbTab() {

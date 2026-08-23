@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
-import { runMMInventory, runOptimalExecution } from "@/lib/cripto/quant-lab.functions"
+import { runMMInventory, runOptimalExecution, runMMHJB, runMMHJBMulti } from "@/lib/cripto/quant-lab.functions"
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar } from "recharts"
 
 function fmt(n: number|null|undefined, d=2){ if(n==null||!isFinite(n)) return "—"; return n.toFixed(d) }
 
@@ -17,14 +18,16 @@ export function QuantLabPanel(){
     <div className="space-y-4">
       <div>
         <h3 className="text-[15px] font-semibold">Quant Lab — metodologías HFT Labadie sobre futuros Binance <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">1m · Demo</span></h3>
-        <p className="text-[11px] text-muted-foreground">Market-Making con control de inventario (Avellaneda-Stoikov/Fodra-Labadie) y Ejecución Óptima Almgren-Chriss vs TWAP vs naive. Port de metodologias/mm_inventory.py y optimal_execution.py.</p>
+        <p className="text-[11px] text-muted-foreground">Market-Making con control de inventario (Avellaneda-Stoikov/Fodra-Labadie) y Ejecución Óptima Almgren-Chriss vs TWAP vs naive. Port de metodologias/mm_inventory.py y optimal_execution.py. Nuevo: HJB Fodra-Labadie 1303.7177v2 (OU Δ + intensidad Poisson + MC — Binance/Yahoo).</p>
       </div>
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="mm" className="text-[11px]">MM Inventario</TabsTrigger>
+          <TabsTrigger value="hjb" className="text-[11px]">Fodra-Labadie HJB</TabsTrigger>
           <TabsTrigger value="ejecucion" className="text-[11px]">Ejecución Óptima</TabsTrigger>
         </TabsList>
         <TabsContent value="mm" className="mt-3"><MMTab /></TabsContent>
+        <TabsContent value="hjb" className="mt-3"><HJBTab /></TabsContent>
         <TabsContent value="ejecucion" className="mt-3"><EjecucionTab /></TabsContent>
       </Tabs>
     </div>
@@ -74,6 +77,42 @@ function MMTab(){
       )}
     </div>
   )
+}
+
+function histBins(paths: number[], bins=12){ if(!paths?.length) return []; const min=Math.min(...paths), max=Math.max(...paths); const w=(max-min)/bins||1; const c=Array.from({length:bins},(_,i)=>({bin: min+w*i, count:0, label: `${(min+w*i).toFixed(0)}`})); for(const v of paths){ const idx=Math.min(bins-1, Math.max(0, Math.floor((v-min)/w))); c[idx].count++; } return c; }
+function HJBTab(){
+  const [symbol,setSymbol]=useState("BTCUSDT")
+  const [source,setSource]=useState<"binance"|"yahoo">("binance")
+  const [data,setData]=useState<any>(null); const [loading,setLoading]=useState(false); const [err,setErr]=useState<string|null>(null)
+  const fn=useServerFn(runMMHJB)
+  const run=async()=>{ setLoading(true); setErr(null); try{ setData(await fn({data:{symbol, source, days:20}})) } catch(e:any){ setErr(e.message)} finally{ setLoading(false)} }
+  useEffect(()=>{run()},[])
+  return (<div className="space-y-3">
+    <Card className="border-border/40 bg-background/30"><CardContent className="p-3 flex flex-wrap gap-3 items-end">
+      <div className="flex flex-col gap-1"><Label className="text-[10px]">Fuente</Label><select value={source} onChange={e=>setSource(e.target.value as any)} className="h-7 rounded border bg-background px-2 text-xs"><option value="binance">Binance</option><option value="yahoo">Yahoo</option></select></div>
+      <div className="flex flex-col gap-1"><Label className="text-[10px]">Símbolo</Label><Input value={symbol} onChange={e=>setSymbol(e.target.value.toUpperCase())} className="h-7 text-xs w-36" placeholder="BTCUSDT o GGAL.BA" /></div>
+      <Button onClick={run} disabled={loading} className="h-7 text-xs">{loading?"Calculando…":"Calcular HJB"}</Button>
+    </CardContent></Card>
+    {err && <div className="rounded border border-red-500/30 bg-red-500/10 p-2 text-xs text-red-400">{err}</div>}
+    {loading && <Skeleton className="h-40 w-full" />}
+    {data && (<>
+      <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[12px]">Fodra-Labadie HJB — {data.symbol} ({data.source}) n={data.n} · OU {data.ouFit? `a=${fmt(data.ouFit.a,4)} µ=${fmt(data.ouFit.mu,1)} halfLife=${fmt(data.ouFit.halfLife,1)}d` : "martingala (no fiteable)"}</CardTitle></CardHeader><CardContent className="font-mono text-[11px] space-y-1">
+        <div>q=0: ψ={fmt(data.quotes.flat.psiFee,4)} (ψ*={fmt(data.quotes.flat.psiStar,4)}+2α) · r*={fmt(data.quotes.flat.rStar,2)} · π̃={fmt(data.quotes.flat.piTilde,5)} · gain/spread {fmt(data.quotes.flat.gainPerSpread,4)} {data.quotes.flat.scalable?"· SCALPING":""}</div>
+        <div>q=5: ψ={fmt(data.quotes.withInventory.psiFee,4)} r*={fmt(data.quotes.withInventory.rStar,2)} (tilde {fmt(data.quotes.withInventory.rStar - data.quotes.flat.rStar,2)})</div>
+      </CardContent></Card>
+      <div className="grid gap-3 md:grid-cols-2">
+        <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[12px]">Monte Carlo — martingala (Δ≡0)</CardTitle></CardHeader><CardContent className="font-mono text-[11px] space-y-0.5"><div>mean {fmt(data.mc.martingale.mean,2)}</div><div>VaR95 {fmt(data.mc.martingale.var95,2)}</div><div>Sharpe {fmt(data.mc.martingale.sharpe,2)}</div><div>skew {fmt(data.mc.martingale.skew,2)} kurt {fmt(data.mc.martingale.kurt,2)}</div></CardContent></Card>
+        <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[12px]">Monte Carlo — OU drift (Δ≠0)</CardTitle></CardHeader><CardContent className="font-mono text-[11px] space-y-0.5"><div>mean {fmt(data.mc.ouDrift.mean,2)}</div><div>VaR95 {fmt(data.mc.ouDrift.var95,2)}</div><div>Sharpe {fmt(data.mc.ouDrift.sharpe,2)}</div><div>skew {fmt(data.mc.ouDrift.skew,2)} kurt {fmt(data.mc.ouDrift.kurt,2)}</div></CardContent></Card>
+      </div>
+      {data.quotePath?.length ? <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[12px]">Cotizaciones vs tiempo (mid/bid/ask — trayectoria real con inventario)</CardTitle></CardHeader><CardContent className="h-44"><ResponsiveContainer width="100%" height="100%"><LineChart data={data.quotePath} margin={{top:5,right:5,left:0,bottom:0}}><CartesianGrid strokeDasharray="3 3" stroke="rgba(100,100,100,0.2)" /><XAxis dataKey="t" tick={{fontSize:9}} tickFormatter={(v:any)=> Number(v).toFixed(1)} /><YAxis tick={{fontSize:9}} domain={['auto','auto']} /><Tooltip /><Line type="monotone" dataKey="mid" stroke="#8884d8" dot={false} strokeWidth={1.2} /><Line type="monotone" dataKey="bid" stroke="#82ca9d" dot={false} strokeWidth={1} /><Line type="monotone" dataKey="ask" stroke="#ff7300" dot={false} strokeWidth={1} /></LineChart></ResponsiveContainer></CardContent></Card> : null}
+      {data.mc?.pnlPaths?.length || data.mc?.martingalePaths?.length ? <div className="grid gap-3 md:grid-cols-2">
+        <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[12px]">Hist PnL martingala</CardTitle></CardHeader><CardContent className="h-36"><ResponsiveContainer width="100%" height="100%"><BarChart data={histBins(data.mc.martingalePaths??[],12)}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="label" tick={{fontSize:8}} /><YAxis tick={{fontSize:9}} /><Tooltip /><Bar dataKey="count" fill="#8884d8" /></BarChart></ResponsiveContainer></CardContent></Card>
+        <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[12px]">Hist PnL OU drift</CardTitle></CardHeader><CardContent className="h-36"><ResponsiveContainer width="100%" height="100%"><BarChart data={histBins(data.mc.pnlPaths??[],12)}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="label" tick={{fontSize:8}} /><YAxis tick={{fontSize:9}} /><Tooltip /><Bar dataKey="count" fill="#82ca9d" /></BarChart></ResponsiveContainer></CardContent></Card>
+      </div> : null}
+      {data.sensitivity?.length ? <Card className="border-border/40 bg-background/30"><CardHeader className="py-2"><CardTitle className="text-[12px]">Sensibilidad ε×α (ψ_fee y r* con q=0)</CardTitle></CardHeader><CardContent className="overflow-x-auto"><table className="w-full text-[10px] font-mono"><thead className="text-muted-foreground"><tr><th>ε \ α</th>{data.sensitivity[0].row.map((c:any)=><th key={c.alpha}>α={c.alpha}</th>)}</tr></thead><tbody>{data.sensitivity.map((r:any)=><tr key={r.eps} className="border-t border-border/10"><td className="font-semibold">{r.eps}</td>{r.row.map((c:any)=><td key={c.alpha} className={c.psiFee<=0?"text-red-400":""}>ψ{c.psiFee.toFixed(2)} r{c.rStar.toFixed(1)}</td>)}</tr>)}</tbody></table></CardContent></Card> : null}
+      <p className="text-[10px] text-muted-foreground">Paper §2-§4: δ±*=1/k±Δ, ψ*=2/k, π̃=ηz+νσ²τ; fee ψ_α*=ψ*+2α (gain constante); OU Δ=(µ−s)(1−e^(−aτ)). El OU drift aumenta PnL medio pero también colas.</p>
+    </>)}
+  </div>)
 }
 
 function EjecucionTab(){

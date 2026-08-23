@@ -279,27 +279,81 @@ export async function generateRecommendationsUI(
 }
 
 /**
- * Generate slide background (stub - not yet implemented)
+ * Generate slide background via NVIDIA image chain
  */
-export async function generateSlideBackground(input?: any): Promise<{ ok: boolean; data?: any; error?: string }> {
-  console.warn("generateSlideBackground not yet implemented");
-  return { ok: false, error: "generateSlideBackground not yet implemented" };
+export async function generateSlideBackground(input?: any): Promise<{ ok: boolean; url?: string; provider?: string; model?: string; error?: string }> {
+  const data = input?.data ?? input;
+  const prompt: string | undefined = data?.prompt;
+  const highQuality: boolean = Boolean(data?.highQuality);
+  const conversationId: string | null = data?.conversationId ?? null;
+  if (!prompt?.trim()) return { ok: false, error: "Prompt vacío" };
+  try {
+    const { generateBackground } = await import("./studio.server");
+    const result = await generateBackground(conversationId, prompt, highQuality);
+    return { ok: true, url: result.url, provider: result.provider, model: result.model };
+  } catch (e: any) {
+    console.error("generateSlideBackground failed:", e);
+    return { ok: false, error: e?.message ?? String(e) };
+  }
 }
 
 /**
- * Read image file (stub - not yet implemented)
+ * Read image file using vision AI (NVIDIA VISION_CHAIN).
  */
-export async function readImageFile(input?: any): Promise<{ ok: boolean; data?: any; error?: string }> {
-  console.warn("readImageFile not yet implemented");
-  return { ok: false, error: "readImageFile not yet implemented" };
+export async function readImageFile(input?: any): Promise<{ ok: boolean; text?: string; provider?: string; model?: string; error?: string }> {
+  const data = input?.data ?? input;
+  const base64: string | undefined = data?.base64;
+  const mime: string = data?.mime ?? "image/png";
+  const conversationId: string | null = data?.conversationId ?? null;
+  if (!base64) return { ok: false, error: "No se proporcionó imagen base64" };
+  if (base64.length < 100) return { ok: false, error: "Imagen base64 demasiado corta o corrupta" };
+  try {
+    const { describeImage } = await import("./studio.server");
+    const result = await describeImage(conversationId, base64, mime);
+    return { ok: true, text: result.text, provider: result.provider, model: result.model };
+  } catch (e: any) {
+    try {
+      const { VISION_CHAIN } = await import("./model-catalog");
+      const { resilientVision } = await import("./providers.server");
+      const result = await resilientVision(
+        VISION_CHAIN,
+        base64,
+        mime,
+        "Transcribí con precisión todo el texto, tablas y series numéricas visibles en esta imagen financiera. Devolvé las tablas en formato markdown y no inventes ningún número que no esté claramente legible. Si es un gráfico, describí ejes, valores y tendencia.",
+      );
+      return { ok: true, text: result.value, provider: result.provider, model: result.model };
+    } catch (e2: any) {
+      console.error("readImageFile failed:", e2);
+      return { ok: false, error: e2?.message ?? e?.message ?? String(e2 ?? e) };
+    }
+  }
 }
 
 /**
- * Studio turn (stub - not yet implemented)
+ * Studio turn — chat con contexto, orquestación reasoning/narrative
  */
-export async function studioTurn(input?: any): Promise<{ ok: boolean; data?: any; error?: string }> {
-  console.warn("studioTurn not yet implemented");
-  return { ok: false, error: "studioTurn not yet implemented" };
+export async function studioTurn(input?: any): Promise<{ ok: boolean; text?: string; provider?: string; model?: string; slide?: any; checks?: any; intent?: string; error?: string; attempts?: any[] }> {
+  const data = input?.data ?? input;
+  if (!data?.message?.trim()) return { ok: false, error: "Mensaje vacío" };
+  try {
+    const { runStudioTurn } = await import("./studio.server");
+    const result = await runStudioTurn({
+      conversationId: data.conversationId ?? null,
+      message: data.message,
+      history: Array.isArray(data.history) ? data.history : [],
+      files: Array.isArray(data.files) ? data.files : [],
+      selectedElementId: data.selectedElementId ?? null,
+      currentSlide: data.currentSlide ?? null,
+      highQualityImage: Boolean(data.highQualityImage),
+      useWeb: Boolean(data.useWeb),
+      modelPrefs: data.modelPrefs ?? null,
+      uiContext: data.uiContext ?? null,
+    });
+    return { ok: true, text: result.text, provider: result.provider, model: result.model, slide: result.slide, checks: result.checks, intent: result.intent, attempts: result.attempts };
+  } catch (e: any) {
+    console.error("studioTurn failed:", e);
+    return { ok: false, error: e?.message ?? String(e) };
+  }
 }
 
 // Stubs for lab panel functions are already exported above

@@ -2023,114 +2023,114 @@
         "instrumento": "BONO",
         "tipo": "Hard Dollar",
         "tipoBono": "SOBERANO_HD",
-        "descripcion": "BONOS DE LA REPUBLICA ARGENTINA EN DOLARES ESTADOUNIDENSES STEP UP 2035",
+        "descripcion": "BONOS DE LA REPUBLICA ARGENTINA EN DOLARES ESTADOUNIDENSES 7.125% 2035 (Bonar 2035)",
         "vencimiento": "2035-07-09",
         "fechaEmision": "2020-09-04",
         "isin": "",
         "jurisdiccion": "ARG",
-        "tipoCupon": "Step-up",
+        "tipoCupon": "Fixed rate",
         "moneda": "USD",
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
-        "convencionDias": "30/360",
+        "convencionDias": "ACT/365",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.125,
+        "cuponAnual": 7.125,
         "valorPar": 100,
         "valorResidualActual": 100,
-        "yieldConvention": "STREET",
-        "tipoTasa": "step-up",
+        "yieldConvention": "TRUE",
+        "tipoTasa": "fixed",
         "ajuste": null,
         "flujos_futuros_cada_100_vn": [
             {
                 "fecha": "2027-01-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2027-07-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2031-01-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2031-07-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2032-01-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2032-07-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2033-01-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2033-07-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2034-01-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2034-07-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2035-01-09",
-                "monto": 1.81,
+                "monto": 3.5625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2035-07-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 103.5625,
+                "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
         "historico": []

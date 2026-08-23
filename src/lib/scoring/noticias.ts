@@ -91,25 +91,21 @@ export async function calcularScoreNoticias(
   ticker: string,
   titulares: string[],
 ): Promise<SubScore> {
-  if (process.env.GEMINI_API_KEY) {
-    try {
-      const r = await clasificarSentimientoNoticias(ticker, titulares);
-      if (r) {
-        const v = sentimientoAScore(r);
-        if (v != null) {
-          return {
-            valor: v,
-            detalle: { intensidad: r.intensidad, sentimiento: sentimientoNumerico(r.sentimiento) },
-            fuente: "gemini-2.5-flash",
-            disponible: titulares.length > 0,
-          };
-        }
+  try {
+    const r = await clasificarSentimientoNoticias(ticker, titulares);
+    if (r) {
+      const v = sentimientoAScore(r);
+      if (v != null) {
+        return {
+          valor: v,
+          detalle: { intensidad: r.intensidad, sentimiento: sentimientoNumerico(r.sentimiento) },
+          fuente: "nvidia-nemotron",
+          disponible: titulares.length > 0,
+        };
       }
-    } catch (err) {
-      // # REVISAR: fallback Gemini->keywords activado por excepción en log, no silenciar.
-
-      console.error("[noticias] fallback Gemini->keywords por excepción:", err);
     }
+  } catch (err) {
+    console.error("[noticias] fallback NVIDIA->keywords por excepción:", err);
   }
 
   const analizadas = titulares.map(analizarTitular);

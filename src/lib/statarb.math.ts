@@ -2,6 +2,7 @@
 import { mean, std, pearsonR, linregress, computeHurst, computePVariance, impliedPFromReturns } from "./math/stats";
 import { getRiskFreeRateSync } from "./risk-free-rate";
 import { clampP } from "./labadie/contracts";
+import { calcularCurvaOptima } from "./labadie/execution-curve";
 import type {
   PairAnalysisResult,
   PairConfig,
@@ -391,7 +392,7 @@ function runAnalysisOn(
     }
   }
 
-  //  Labadie §2.3–2.4: Target Close (TC) / Implementation Shortfall (IS) 
+  //  Labadie §2.3–2.4: Target Close (TC) / Implementation Shortfall (IS) — delega al motor canónico
   let tradingCurve: { step: number; volume: number; cumulative: number }[] | undefined;
   let optimalStartPct: number | undefined;
   let optimalStopPct: number | undefined;
@@ -400,93 +401,14 @@ function runAnalysisOn(
   const gamma = config.marketImpactGamma ?? 0.5;
   const partRate = config.participationRate ?? 0.1;
   const pVal = config.pValue ?? 2;
-  // Usar Hurst real de los datos si está disponible; sino H=0.5 (random walk)
   const H_actual = hurstOverride ?? 0.5;
-  const T = aligned.length;
-  const Nsteps = Math.min(T, 100); // discretización
-
   if (algo === "tc" || algo === "is") {
-    // Fórmula recursiva de Labadie (secciones 2.3-2.4):
-    // Para TC (forward): v_n = (σ² × τ^(2H-1) × Σ_{i=n}^{N-1} v_i) / (I'(v_n) + σ² × τ^(2H-1) × (N-n))
-    // Para IS (backward): v_n = (σ² × τ^(2H-1) × Σ_{i=0}^{n-1} v_i) / (I'(v_n) + σ² × τ^(2H-1) × n)
-    const tau = 1 / Nsteps;
-    const sigma2tau = sigma * sigma * Math.pow(tau, 2 * H_actual - 1); // τ^(2H-1), usa H real
-    const I_prime = gamma * Math.pow(partRate, gamma - 1); // derivada del impacto marginal
-    // PVol constraint (§2.2): máximo % de participación por intervalo
-    const pVolMax = config.participationRate ?? 0.1;
-
-    const volumes: number[] = new Array(Nsteps).fill(1 / Nsteps);
-    if (algo === "tc") {
-      // Target Close: forward recursion con convergencia (shooting method, Labadie §2.5)
-      for (let iter = 0; iter < 50; iter++) {
-        const prev = [...volumes];
-        for (let n = 0; n < Nsteps; n++) {
-          let sumFuture = 0;
-          for (let j = n + 1; j < Nsteps; j++) sumFuture += volumes[j];
-          const denom = I_prime + sigma2tau * (Nsteps - n);
-          if (denom > 0) {
-            volumes[n] = (sigma2tau * sumFuture) / denom;
-          }
-          // PVol constraint: v_n ≤ PVol_max
-          if (volumes[n] > pVolMax) volumes[n] = pVolMax;
-        }
-        // Normalizar
-        const total = volumes.reduce((s, v) => s + v, 0);
-        if (total > 0) for (let n = 0; n < Nsteps; n++) volumes[n] /= total;
-        // Convergencia: cambio máximo < 0.1%
-        let maxChange = 0;
-        for (let n = 0; n < Nsteps; n++) {
-          const change = Math.abs(volumes[n] - prev[n]);
-          if (change > maxChange) maxChange = change;
-        }
-        if (maxChange < 0.001) break;
-      }
-      // Optimal start: find when cumulative volume first exceeds 1% of total
-      let cum = 0;
-      for (let n = 0; n < Nsteps; n++) {
-        cum += volumes[n];
-        if (cum > 0.01) { optimalStartPct = n / Nsteps; break; }
-      }
-      optimalStartPct = optimalStartPct ?? 0;
-    } else {
-      // Implementation Shortfall: backward recursion con convergencia
-      for (let iter = 0; iter < 50; iter++) {
-        const prev = [...volumes];
-        for (let n = Nsteps - 1; n >= 0; n--) {
-          let sumPast = 0;
-          for (let j = 0; j < n; j++) sumPast += volumes[j];
-          const denom = I_prime + sigma2tau * n;
-          if (denom > 0) {
-            volumes[n] = (sigma2tau * sumPast) / denom;
-          }
-          // PVol constraint: v_n ≤ PVol_max
-          if (volumes[n] > pVolMax) volumes[n] = pVolMax;
-        }
-        const total = volumes.reduce((s, v) => s + v, 0);
-        if (total > 0) for (let n = 0; n < Nsteps; n++) volumes[n] /= total;
-        // Convergencia: cambio máximo < 0.1%
-        let maxChange = 0;
-        for (let n = 0; n < Nsteps; n++) {
-          const change = Math.abs(volumes[n] - prev[n]);
-          if (change > maxChange) maxChange = change;
-        }
-        if (maxChange < 0.001) break;
-      }
-      // Optimal stop: find when cumulative volume reaches 99%
-      let cum = 0;
-      for (let n = 0; n < Nsteps; n++) {
-        cum += volumes[n];
-        if (cum > 0.99) { optimalStopPct = n / Nsteps; break; }
-      }
-      optimalStopPct = optimalStopPct ?? 1;
-    }
-
-    // Build trading curve
-    let cumVol = 0;
-    tradingCurve = volumes.map((v, i) => {
-      cumVol += v;
-      return { step: i, volume: v, cumulative: cumVol };
+    const { curve, optimalPct } = calcularCurvaOptima({
+      algo, T: aligned.length, sigma, hurst: H_actual, gamma, participationRate: partRate,
+      volumeProfile: config.volumeProfile,
     });
+    tradingCurve = curve;
+    if (algo === "tc") optimalStartPct = optimalPct; else optimalStopPct = optimalPct;
   }
 
   const spreadChart = dates.map((d, i) => ({

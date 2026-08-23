@@ -102,6 +102,8 @@ const HERRAMIENTAS_POR_ROL: Record<RolAgente, string[]> = {
     "ranking_valuacion_sectores",
     "walkforward_bb_rsi",
     "mm_inventario_sim",
+    "mm_hjb_sim",
+    "implied_p_labadie",
     "ejecucion_optima_crypto",
     "pairs_crypto_scan",
     "pairs_crypto_analizar",

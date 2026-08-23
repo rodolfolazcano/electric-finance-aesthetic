@@ -176,15 +176,44 @@ async function imageToVideo(input: MultimodalInput): Promise<MultimodalOutput> {
 }
 
 async function imageToText(input: MultimodalInput): Promise<MultimodalOutput> {
-  const base64 = input.attachment?.base64;
-  const url = input.attachment?.url;
+  let base64 = input.attachment?.base64;
+  let url = input.attachment?.url;
+  let mime = input.attachment?.mime ?? "image/png";
   if (!base64 && !url) {
-    return { text: "Necesito la imagen para transcribirla/analizarla.", model: "none" };
+    return { text: "Necesito la imagen para transcribirla/analizarla. Subí la imagen al Studio (panel Referencias/Datos) o pasá la URL/base64.", model: "none" };
+  }
+  // Si solo hay URL, convertirla a base64 para describeImage/resilientVision
+  if (!base64 && url) {
+    if (url.startsWith("data:")) {
+      // data:image/png;base64,....
+      const comma = url.indexOf(",");
+      const header = url.slice(0, comma);
+      base64 = url.slice(comma + 1);
+      const mimeMatch = header.match(/data:([^;]+)/);
+      if (mimeMatch) mime = mimeMatch[1];
+    } else if (url.startsWith("http")) {
+      try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const buf = Buffer.from(await res.arrayBuffer());
+        base64 = buf.toString("base64");
+        const ct = res.headers.get("content-type");
+        if (ct) mime = ct.split(";")[0];
+      } catch (e: any) {
+        return { text: `No pude descargar la imagen de ${url}: ${e?.message ?? String(e)}. Probá subiendo el archivo directamente.`, model: "none" };
+      }
+    } else {
+      // url parece ser base64 puro sin prefijo
+      base64 = url;
+    }
+  }
+  if (!base64) {
+    return { text: "No pude obtener la imagen en base64 para analizarla.", model: "none" };
   }
   const result = await describeImage(
     input.conversationId,
-    base64 ?? url!,
-    input.attachment?.mime ?? "image/png",
+    base64,
+    mime,
   );
   return { text: result.text, model: result.model };
 }

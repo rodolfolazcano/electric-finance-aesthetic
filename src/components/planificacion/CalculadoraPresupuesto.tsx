@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { X, Plus } from "lucide-react";
 import { calcularPresupuesto, type PresupuestoInput, type PresupuestoResult } from "@/lib/planificacion/presupuesto.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const PIE_COLORS = ["#10b981", "#fbbf24", "#ef4444", "#a855f7", "#3b82f6", "#f97316", "#06b6d4", "#ec4899", "#84cc16", "#14b8a6"];
@@ -94,7 +93,6 @@ export function CalculadoraPresupuesto() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="presupuesto" />
       </div>
     </div>
   );

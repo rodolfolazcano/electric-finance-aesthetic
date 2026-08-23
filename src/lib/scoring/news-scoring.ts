@@ -1,20 +1,14 @@
-// @ts-nocheck
-// FASE 6 — Clasificador Gemini compartido (leaf).
-// No tiene core que delegar: es la fuente de clasificación por IA que usan
-// src/lib/scoring/noticias.ts (Fase 3) y scoring-engine.ts. El motor unificado
-// lo consume vía calcularScoreNoticias. Sin cambios funcionales.
-import { GoogleGenAI } from "@google/genai";
+import { resilientJson } from "@/lib/ai/providers.server";
+import { JSON_CHAIN } from "@/lib/ai/model-catalog";
+import type { ChatMessage } from "@/lib/ai/providers.server";
+import { z } from "zod";
 
-const NEWS_SCHEMA = {
-  type: "object",
-  properties: {
-    ticker: { type: "string" },
-    sentimiento: { type: "string", enum: ["positivo", "neutral", "negativo"] },
-    intensidad: { type: "number" },
-    motivoBreve: { type: "string" },
-  },
-  required: ["ticker", "sentimiento", "intensidad", "motivoBreve"],
-};
+const NewsSentimientoSchema = z.object({
+  ticker: z.string(),
+  sentimiento: z.enum(["positivo", "neutral", "negativo"]),
+  intensidad: z.number(),
+  motivoBreve: z.string(),
+});
 
 const NEWS_SYSTEM_PROMPT = `Clasificá el sentimiento de las siguientes noticias financieras para el ticker indicado. 
 NO es una recomendación de compra/venta. Solo clasificá el tono de lo que está escrito.
@@ -33,37 +27,24 @@ export async function clasificarSentimientoNoticias(
 ): Promise<NewsSentimiento | null> {
   if (titulares.length === 0) return null;
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-
   try {
-    const client = new GoogleGenAI({ apiKey });
+    const messages: ChatMessage[] = [
+      { role: "system", content: NEWS_SYSTEM_PROMPT },
+      { role: "user", content: JSON.stringify({ ticker, noticias: titulares }) },
+    ];
 
-    const result = await client.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: JSON.stringify({ ticker, noticias: titulares }) }],
-        },
-      ],
-      config: {
-        systemInstruction: { role: "system", parts: [{ text: NEWS_SYSTEM_PROMPT }] },
-        responseMimeType: "application/json",
-        responseSchema: NEWS_SCHEMA,
-        temperature: 0.2,
-      },
+    const result = await resilientJson(JSON_CHAIN, messages, {
+      schema: NewsSentimientoSchema,
+      temperature: 0.2,
     });
 
-    const text = result.text;
-    if (!text) return null;
+    if (!result.ok) return null;
 
-    const raw = JSON.parse(text);
     return {
-      ticker: raw.ticker ?? ticker,
-      sentimiento: raw.sentimiento ?? "neutral",
-      intensidad: Math.min(100, Math.max(0, raw.intensidad ?? 50)),
-      motivoBreve: raw.motivoBreve ?? "",
+      ticker: result.data.ticker ?? ticker,
+      sentimiento: result.data.sentimiento ?? "neutral",
+      intensidad: Math.min(100, Math.max(0, result.data.intensidad ?? 50)),
+      motivoBreve: result.data.motivoBreve ?? "",
     };
   } catch {
     return null;

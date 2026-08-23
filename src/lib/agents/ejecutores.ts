@@ -3265,6 +3265,7 @@ export async function ejecutarIolAsesor(
 
 import { analyzePair } from "@/lib/statarb.math";
 import type { PairConfig } from "@/lib/statarb.types";
+import { estimateExecutionCosts } from "@/lib/labadie/execution-curve";
 
 type HistPoint = { date: string; close: number };
 
@@ -3452,6 +3453,7 @@ export async function ejecutarCurvaEjecucionLabadie(argsRaw: string): Promise<{
   let pValor = 2;
   let gammaImpacto = 0.5;
   let volatilidad: number | undefined;
+  let usarVolumenReal = false;
   try {
     const args = JSON.parse(argsRaw) as {
       simbolo?: string;
@@ -3460,7 +3462,9 @@ export async function ejecutarCurvaEjecucionLabadie(argsRaw: string): Promise<{
       pVarianza?: number;
       gammaImpacto?: number;
       volatilidadAnual?: number;
+      usarVolumenReal?: boolean;
     };
+    if (typeof (args as any).usarVolumenReal === "boolean") usarVolumenReal = (args as any).usarVolumenReal;
     simbolo = String(args.simbolo ?? "").trim();
     const bm = String(args.benchmark ?? "").toLowerCase();
     if (bm === "tc" || bm === "is") benchmark = bm;
@@ -3503,6 +3507,10 @@ export async function ejecutarCurvaEjecucionLabadie(argsRaw: string): Promise<{
     // El motor TC/IS opera sobre un par: se usa el activo contra sí mismo
     // desplazado (spread ≈ precio) para heredar las curvas de volumen/vol.
     const h2 = h1.map((p, i) => ({ date: p.date, close: i === 0 ? p.close : h1[i - 1]!.close }));
+    let volumeProfile: number[] | undefined;
+    if (usarVolumenReal) {
+      try { const { fetchVolumeProfile } = await import("@/lib/yahoo-http"); volumeProfile = await fetchVolumeProfile(simbolo, Math.min(h1.length, 100)); } catch {}
+    }
     const config: PairConfig = {
       asset1: simbolo,
       asset2: `${simbolo} (lag-1)`,
@@ -3518,7 +3526,8 @@ export async function ejecutarCurvaEjecucionLabadie(argsRaw: string): Promise<{
       marketImpactGamma: gammaImpacto,
       participationRate: participacion,
       ...(volatilidad != null ? { volatility: volatilidad } : {}),
-    };
+      ...(volumeProfile ? { volumeProfile, usarVolumenReal: true } : {}),
+    } as PairConfig;
     const r = analyzePair(h1, h2, config);
     const L: string[] = [];
     L.push(
@@ -3559,8 +3568,15 @@ export async function ejecutarCurvaEjecucionLabadie(argsRaw: string): Promise<{
               : "≈ Martingala (p=2): perfil neutral de ejecución."
         }`,
       );
+    // Gap 4: Costos esperados (impacto + varianza)
+    if (r.tradingCurve?.length) {
+      try {
+        const costs = estimateExecutionCosts(r.tradingCurve, { sigma: (r as any).volatility ?? volatilidad ?? 0.2, hurst: r.hurstExponent ?? 0.5, gamma: gammaImpacto });
+        L.push(`- Costos estimados (Gap 4): impacto ${costs.expectedImpactBps.toFixed(1)} bps + riesgo ${costs.riskAdjustment.toFixed(1)} bps = total ${costs.totalCostBps.toFixed(1)} bps (varianza ${costs.varianceTerm.toExponential(2)}).`);
+      } catch { /* ignorar */ }
+    }
     L.push(
-      "- Restricción PVol: cuando la curva óptima pide más que la participación máxima, se satura el límite (min(curva TC, curva PVol)) y se retoma TC después.",
+      "- Restricción PVol: cuando la curva óptima pide más que la participación máxima, se satura el límite (min(curva TC, curva PVol)) y se retoma TC después. Gap 2: con perfil de volumen real V(n) el cap por slice es q·V(n).",
     );
     L.push(
       "\nNota metodológica: cálculo educativo sobre curvas históricas de volumen/volatilidad de Yahoo Finance (J = E(impacto) + λ×riesgo con impacto cóncavo (v/V)^γ). No constituye una orden ni asesoramiento de ejecución.",
@@ -3573,6 +3589,21 @@ export async function ejecutarCurvaEjecucionLabadie(argsRaw: string): Promise<{
       ok: false,
     };
   }
+}
+
+export async function ejecutarImpliedPLabadie(argsRaw: string): Promise<{ texto: string; fuentes: FuenteMercado[]; ok: boolean }> {
+  let simbolo = ""; let inicioDeseado = 0.3; let participacion=0.1; let gamma=0.5;
+  try { const a=JSON.parse(argsRaw) as any; simbolo=String(a.simbolo??"").trim(); if(typeof a.inicioDeseadoPct==="number") inicioDeseado=a.inicioDeseadoPct; if(typeof a.participacionMaxima==="number") participacion=a.participacionMaxima; if(typeof a.gammaImpacto==="number") gamma=a.gammaImpacto; } catch {}
+  if(!simbolo || !(inicioDeseado>=0 && inicioDeseado<=0.95)) return { texto:"SIN RESULTADOS: falta simbolo e inicioDeseadoPct 0-0.95", fuentes:[], ok:false };
+  try {
+    const h = await historicoLabadie(simbolo, 365);
+    if(h.length<30) return { texto:`SIN RESULTADOS: datos insuficientes ${simbolo}`, fuentes:[], ok:false };
+    const closes = h.map(p=>p.close); const rets = closes.slice(1).map((c,i)=> (c-closes[i]!)/closes[i]!);
+    const sigma = Math.sqrt(rets.reduce((s,v)=>s+v*v,0)/rets.length)*Math.sqrt(252);
+    const { impliedPFromStartTime } = await import("@/lib/labadie/execution-curve");
+    const r = impliedPFromStartTime({ targetStartPct: inicioDeseado, T: 100, sigma: Math.max(0.05, sigma), gamma, participationRate: participacion });
+    return { texto: `p implícita Gap 1 §4.3 — ${simbolo} inicio deseado ${(inicioDeseado*100).toFixed(0)}% → p=${r.impliedP.toFixed(2)} H=${r.hurst.toFixed(3)} logrado ${(r.achievedStartPct*100).toFixed(0)}% (sigma anual ${sigma.toFixed(3)}, γ ${gamma}, PVol ${(participacion*100).toFixed(0)}%)`, fuentes:[], ok:true };
+  } catch(e){ return { texto:`SIN RESULTADOS implied_p: ${e instanceof Error?e.message:String(e)}`, fuentes:[], ok:false }; }
 }
 
 export async function ejecutarCierreMercado(): Promise<{
@@ -3637,7 +3668,7 @@ export async function ejecutarInformeMatutino(argsRaw: string): Promise<{
     let mdFinal: string | null = null;
     let informeIA: any = null;
     try {
-      const { generateInformeMatutino } = await import("@/lib/informe-matutino/gemini.functions");
+      const { generateInformeMatutino } = await import("@/lib/informe-matutino/informe.functions");
       informeIA = await (generateInformeMatutino as unknown as (s: any) => Promise<any>)(snapshot);
       if (informeIA) {
         const { formatInformeParaChat } = await import("@/lib/informe-matutino/persistence.functions");
@@ -3952,11 +3983,54 @@ export async function ejecutarYTM(argsRaw: string, sessionId: string): Promise<{
     L.push(`Flujos futuros: ${r.flujosFuturos} — ${r.diagnostico}`);
     L.push(`Flujos (próx. 5): ${r.flujos.slice(0, 5).map((f) => `${f.fecha}:${f.monto}`).join(" | ")}`);
     L.push(`Fuente: ${r.fuente} | Motor: Newton-Raphson ACT/365 RENTA_FIJA_COMPLETA.json`);
-    // Intentar gráfico de flujos
+    // Gráfico de flujos: PNG satori oscuro (Telegram) + serie completa (web)
     let eventos: any[] | undefined;
     try {
       const serie = r.flujos.map((f) => ({ f: f.fecha, v: f.monto }));
-      if (serie.length) eventos = [{ t: "chart", v: { tipo: "barras", titulo: `${ticker} — Flujos futuros`, categorias: serie.slice(0, 8).map((s) => s.f.slice(5)), valores: serie.slice(0, 8).map((s) => s.v) } }];
+      if (serie.length) {
+        // 1) Serie completa para la web (sin recortar, con año)
+        const serieWeb = {
+          t: "chart",
+          v: {
+            tipo: "barras",
+            titulo: `${ticker} — Flujos futuros`,
+            // label con año para no repetir 01-09: 2027-01-09 → 27-01-09
+            categorias: serie.map((s) => s.f.slice(2)),
+            valores: serie.map((s) => s.v),
+          },
+        };
+        eventos = [serieWeb];
+
+        // 2) PNG oscuro profesional para Telegram (satori + resvg)
+        try {
+          const { generarFlujoBonoPng } = await import("@/lib/charts/flujo-bono-slide.server");
+          const png = await generarFlujoBonoPng({
+            ticker: r.ticker,
+            nombre: r.nombre,
+            emisor: r.emisor,
+            moneda: r.moneda,
+            fechaVencimiento: r.fechaVencimiento,
+            precio: r.precio,
+            precioMoneda: r.precioMoneda,
+            fechaPrecio: r.fechaPrecio,
+            fuentePrecio: r.fuentePrecio,
+            tirAnual: r.tirAnual,
+            tem: r.tem,
+            tna: r.tna,
+            flujos: r.flujos.map((f) => ({ fecha: f.fecha, monto: f.monto })),
+          });
+          eventos.push({
+            t: "chart",
+            v: {
+              tipo: "flujo_bono_png",
+              titulo: `${ticker} — Flujos futuros`,
+              pngBase64: png.toString("base64"),
+            },
+          });
+        } catch (e) {
+          console.warn("[YTM] no se pudo generar PNG flujo bono", e);
+        }
+      }
     } catch {}
     return { texto: L.join("\n"), fuentes: [{ dominio: "api.invertironline.com", url: "https://api.invertironline.com", title: "IOL" } as any], ok: true, eventos } as any;
   } catch (e) {
@@ -4273,6 +4347,24 @@ export async function ejecutarEjecucionOptimaCrypto(argsRaw: string): Promise<{ 
   } catch (e) {
     return { texto: `SIN RESULTADOS ejecucion_optima_crypto: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
   }
+}
+
+/** Fodra-Labadie HJB 1303.7177v2. */
+export async function ejecutarMMHJB(argsRaw: string): Promise<{ texto: string; fuentes: import("@/lib/mercado.server").FuenteMercado[]; ok: boolean }> {
+  let symbol = "BTCUSDT", fuente: "binance"|"yahoo"="binance", dias=20, epsilon=0.001, alphaFee=0.05;
+  try { const a = JSON.parse(argsRaw) as any; if(a.simbolo) symbol=String(a.simbolo); if(a.fuente) fuente=a.fuente==="yahoo"?"yahoo":"binance"; if(typeof a.dias==="number") dias=a.dias; if(typeof a.epsilon==="number") epsilon=a.epsilon; if(typeof a.alphaFee==="number") alphaFee=a.alphaFee; } catch {}
+  try {
+    const { runMMHJB } = await import("@/lib/cripto/quant-lab.functions");
+    const r:any = await runMMHJB({ data:{ symbol, days:dias, source:fuente, epsilon, alphaFee }});
+    const qf=r.quotes; const mc=r.mc;
+    const fmt=(n:number,d=2)=> isFinite(n)? n.toFixed(d):"N/D";
+    const ou=r.ouFit? `OU fit a=${fmt(r.ouFit.a,4)} µ=${fmt(r.ouFit.mu,1)} σ=${fmt(r.ouFit.sigma,4)} halfLife=${fmt(r.ouFit.halfLife,1)}d` : "OU no fiteable (martingala)";
+    return { texto: [`FODRA-LABADIE HJB 1303.7177v2 — ${symbol} (${fuente}) n=${r.n} · ${ou}`,
+      `Cotización óptima (q=0): bid ${fmt(qf.flat.rStar - qf.flat.psiFee/2,2)} | ask ${fmt(qf.flat.rStar + qf.flat.psiFee/2,2)} · ψ=${fmt(qf.flat.psiFee,4)} (ψ*=${fmt(qf.flat.psiStar,4)}+2α=${fmt(2*alphaFee,4)}) · r*=Δ-correction; gain/spread ${fmt(qf.flat.gainPerSpread,4)} · π̃=${fmt(qf.flat.piTilde,5)} · scalable=${qf.flat.scalable?"SCALPING":"no"}`,
+      `Con inventario q=5: ψ=${fmt(qf.withInventory.psiFee,4)} r*=${fmt(qf.withInventory.rStar,2)} (tilte inventario ${fmt(qf.withInventory.rStar - qf.flat.rStar,2)})`,
+      `Monte Carlo ${qf.flat? "" : ""}${r.mc? "" : ""}— martingala mean ${fmt(mc.martingale.mean,2)} std ${fmt(mc.martingale.std,2)} VaR95 ${fmt(mc.martingale.var95,2)} Sharpe ${fmt(mc.martingale.sharpe,2)} | OU-drift mean ${fmt(mc.ouDrift.mean,2)} Sharpe ${fmt(mc.ouDrift.sharpe,2)} skew ${fmt(mc.ouDrift.skew,2)}`].join("\n"),
+      fuentes:[{ dominio: fuente==="yahoo"?"finance.yahoo.com":"binance.com", url: fuente==="yahoo"? `https://finance.yahoo.com/quote/${symbol}`:"https://fapi.binance.com", title: "Market-making HJB" }], ok:true };
+  } catch(e){ return { texto:`SIN RESULTADOS mm_hjb_sim: ${e instanceof Error?e.message:String(e)}`, fuentes:[], ok:false }; }
 }
 
 /** Escáner de cointegración entre perps Binance. */

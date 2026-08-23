@@ -1,4 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
+import { resilientJson } from "@/lib/ai/providers.server";
+import { REASONING_CHAIN } from "@/lib/ai/model-catalog";
+import type { ChatMessage } from "@/lib/ai/providers.server";
 import { InformeMatutinoIASchema } from "./schema";
 import type { MarketContextSnapshot, InformeMatutinoIA } from "./types";
 
@@ -192,43 +194,26 @@ const RESPONSE_SCHEMA = {
 export async function generateInformeMatutino(
   snapshot: MarketContextSnapshot,
 ): Promise<InformeMatutinoIA | null> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    console.error("Informe matutino: falta GEMINI_API_KEY");
-    return null;
-  }
-
   try {
-    const client = new GoogleGenAI({ apiKey });
+    const messages: ChatMessage[] = [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: JSON.stringify(snapshot) },
+    ];
 
-    const result = await client.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [{ role: "user", parts: [{ text: JSON.stringify(snapshot) }] }],
-      config: {
-        systemInstruction: { role: "system", parts: [{ text: SYSTEM_PROMPT }] },
-        responseMimeType: "application/json",
-        responseSchema: RESPONSE_SCHEMA,
-        temperature: 0.4,
-      },
+    const result = await resilientJson(REASONING_CHAIN, messages, {
+      schema: InformeMatutinoIASchema,
+      temperature: 0.4,
+      maxTokens: 16384,
     });
 
-    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) {
-      console.error("Informe matutino: respuesta vacía de Gemini");
+    if (!result.ok) {
+      console.error("Informe matutino: fallo NVIDIA", result.error);
       return null;
     }
 
-    const raw = JSON.parse(text);
-    const parsed = InformeMatutinoIASchema.safeParse(raw);
-
-    if (!parsed.success) {
-      console.error("Informe matutino: validación Zod fallida", parsed.error);
-      return null;
-    }
-
-    return parsed.data;
+    return result.data;
   } catch (err) {
-    console.error("Informe matutino: fallo llamada a Gemini", err);
+    console.error("Informe matutino: fallo llamada NVIDIA", err);
     return null;
   }
 }

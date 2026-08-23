@@ -647,13 +647,13 @@ export async function toolInformeMatutino(args: { fecha?: string }): Promise<str
     const snapshot: any = await (buildMarketSnapshot as unknown as () => Promise<any>)();
     let iaPart = "";
     try {
-      const { generateInformeMatutino } = await import("@/lib/informe-matutino/gemini.functions");
+      const { generateInformeMatutino } = await import("@/lib/informe-matutino/informe.functions");
       const ia: any = await (generateInformeMatutino as unknown as (s: any) => Promise<any>)(
         snapshot,
       );
       if (ia)
         iaPart = `\n\n--- NARRATIVA IA ---\nHumor: ${ia.humorMercado}\nResumen: ${ia.resumenEjecutivo}\nRadar Int: ${ia.radarInternacional?.titular} — ${ia.radarInternacional?.bullets?.join(" | ")}\nRadar Local: ${ia.radarLocal?.titular} — ${ia.radarLocal?.bullets?.join(" | ")}`;
-      else iaPart = "\n\n[IA no disponible: falta GEMINI_API_KEY o error del modelo]";
+      else iaPart = "\n\n[IA no disponible: error del modelo NVIDIA]";
     } catch (e: any) {
       iaPart = `\n\n[IA error: ${e?.message?.slice(0, 300) ?? String(e)}]`;
     }

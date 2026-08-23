@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { buildMarketSnapshot } from "./snapshot.functions";
-import { generateInformeMatutino } from "./gemini.functions";
+import { generateInformeMatutino } from "./informe.functions";
 import type { MarketContextSnapshot, InformeMatutinoCompleto } from "./types";
 import type { InformeMatutinoIA } from "./schema";
 

@@ -139,6 +139,41 @@ async function fetchPrecioIOL(ticker: string, sessionId: string): Promise<{ prec
   return { precio: null, moneda: "ARS", detalle: null };
 }
 
+/** CCL en vivo (argentinadatos → criptoya fallback) con caché de 15 minutos. */
+let cclCache: { valor: number; ts: number; fuente: string } | null = null;
+const CCL_TTL_MS = 15 * 60 * 1000;
+
+export async function obtenerCCL(): Promise<{ valor: number; fuente: string } | null> {
+  if (cclCache && Date.now() - cclCache.ts < CCL_TTL_MS) {
+    return { valor: cclCache.valor, fuente: cclCache.fuente };
+  }
+  try {
+    const r = await fetch("https://api.argentinadatos.com/v1/cotizaciones/dolares/ccl", { cache: "no-store" } as any);
+    if (r.ok) {
+      const d: any = await r.json();
+      let v: number | null = null;
+      if (Array.isArray(d) && d.length) v = Number(d[d.length - 1]?.venta ?? d[0]?.venta);
+      else if (d?.venta) v = Number(d.venta);
+      if (v != null && isFinite(v) && v > 0) {
+        cclCache = { valor: v, ts: Date.now(), fuente: "argentinadatos" };
+        return { valor: v, fuente: "argentinadatos" };
+      }
+    }
+  } catch {}
+  try {
+    const r = await fetch("https://criptoya.com/api/dolar", { cache: "no-store" } as any);
+    if (r.ok) {
+      const d: any = await r.json();
+      const v = Number(d?.ccl?.price ?? d?.ccl?.venta ?? d?.ccl?.ask);
+      if (isFinite(v) && v > 0) {
+        cclCache = { valor: v, ts: Date.now(), fuente: "criptoya" };
+        return { valor: v, fuente: "criptoya" };
+      }
+    }
+  } catch {}
+  return null;
+}
+
 /** Especie inferida del sufijo del ticker (AL30→Pesos, AL30D→Dolar, AL30C→Cable). */
 function especieDeTicker(t: string): string {
   const u = t.toUpperCase();
@@ -283,21 +318,40 @@ export async function calcularYTM(tickerRaw: string, sessionId: string, precioMa
   const { precioCrudo, precioMoneda, detalle: precioDetalle, fechaPrecio, fuentePrecio } = resPrecio;
 
   // Convertir precio a % del valor nominal según la ESPECIE del precio obtenido.
-  // Convención BYMA: la pata PESOS de un bono USD (AL30, GD30...) cotiza como
-  // ‰ del nominal → 84.460 ARS = 84,46% del par. La TIR es la del subyacente:
-  // NO se convierte por MEP/CCL (mismo bono, mismo flujo USD; el ÷MEP inflaba
-  // la TIR ~20 puntos). Especies D/C ya vienen en USD por 100 VN.
+  // La pata PESOS de un bono USD (AL30, GD30, AL35...) cotiza en ARS por cada
+  // 100 USD de nominal ≈ (% par USD × CCL). Para llevarla a % par USD se divide
+  // por el CCL EN VIVO (÷1000 fijo era incorrecto: sólo valía con CCL=1000 y
+  // aplastaba la TIR, ej. AL35 5.15% en vez de ~12%). Especies D/C ya vienen
+  // en USD por 100 VN. Si el usuario dió un precio manual chico (<1000) para un
+  // bono USD, se interpreta que ya está en % par USD y no se convierte.
   let precioParaTIR = precioCrudo;
   let monedaCalculo: string = bono.moneda;
 
   if (resPrecio.especieEfectiva === "Pesos" && bono.moneda === "USD") {
-    precioParaTIR = precioCrudo / 1000;
-    monedaCalculo = `USD (% par: ${precioCrudo} ARS / 1000)`;
+    const yaEsParUsd = precioManual != null && precioCrudo < 1000;
+    if (yaEsParUsd) {
+      monedaCalculo = "USD (% par indicado por el usuario)";
+    } else {
+      const ccl = await obtenerCCL();
+      if (!ccl) {
+        throw new Error(
+          `No pude convertir el precio ARS de ${ticker} a % del valor nominal: el dólar CCL no está disponible ahora (argentinadatos/criptoya sin respuesta). Pasame el precio en % par USD ("calcula la TIR de ${ticker} con precio 70") y lo calculo sin conversión.`,
+        );
+      }
+      precioParaTIR = precioCrudo / ccl.valor;
+      monedaCalculo = `USD (% par: ${precioCrudo} ARS ÷ CCL ${ccl.valor.toFixed(2)} [${ccl.fuente}])`;
+    }
   } else if (resPrecio.especieEfectiva !== "Pesos") {
     precioParaTIR = precioCrudo;
     monedaCalculo = "USD";
   } else {
     monedaCalculo = precioMoneda;
+  }
+
+  if (!(precioParaTIR > 0.5 && precioParaTIR < 500)) {
+    throw new Error(
+      `Precio fuera de rango plausible para ${ticker}: ${precioCrudo} ${precioMoneda} → ${precioParaTIR.toFixed(2)} % del valor nominal. Verificá la especie de la cotización o pasame el precio en % par.`,
+    );
   }
 
   // Flujos futuros (filtrar pasado)

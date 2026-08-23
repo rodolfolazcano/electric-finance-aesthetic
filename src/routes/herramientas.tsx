@@ -6,7 +6,6 @@ import {
   Bitcoin,
   ArrowLeftRight,
   Calculator,
-  CalendarCheck,
   Percent,
   Compass,
   Menu,
@@ -24,7 +23,6 @@ import { useIOLSession } from "@/lib/herramientas/iol-context";
 import { AnalisisTab } from "@/components/herramientas/AnalisisTab";
 import { CuantitativoTab } from "@/components/herramientas/CuantitativoTab";
 import { SectoresTab } from "@/components/herramientas/SectoresTab";
-import { PlanificacionPersonalTab } from "@/components/herramientas/PlanificacionPersonalTab";
 import { CalculadoraFinancieraTab } from "@/components/herramientas/CalculadoraFinancieraTab";
 import { CriptoTab } from "@/components/herramientas/CriptoTab";
 import { ArbitrajeP2PPanel } from "@/components/herramientas/ArbitrajeP2PPanel";
@@ -61,9 +59,9 @@ export const Route = createFileRoute("/herramientas")({
   component: HerramientasPage,
 });
 
-// T11: reorder académico tabs (ids intactos, solo orden). Default tab sigue siendo "contexto" via validateSearch fallback aunque quede último visualmente.
+// Simuladores (ex Calculadora+Planificación consolidados en 2 herramientas)
 const TABS = [
-  { id: "calculadora", label: "Calculadora", icon: Calculator, tipo: "core" },
+  { id: "calculadora", label: "Simuladores", icon: Calculator, tipo: "core" },
   { id: "cuantitativo", label: "Cuantitativo", icon: LineChart, tipo: "core" },
   { id: "sectores", label: "Sectores", icon: Building2, tipo: "core" },
   { id: "analisis", label: "Análisis", icon: TrendingUp, tipo: "core" },
@@ -72,7 +70,6 @@ const TABS = [
   { id: "portafolio", label: "Portafolio", icon: Briefcase, tipo: "core" },
   { id: "arbitrador", label: "Arbitrador", icon: ArrowLeftRight, tipo: "core" },
   { id: "cripto", label: "Cripto", icon: Bitcoin, tipo: "core" },
-  { id: "planificacion", label: "Planificación", icon: CalendarCheck, tipo: "core" },
   { id: "contexto", label: "Contexto", icon: Compass, tipo: "core" },
 ] as const;
 
@@ -291,22 +288,7 @@ function HerramientasContenido() {
           railState.isMobile && "ml-0",
         )}
       >
-        <div className={`${CONTAINER} pt-16 pb-4`}>
-          <div className="flex flex-col gap-3">
-            <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70">
-                Panel de análisis financiero
-              </p>
-              <p className="mt-1 max-w-2xl text-[12px] leading-snug text-muted-foreground/80">
-                Datos en vivo de Yahoo Finance, IOL, BCRA, ArgentinaDatos y CriptoYa. Si opera con
-                InvertirOnline, inicie sesión desde el botón IOL arriba a la derecha para analizar
-                su portafolio real.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${CONTAINER} pb-16`}>
+        <div className={`${CONTAINER} pt-16 pb-16`}>
           <main className="min-w-0 flex-1 w-full">
             {activo === "analisis" && <AnalisisTab tickerInicial={ticker} />}
             {activo === "sectores" && <SectoresTab initialTab={subTab} />}
@@ -321,9 +303,10 @@ function HerramientasContenido() {
             )}
             {activo === "opciones" && <OptionsPanel />}
             {activo === "arbitrador" && <ArbitrajeP2PPanel />}
-            {activo === "cripto" && <CriptoTab />}
+            {activo === "cripto" && <CriptoTab initialSubTab={subTab} onSubTabChange={setSubTab} />}
             {activo === "calculadora" && <CalculadoraFinancieraTab initialSubTab={subTab} />}
-            {activo === "planificacion" && <PlanificacionPersonalTab initialSubTab={subTab} onSubTabChange={setSubTab} />}
+            {/* planificacion consolidada en Simuladores: legado redirige a calculadora/planificador */}
+            {activo === "planificacion" && <CalculadoraFinancieraTab initialSubTab={subTab ?? "planificador"} />}
             {activo === "contexto" && <ContextoTab />}
             <CNVDisclaimer className="mt-8" />
           </main>

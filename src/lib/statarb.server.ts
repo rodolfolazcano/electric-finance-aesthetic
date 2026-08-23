@@ -125,6 +125,9 @@ export const computePairAnalysis = createServerFn({ method: "POST" })
         marketImpactGamma: z.number().min(0).max(1).optional().default(0.5),
         participationRate: z.number().min(0).max(0.5).optional().default(0.1),
         volatility: z.number().min(0).max(1).optional().default(0.2),
+        usarVolumenReal: z.boolean().optional().default(false),
+        volumeProfile: z.array(z.number()).optional(),
+        targetStartPct: z.number().min(0).max(0.95).optional(),
       })
       .parse(input),
   )
@@ -134,6 +137,14 @@ export const computePairAnalysis = createServerFn({ method: "POST" })
         ? (t: string) => fetchHistoryIOLStatArb(t, data.period + 60, data.token!, data.mercado)
         : (t: string) => fetchHistoryYahoo(t, data.period + 60, data.interval);
     const [hist1, hist2] = await Promise.all([fetchFn(data.asset1), fetchFn(data.asset2)]);
+    // Gap 2: perfil real si se pide
+    let volumeProfile: number[] | undefined = (data as any).volumeProfile;
+    if (!volumeProfile && (data as any).usarVolumenReal && data.source !== "iol") {
+      try {
+        const { fetchVolumeProfile } = await import("./yahoo-http");
+        volumeProfile = await fetchVolumeProfile(data.asset1, Math.min(hist1.length, 100));
+      } catch { /* fallback uniforme lo maneja el motor */ }
+    }
 
     if (hist1.length < 30 || hist2.length < 30) {
       throw new Error(
@@ -151,13 +162,15 @@ export const computePairAnalysis = createServerFn({ method: "POST" })
       stopThresh: data.stopThresh,
       capitalPerPair: data.capitalPerPair,
       txCost: data.txCost,
-      //  Labadie params 
       executionAlgo: data.executionAlgo,
       pValue: data.pValue,
       marketImpactGamma: data.marketImpactGamma,
       participationRate: data.participationRate,
       volatility: data.volatility,
-    };
+      volumeProfile,
+      usarVolumenReal: (data as any).usarVolumenReal,
+      targetStartPct: (data as any).targetStartPct,
+    } as PairConfig;
 
     return analyzePair(hist1, hist2, config);
   });
@@ -189,6 +202,9 @@ export const computeBacktestGrid = createServerFn({ method: "POST" })
         marketImpactGamma: z.number().min(0).max(1).optional().default(0.5),
         participationRate: z.number().min(0).max(0.5).optional().default(0.1),
         executionAlgo: z.enum(["pairs", "tc", "is"]).optional().default("pairs"),
+        usarVolumenReal: z.boolean().optional().default(false),
+        volumeProfile: z.array(z.number()).optional(),
+        targetStartPct: z.number().min(0).max(0.95).optional(),
       })
       .parse(input),
   )
@@ -198,6 +214,12 @@ export const computeBacktestGrid = createServerFn({ method: "POST" })
         ? (t: string) => fetchHistoryIOLStatArb(t, data.period + 60, data.token!, data.mercado)
         : (t: string) => fetchHistoryYahoo(t, data.period + 60, data.interval);
     const [hist1, hist2] = await Promise.all([fetchFn(data.asset1), fetchFn(data.asset2)]);
+    if (!volumeProfile && (data as any).usarVolumenReal && data.source !== "iol") {
+      try {
+        const { fetchVolumeProfile } = await import("./yahoo-http");
+        volumeProfile = await fetchVolumeProfile(data.asset1, Math.min(hist1.length, 100));
+      } catch {}
+    }
 
     if (hist1.length < 30 || hist2.length < 30) {
       throw new Error(
@@ -221,12 +243,14 @@ export const computeBacktestGrid = createServerFn({ method: "POST" })
       bMax: data.bMax,
       bStep: data.bStep,
       metric: data.metric,
-      //  Labadie params 
       pValue: data.pValue,
       marketImpactGamma: data.marketImpactGamma,
       participationRate: data.participationRate,
       executionAlgo: data.executionAlgo,
-    };
+      volumeProfile,
+      usarVolumenReal: (data as any).usarVolumenReal,
+      targetStartPct: (data as any).targetStartPct,
+    } as BacktestConfig;
 
     return runBacktest(hist1, hist2, config);
   });
