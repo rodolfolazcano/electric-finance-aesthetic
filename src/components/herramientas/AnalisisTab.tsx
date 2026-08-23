@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -377,9 +377,16 @@ function NoticiasPanel({ ticker }: { ticker: string }) {
   );
 }
 
-export function AnalisisTab() {
-  const [input, setInput] = useState("");
-  const [ticker, setTicker] = useState<string | null>(null);
+export function AnalisisTab({ tickerInicial }: { tickerInicial?: string | null }) {
+  const [input, setInput] = useState(tickerInicial ?? "");
+  const [ticker, setTicker] = useState<string | null>(tickerInicial ?? null);
+
+  useEffect(() => {
+    if (tickerInicial && tickerInicial.trim()) {
+      setInput(tickerInicial.trim());
+      setTicker(tickerInicial.trim().toUpperCase());
+    }
+  }, [tickerInicial]);
 
   const analizar = useMutation({
     mutationFn: async (t: string) => t.trim().toUpperCase(),

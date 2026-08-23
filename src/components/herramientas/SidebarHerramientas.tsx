@@ -2,7 +2,6 @@
 import { cn } from "@/lib/utils";
 import {
   BarChart3,
-  Globe,
   Sparkles,
   ArrowLeftRight,
   Building2,
@@ -44,10 +43,9 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     id: "mercado",
     title: "MERCADO",
     items: [
-      { value: "contexto", label: "01 · Contexto", shortLabel: "Contexto", icon: Globe },
       {
         value: "sectores",
-        label: "02 · Sectores",
+        label: "01 · Sectores",
         icon: Building2,
         shortLabel: "Sectores",
         subTabs: [
@@ -69,7 +67,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       {
         value: "analisis",
-        label: "03 · Análisis",
+        label: "02 · Análisis",
         shortLabel: "Análisis",
         icon: TrendingUp,
         subTabs: [
@@ -79,7 +77,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
       },
       {
         value: "cuantitativo",
-        label: "04 · Cuantitativo",
+        label: "03 · Cuantitativo",
         shortLabel: "Cuantitativo",
         icon: Layers,
         subTabs: [
@@ -92,17 +90,17 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
           { value: "estimaciones", label: "Estimaciones" },
         ],
       },
-      { value: "portafolio", label: "05 · Portafolio", shortLabel: "Portafolio", icon: Briefcase },
+      { value: "portafolio", label: "04 · Portafolio", shortLabel: "Portafolio", icon: Briefcase },
     ],
   },
   {
     id: "instrumentos",
     title: "INSTRUMENTOS",
     items: [
-      { value: "renta-fija", label: "06 · Renta Fija", shortLabel: "Renta Fija", icon: BarChart3 },
-      { value: "opciones", label: "07 · Opciones", shortLabel: "Opciones", icon: TrendingUp },
-      { value: "arbitrador", label: "08 · Arbitrador", shortLabel: "Arbitrador", icon: ArrowLeftRight },
-      { value: "cripto", label: "09 · Cripto", shortLabel: "Cripto", icon: Sparkles },
+      { value: "renta-fija", label: "05 · Renta Fija", shortLabel: "Renta Fija", icon: BarChart3 },
+      { value: "opciones", label: "06 · Opciones", shortLabel: "Opciones", icon: TrendingUp },
+      { value: "arbitrador", label: "07 · Arbitrador", shortLabel: "Arbitrador", icon: ArrowLeftRight },
+      { value: "cripto", label: "08 · Cripto", shortLabel: "Cripto", icon: Sparkles },
     ],
   },
   {
@@ -111,7 +109,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       {
         value: "planificacion",
-        label: "10 · Planificación",
+        label: "09 · Planificación",
         shortLabel: "Planificación",
         icon: Calculator,
         subTabs: [

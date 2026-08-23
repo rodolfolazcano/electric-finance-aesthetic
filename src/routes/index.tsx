@@ -743,7 +743,7 @@ function Index() {
                 </p>
                 <Link
                   to="/herramientas"
-                  search={{ tab: "contexto" }}
+                  search={{ tab: "analisis" }}
                   className="flex-none rounded-full bg-primary px-5 py-2.5 text-[12.5px] font-semibold text-primary-foreground shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:bg-primary/90"
                 >
                   Abrir Herramientas

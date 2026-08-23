@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
-  Gauge,
   LineChart,
   Layers,
   PieChart,
@@ -14,12 +13,12 @@ import {
   X,
   Phone,
   Briefcase,
+  Search,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { IOLLoginButton } from "@/components/shared/IOLLoginButton";
-import { ContextoTab } from "@/components/herramientas/ContextoTab";
 import { AnalisisTab } from "@/components/herramientas/AnalisisTab";
 import { CuantitativoTab } from "@/components/herramientas/CuantitativoTab";
 import { SectoresTab } from "@/components/herramientas/SectoresTab";
@@ -31,6 +30,8 @@ import { OptionsPanel } from "@/components/options/OptionsPanel";
 import { PortfolioComposition } from "@/components/optimizer/PortfolioComposition";
 import { RentaFijaPanel } from "@/components/sections/RentaFijaPanel";
 import { SidebarHerramientas } from "@/components/herramientas/SidebarHerramientas";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import bgImage from "@/assets/bg-skyline.jpg";
 import retratoCintia from "@/assets/cintia-boos.png";
 
@@ -40,7 +41,7 @@ const WHATSAPP =
 export const Route = createFileRoute("/herramientas")({
   validateSearch: (search: Record<string, unknown>) => {
     const out: { tab: string; subTab?: string; ticker?: string } = {
-      tab: (search["tab"] as string) || "contexto",
+      tab: (search["tab"] as string) || "analisis",
     };
     if (search["subTab"]) out.subTab = String(search["subTab"]);
     if (search["ticker"]) out.ticker = String(search["ticker"]);
@@ -52,7 +53,7 @@ export const Route = createFileRoute("/herramientas")({
       {
         name: "description",
         content:
-          "Contexto de mercado, análisis fundamental, optimización de carteras, riesgo, CAPM y análisis sectorial con datos en vivo.",
+          "Análisis fundamental y técnico, optimización de carteras, riesgo, CAPM, renta fija, opciones y análisis sectorial con datos en vivo.",
       },
     ],
   }),
@@ -60,7 +61,6 @@ export const Route = createFileRoute("/herramientas")({
 });
 
 const TABS = [
-  { id: "contexto", label: "Contexto", icon: Gauge, tipo: "core" },
   { id: "analisis", label: "Análisis", icon: Activity, tipo: "core" },
   { id: "sectores", label: "Sectores", icon: Layers, tipo: "core" },
   { id: "cuantitativo", label: "Cuantitativo", icon: LineChart, tipo: "core" },
@@ -90,12 +90,13 @@ function HerramientasPage() {
 }
 
 function HerramientasContenido() {
-  const { tab, subTab } = Route.useSearch();
+  const { tab, subTab, ticker } = Route.useSearch();
   const navigate = useNavigate();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [tickerInput, setTickerInput] = useState("");
   const [railState, setRailState] = useState({ isVisible: true, isExpanded: true, isMobile: false });
-  const activo = (TABS.some((t) => t.id === tab) ? tab : "contexto") as TabId;
+  const activo = (TABS.some((t) => t.id === tab) ? tab : "analisis") as TabId;
 
   const setTab = (newTab: string) => navigate({ search: { tab: newTab } as any });
   const setSubTab = (newSub: string) => navigate({ search: { tab: activo, subTab: newSub } as any });
@@ -201,21 +202,43 @@ function HerramientasContenido() {
 
       {/* Contenido - ocupa todo el ancho y más arriba */}
       <div className={cn("transition-all duration-200", !railState.isMobile && railState.isVisible && (railState.isExpanded ? "ml-[252px]" : "ml-[64px]"), railState.isMobile && "ml-0")}>
-        <div className={`${CONTAINER} pt-20 pb-6`}>
-          <p className="eyebrow">Panel de análisis financiero</p>
-          <h1 className="mt-3 max-w-4xl font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight chrome-text">
-            Probá el panel de análisis financiero
-          </h1>
-          <p className="mt-3 max-w-3xl text-[17px] leading-relaxed text-muted-foreground lg:text-[19px]">
-            Datos en vivo de Yahoo Finance, IOL, BCRA, ArgentinaDatos y CriptoYa. Si opera con InvertirOnline, inicie sesión desde el botón <span className="text-foreground font-medium">IOL</span> arriba a la derecha para analizar su portafolio real. Use atrás/adelante del navegador o del header para navegar.
-          </p>
-          <div aria-hidden className="electric-line mt-6 max-w-3xl" />
+        <div className={`${CONTAINER} pt-20 pb-4`}>
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div className="min-w-0">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70">
+                Panel de análisis financiero
+              </p>
+              <p className="mt-1 max-w-2xl text-[12px] leading-snug text-muted-foreground/80">
+                Datos en vivo de Yahoo Finance, IOL, BCRA, ArgentinaDatos y CriptoYa. Si opera con
+                InvertirOnline, inicie sesión desde el botón IOL arriba a la derecha para analizar
+                su portafolio real.
+              </p>
+            </div>
+            <form
+              className="flex w-full max-w-sm flex-none items-center gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const t = tickerInput.trim().toUpperCase();
+                if (t) navigate({ search: { tab: "analisis", ticker: t } as any });
+              }}
+            >
+              <Input
+                value={tickerInput}
+                onChange={(e) => setTickerInput(e.target.value)}
+                placeholder="Ticker (ej. AAPL, GGAL.BA)"
+                className="h-9 font-mono uppercase"
+              />
+              <Button type="submit" size="sm" className="h-9" disabled={!tickerInput.trim()}>
+                <Search className="h-4 w-4" />
+                Analizar
+              </Button>
+            </form>
+          </div>
         </div>
 
         <div className={`${CONTAINER} pb-16`}>
           <main className="min-w-0 flex-1 w-full">
-            {activo === "contexto" && <ContextoTab />}
-            {activo === "analisis" && <AnalisisTab />}
+            {activo === "analisis" && <AnalisisTab tickerInicial={ticker} />}
             {activo === "sectores" && <SectoresTab initialTab={subTab} />}
             {activo === "cuantitativo" && <CuantitativoTab />}
             {activo === "portafolio" && <PortfolioComposition />}

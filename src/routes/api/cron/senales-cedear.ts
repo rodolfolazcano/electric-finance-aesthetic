@@ -45,7 +45,7 @@ export default eventHandler(async () => {
         }
         // si no hubo fuertes, enviar resumen
         if (fuertes.length === 0) {
-          const txt = `Señales CEDEAR/BCBA ${fecha} (${payload.criterio}):\n` + payload.senales.slice(0, 4).map((s: any) => `${s.senal} ${s.tickerBCBA} (${s.tickerUS} ${s.variacionUS?.toFixed(2) ?? "--"}%)`).join("\n") + `\nVer detalle en /herramientas?tab=contexto`;
+          const txt = `Señales CEDEAR/BCBA ${fecha} (${payload.criterio}):\n` + payload.senales.slice(0, 4).map((s: any) => `${s.senal} ${s.tickerBCBA} (${s.tickerUS} ${s.variacionUS?.toFixed(2) ?? "--"}%)`).join("\n") + `\nVer detalle en /herramientas?tab=sectores`;
           await sendTelegramMessage({ text: txt });
         }
       } catch (e) {
