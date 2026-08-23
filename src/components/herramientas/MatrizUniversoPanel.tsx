@@ -99,7 +99,10 @@ interface NodoMatriz {
   returns: number[];
 }
 
-export function MatrizUniversoPanel({ sectorFilter, cohorteFiltro }: { sectorFilter?: string; cohorteFiltro?: (ticker: string) => string } = {}) {
+export function MatrizUniversoPanel({
+  sectorFilter,
+  cohorteFiltro,
+}: { sectorFilter?: string; cohorteFiltro?: (ticker: string) => string } = {}) {
   const fn = useServerFn(getMatrizUniverso);
   const sectores = useMemo(() => getUniqueSectores(), []);
   const flat = useMemo(() => getFlatTickerList(), []);
@@ -128,8 +131,7 @@ export function MatrizUniversoPanel({ sectorFilter, cohorteFiltro }: { sectorFil
             t.sector === sec &&
             !/Nombre no encontrado/i.test(t.nombre) &&
             // Cohorte homogénea: nunca mezclar tipo/moneda/mercado en la matriz
-            (!cohorteFiltro ||
-              cohorteFiltro(t.ticker) === cohorteFiltro(sectorFilter ?? "")) &&
+            (!cohorteFiltro || cohorteFiltro(t.ticker) === cohorteFiltro(sectorFilter ?? "")) &&
             !nodos.some((n) => n.key === t.ticker),
         );
         for (const a of activos.slice(0, MAX_ACTIVOS)) {
@@ -191,7 +193,7 @@ export function MatrizUniversoPanel({ sectorFilter, cohorteFiltro }: { sectorFil
     }
 
     return { nodos, lista: [...tickersNecesarios].slice(0, MAX_FETCH) };
-  }, [nivel, sectoresSel, agrupacion, flat]);
+  }, [nivel, sectoresSel, agrupacion, flat, sectorFilter, cohorteFiltro]);
 
   const truncado = plan.lista.length >= MAX_FETCH;
 
@@ -235,6 +237,8 @@ export function MatrizUniversoPanel({ sectorFilter, cohorteFiltro }: { sectorFil
   const benchmarkReturns = q.data?.returns[benchmark] ?? [];
 
   // Cache de pares por métrica (se reinicia si cambian datos o métrica)
+  // Reset intencional: la caché debe vaciarse al cambiar métrica o datos
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const pairwiseCache = useMemo(() => new Map<string, number>(), [q.data, metric]);
   const getVal = (a: NodoMatriz, b: NodoMatriz): number => {
     if (a.key === b.key) {

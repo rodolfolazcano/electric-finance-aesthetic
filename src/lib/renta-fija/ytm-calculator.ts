@@ -109,27 +109,6 @@ function findBono(ticker: string): BonoJSON | null {
   return null;
 }
 
-async function getDolarMEP(): Promise<number> {
-  try {
-    const r = await fetch("https://api.argentinadatos.com/v1/cotizaciones/dolares/mep", { cache: "no-store" } as any);
-    if (r.ok) {
-      const d: any = await r.json();
-      // argentinadatos devuelve { venta, compra } o array
-      if (d?.venta) return Number(d.venta);
-      if (Array.isArray(d) && d[0]?.venta) return Number(d[0].venta);
-    }
-  } catch {}
-  try {
-    const r = await fetch("https://criptoya.com/api/dolar", { cache: "no-store" } as any);
-    if (r.ok) {
-      const d: any = await r.json();
-      if (d?.mep?.venta) return Number(d.mep.venta);
-      if (d?.mep?.ask) return Number(d.mep.ask);
-    }
-  } catch {}
-  return 1500; // fallback
-}
-
 async function fetchPrecioIOL(ticker: string, sessionId: string): Promise<{ precio: number | null; moneda: string; detalle: any }> {
   const sid = await ensureIOLSession(sessionId);
   // Probar bCBA con CotizacionDetalle y Cotizacion
@@ -266,6 +245,15 @@ export async function calcularYTM(tickerRaw: string, sessionId: string, precioMa
   if (!bono) {
     throw new Error(`Bono ${ticker} no encontrado en RENTA_FIJA_COMPLETA.json. Verificá el ticker (ej. AL30, GD30, AL35, AE38).`);
   }
+
+  // Especies D/C con flujo_fondos null: heredar los flujos del ticker base
+  // (mismo bono subyacente; AL30D → AL30). Mismo criterio que motor.ts.
+  if ((!bono.flujo_fondos || !bono.flujo_fondos.length) && /[DC]$/.test(ticker)) {
+    const base = findBono(ticker.replace(/[DC]$/, ""));
+    if (base?.flujo_fondos?.length) {
+      bono.flujo_fondos = base.flujo_fondos;
+    }
+  }
   if (!bono.flujo_fondos || !bono.flujo_fondos.length) {
     throw new Error(`Bono ${ticker} sin flujo_fondos en el JSON. No se puede calcular TIR.`);
   }
@@ -294,16 +282,17 @@ export async function calcularYTM(tickerRaw: string, sessionId: string, precioMa
   }
   const { precioCrudo, precioMoneda, detalle: precioDetalle, fechaPrecio, fuentePrecio } = resPrecio;
 
-  // Convertir precio a USD si es necesario para el cálculo.
-  // La conversión depende de la ESPECIE del precio obtenido (puede ser una
-  // especie hermana): Pesos + flujos USD → dividir por MEP; D/C → ya en USD.
+  // Convertir precio a % del valor nominal según la ESPECIE del precio obtenido.
+  // Convención BYMA: la pata PESOS de un bono USD (AL30, GD30...) cotiza como
+  // ‰ del nominal → 84.460 ARS = 84,46% del par. La TIR es la del subyacente:
+  // NO se convierte por MEP/CCL (mismo bono, mismo flujo USD; el ÷MEP inflaba
+  // la TIR ~20 puntos). Especies D/C ya vienen en USD por 100 VN.
   let precioParaTIR = precioCrudo;
   let monedaCalculo: string = bono.moneda;
 
   if (resPrecio.especieEfectiva === "Pesos" && bono.moneda === "USD") {
-    const mep = await getDolarMEP();
-    precioParaTIR = precioCrudo / mep;
-    monedaCalculo = "USD (convertido desde ARS via MEP " + mep.toFixed(2) + ")";
+    precioParaTIR = precioCrudo / 1000;
+    monedaCalculo = `USD (% par: ${precioCrudo} ARS / 1000)`;
   } else if (resPrecio.especieEfectiva !== "Pesos") {
     precioParaTIR = precioCrudo;
     monedaCalculo = "USD";

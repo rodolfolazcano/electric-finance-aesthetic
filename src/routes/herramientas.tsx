@@ -33,7 +33,6 @@ import { PortfolioComposition } from "@/components/optimizer/PortfolioCompositio
 import { RentaFijaPanel } from "@/components/sections/RentaFijaPanel";
 import { SidebarHerramientas } from "@/components/herramientas/SidebarHerramientas";
 import { ContextoTab } from "@/components/herramientas/ContextoTab";
-import bgImage from "@/assets/bg-skyline.jpg";
 import retratoCintia from "@/assets/cintia-boos.png";
 
 const WHATSAPP =
@@ -117,17 +116,14 @@ function HerramientasContenido() {
   }, []);
 
   return (
-    <div className="relative min-h-screen text-foreground">
-      <div aria-hidden className="fixed inset-0 -z-10">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        />
+    <div className="herramientas-page relative min-h-screen text-foreground">
+      {/* Fondo sólido oscuro + brillos eléctricos tenues: máximo contraste para tablas/gráficos */}
+      <div aria-hidden className="fixed inset-0 -z-10 bg-[#04060b]">
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(56rem 34rem at 82% 8%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 62%), radial-gradient(46rem 30rem at -5% 92%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%), linear-gradient(180deg, rgba(6,9,18,0.72) 0%, rgba(6,9,18,0.45) 45%, rgba(6,9,18,0.62) 100%)",
+              "radial-gradient(56rem 34rem at 82% 8%, color-mix(in oklab, var(--primary) 7%, transparent), transparent 62%), radial-gradient(46rem 30rem at -5% 92%, color-mix(in oklab, var(--accent) 6%, transparent), transparent 60%)",
           }}
         />
       </div>

@@ -507,6 +507,33 @@ html {
   font-feature-settings: "tnum";
 }
 
+/* ============ HERRAMIENTAS — fondo sólido oscuro + superficies legibles ============ */
+/* Scope: solo /herramientas. Superficies casi opacas para que tablas, gráficos y
+   texto tengan contraste pleno sobre el fondo oscuro. */
+
+.herramientas-page .glass {
+  background: oklch(0.2 0.006 252 / 0.92);
+  backdrop-filter: blur(10px) saturate(130%);
+}
+
+.herramientas-page .glass-2 {
+  background: oklch(0.24 0.006 252 / 0.92);
+  backdrop-filter: blur(10px) saturate(130%);
+}
+
+.herramientas-page .glass-strong {
+  background: oklch(0.19 0.01 256 / 0.95);
+}
+
+.herramientas-page table {
+  color: var(--color-foreground);
+}
+
+.herramientas-page th,
+.herramientas-page td {
+  border-color: var(--color-border);
+}
+
 @utility text-mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;

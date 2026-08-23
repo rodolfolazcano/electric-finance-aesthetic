@@ -217,17 +217,13 @@ export async function calcularTIRReal(tickerRaw: string, precioManual?: number):
     fuentePrecio = "manual/IOL";
   }
 
-  // Para hard dollar en especie Pesos, precio viene en ARS, convertir a USD para TIR_Anual_USD
+  // Para hard dollar en especie Pesos: la cotización ARS es ‰ del nominal USD
+  // (84.460 → 84,46% del par). La TIR es la del subyacente USD; NO se divide
+  // por CCL/MEP (mismo bono, mismo flujo — el ÷CCL inflaba la TIR ~20 puntos).
   const esHardDollar = /Hard Dollar|Bonar|Global|Bonte.*Dollar/i.test(`${bono.tipo} ${bono.subtipo} ${bono.tipo}`) || bono.moneda === "USD";
   if (esHardDollar && bono.especie === "Pesos" && precio != null) {
-    // AL30 en pesos: precio 65.000 ARS con CCL ~1500 = 43 USD por 100 VN
-    ccl = await fetchDolarCCL();
-    if (ccl && ccl > 100) {
-      precioUSD = precio / ccl;
-    } else {
-      // Si no hay CCL, usar precio tal cual pero advertir
-      precioUSD = null;
-    }
+    precioUSD = precio / 1000;
+    ccl = null;
   } else if (bono.especie === "Dolar" || bono.especie === "Cable") {
     precioUSD = precio;
   }

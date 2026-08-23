@@ -1283,10 +1283,12 @@ function IntermarketFull() {
   );
 }
 
+import { OportunidadesOrquestadasTab } from "./OportunidadesOrquestadasTab";
+
 export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
   // Reorden metodológico (corpus pt): Panorama Murphy → Análisis Pascale →
-  // Valuación relativa → Estructura Bustamante → Cartera Elbaum
-  const valid = ["panorama", "intermarket", "analisis", "valuacion", "matriz", "cartera"];
+  // Valuación relativa → Estructura Bustamante → Cartera Elbaum → Oportunidades (orquestado 5 fases)
+  const valid = ["panorama", "intermarket", "analisis", "valuacion", "matriz", "cartera", "oportunidades"];
   const LEGACY_MAP: Record<string, string> = {
     performance: "panorama",
     panel: "analisis",
@@ -1294,7 +1296,6 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
     "etf-fit": "analisis",
     benchmarks: "cartera",
     valuacion: "valuacion",
-    oportunidades: "valuacion",
     estructura: "analisis",
   };
   const inicial = initialTab
@@ -1757,6 +1758,11 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
         {/* 5 · CARTERA — Elbaum: correlaciones/benchmarks como diversificación */}
         <TabsContent value="cartera" className="mt-4 space-y-6">
           <BenchmarksPanel sectorFilter={sectorFilter} />
+        </TabsContent>
+
+        {/* 6 · OPORTUNIDADES — Orquestado 5 fases (no aislado): Intermarket → Sectores favorecidos → Activos → Cuantitativo R² → Fundamental+Técnico */}
+        <TabsContent value="oportunidades" className="mt-4 space-y-6">
+          <OportunidadesOrquestadasTab sectorFilter={sectorFilter} />
         </TabsContent>
       </Tabs>
     </div>

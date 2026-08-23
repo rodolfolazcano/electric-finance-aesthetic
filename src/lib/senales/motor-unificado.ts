@@ -151,7 +151,7 @@ async function scoreTecnico(simbolo: string): Promise<{ score: number; data: any
   // Intentar semáforo primero ( -2..+2 → 0..10 )
   try {
     const sem = await analizarSemaforo(simbolo);
-    if (!sem.error && sem.senal) {
+    if (!sem.error && sem.recommendation) {
       const map: Record<string, number> = {
         COMPRA: 8.5,
         "COMPRA CON CAUTELA": 6.8,
@@ -159,11 +159,11 @@ async function scoreTecnico(simbolo: string): Promise<{ score: number; data: any
         REDUCIR: 3.5,
         VENTA: 1.5,
       };
-      const s = map[sem.senal] ?? 5;
+      const s = map[sem.recommendation] ?? 5;
       return {
         score: s,
         data: sem,
-        nota: `Técnico Semaforo ${sem.senal} — RSI ${sem.rsi?.toFixed(1) ?? "?"} MACD ${sem.macdHist?.toFixed(3) ?? "?"} SMA20/50/200 ${sem.sma20?.toFixed(1) ?? "?"}/${sem.sma50?.toFixed(1) ?? "?"}/${sem.sma200?.toFixed(1) ?? "?"} → ${s}/10`,
+        nota: `Técnico Semaforo ${sem.recommendation} — RSI ${sem.history.rsi?.toFixed(1) ?? "?"} MACD ${sem.history.histMacd?.toFixed(3) ?? "?"} SMA20/50/200 ${sem.history.sma20?.toFixed(1) ?? "?"}/${sem.history.sma50?.toFixed(1) ?? "?"}/${sem.history.sma200?.toFixed(1) ?? "?"} → ${s}/10`,
       };
     }
   } catch {}
@@ -212,23 +212,23 @@ async function scoreCuantitativo(simbolo: string): Promise<{ score: number; ries
 
   if (riesgo && !riesgo.error) {
     // Sharpe
-    if (riesgo.sharpeRatio != null) {
-      if (riesgo.sharpeRatio > 1.2) {
+    if (riesgo.sharpe != null) {
+      if (riesgo.sharpe > 1.2) {
         s += 1.2;
-        notas.push(`Sharpe ${riesgo.sharpeRatio.toFixed(2)} alto`);
-      } else if (riesgo.sharpeRatio > 0.5) {
+        notas.push(`Sharpe ${riesgo.sharpe.toFixed(2)} alto`);
+      } else if (riesgo.sharpe > 0.5) {
         s += 0.5;
-      } else if (riesgo.sharpeRatio < 0) {
+      } else if (riesgo.sharpe < 0) {
         s -= 1.5;
         notas.push(`Sharpe negativo`);
       }
     }
     // Volatilidad
-    if (riesgo.volatilityAnnual != null) {
-      if (riesgo.volatilityAnnual > 0.5) {
+    if (riesgo.volatilidadAnual != null) {
+      if (riesgo.volatilidadAnual > 0.5) {
         s -= 0.8;
-        notas.push(`Vol ${ (riesgo.volatilityAnnual*100).toFixed(0)}% alta`);
-      } else if (riesgo.volatilityAnnual < 0.2) s += 0.4;
+        notas.push(`Vol ${ (riesgo.volatilidadAnual*100).toFixed(0)}% alta`);
+      } else if (riesgo.volatilidadAnual < 0.2) s += 0.4;
     }
     // Max drawdown
     if (riesgo.maxDrawdown != null && riesgo.maxDrawdown < -0.3) {
