@@ -165,8 +165,11 @@ export const IMAGE_CHAIN_HQ: ModelRef[] = [
 
 /** Visión: leer gráficos, tablas y documentos escaneados. Solo NVIDIA. */
 export const VISION_CHAIN: ModelRef[] = [
+  { provider: "nvidia", model: "meta/llama-3.2-90b-vision-instruct", maxTokens: 8192 },
   { provider: "nvidia", model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", maxTokens: 8192 },
   { provider: "nvidia", model: "thinkingmachines/inkling", maxTokens: 8192 },
+  { provider: "nvidia", model: "meta/llama-3.2-11b-vision-instruct", maxTokens: 8192 },
+  { provider: "nvidia", model: "microsoft/phi-3.5-vision-instruct", maxTokens: 8192 },
 ];
 
 /** Router ultrarrápido para clasificación de intenciones (< 50ms). */

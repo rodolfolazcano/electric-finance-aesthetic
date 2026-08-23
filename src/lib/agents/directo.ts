@@ -82,6 +82,12 @@ export async function respuestaDirecta(
       tool_calls: toolCalls,
     });
 
+    mensajes.push({
+      role: "system",
+      content:
+        "Ya ejecutaste herramientas en este turno: cuando redactes la respuesta final, basate ÚNICAMENTE en esos resultados citando la fuente. PROHIBIDO sugerirle al usuario que revise noticias/análisis por su cuenta o derivarlo a otros servicios para un dato que ya podés dar vos. Si falta un dato, invocá otra herramienta ahora.",
+    });
+
     for (const tc of toolCalls) {
       const name = String(tc?.function?.name ?? "");
       const argsRaw =
