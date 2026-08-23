@@ -1163,6 +1163,9 @@ function EtfFitPanel({ sectorFilter }: { sectorFilter: string }) {
       </Card>
     );
   const rows: EtfFitResult[] = (q.data as any)?.etfResults ?? [];
+  const top = rows[0];
+  const interp = top ? interpretarFitLabdie(top) : null;
+  const topMeta = top ? getEtfMeta(top.etf) : null;
   return (
     <Card>
       <CardHeader>
@@ -1170,14 +1173,14 @@ function EtfFitPanel({ sectorFilter }: { sectorFilter: string }) {
           <Target className="h-4 w-4 text-primary" /> ETF Fit — {sector}
         </CardTitle>
         <p className="text-[13px] text-muted-foreground">
-          Qué ETF replica mejor el comportamiento del sector · Correlación y tracking
+          Qué ETF replica mejor el comportamiento del sector · Correlación, tracking error y basis risk (Labadie 2017)
         </p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <select
           value={sector}
           onChange={(e) => setSector(e.target.value)}
-          className="mb-4 w-full max-w-xs rounded border bg-background px-2 py-1.5 text-[12px]"
+          className="w-full max-w-xs rounded border bg-background px-2 py-1.5 text-[12px]"
         >
           {SECTORES.map((s) => (
             <option key={s} value={s}>
@@ -1185,6 +1188,20 @@ function EtfFitPanel({ sectorFilter }: { sectorFilter: string }) {
             </option>
           ))}
         </select>
+        {/* Interpretación dinámica Labadié */}
+        {interp && top && (
+          <div className={`rounded-lg border p-3 text-[12px] leading-relaxed ${interp.nivel === "excelente" ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : interp.nivel === "moderado" ? "border-amber-500/30 bg-amber-500/10 text-amber-200" : interp.nivel === "debil" ? "border-orange-500/30 bg-orange-500/10 text-orange-200" : "border-red-500/30 bg-red-500/10 text-red-300"}`}>
+            <div className="font-semibold flex items-center gap-2">
+              <span className="font-mono">{top.etf}</span>
+              {topMeta ? <span className="font-normal text-[11px] opacity-80">— {topMeta.nombre} · {topMeta.replication} · {topMeta.expense}</span> : null}
+              <span className="ml-auto rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-widest bg-background/40">{interp.nivel}</span>
+            </div>
+            <p className="mt-1.5">{interp.texto}</p>
+            <p className="mt-1 text-[11px] opacity-90"><span className="font-semibold">Basis risk:</span> {interp.basisRisk} · <span className="font-semibold">Tracking error proxy:</span> {interp.trackingErrorProxy} varianza no explicada</p>
+            <p className="mt-1 font-mono text-[11px] bg-background/40 rounded px-2 py-1">{interp.hedgeEjemplo}</p>
+            {topMeta && <p className="mt-1 text-[11px] opacity-70">{topMeta.descripcion} — Pros: {topMeta.pros} · Cons: {topMeta.cons}</p>}
+          </div>
+        )}
         {rows.length === 0 ? (
           <p className="text-[13px] text-muted-foreground">Sin resultados.</p>
         ) : (
@@ -1193,28 +1210,41 @@ function EtfFitPanel({ sectorFilter }: { sectorFilter: string }) {
               <TableHeader>
                 <TableRow>
                   <TableHead>ETF</TableHead>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Replication</TableHead>
                   <TableHead className="text-right">Corr</TableHead>
                   <TableHead className="text-right">R²</TableHead>
                   <TableHead className="text-right">Beta</TableHead>
+                  <TableHead>Interpretación</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rows.slice(0, 10).map((r) => (
-                  <TableRow key={r.etf}>
-                    <TableCell className="font-mono font-medium">{r.etf}</TableCell>
-                    <TableCell className="text-right font-mono">
-                      {r.correlation?.toFixed(3) ?? "s/d"}
-                    </TableCell>
-                    <TableCell className="text-right font-mono">
-                      {r.rSquared?.toFixed(3) ?? "s/d"}
-                    </TableCell>
-                    <TableCell className="text-right font-mono">
-                      {r.beta?.toFixed(2) ?? "s/d"}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {rows.slice(0, 10).map((r) => {
+                  const meta = getEtfMeta(r.etf);
+                  const it = interpretarFitLabdie(r);
+                  return (
+                    <TableRow key={r.etf}>
+                      <TableCell className="font-mono font-medium">{r.etf}</TableCell>
+                      <TableCell className="text-[11px] max-w-[180px] truncate" title={meta?.nombre ?? r.etf}>{meta?.nombre ?? (r as any).name ?? "—"}</TableCell>
+                      <TableCell className="text-[10px] font-mono">{meta?.replication ?? "—"}</TableCell>
+                      <TableCell className="text-right font-mono">
+                        {r.correlation?.toFixed(3) ?? "s/d"}
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
+                        {r.rSquared?.toFixed(3) ?? "s/d"}
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
+                        {r.beta?.toFixed(2) ?? "s/d"}
+                      </TableCell>
+                      <TableCell className="text-[11px]">
+                        <span className={`rounded px-1.5 py-0.5 text-[10px] ${it.nivel === "excelente" ? "bg-emerald-500/15 text-emerald-400" : it.nivel === "moderado" ? "bg-amber-500/15 text-amber-400" : it.nivel === "debil" ? "bg-orange-500/15 text-orange-400" : "bg-red-500/15 text-red-400"}`}>{it.nivel}</span>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
+            <p className="mt-2 text-[11px] text-muted-foreground">Método Labadié: Full replication (tracking error 0.03-0.15%) vs Optimised sampling (0.25-0.40%) vs Synthetic (0.40-1.20% + riesgo crédito). Basis risk = correlación + tracking error. Ver <em>lectures_2017_unam_etf_v4</em> p.13,19-24.</p>
           </div>
         )}
       </CardContent>
