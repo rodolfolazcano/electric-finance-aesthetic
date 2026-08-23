@@ -7,19 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { getOportunidadesOrquestadas } from "@/lib/herramientas/oportunidades-orquestadas.functions";
-import sectoresData from "@/lib/herramientas/sectores.json";
-
-const SECTORES = Object.keys(sectoresData).sort().filter((s) => s !== "No disponible");
 
 export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: string } = {}) {
-  const [sector, setSector] = useState(sectorFilter ?? "");
-  const [cohorte, setCohorte] = useState<"BCBA_ARS" | "CEDear_ARS" | "CEDear_USD" | "US_USD" | "">("");
   const fn = useServerFn(getOportunidadesOrquestadas);
   const q = useQuery({
-    queryKey: ["oportunidades-orquestadas", sector, cohorte],
-    queryFn: () => fn({ data: { sector: sector || undefined, cohorte: cohorte || undefined, topN: 8, maxTickers: 30 } }),
+    queryKey: ["oportunidades-orquestadas", sectorFilter ?? "auto"],
+    queryFn: () => fn({ data: { sector: sectorFilter || undefined, topN: 8, maxTickers: 30 } }),
     staleTime: 15 * 60_000,
-    // Recarga SIEMPRE al cambiar sector/cohorte (nueva key) o al volver al tab
     refetchOnMount: "always",
     refetchOnWindowFocus: false,
   });
@@ -45,30 +39,12 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
         <p className="text-[11px] text-muted-foreground mt-1">Metodologías: Murphy intermarket + oro/dólar/yield, Pring 6 etapas, Bustamante 5 pasos, Fowler Newton moneda homogénea, Pascale valuación, Elbaum carteras/Markowitz, Labadie p=1/H & spectral + Hurst mean-reversion, Dumrauf Fisher exacta.</p>
       </div>
 
-      {/* Controles */}
+      {/* Controles — 100% orquestado: Re-ejecutar con nuevo universo */}
       <Card>
-        <CardContent className="p-4 flex flex-wrap items-end gap-3">
-          <div>
-            <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">Sector</label>
-            <select value={sector} onChange={(e) => { setSector(e.target.value); q.refetch(); }} className="mt-1 w-64 rounded border bg-background px-2 py-1.5 text-[12px]">
-              <option value="">Auto (sectores favorecidos por Intermarket)</option>
-              {SECTORES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">Cohorte homogénea</label>
-            <select value={cohorte} onChange={(e) => { setCohorte(e.target.value as any); q.refetch(); }} className="mt-1 w-48 rounded border bg-background px-2 py-1.5 text-[12px]">
-              <option value="">Auto (más numerosa)</option>
-              <option value="BCBA_ARS">BCBA ARS</option>
-              <option value="CEDear_ARS">CEDEAR ARS</option>
-              <option value="CEDear_USD">CEDEAR USD</option>
-              <option value="US_USD">EE.UU. USD</option>
-            </select>
-          </div>
+        <CardContent className="p-4 flex flex-wrap items-center gap-3">
+          <p className="text-[11px] text-muted-foreground">
+            Sectores favorecidos por Intermarket · Máx 50 tickers por corrida (priorizados por liquidez)
+          </p>
           <Button onClick={() => q.refetch()} disabled={q.isFetching} size="sm" className="ml-auto">
             {q.isFetching ? "Actualizando..." : "Re-ejecutar (15m cache)"}
           </Button>
