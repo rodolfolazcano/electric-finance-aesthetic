@@ -181,10 +181,49 @@ export const getOportunidadesOrquestadas = createServerFn({ method: "POST" })
         }));
       } catch {}
 
+      // ── FASE 6 · Catalizador cualitativo (Value Investing + Tácticas Schvarz)
+      // Grado de catalizador: upgrade reciente / earnings surprise / momentum volumen
+      // Bonus +0.5 si hay catalizador concreto, +0.3 si hay moat/ventaja competitiva (margen alto)
+      try {
+        const topTickers = senalesOrdenadas.slice(0, 12).map((s: any) => String(s.ticker).toUpperCase());
+        if (topTickers.length) {
+          const { getQuotes } = await import("@/lib/history-cache.server");
+          const quotes = (await getQuotes(topTickers).catch(() => ({}))) as Record<string, any>;
+          for (const s of senalesOrdenadas.slice(0, 12)) {
+            const q: any = quotes?.[String(s.ticker).toUpperCase()] ?? {};
+            // earningsGrowth / revenueGrowth disponibles en quoteSummary financialData
+            const eg = q?.earningsGrowth ?? q?.earningsGrowthRaw ?? null;
+            const rg = q?.revenueGrowth ?? null;
+            const pm = q?.profitMargins ?? q?.profitMargin ?? null;
+            // upgradeDowngradeHistory: buscar upgrade reciente (últimos 30 días) en q.upgradeDowngradeHistory?.history
+            let hasUpgrade = false;
+            try {
+              const hist: any[] = q?.upgradeDowngradeHistory?.history ?? q?.upgradeDowngradeHistory ?? [];
+              if (Array.isArray(hist) && hist.length) {
+                const recent = hist.slice(0, 3);
+                hasUpgrade = recent.some((h: any) => String(h?.toGrade ?? h?.action ?? "").toLowerCase().includes("buy") || String(h?.action ?? "").toLowerCase().includes("upgrade"));
+              }
+            } catch {}
+            let bonus = 0;
+            const motivos: string[] = [];
+            if (hasUpgrade) { bonus += 0.5; motivos.push("upgrade broker"); }
+            if (typeof eg === "number" && eg > 0.15) { bonus += 0.4; motivos.push(`earnings +${(eg*100).toFixed(0)}%`); }
+            else if (typeof rg === "number" && rg > 0.10) { bonus += 0.3; motivos.push(`revenue +${(rg*100).toFixed(0)}%`); }
+            if (typeof pm === "number" && pm > 0.20) { bonus += 0.3; motivos.push("margen >20% (moat)"); }
+            if (bonus > 0) {
+              s.scoreTotal = Math.round((s.scoreTotal + bonus) * 10) / 10;
+              s.catalizadorBonus = `+${bonus.toFixed(1)}`;
+              s.catalizadorMotivo = motivos.join(" · ");
+            }
+          }
+          senalesOrdenadas.sort((a: any, b: any) => b.scoreTotal - a.scoreTotal);
+        }
+      } catch {}
+
       // ── ORDEN DE EJECUCIÓN DEL SCORING (jerarquía pt) ──────────────────────
       // 1 Intermarket (fase1: ratios Murphy + ciclo Pring) → 2 Macro (régimen
       // BCRA/riesgo/Fisher, gate de exigencia) → 3 Cuantitativo (fase4 R²/beta)
-      // → 4 Fundamental (fase5 gate Pascale 5.0 + MOS) → 5 Técnico (score ≥4.5).
+      // → 4 Fundamental (fase5 gate Pascale 5.0 + MOS) → 5 Técnico (score ≥4.5) → 6 Catalizador (Value/Tácticas)
       // Gate macro: régimen ADVERSO penaliza el score final (−0.5) y lo reporta.
       const regimenMacro = base.fase1?.macro?.regimen_macro ?? "NEUTRO";
       if (regimenMacro === "ADVERSO") {
@@ -198,9 +237,10 @@ export const getOportunidadesOrquestadas = createServerFn({ method: "POST" })
       const pipeline = [
         { fase: "1 · Intermarket", fuente: "Murphy ratios + ciclo Pring/Stovall", ok: !!base.fase1?.ciclo },
         { fase: "2 · Macro", fuente: `BCRA/CriptoYa/Fisher — régimen ${regimenMacro}`, ok: !!base.fase1?.macro },
-        { fase: "3 · Cuantitativo", fuente: "β/R² vs factor mayor ajuste", ok: tickerBestBenchmarks.length > 0 },
+        { fase: "3 · Cuantitativo", fuente: "β/R² vs factor mayor ajuste + Hurst p=1/H", ok: tickerBestBenchmarks.length > 0 },
         { fase: "4 · Fundamental", fuente: "Pascale 6D gate 5.0 + MOS Value", ok: base.fase5.senales.length > 0 },
         { fase: "5 · Técnico", fuente: "RSI/MACD/SMA score ≥4.5 + R/R ≥1.2", ok: true },
+        { fase: "6 · Catalizador (Value Investing / Tácticas)", fuente: "upgrade/earnings/margen (moat) — bonus cualitativo", ok: senalesOrdenadas.some((s: any) => s.catalizadorBonus) },
       ];
 
       return {

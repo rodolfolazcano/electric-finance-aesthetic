@@ -37,10 +37,12 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
       <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
         <h3 className="font-display text-lg font-semibold">Oportunidades — Panel de análisis financiero orquestado</h3>
         <p className="text-[13px] text-muted-foreground mt-1">
-          Datos en vivo Yahoo Finance, IOL, BCRA, ArgentinaDatos y CriptoYa. Máx 50 tickers por corrida.
-          Flujo: <span className="font-mono">Intermarket (Murphy)</span> → Sectores favorecidos (Pring/Schvarz) → Activos por sector → Cuantitativo vs factor mayor R² (CAPM/Labadie) → Fundamental (Pascale 6D) + Técnico → Oportunidades.
+          Datos en vivo Yahoo Finance, IOL, BCRA, ArgentinaDatos y CriptoYa. Screener solo sobre subyacentes EE.UU. (NYSE/NASDAQ) con estados contables completos — cada señal muestra su vía operable en BCBA (CEDEAR ARS/USD) o cuenta EE.UU. Máx 50 tickers por corrida, priorizados por liquidez.
         </p>
-        <p className="text-[11px] text-muted-foreground mt-1">Metodologías: Murphy intermarket, Pring 6 etapas, Bustamante 5 pasos, Fowler Newton moneda homogénea, Pascale valuación, Elbaum carteras/Markowitz, Labadie p=1/H & spectral, Dumrauf Fisher exacta.</p>
+        <p className="text-[12px] text-muted-foreground mt-1">
+          Flujo: <span className="font-mono">Intermarket (Murphy)</span> → <span className="font-mono">Macro</span> → <span className="font-mono">Cuantitativo (R² + Hurst p=1/H)</span> → <span className="font-mono">Fundamental (Pascale 6D gate)</span> → <span className="font-mono">Técnico</span> → <span className="font-mono">Catalizador (Value Investing / Tácticas — upgrade/earnings/margen)</span> → Oportunidades.
+        </p>
+        <p className="text-[11px] text-muted-foreground mt-1">Metodologías: Murphy intermarket + oro/dólar/yield, Pring 6 etapas, Bustamante 5 pasos, Fowler Newton moneda homogénea, Pascale valuación, Elbaum carteras/Markowitz, Labadie p=1/H & spectral + Hurst mean-reversion, Dumrauf Fisher exacta.</p>
       </div>
 
       {/* Controles */}
@@ -212,6 +214,7 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
                       <th className="text-left">Ticker</th>
                       <th className="text-left">Señal</th>
                       <th className="text-right">Score</th>
+                      <th className="text-left">Catalizador</th>
                       <th className="text-right">Upside</th>
                       <th className="text-right">R/R</th>
                       <th className="text-left">Factor R²</th>
@@ -227,7 +230,8 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
                           <td>
                             <Badge className={s.senal?.includes("COMPRA") ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"}>{s.senal}</Badge>
                           </td>
-                          <td className="text-right">{s.scoreTotal?.toFixed(1)}</td>
+                          <td className="text-right">{s.scoreTotal?.toFixed(1)}{s.catalizadorBonus && <span className="ml-1 text-[10px] text-emerald-400">{s.catalizadorBonus}</span>}</td>
+                          <td className="text-[11px] text-emerald-400">{s.catalizadorMotivo ?? "—"}</td>
                           <td className="text-right">{s.detalles?.ficha?.margen_seguridad?.upside_pct?.toFixed(1) ?? "—"}%</td>
                           <td className="text-right">{s.tecnica?.rrr?.toFixed(2) ?? "—"}</td>
                           <td className="text-right text-muted-foreground">{r2 != null ? r2.toFixed(3) : "—"}</td>
