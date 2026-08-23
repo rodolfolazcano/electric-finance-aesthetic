@@ -1,4 +1,4 @@
-﻿import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,8 +8,10 @@ import {
   type ObjetivosResult,
 } from "@/lib/planificacion/objetivos.functions";
 import { calcularInteresCompuesto } from "@/lib/calculadora-financiera.functions";
+import { getTasasVivasPlanificacion } from "@/lib/planificacion/tasas-vivas.functions";
+import { FieldHelp } from "./FieldHelp";
+import { usePerfilAfc } from "./PerfilAfcWizard";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const defaultInput: ObjetivosInput = {
@@ -21,9 +23,13 @@ const defaultInput: ObjetivosInput = {
 
 export function CalculadoraObjetivos() {
   const fn = useServerFn(calcularObjetivo);
+  const tasasFn = useServerFn(getTasasVivasPlanificacion);
+  const [perfil] = usePerfilAfc();
+  const [tasas, setTasas] = useState<any | null>(null);
   const [inputs, setInputs] = useState<ObjetivosInput>(defaultInput);
   const [result, setResult] = useState<ObjetivosResult | null>(null);
   const [loading, setLoading] = useState(false);
+  useEffect(()=>{ tasasFn({} as any).then((t:any)=>{ setTasas(t); const pf=t.mejorPF?.tna??70; const fci=t.fciMM?.teaAnual??60; const sug=perfil==="conservador"?fci:perfil==="arriesgado"?(t.lecapTea??pf):pf; setInputs(p=>({...p,tasaEsperada:+sug.toFixed(1)})); }).catch(()=>{});},[perfil]);
 
   const handleCalc = async () => {
     setLoading(true);
@@ -42,7 +48,7 @@ export function CalculadoraObjetivos() {
   return (
     <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <div className="glass p-5 space-y-4">
-        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">ParÃ¡metros</h3>
+        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Parámetros</h3>
         <div>
           <label className="text-xs text-muted-foreground">Monto objetivo ($)</label>
           <Input
@@ -71,16 +77,17 @@ export function CalculadoraObjetivos() {
           />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Tasa esperada (% anual)</label>
+          <FieldHelp label="Tasa esperada (% anual)" help="Rendimiento nominal. Sugerido según perfil: conservador→FCI, moderado→PF, arriesgado→LECAP. Ej. PF 68% hoy es tu ancla real." datoVivo={tasas?{label:perfil==="conservador"?`FCI`:perfil==="moderado"?`PF`:`LECAP`, valor:`${(perfil==="conservador"?tasas.fciMM?.teaAnual:perfil==="moderado"?tasas.mejorPF?.tna:tasas.lecapTea)??8}%`}:null} onUsar={()=>{const v=perfil==="conservador"?tasas?.fciMM?.teaAnual:perfil==="moderado"?tasas?.mejorPF?.tna:tasas?.lecapTea; if(v!=null) setInputs(p=>({...p,tasaEsperada:+v.toFixed(1)}));}} />
           <Input
             type="number"
             value={inputs.tasaEsperada}
             onChange={(e) => setInputs((p) => ({ ...p, tasaEsperada: Number(e.target.value) }))}
             className="h-8 text-xs mt-1"
           />
+          <p className="text-[11px] text-muted-foreground mt-1">Si tu objetivo es vivienda, compara con alquiler: la cuota hipotecaria vs alquiler mensual + costo oportunidad de la seña al FCI.</p>
         </div>
         <Button onClick={handleCalc} disabled={loading} className="w-full">
-          {loading ? "Calculandoâ€¦" : "Calcular"}
+          {loading ? "Calculando…" : "Calcular"}
         </Button>
       </div>
 
@@ -114,7 +121,7 @@ export function CalculadoraObjetivos() {
 
             <div className="glass p-5">
               <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
-                Aporte necesario segÃºn tasa de retorno
+                Aporte necesario según tasa de retorno
               </div>
               <div className="h-52">
                 <ResponsiveContainer width="100%" height="100%">
@@ -168,7 +175,6 @@ export function CalculadoraObjetivos() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="objetivos" />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-﻿import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,11 @@ import {
   type InversionesInput,
   type InversionesResult,
 } from "@/lib/planificacion/inversiones.functions";
-import { calcularInteresCompuesto } from "@/lib/calculadora-financiera.functions";
+import { calcularInteresCompuesto, fisherReal } from "@/lib/calculadora-financiera.functions";
+import { getTasasVivasPlanificacion } from "@/lib/planificacion/tasas-vivas.functions";
+import { FieldHelp } from "./FieldHelp";
+import { usePerfilAfc } from "./PerfilAfcWizard";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import {
   LineChart,
   Line,
@@ -32,9 +34,13 @@ const defaultInput: InversionesInput = {
 
 export function CalculadoraInversiones() {
   const fn = useServerFn(calcularInversiones);
+  const tasasFn = useServerFn(getTasasVivasPlanificacion);
+  const [perfil] = usePerfilAfc();
+  const [tasas, setTasas] = useState<any | null>(null);
   const [inputs, setInputs] = useState<InversionesInput>(defaultInput);
   const [result, setResult] = useState<InversionesResult | null>(null);
   const [loading, setLoading] = useState(false);
+  useEffect(()=>{ tasasFn({} as any).then((t:any)=>{ setTasas(t); const pf=t.mejorPF?.tna??70; const fci=t.fciMM?.teaAnual??60; const sug = perfil==="conservador"?fci:perfil==="arriesgado"?(t.lecapTea??pf):pf; setInputs(p=>({...p, tasaEsperada: +sug.toFixed(1)}));}).catch(()=>{}); },[perfil]);
 
   const handleCalc = async () => {
     setLoading(true);
@@ -60,7 +66,7 @@ export function CalculadoraInversiones() {
   return (
     <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <div className="glass p-5 space-y-4">
-        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">ParÃ¡metros</h3>
+        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Parámetros</h3>
         <div>
           <label className="text-xs text-muted-foreground">Monto inicial ($)</label>
           <Input
@@ -71,7 +77,7 @@ export function CalculadoraInversiones() {
           />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Aporte periÃ³dico ($)</label>
+          <label className="text-xs text-muted-foreground">Aporte periódico ($)</label>
           <Input
             type="number"
             value={inputs.aportePeriodico}
@@ -97,16 +103,17 @@ export function CalculadoraInversiones() {
           </select>
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Tasa esperada (% anual)</label>
+          <FieldHelp label="Tasa esperada (% anual)" help="Rendimiento nominal anual que esperás. Sugerido según perfil: conservador→FCI MM, moderado→PF, arriesgado→LECAP. Se precarga con dato vivo." datoVivo={tasas?{label: perfil==="conservador"?`FCI ${tasas.fciMM?.fondo?.slice(0,10)??"MM"}`:perfil==="moderado"?`PF ${tasas.mejorPF?.entidad?.slice(0,10)??"banco"}`:`LECAP`, valor:`${(perfil==="conservador"?tasas.fciMM?.teaAnual:perfil==="moderado"?tasas.mejorPF?.tna:tasas.lecapTea)??10}%`}:null} onUsar={()=>{const v=perfil==="conservador"?tasas?.fciMM?.teaAnual:perfil==="moderado"?tasas?.mejorPF?.tna:tasas?.lecapTea; if(v!=null) setInputs(p=>({...p,tasaEsperada:+v.toFixed(1)}));}} />
           <Input
             type="number"
             value={inputs.tasaEsperada}
             onChange={(e) => setInputs((p) => ({ ...p, tasaEsperada: Number(e.target.value) }))}
             className="h-8 text-xs mt-1"
           />
+          {tasas?.inflacionMensual!=null && <p className="text-[11px] text-muted-foreground mt-1">Real aprox: {fisherReal(inputs.tasaEsperada, tasas.inflacionMensual*12).toFixed(1)}% (Fisher vs π {(tasas.inflacionMensual*12).toFixed(1)}%)</p>}
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Plazo (aÃ±os)</label>
+          <label className="text-xs text-muted-foreground">Plazo (años)</label>
           <Input
             type="number"
             value={inputs.plazoAnos}
@@ -115,7 +122,7 @@ export function CalculadoraInversiones() {
           />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Tipo de interÃ©s</label>
+          <label className="text-xs text-muted-foreground">Tipo de interés</label>
           <select
             value={inputs.tipoInteres}
             onChange={(e) =>
@@ -128,7 +135,7 @@ export function CalculadoraInversiones() {
           </select>
         </div>
         <Button onClick={handleCalc} disabled={loading} className="w-full">
-          {loading ? "Calculandoâ€¦" : "Proyectar"}
+          {loading ? "Calculando…" : "Proyectar"}
         </Button>
       </div>
 
@@ -162,7 +169,7 @@ export function CalculadoraInversiones() {
 
             <div className="glass p-5">
               <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
-                ProyecciÃ³n: con aportes vs sin aportes
+                Proyección: con aportes vs sin aportes
               </div>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -226,7 +233,6 @@ export function CalculadoraInversiones() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="inversiones" />
       </div>
     </div>
   );

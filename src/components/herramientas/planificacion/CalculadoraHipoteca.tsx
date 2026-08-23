@@ -8,9 +8,8 @@ import {
   type HipotecaResult,
 } from "@/lib/planificacion/hipoteca.functions";
 import { getRiskFreeRateETTI } from "@/lib/herramientas/renta-fija.functions";
-import { calcularInteresCompuesto, calcularInteresSimple } from "@/lib/calculadora-financiera.functions";
+import { calcularInteresCompuesto, calcularInteresSimple, formatNumber } from "@/lib/calculadora-financiera.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
-import { ContactCTA } from "./ContactCTA";
 import {
   LineChart,
   Line,
@@ -38,6 +37,8 @@ export function CalculadoraHipoteca() {
   const [loadingETTI, setLoadingETTI] = useState(true);
   const [ettiNota, setEttiNota] = useState<string>("cargando tasa ETTI…");
   const [spread, setSpread] = useState(0);
+  const [alquiler, setAlquiler] = useState(450000);
+  const [sena, setSena] = useState(15000000);
 
   // A4: tasa default = ETTI*100 + spread editable. Loading state mientras trae tasa.
   useEffect(() => {
@@ -167,6 +168,12 @@ export function CalculadoraHipoteca() {
             <option value="aleman">Alemán (amort. fija)</option>
           </select>
         </div>
+        <div className="rounded border border-border/40 bg-muted/10 p-3 space-y-2">
+          <div className="text-[11px] font-semibold uppercase tracking-wider">Comparar: ¿alquilar o comprar?</div>
+          <label className="text-xs">Alquiler mensual de referencia ($)<input type="number" value={alquiler} onChange={e=>setAlquiler(Number(e.target.value)||0)} className="mt-1 w-full rounded border border-border/40 bg-background px-2 py-1.5 text-xs" /></label>
+          <label className="text-xs">Seña / anticipo que pondrías si comprás ($)<input type="number" value={sena} onChange={e=>setSena(Number(e.target.value)||0)} className="mt-1 w-full rounded border border-border/40 bg-background px-2 py-1.5 text-xs" /></label>
+          <p className="text-[11px] text-muted-foreground">Si alquilás, esa seña podría quedar invertida al FCI MM / caución (ETTI {(ettiNota.match(/(\d+\.\d+)%/)?.[1] ?? 5)}%). Comparamos costo total.</p>
+        </div>
         <Button onClick={handleCalc} disabled={loading} className="w-full">
           {loading ? "Calculando…" : "Calcular"}
         </Button>
@@ -276,6 +283,13 @@ export function CalculadoraHipoteca() {
               </div>
             </div>
 
+            {/* Alquilar vs comprar — punto de equilibrio */}
+            {result && (
+              <div className="glass p-4">
+                <div className="mono mb-2 text-[12px] uppercase tracking-[0.18em] text-muted-foreground">Alquilar vs comprar</div>
+                {(()=>{ const cuota=result.cuota; const meses=inputs.plazoMeses; const totalCuotas=result.totalPagado; const totalAlquiler=alquiler*meses; const costoOportunidad = sena * ( (ettiNota.match(/(\d+\.\d+)%/) ? Number(ettiNota.match(/(\d+\.\d+)%/)![1])/100 : 0.05)/12 * meses ); const diff = totalCuotas - (totalAlquiler + costoOportunidad); const gana = diff < 0 ? "Comprar" : "Alquilar"; const equilib = alquiler>0 ? Math.ceil(totalCuotas/(alquiler)) : 0; return <><p className="text-sm">Cuota <b>${cuota.toLocaleString()}</b> vs alquiler <b>${alquiler.toLocaleString()}</b> · Total cuotas {formatNumber(totalCuotas)} vs alquiler+oportunidad {formatNumber(totalAlquiler+costoOportunidad)} → <b>{gana}</b> conviene</p><p className="text-[11px] text-muted-foreground mt-1">Punto de equilibrio: si te quedás ~{equilib} meses, se igualan costos. AFC horizonte: corto (≤1a) liquidez→alquiler; largo ({">"}3a) patrimonio→compra si perfil moderado/arriesgado lo admite.</p></>;})()}
+              </div>
+            )}
             <div className="glass overflow-x-auto p-5">
               <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
                 Tabla de amortización (cada 12 cuotas)
@@ -326,7 +340,6 @@ export function CalculadoraHipoteca() {
             Descargar modelo (.xlsx)
           </Button>
         </div>
-        <ContactCTA origen="hipoteca" />
       </div>
     </div>
   );

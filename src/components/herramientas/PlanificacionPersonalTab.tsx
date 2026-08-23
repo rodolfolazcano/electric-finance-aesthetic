@@ -29,7 +29,10 @@ const VISTAS: { key: SubTab; label: string }[] = [
   { key: "patrimonio-neto", label: "Patrimonio" },
 ];
 
-export function PlanificacionPersonalTab({ initialSubTab }: { initialSubTab?: string } = {}) {
+export function PlanificacionPersonalTab({
+  initialSubTab,
+  onSubTabChange,
+}: { initialSubTab?: string; onSubTabChange?: (subTab: string) => void } = {}) {
   // referencia dedup (no se usan directamente aquí pero garantiza import centralizado)
   void calcularInteresSimple;
   void calcularInteresCompuesto;
@@ -64,22 +67,20 @@ export function PlanificacionPersonalTab({ initialSubTab }: { initialSubTab?: st
 
   return (
     <div className="space-y-8 w-full">
-      <div>
-        <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight">
-          Planificación financiera personal
-        </h2>
-        <p className="mt-1 max-w-3xl text-[17px] leading-relaxed text-muted-foreground lg:text-[19px]">
-          Calculadoras de jubilación, hipoteca, crecimiento, objetivos, presupuesto, deudas y
-          patrimonio neto para planificar sus finanzas personales.
-        </p>
-        <div aria-hidden className="electric-line mt-6 max-w-3xl" />
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.18em]">Tu ciclo vital AFC — ¿dónde estás?</h3>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Acumulación (&lt;45a): priorizá crecimiento (jubilación/inversiones). Consolidación (45-65): equilibrá crecimiento + preservación (objetivos/hipoteca). Retiro (65+): preservación y rentas (jubilación/patrimonio). Cada calculadora te dice en qué etapa estás y sugiere el perfil.</p>
+        <p className="mt-1 text-[11px] text-muted-foreground">Metodología: AFC Asesoramiento §3-4 (rentabilidad-seguridad-liquidez, horizonte &lt;1a corto, 1-3a medio, &gt;3a largo) + Seguros ciclo vital. Tu horizonte y perfil ajustan las tasas sugeridas automáticamente.</p>
       </div>
-
-      <div className="flex flex-wrap gap-1.5 border-b border-border/40 pb-2 w-full">
+      {/* Tabs horizontales duplican el panel lateral — visibles solo en móvil (< lg) */}
+      <div className="flex flex-wrap gap-1.5 border-b border-border/40 pb-2 w-full lg:hidden" aria-label="Navegación planificación (móvil)">
         {VISTAS.map((v) => (
           <button
             key={v.key}
-            onClick={() => setVista(v.key)}
+            onClick={() => {
+              setVista(v.key);
+              onSubTabChange?.(v.key);
+            }}
             className={`font-mono text-[14px] px-4 py-2 rounded-lg border transition-colors ${
               vista === v.key
                 ? "border-primary/60 bg-primary/10 text-primary"
