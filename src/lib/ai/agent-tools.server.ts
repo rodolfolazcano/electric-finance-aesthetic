@@ -207,7 +207,7 @@ export async function toolSandbox(args: ToolSandboxArgs): Promise<string> {
   }
 }
 
-//  context_library_search
+//  context_library_search (Supabase)
 
 export type ToolLibSearchArgs = { query: string; limit?: number };
 
@@ -221,6 +221,19 @@ export async function toolLibSearch(args: ToolLibSearchArgs): Promise<string> {
       .join("\n\n---\n\n");
   } catch (e: any) {
     return `[ERROR buscando en biblioteca]: ${e.message ?? String(e)}`;
+  }
+}
+
+//  consultar_base_conocimiento — corpus académico 185 docs / 12.776 chunks (Pascale, Fowler, Biondi, Elbaum, Dumrauf, Blanchard, Dornbusch, Bustamante, Murphy, Labadié)
+export type ToolBaseConocimientoArgs = { query: string; limit?: number };
+export async function toolBaseConocimiento(args: ToolBaseConocimientoArgs): Promise<string> {
+  try {
+    const { buscarAcademico } = await import("@/lib/kb-academic");
+    const res = await buscarAcademico(args.query, args.limit ?? 5);
+    if (!res.length) return "(sin coincidencias en base académica — probar con términos más específicos o consultar_base_conocimiento con categoría, ej: 'Pascale WACC' o 'Labadie Hurst')";
+    return res.map((c) => `[${c.categoria} | ${c.archivo} p${c.pagina}] sim ${(c.similitud * 100).toFixed(1)}%\n${c.texto.slice(0, 1400)}`).join("\n\n---\n\n");
+  } catch (e: any) {
+    return `[ERROR base académica]: ${e.message ?? String(e)}`;
   }
 }
 
@@ -797,6 +810,17 @@ export const AGENT_TOOLS: ToolRecord[] = [
     },
     required: ["query"],
     run: (a) => toolLibSearch(a as ToolLibSearchArgs),
+  },
+  {
+    name: "consultar_base_conocimiento",
+    description:
+      "Consulta el corpus académico Coronar (185 docs / 12.776 chunks: Pascale, Fowler Newton, Biondi, Elbaum, Dumrauf, Alonso, Blanchard/Perez-Enrri, Dornbusch-Fischer, Bustamante, Murphy + Labadié Quant 1205.3482v6 TC/IS p=1/H, 1303.7177 HFT, microstructure Kyle/Glosten, stat-arb 5 stages, spectral PCA, ML, zoology, ETFs, Black-Scholes). USAR SIEMPRE antes de calcular: encuadre académico dicta método. Categorías: Labadié - Quant & Microstructure; Pascale - Finanzas de la empresa; Contabilidad - Fowler Newton; Estados contables - Biondi; Carteras - Elbaum; Calculo financiero - Dumrauf; Macro LATAM - Blanchard/Perez-Enrri; Macro - Dornbusch-Fischer; Financiacion y mercados - Bustamante; Intermarket - Murphy. Ej: 'Pascale WACC', 'Labadie Hurst', 'Murphy intermarket ratios', 'Fowler Newton estados contables'.",
+    params: {
+      query: { type: "string", description: "Consulta académica con categoría + concepto, ej: 'Pascale DCF' o 'Labadie p=1/H'" },
+      limit: { type: "integer", description: "Máximo chunks (default 5)" },
+    },
+    required: ["query"],
+    run: (a) => toolBaseConocimiento(a as ToolBaseConocimientoArgs),
   },
   {
     name: "telegram_enviar_senal",
