@@ -248,7 +248,7 @@ export async function generarFlujoBonoPng(d: DatosFlujoBono): Promise<Buffer> {
               ]),
             ]),
           ]),
-          div({ display: "flex", fontSize: "11px", color: C.gris2, marginTop: "4px" }, `${flujoResumen} · Cada 100 VN · El pico rojo es el vencimiento`),
+          div({ display: "flex", fontSize: "11px", color: C.gris2, marginTop: "4px" }, `${flujoResumen} · Cada 100 VN · Las barras rojas incluyen amortización de capital`),
           div({ display: "flex", marginTop: "14px" }, [
             div({ display: "flex", flexDirection: "column", width: "60px" }, yAxisNodes),
             div(

@@ -841,6 +841,30 @@ ${nivelPrompt}${contextoBloque}${uiBloque}`,
     { role: "user", content: input.message },
   ];
 
+  // 3.b COMPUERTA DE RAZONAMIENTO PREVIO: interpretar el mensaje humano y
+  // planificar antes de ejecutar cualquier tool. Fail-open ante errores.
+  if (input.message.trim().length >= 15) {
+    try {
+      const { resilientChat } = await import("./providers.server");
+      const { REASONING_CHAIN } = await import("./model-catalog");
+      const planRes = await resilientChat(REASONING_CHAIN, [
+        {
+          role: "system",
+          content:
+            "Sos la compuerta de razonamiento previo de un agente financiero. Interpretá el pedido en lenguaje natural humano: intención real, entidades/tickers mencionados, qué archivos del contexto aplican y un plan mínimo de herramientas EN ORDEN. NO ejecutes nada. Respondé SOLO texto plano conciso (máx 8 líneas):\nINTENCIÓN: ...\nENTIDADES: ...\nARCHIVOS APLICABLES: ...\nPLAN: 1) herramienta — porqué; 2) ...",
+        },
+        { role: "user", content: input.message },
+      ], { maxTokens: 500 });
+      const planTexto = String(planRes.value ?? "").trim();
+      if (planTexto && !planTexto.startsWith("[API no disponible")) {
+        messages.splice(1, 0, {
+          role: "system",
+          content: `PLAN DE RAZONAMIENTO PREVIO (interpretación humana del pedido; seguílo, podés desviarte si una tool falla):\n${planTexto}`,
+        });
+      }
+    } catch { /* fail-open */ }
+  }
+
   // Fast path: seguimiento con tools (mismo topico, nivel fast, menos iteraciones)
   if (skip && nivel === "fast") {
     try {

@@ -1,14 +1,6 @@
 import { resilientJson } from "@/lib/ai/providers.server";
 import { JSON_CHAIN } from "@/lib/ai/model-catalog";
 import type { ChatMessage } from "@/lib/ai/providers.server";
-import { z } from "zod";
-
-const NewsSentimientoSchema = z.object({
-  ticker: z.string(),
-  sentimiento: z.enum(["positivo", "neutral", "negativo"]),
-  intensidad: z.number(),
-  motivoBreve: z.string(),
-});
 
 const NEWS_SYSTEM_PROMPT = `Clasificá el sentimiento de las siguientes noticias financieras para el ticker indicado. 
 NO es una recomendación de compra/venta. Solo clasificá el tono de lo que está escrito.
@@ -33,18 +25,18 @@ export async function clasificarSentimientoNoticias(
       { role: "user", content: JSON.stringify({ ticker, noticias: titulares }) },
     ];
 
-    const result = await resilientJson(JSON_CHAIN, messages, {
-      schema: NewsSentimientoSchema,
+    const result = await resilientJson<NewsSentimiento>(JSON_CHAIN, messages, {
       temperature: 0.2,
     });
 
-    if (!result.ok) return null;
+    const valor = result.value;
+    if (!valor || typeof valor !== "object") return null;
 
     return {
-      ticker: result.data.ticker ?? ticker,
-      sentimiento: result.data.sentimiento ?? "neutral",
-      intensidad: Math.min(100, Math.max(0, result.data.intensidad ?? 50)),
-      motivoBreve: result.data.motivoBreve ?? "",
+      ticker: valor.ticker ?? ticker,
+      sentimiento: valor.sentimiento ?? "neutral",
+      intensidad: Math.min(100, Math.max(0, valor.intensidad ?? 50)),
+      motivoBreve: valor.motivoBreve ?? "",
     };
   } catch {
     return null;

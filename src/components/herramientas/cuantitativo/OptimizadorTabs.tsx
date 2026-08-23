@@ -43,7 +43,27 @@ import universoCompleto from "@/data/unificado_completo.json";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import bcbaCedearsData from "@/lib/bcba-cedears.json";
-import { toCedearTicker } from "@/components/herramientas/shared/formatters";
+import { toCedearTicker, fmtNum } from "@/components/herramientas/shared/formatters";
+
+const SECTOR_EN_TO_ES: Record<string, string> = {
+  Technology: "Tecnología",
+  "Communication Services": "Servicios de Comunicación",
+  "Consumer Cyclical": "Consumo Cíclico",
+  "Consumer Defensive": "Defensiva del Consumidor",
+  Healthcare: "Cuidado de la Salud",
+  "Financial Services": "Servicios Financieros",
+  Energy: "Energía",
+  "Basic Materials": "Materiales Básicos",
+  Industrials: "Acciones Industriales",
+  Utilities: "Utilidades",
+  "Real Estate": "Bienes Raíces",
+};
+function traducirSector(s: string): string {
+  return SECTOR_EN_TO_ES[s] ?? s;
+}
+function traducirIndustria(i: string): string {
+  return i;
+}
 
 export function OptimizadorTabs() {
   const [subtab, setSubtab] = useState("manual");
@@ -2457,7 +2477,6 @@ function AllOptimizerResult({
   onTabChange: (t: string) => void;
   portfolioTickers?: string[];
 }) {
-  const navigate = useNavigate({ from: Route.id });
   const active = tab || data.strategies[0]?.strategy || "";
   const [selectedCapmBm, setSelectedCapmBm] = useState(data.capmBenchmarks?.[0]?.benchmark ?? "");
   const onBenchmarkSelect = useCallback((bm: string) => setSelectedCapmBm(bm), []);

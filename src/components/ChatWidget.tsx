@@ -49,6 +49,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { getRegistry } from "@/components/herramientas/simuladores/chat/registry";
+import { parseIntent } from "@/components/herramientas/simuladores/chat/intent";
 
 const WHATSAPP = "https://wa.me/541162355944";
 
@@ -440,6 +442,7 @@ export function ChatWidget() {
   const streamTokenRef = useRef(0);
   const pausedRef = useRef(false);
   const resumeRef = useRef<(() => void) | null>(null);
+  const lastSimuladorActionsRef = useRef<any[]>([]);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const [paused, setPaused] = useState(false);
@@ -453,6 +456,63 @@ export function ChatWidget() {
     }
   });
   const [autonomoActivo, setAutonomoActivo] = useState(false);
+
+  // ---- Simuladores bridge: el chat global también controla ¿Dónde invierto? y Mi plan ----
+  function getSimuladorActive(): string {
+    try {
+      const u = new URL(window.location.href);
+      const sp = u.searchParams.get("subTab");
+      if (sp === "comparador" || sp === "planificador") return sp;
+      const reg = getRegistry();
+      if (reg.planificador) return "planificador";
+      if (reg.comparador) return "comparador";
+      if (u.searchParams.get("tab") === "calculadora") return "comparador";
+      return "comparador";
+    } catch { return "comparador"; }
+  }
+  function executeSimuladorActions(actions: ReturnType<typeof parseIntent>["actions"]) {
+    const reg = getRegistry();
+    for (const a of actions) {
+      try {
+        if ((a as any).tool === "ui.setSubTab") {
+          window.dispatchEvent(new CustomEvent("simulador:changeSubTab", { detail: { subTab: (a as any).subTab } }));
+          try {
+            const url = new URL(window.location.href);
+            url.searchParams.set("tab", "calculadora");
+            url.searchParams.set("subTab", (a as any).subTab);
+            window.history.replaceState({}, "", url.toString());
+          } catch {}
+        } else if ((a as any).tool === "comparador.setCapital") reg.comparador?.setCapital((a as any).capital);
+        else if ((a as any).tool === "comparador.setDias") reg.comparador?.setDias((a as any).dias);
+        else if ((a as any).tool === "comparador.setInflacion") reg.comparador?.setInflacion((a as any).inflacion);
+        else if ((a as any).tool === "comparador.setVista") reg.comparador?.setVista((a as any).vista);
+        else if ((a as any).tool === "comparador.setModoReal") reg.comparador?.setModoReal((a as any).modoReal);
+        else if ((a as any).tool === "comparador.setInstrumento") {
+          const { id, ...rest } = a as any;
+          if (rest.enabled != null) reg.comparador?.setInstrumentoEnabled(id, rest.enabled);
+          if (rest.modo) reg.comparador?.setInstrumentoModo(id, rest.modo, rest.entidadId, rest.manualVal);
+        } else if ((a as any).tool === "planificador.setCampos") {
+          const p = (a as any).patch;
+          if (p.aporteInicial != null) reg.planificador?.setAporteInicial(p.aporteInicial);
+          if (p.aporteMensual != null) reg.planificador?.setAporteMensual(p.aporteMensual);
+          if (p.tna != null) reg.planificador?.setTna(p.tna);
+          if (p.inflacion != null) reg.planificador?.setInflacion(p.inflacion);
+          if (p.conCuotas != null) reg.planificador?.setConCuotas(p.conCuotas);
+          if (p.anticipada != null) reg.planificador?.setAnticipada(p.anticipada);
+          if (p.modo != null) reg.planificador?.setModo(p.modo);
+          if (p.vista != null) reg.planificador?.setVista(p.vista);
+          if (p.modoMeta != null) reg.planificador?.setModoMeta(p.modoMeta);
+          if (p.vfObjetivo != null) reg.planificador?.setVfObjetivo(p.vfObjetivo);
+          if (p.mesesMeta != null) reg.planificador?.setMesesMeta(p.mesesMeta);
+          if (p.edadActual != null) reg.planificador?.setEdadActual(p.edadActual);
+          if (p.edadRetiro != null) reg.planificador?.setEdadRetiro(p.edadRetiro);
+          if (p.esperanzaVida != null) reg.planificador?.setEsperanzaVida(p.esperanzaVida);
+          if (p.tasaDescuento != null) reg.planificador?.setTasaDescuento(p.tasaDescuento);
+        } else if ((a as any).tool === "planificador.setFlujos") reg.planificador?.setFlujos((a as any).flujos);
+        else if ((a as any).tool === "planificador.setExtras") reg.planificador?.setExtras((a as any).extras);
+      } catch {}
+    }
+  }
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -603,6 +663,21 @@ export function ChatWidget() {
   async function process(question: string) {
     const q = question.trim();
     if (!q) return;
+    // Bridge simuladores: si el usuario está en Herramientas, intentamos ejecutar en la UI localmente
+    try {
+      const reg = getRegistry();
+      const hasSimulador = !!(reg.comparador || reg.planificador);
+      const isHerramientas = typeof window !== "undefined" && (window.location.pathname.includes("herramientas") || window.location.search.includes("calculadora") || hasSimulador);
+      if (isHerramientas) {
+        const active = getSimuladorActive();
+        const snap = active === "planificador" ? reg.planificador?.getSnapshot() : reg.comparador?.getSnapshot();
+        const parsed = parseIntent(q, active, snap ?? {});
+        if (parsed.actions.length) {
+          executeSimuladorActions(parsed.actions);
+          lastSimuladorActionsRef.current = parsed.actions;
+        } else lastSimuladorActionsRef.current = [];
+      } else lastSimuladorActionsRef.current = [];
+    } catch {}
     // Se agrega de forma síncrona: streamTurn arranca con el mensaje actual ya presente.
     commit((prev) => [...prev, { role: "user" as const, content: q }]);
     setInput("");
@@ -618,6 +693,25 @@ export function ChatWidget() {
     const history = messagesRef.current
       .filter((m) => m !== WELCOME && !(m.role === "assistant" && !m.content.trim()))
       .map((m) => ({ role: m.role, content: m.content }));
+    // Inyectar contexto del simulador para que el LLM interprete correctamente lo que ya se ve en la UI
+    try {
+      const reg = getRegistry();
+      const active = getSimuladorActive();
+      const snap: any = active === "planificador" ? reg.planificador?.getSnapshot() : reg.comparador?.getSnapshot();
+      const pending = lastSimuladorActionsRef.current;
+      if (history.length) {
+        const last = history[history.length - 1];
+        if (last && last.role === "user") {
+          let ctx = "";
+          if (pending.length) ctx += ` [Acciones UI ya ejecutadas localmente: ${JSON.stringify(pending).slice(0, 800)}]`;
+          if (snap) ctx += active === "comparador"
+            ? ` [Contexto simulador ¿Dónde invierto? capital=${snap.capital} dias=${snap.dias} meses=${snap.meses} inflacion=${snap.inflacionMensual ?? "—"} ganador=${snap.ganador ? `${snap.ganador.label} ${snap.ganador.fuenteLabel} $${snap.ganador.vfNominal}` : "—"} vista=${snap.vista}]`
+            : ` [Contexto Mi plan modo=${snap.modo} vista=${snap.vista} aporteInicial=${snap.aporteInicial} aporteMensual=${snap.aporteMensual} tna=${snap.tna} inflacion=${snap.inflacionMensual} van=${snap.vanVal ?? "—"} tir=${snap.tirVal ?? "—"}]`;
+          if (ctx) last.content = last.content + ctx;
+        }
+      }
+      lastSimuladorActionsRef.current = [];
+    } catch {}
     commit((prev) => [...prev, { role: "assistant" as const, content: "" }]);
     setLoading(true);
 

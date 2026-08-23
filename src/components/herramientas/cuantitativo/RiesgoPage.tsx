@@ -28,6 +28,8 @@ import { CHART_TOOLTIP_STYLE, CHART_TOOLTIP_STYLE_LG, AXIS_TICK, AXIS_TICK_LG, G
 import { MarketDataInput } from "@/components/market-data/MarketDataInput";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { fmtNum } from "@/components/herramientas/shared/formatters";
 
 export function RiesgoPage() {
   const { accessToken, refreshToken, updateTokens } = useIOLSession();
@@ -1255,7 +1257,7 @@ function RiesgoManual({
 function RiesgoPortafolioIOL() {
   const fnSemaforoBatch = useServerFn(getSemaforoBatch);
   const iol = useIOLPortafolio();
-  const navigate = useNavigate({ from: Route.id });
+  const navigate = useNavigate({ from: "/herramientas" });
   const [tickers, setTickers] = useState<string[]>([]);
   const [semafotos, setSemafotos] = useState<SemaforoResult[] | null>(null);
   const [loadingPortfolio, setLoadingPortfolio] = useState(false);

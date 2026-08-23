@@ -84,15 +84,15 @@
               "fecha_vencimiento": "2030-07-09",
               "plazo": "Mediano",
               "cupon": {
-                "tasa": 1,
-                "tipo": "Step-up",
-                "detalle": "1.0% hasta Jul-2024, luego 4.0% anual (2.0 semestral)",
+                "tasa": 0.75,
+                "tipo": "Fija",
+                "detalle": "0.75% anual hasta jul-2027, luego 1.75% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "13 cuotas semestrales: 4% en jul-2024 y 12×8% (hasta jul-2030)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 150000000000,
               "volumen_diario_usd": 450000000,
@@ -107,51 +107,43 @@
               "flujo_fondos": [
                 {
                   "fecha": "2027-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.24
                 },
                 {
                   "fecha": "2027-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
                 },
                 {
                   "fecha": "2028-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.42
                 },
                 {
                   "fecha": "2028-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.35
                 },
                 {
                   "fecha": "2029-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.28
                 },
                 {
                   "fecha": "2029-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
                 },
                 {
                   "fecha": "2030-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.14
                 },
                 {
                   "fecha": "2030-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 102,
-                  "moneda": "USD"
+                  "monto_por_cien": 8.07
                 }
               ],
               "historico_precios": [],
@@ -174,15 +166,15 @@
               "fecha_vencimiento": "2030-07-09",
               "plazo": "Mediano",
               "cupon": {
-                "tasa": 1,
-                "tipo": "Step-up",
-                "detalle": "1.0% hasta Jul-2024, luego 4.0% anual (2.0 semestral)",
+                "tasa": 0.75,
+                "tipo": "Fija",
+                "detalle": "0.75% anual hasta jul-2027, luego 1.75% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "13 cuotas semestrales: 4% en jul-2024 y 12×8% (hasta jul-2030)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 50000000000,
               "volumen_diario_usd": 150000000,
@@ -197,51 +189,43 @@
               "flujo_fondos": [
                 {
                   "fecha": "2027-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.24
                 },
                 {
                   "fecha": "2027-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
                 },
                 {
                   "fecha": "2028-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.42
                 },
                 {
                   "fecha": "2028-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.35
                 },
                 {
                   "fecha": "2029-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.28
                 },
                 {
                   "fecha": "2029-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
                 },
                 {
                   "fecha": "2030-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.14
                 },
                 {
                   "fecha": "2030-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 102,
-                  "moneda": "USD"
+                  "monto_por_cien": 8.07
                 }
               ],
               "historico_precios": [],
@@ -264,15 +248,15 @@
               "fecha_vencimiento": "2030-07-09",
               "plazo": "Mediano",
               "cupon": {
-                "tasa": 1,
-                "tipo": "Step-up",
-                "detalle": "1.0% hasta Jul-2024, luego 4.0% anual (2.0 semestral)",
+                "tasa": 0.75,
+                "tipo": "Fija",
+                "detalle": "0.75% anual hasta jul-2027, luego 1.75% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "13 cuotas semestrales: 4% en jul-2024 y 12×8% (hasta jul-2030)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 30000000000,
               "volumen_diario_usd": 90000000,
@@ -287,51 +271,43 @@
               "flujo_fondos": [
                 {
                   "fecha": "2027-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.24
                 },
                 {
                   "fecha": "2027-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
                 },
                 {
                   "fecha": "2028-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.42
                 },
                 {
                   "fecha": "2028-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.35
                 },
                 {
                   "fecha": "2029-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.28
                 },
                 {
                   "fecha": "2029-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
                 },
                 {
                   "fecha": "2030-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.14
                 },
                 {
                   "fecha": "2030-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 102,
-                  "moneda": "USD"
+                  "monto_por_cien": 8.07
                 }
               ],
               "historico_precios": [],
@@ -353,15 +329,15 @@
               "fecha_vencimiento": "2035-07-09",
               "plazo": "Largo",
               "cupon": {
-                "tasa": 7.125,
-                "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "tasa": 4.125,
+                "tipo": "Step-up",
+                "detalle": "4.125% anual hasta jul-2027, 4.75% hasta jul-2028, luego 5.00% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "10 cuotas semestrales del 10% (ene-2031 a jul-2035)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 80000000000,
               "volumen_diario_usd": 240000000,
@@ -377,110 +353,92 @@
                 {
                   "fecha": "2027-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 2.0625
                 },
                 {
                   "fecha": "2027-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 2.0625
                 },
                 {
                   "fecha": "2028-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 2.375
                 },
                 {
                   "fecha": "2028-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 2.375
                 },
                 {
                   "fecha": "2029-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 2.5
                 },
                 {
                   "fecha": "2029-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 2.5
                 },
                 {
                   "fecha": "2030-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 2.5
                 },
                 {
                   "fecha": "2030-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 2.5
                 },
                 {
                   "fecha": "2031-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12.5
                 },
                 {
                   "fecha": "2031-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12.25
                 },
                 {
                   "fecha": "2032-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12
                 },
                 {
                   "fecha": "2032-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.75
                 },
                 {
                   "fecha": "2033-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.5
                 },
                 {
                   "fecha": "2033-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.25
                 },
                 {
                   "fecha": "2034-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11
                 },
                 {
                   "fecha": "2034-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.75
                 },
                 {
                   "fecha": "2035-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.5
                 },
                 {
                   "fecha": "2035-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 103.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 10.25
                 }
               ],
               "historico_precios": [],
@@ -502,15 +460,15 @@
               "fecha_vencimiento": "2035-07-09",
               "plazo": "Largo",
               "cupon": {
-                "tasa": 7.125,
-                "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "tasa": 4.125,
+                "tipo": "Step-up",
+                "detalle": "4.125% anual hasta jul-2027, 4.75% hasta jul-2028, luego 5.00% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "10 cuotas semestrales del 10% (ene-2031 a jul-2035)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 15000000000,
               "volumen_diario_usd": 45000000,
@@ -522,7 +480,98 @@
                 "dias_convencion": "ACT/365",
                 "tipo_tir": "TIR_Anual_USD"
               },
-              "flujo_fondos": null,
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.0625
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.0625
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.375
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.375
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2031-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12.5
+                },
+                {
+                  "fecha": "2031-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12.25
+                },
+                {
+                  "fecha": "2032-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12
+                },
+                {
+                  "fecha": "2032-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.75
+                },
+                {
+                  "fecha": "2033-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.5
+                },
+                {
+                  "fecha": "2033-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.25
+                },
+                {
+                  "fecha": "2034-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11
+                },
+                {
+                  "fecha": "2034-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.75
+                },
+                {
+                  "fecha": "2035-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.5
+                },
+                {
+                  "fecha": "2035-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.25
+                }
+              ],
               "historico_precios": [],
               "paridades_historicas": []
             },
@@ -540,15 +589,15 @@
               "fecha_vencimiento": "2041-07-09",
               "plazo": "Largo",
               "cupon": {
-                "tasa": 7.125,
+                "tasa": 3.5,
                 "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "detalle": "3.50% anual hasta jul-2029, luego 4.875% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "28 cuotas semestrales iguales de 3.5714% (ene-2028 a jul-2041)",
               "liquidez": "Media",
               "volumen_diario_pesos": 30000000000,
               "volumen_diario_usd": 90000000,
@@ -560,7 +609,158 @@
                 "dias_convencion": "ACT/365",
                 "tipo_tir": "TIR_Anual_USD"
               },
-              "flujo_fondos": null,
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 1.75
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 1.75
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3214
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.2589
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1964
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1339
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.6607
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.5737
+                },
+                {
+                  "fecha": "2031-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.4866
+                },
+                {
+                  "fecha": "2031-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3996
+                },
+                {
+                  "fecha": "2032-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3125
+                },
+                {
+                  "fecha": "2032-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.2254
+                },
+                {
+                  "fecha": "2033-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1384
+                },
+                {
+                  "fecha": "2033-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.0513
+                },
+                {
+                  "fecha": "2034-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.9643
+                },
+                {
+                  "fecha": "2034-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.8772
+                },
+                {
+                  "fecha": "2035-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.7902
+                },
+                {
+                  "fecha": "2035-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.7031
+                },
+                {
+                  "fecha": "2036-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.6161
+                },
+                {
+                  "fecha": "2036-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.529
+                },
+                {
+                  "fecha": "2037-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.442
+                },
+                {
+                  "fecha": "2037-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.3549
+                },
+                {
+                  "fecha": "2038-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.2679
+                },
+                {
+                  "fecha": "2038-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.1808
+                },
+                {
+                  "fecha": "2039-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.0938
+                },
+                {
+                  "fecha": "2039-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.0067
+                },
+                {
+                  "fecha": "2040-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.9196
+                },
+                {
+                  "fecha": "2040-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.8326
+                },
+                {
+                  "fecha": "2041-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.7455
+                },
+                {
+                  "fecha": "2041-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.6585
+                }
+              ],
               "historico_precios": [],
               "paridades_historicas": []
             },
@@ -580,15 +780,15 @@
               "fecha_vencimiento": "2029-07-09",
               "plazo": "Corto",
               "cupon": {
-                "tasa": 7.125,
+                "tasa": 1,
                 "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "detalle": "1.00% anual fijo",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "10 cuotas semestrales del 10% (ene-2025 a jul-2029)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 60000000000,
               "volumen_diario_usd": 180000000,
@@ -603,39 +803,33 @@
               "flujo_fondos": [
                 {
                   "fecha": "2027-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.3
                 },
                 {
                   "fecha": "2027-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.25
                 },
                 {
                   "fecha": "2028-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.2
                 },
                 {
                   "fecha": "2028-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.15
                 },
                 {
                   "fecha": "2029-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.1
                 },
                 {
                   "fecha": "2029-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 103.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 10.05
                 }
               ],
               "historico_precios": [],
@@ -657,15 +851,15 @@
               "fecha_vencimiento": "2029-07-09",
               "plazo": "Corto",
               "cupon": {
-                "tasa": 7.125,
+                "tasa": 1,
                 "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "detalle": "1.00% anual fijo",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "10 cuotas semestrales del 10% (ene-2025 a jul-2029)",
               "liquidez": "Media",
               "volumen_diario_pesos": 10000000000,
               "volumen_diario_usd": 30000000,
@@ -677,7 +871,38 @@
                 "dias_convencion": "ACT/365",
                 "tipo_tir": "TIR_Anual_USD"
               },
-              "flujo_fondos": null,
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.3
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.25
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.2
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.15
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.1
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.05
+                }
+              ],
               "historico_precios": [],
               "paridades_historicas": []
             }
@@ -711,15 +936,15 @@
               "fecha_vencimiento": "2030-07-09",
               "plazo": "Mediano",
               "cupon": {
-                "tasa": 1,
-                "tipo": "Step-up",
-                "detalle": "1.0% hasta Jul-2024, luego 4.0% anual (2.0 semestral)",
+                "tasa": 0.75,
+                "tipo": "Fija",
+                "detalle": "0.75% anual hasta jul-2027, luego 1.75% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "13 cuotas semestrales: 4% en jul-2024 y 12×8% (hasta jul-2030)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 120000000000,
               "volumen_diario_usd": 360000000,
@@ -734,51 +959,43 @@
               "flujo_fondos": [
                 {
                   "fecha": "2027-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.24
                 },
                 {
                   "fecha": "2027-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
                 },
                 {
                   "fecha": "2028-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.42
                 },
                 {
                   "fecha": "2028-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.35
                 },
                 {
                   "fecha": "2029-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.28
                 },
                 {
                   "fecha": "2029-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
                 },
                 {
                   "fecha": "2030-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 2,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.14
                 },
                 {
                   "fecha": "2030-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 102,
-                  "moneda": "USD"
+                  "monto_por_cien": 8.07
                 }
               ],
               "historico_precios": [],
@@ -801,15 +1018,15 @@
               "fecha_vencimiento": "2030-07-09",
               "plazo": "Mediano",
               "cupon": {
-                "tasa": 1,
-                "tipo": "Step-up",
-                "detalle": "1.0% hasta Jul-2024, luego 4.0%",
+                "tasa": 0.75,
+                "tipo": "Fija",
+                "detalle": "0.75% anual hasta jul-2027, luego 1.75% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "13 cuotas semestrales: 4% en jul-2024 y 12×8% (hasta jul-2030)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 40000000000,
               "volumen_diario_usd": 120000000,
@@ -821,7 +1038,48 @@
                 "dias_convencion": "ACT/365",
                 "tipo_tir": "TIR_Anual_USD"
               },
-              "flujo_fondos": null,
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.24
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.42
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.35
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.28
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.14
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.07
+                }
+              ],
               "historico_precios": [],
               "paridades_historicas": []
             },
@@ -842,15 +1100,15 @@
               "fecha_vencimiento": "2030-07-09",
               "plazo": "Mediano",
               "cupon": {
-                "tasa": 1,
-                "tipo": "Step-up",
-                "detalle": "1.0% hasta Jul-2024, luego 4.0%",
+                "tasa": 0.75,
+                "tipo": "Fija",
+                "detalle": "0.75% anual hasta jul-2027, luego 1.75% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "13 cuotas semestrales: 4% en jul-2024 y 12×8% (hasta jul-2030)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 25000000000,
               "volumen_diario_usd": 75000000,
@@ -862,7 +1120,48 @@
                 "dias_convencion": "ACT/365",
                 "tipo_tir": "TIR_Anual_USD"
               },
-              "flujo_fondos": null,
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.24
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.42
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.35
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.28
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.21
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.14
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 8.07
+                }
+              ],
               "historico_precios": [],
               "paridades_historicas": []
             },
@@ -875,20 +1174,22 @@
               "subtipo": "Tasa Fija",
               "ley": "Nueva_York",
               "especie": "Pesos",
-              "especies_relacionadas": {},
+              "especies_relacionadas": {
+                "D": "GD35D"
+              },
               "fecha_emision": "2020-09-04",
               "fecha_vencimiento": "2035-07-09",
               "plazo": "Largo",
               "cupon": {
-                "tasa": 7.125,
-                "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "tasa": 4.125,
+                "tipo": "Step-up",
+                "detalle": "4.125% anual hasta jul-2027, 4.75% hasta jul-2028, luego 5.00% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "10 cuotas semestrales del 10% (ene-2031 a jul-2035)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 70000000000,
               "volumen_diario_usd": 210000000,
@@ -900,7 +1201,98 @@
                 "dias_convencion": "ACT/365",
                 "tipo_tir": "TIR_Anual_USD"
               },
-              "flujo_fondos": null,
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.0625
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.0625
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.375
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.375
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2031-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12.5
+                },
+                {
+                  "fecha": "2031-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12.25
+                },
+                {
+                  "fecha": "2032-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12
+                },
+                {
+                  "fecha": "2032-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.75
+                },
+                {
+                  "fecha": "2033-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.5
+                },
+                {
+                  "fecha": "2033-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.25
+                },
+                {
+                  "fecha": "2034-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11
+                },
+                {
+                  "fecha": "2034-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.75
+                },
+                {
+                  "fecha": "2035-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.5
+                },
+                {
+                  "fecha": "2035-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.25
+                }
+              ],
               "historico_precios": [],
               "paridades_historicas": []
             },
@@ -915,18 +1307,18 @@
               "especie": "Pesos",
               "especies_relacionadas": {},
               "fecha_emision": "2020-09-04",
-              "fecha_vencimiento": "2038-07-09",
+              "fecha_vencimiento": "2038-01-09",
               "plazo": "Largo",
               "cupon": {
-                "tasa": 7.125,
+                "tasa": 5,
                 "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "detalle": "0.125%/2.00%/3.875%/4.25% históricos, 5.00% anual desde jul-2024",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "22 cuotas semestrales iguales de 4.5454% (jul-2027 a ene-2038)",
               "liquidez": "Media",
               "volumen_diario_pesos": 20000000000,
               "volumen_diario_usd": 60000000,
@@ -938,7 +1330,123 @@
                 "dias_convencion": "ACT/365",
                 "tipo_tir": "TIR_Anual_USD"
               },
-              "flujo_fondos": null,
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 7.0455
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.9318
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.8182
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.7045
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.5909
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.4773
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.3636
+                },
+                {
+                  "fecha": "2031-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.25
+                },
+                {
+                  "fecha": "2031-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.1364
+                },
+                {
+                  "fecha": "2032-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.0227
+                },
+                {
+                  "fecha": "2032-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.9091
+                },
+                {
+                  "fecha": "2033-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.7955
+                },
+                {
+                  "fecha": "2033-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.6818
+                },
+                {
+                  "fecha": "2034-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.5682
+                },
+                {
+                  "fecha": "2034-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.4545
+                },
+                {
+                  "fecha": "2035-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3409
+                },
+                {
+                  "fecha": "2035-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.2273
+                },
+                {
+                  "fecha": "2036-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1136
+                },
+                {
+                  "fecha": "2036-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5
+                },
+                {
+                  "fecha": "2037-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.8864
+                },
+                {
+                  "fecha": "2037-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.7727
+                },
+                {
+                  "fecha": "2038-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.6591
+                }
+              ],
               "historico_precios": [],
               "paridades_historicas": []
             },
@@ -953,18 +1461,18 @@
               "especie": "Pesos",
               "especies_relacionadas": {},
               "fecha_emision": "2020-09-04",
-              "fecha_vencimiento": "2038-07-09",
+              "fecha_vencimiento": "2038-01-09",
               "plazo": "Largo",
               "cupon": {
-                "tasa": 7.125,
+                "tasa": 5,
                 "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "detalle": "0.125%/2.00%/3.875%/4.25% históricos, 5.00% anual desde jul-2024",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "22 cuotas semestrales iguales de 4.5454% (jul-2027 a ene-2038)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 40000000000,
               "volumen_diario_usd": 120000000,
@@ -976,7 +1484,123 @@
                 "dias_convencion": "ACT/365",
                 "tipo_tir": "TIR_Anual_USD"
               },
-              "flujo_fondos": null,
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 7.0455
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.9318
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.8182
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.7045
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.5909
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.4773
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.3636
+                },
+                {
+                  "fecha": "2031-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.25
+                },
+                {
+                  "fecha": "2031-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.1364
+                },
+                {
+                  "fecha": "2032-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 6.0227
+                },
+                {
+                  "fecha": "2032-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.9091
+                },
+                {
+                  "fecha": "2033-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.7955
+                },
+                {
+                  "fecha": "2033-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.6818
+                },
+                {
+                  "fecha": "2034-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.5682
+                },
+                {
+                  "fecha": "2034-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.4545
+                },
+                {
+                  "fecha": "2035-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3409
+                },
+                {
+                  "fecha": "2035-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.2273
+                },
+                {
+                  "fecha": "2036-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1136
+                },
+                {
+                  "fecha": "2036-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5
+                },
+                {
+                  "fecha": "2037-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.8864
+                },
+                {
+                  "fecha": "2037-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.7727
+                },
+                {
+                  "fecha": "2038-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.6591
+                }
+              ],
               "historico_precios": [],
               "paridades_historicas": []
             },
@@ -989,20 +1613,22 @@
               "subtipo": "Tasa Fija",
               "ley": "Nueva_York",
               "especie": "Pesos",
-              "especies_relacionadas": {},
+              "especies_relacionadas": {
+                "D": "GD41D"
+              },
               "fecha_emision": "2020-09-04",
               "fecha_vencimiento": "2041-07-09",
               "plazo": "Largo",
               "cupon": {
-                "tasa": 7.125,
+                "tasa": 3.5,
                 "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "detalle": "3.50% anual hasta jul-2029, luego 4.875% anual",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "28 cuotas semestrales iguales de 3.5714% (ene-2028 a jul-2041)",
               "liquidez": "Media",
               "volumen_diario_pesos": 15000000000,
               "volumen_diario_usd": 45000000,
@@ -1014,7 +1640,158 @@
                 "dias_convencion": "ACT/365",
                 "tipo_tir": "TIR_Anual_USD"
               },
-              "flujo_fondos": null,
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 1.75
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 1.75
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3214
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.2589
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1964
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1339
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.6607
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.5737
+                },
+                {
+                  "fecha": "2031-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.4866
+                },
+                {
+                  "fecha": "2031-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3996
+                },
+                {
+                  "fecha": "2032-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3125
+                },
+                {
+                  "fecha": "2032-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.2254
+                },
+                {
+                  "fecha": "2033-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1384
+                },
+                {
+                  "fecha": "2033-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.0513
+                },
+                {
+                  "fecha": "2034-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.9643
+                },
+                {
+                  "fecha": "2034-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.8772
+                },
+                {
+                  "fecha": "2035-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.7902
+                },
+                {
+                  "fecha": "2035-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.7031
+                },
+                {
+                  "fecha": "2036-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.6161
+                },
+                {
+                  "fecha": "2036-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.529
+                },
+                {
+                  "fecha": "2037-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.442
+                },
+                {
+                  "fecha": "2037-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.3549
+                },
+                {
+                  "fecha": "2038-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.2679
+                },
+                {
+                  "fecha": "2038-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.1808
+                },
+                {
+                  "fecha": "2039-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.0938
+                },
+                {
+                  "fecha": "2039-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.0067
+                },
+                {
+                  "fecha": "2040-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.9196
+                },
+                {
+                  "fecha": "2040-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.8326
+                },
+                {
+                  "fecha": "2041-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.7455
+                },
+                {
+                  "fecha": "2041-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.6585
+                }
+              ],
               "historico_precios": [],
               "paridades_historicas": []
             },
@@ -1034,15 +1811,15 @@
               "fecha_vencimiento": "2029-07-09",
               "plazo": "Corto",
               "cupon": {
-                "tasa": 7.125,
+                "tasa": 1,
                 "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "detalle": "1.00% anual fijo",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "10 cuotas semestrales del 10% (ene-2025 a jul-2029)",
               "liquidez": "Alta",
               "volumen_diario_pesos": 50000000000,
               "volumen_diario_usd": 150000000,
@@ -1057,39 +1834,33 @@
               "flujo_fondos": [
                 {
                   "fecha": "2027-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.3
                 },
                 {
                   "fecha": "2027-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.25
                 },
                 {
                   "fecha": "2028-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.2
                 },
                 {
                   "fecha": "2028-07-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.15
                 },
                 {
                   "fecha": "2029-01-09",
-                  "tipo": "Cupon",
-                  "monto_por_cien": 3.5625,
-                  "moneda": "USD"
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.1
                 },
                 {
                   "fecha": "2029-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 103.5625,
-                  "moneda": "USD"
+                  "monto_por_cien": 10.05
                 }
               ],
               "historico_precios": [],
@@ -1111,15 +1882,15 @@
               "fecha_vencimiento": "2029-07-09",
               "plazo": "Corto",
               "cupon": {
-                "tasa": 7.125,
+                "tasa": 1,
                 "tipo": "Fija",
-                "detalle": "7.125% anual fijo",
+                "detalle": "1.00% anual fijo",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
-                "convencion": "ACT/365"
+                "convencion": "30/360"
               },
               "valor_nominal": 100,
-              "amortizacion": "Bullet (100% al vencimiento)",
+              "amortizacion": "10 cuotas semestrales del 10% (ene-2025 a jul-2029)",
               "liquidez": "Media",
               "volumen_diario_pesos": 8000000000,
               "volumen_diario_usd": 24000000,
@@ -1131,7 +1902,662 @@
                 "dias_convencion": "ACT/365",
                 "tipo_tir": "TIR_Anual_USD"
               },
-              "flujo_fondos": null,
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.3
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.25
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.2
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.15
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.1
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.05
+                }
+              ],
+              "historico_precios": [],
+              "paridades_historicas": []
+            },
+            {
+              "ticker": "GD35D",
+              "nombre": "Global 2035 D",
+              "emisor": "Estado Nacional Argentino",
+              "moneda": "USD",
+              "tipo": "Global",
+              "subtipo": "Tasa Fija",
+              "ley": "Nueva_York",
+              "especie": "Cable",
+              "especies_relacionadas": {
+                "Pesos": "GD35"
+              },
+              "fecha_emision": "2020-09-04",
+              "fecha_vencimiento": "2035-07-09",
+              "plazo": "Largo",
+              "cupon": {
+                "tasa": 4.125,
+                "tipo": "Step-up",
+                "detalle": "4.125% anual hasta jul-2027, 4.75% hasta jul-2028, luego 5.00% anual",
+                "frecuencia": "Semestral",
+                "dias_cupon": 182,
+                "convencion": "30/360"
+              },
+              "valor_nominal": 100,
+              "amortizacion": "10 cuotas semestrales del 10% (ene-2031 a jul-2035)",
+              "liquidez": "Alta",
+              "volumen_diario_pesos": 70000000000,
+              "volumen_diario_usd": 210000000,
+              "mercado": "BYMA",
+              "activo": true,
+              "calculo": {
+                "tir_metodo": "Newton-Raphson",
+                "flujo_modelo": "Cupon+Fecha+Amortizacion",
+                "dias_convencion": "ACT/365",
+                "tipo_tir": "TIR_Anual_USD"
+              },
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.0625
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.0625
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.375
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.375
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2031-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12.5
+                },
+                {
+                  "fecha": "2031-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12.25
+                },
+                {
+                  "fecha": "2032-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 12
+                },
+                {
+                  "fecha": "2032-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.75
+                },
+                {
+                  "fecha": "2033-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.5
+                },
+                {
+                  "fecha": "2033-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11.25
+                },
+                {
+                  "fecha": "2034-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 11
+                },
+                {
+                  "fecha": "2034-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.75
+                },
+                {
+                  "fecha": "2035-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.5
+                },
+                {
+                  "fecha": "2035-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 10.25
+                }
+              ],
+              "historico_precios": [],
+              "paridades_historicas": []
+            },
+            {
+              "ticker": "GD41D",
+              "nombre": "Global 2041 D",
+              "emisor": "Estado Nacional Argentino",
+              "moneda": "USD",
+              "tipo": "Global",
+              "subtipo": "Tasa Fija",
+              "ley": "Nueva_York",
+              "especie": "Cable",
+              "especies_relacionadas": {
+                "Pesos": "GD41"
+              },
+              "fecha_emision": "2020-09-04",
+              "fecha_vencimiento": "2041-07-09",
+              "plazo": "Largo",
+              "cupon": {
+                "tasa": 3.5,
+                "tipo": "Fija",
+                "detalle": "3.50% anual hasta jul-2029, luego 4.875% anual",
+                "frecuencia": "Semestral",
+                "dias_cupon": 182,
+                "convencion": "30/360"
+              },
+              "valor_nominal": 100,
+              "amortizacion": "28 cuotas semestrales iguales de 3.5714% (ene-2028 a jul-2041)",
+              "liquidez": "Media",
+              "volumen_diario_pesos": 15000000000,
+              "volumen_diario_usd": 45000000,
+              "mercado": "BYMA",
+              "activo": true,
+              "calculo": {
+                "tir_metodo": "Newton-Raphson",
+                "flujo_modelo": "Cupon+Fecha+Amortizacion",
+                "dias_convencion": "ACT/365",
+                "tipo_tir": "TIR_Anual_USD"
+              },
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 1.75
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 1.75
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3214
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.2589
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1964
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1339
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.6607
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.5737
+                },
+                {
+                  "fecha": "2031-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.4866
+                },
+                {
+                  "fecha": "2031-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3996
+                },
+                {
+                  "fecha": "2032-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.3125
+                },
+                {
+                  "fecha": "2032-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.2254
+                },
+                {
+                  "fecha": "2033-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.1384
+                },
+                {
+                  "fecha": "2033-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 5.0513
+                },
+                {
+                  "fecha": "2034-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.9643
+                },
+                {
+                  "fecha": "2034-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.8772
+                },
+                {
+                  "fecha": "2035-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.7902
+                },
+                {
+                  "fecha": "2035-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.7031
+                },
+                {
+                  "fecha": "2036-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.6161
+                },
+                {
+                  "fecha": "2036-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.529
+                },
+                {
+                  "fecha": "2037-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.442
+                },
+                {
+                  "fecha": "2037-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.3549
+                },
+                {
+                  "fecha": "2038-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.2679
+                },
+                {
+                  "fecha": "2038-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.1808
+                },
+                {
+                  "fecha": "2039-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.0938
+                },
+                {
+                  "fecha": "2039-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 4.0067
+                },
+                {
+                  "fecha": "2040-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.9196
+                },
+                {
+                  "fecha": "2040-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.8326
+                },
+                {
+                  "fecha": "2041-01-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.7455
+                },
+                {
+                  "fecha": "2041-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 3.6585
+                }
+              ],
+              "historico_precios": [],
+              "paridades_historicas": []
+            },
+            {
+              "ticker": "AA37",
+              "nombre": "Argentine Republic 5% 2037",
+              "emisor": "Estado Nacional Argentino",
+              "moneda": "USD",
+              "tipo": "Global",
+              "subtipo": "Tasa Fija",
+              "ley": "Nueva_York",
+              "especie": "Pesos",
+              "especies_relacionadas": {
+                "D": "AA37D"
+              },
+              "fecha_emision": "2020-09-04",
+              "fecha_vencimiento": "2037-07-09",
+              "plazo": "Largo",
+              "cupon": {
+                "tasa": 5,
+                "tipo": "Fija",
+                "detalle": "5.00% anual fijo (SIN verificación oficial — datos heredados de bonos.json)",
+                "frecuencia": "Semestral",
+                "dias_cupon": 182,
+                "convencion": "30/360"
+              },
+              "valor_nominal": 100,
+              "amortizacion": "Bullet (100% al vencimiento) — SIN verificación oficial",
+              "liquidez": "Alta",
+              "volumen_diario_pesos": 70000000000,
+              "volumen_diario_usd": 210000000,
+              "mercado": "BYMA",
+              "activo": true,
+              "calculo": {
+                "tir_metodo": "Newton-Raphson",
+                "flujo_modelo": "Cupon+Fecha+Amortizacion",
+                "dias_convencion": "ACT/365",
+                "tipo_tir": "TIR_Anual_USD"
+              },
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2031-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2031-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2032-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2032-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2033-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2033-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2034-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2034-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2035-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2035-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2036-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2036-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2037-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2037-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 102.5
+                }
+              ],
+              "historico_precios": [],
+              "paridades_historicas": []
+            },
+            {
+              "ticker": "AA37D",
+              "nombre": "Argentine Republic 5% 2037 D",
+              "emisor": "Estado Nacional Argentino",
+              "moneda": "USD",
+              "tipo": "Global",
+              "subtipo": "Tasa Fija",
+              "ley": "Nueva_York",
+              "especie": "Dolar",
+              "especies_relacionadas": {
+                "Pesos": "AA37"
+              },
+              "fecha_emision": "2020-09-04",
+              "fecha_vencimiento": "2037-07-09",
+              "plazo": "Largo",
+              "cupon": {
+                "tasa": 5,
+                "tipo": "Fija",
+                "detalle": "5.00% anual fijo (SIN verificación oficial — datos heredados de bonos.json)",
+                "frecuencia": "Semestral",
+                "dias_cupon": 182,
+                "convencion": "30/360"
+              },
+              "valor_nominal": 100,
+              "amortizacion": "Bullet (100% al vencimiento) — SIN verificación oficial",
+              "liquidez": "Alta",
+              "volumen_diario_pesos": 70000000000,
+              "volumen_diario_usd": 210000000,
+              "mercado": "BYMA",
+              "activo": true,
+              "calculo": {
+                "tir_metodo": "Newton-Raphson",
+                "flujo_modelo": "Cupon+Fecha+Amortizacion",
+                "dias_convencion": "ACT/365",
+                "tipo_tir": "TIR_Anual_USD"
+              },
+              "flujo_fondos": [
+                {
+                  "fecha": "2027-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2027-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2028-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2028-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2029-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2029-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2030-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2030-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2031-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2031-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2032-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2032-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2033-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2033-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2034-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2034-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2035-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2035-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2036-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2036-07-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2037-01-09",
+                  "tipo": "Cupon",
+                  "monto_por_cien": 2.5
+                },
+                {
+                  "fecha": "2037-07-09",
+                  "tipo": "Cupon+Amortizacion",
+                  "monto_por_cien": 102.5
+                }
+              ],
               "historico_precios": [],
               "paridades_historicas": []
             }

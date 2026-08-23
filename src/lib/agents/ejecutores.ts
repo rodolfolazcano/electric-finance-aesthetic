@@ -4017,7 +4017,7 @@ export async function ejecutarYTM(argsRaw: string, sessionId: string): Promise<{
             tirAnual: r.tirAnual,
             tem: r.tem,
             tna: r.tna,
-            flujos: r.flujos.map((f) => ({ fecha: f.fecha, monto: f.monto })),
+            flujos: r.flujos.map((f) => ({ fecha: f.fecha, monto: f.monto, tipo: f.tipo })),
           });
           eventos.push({
             t: "chart",

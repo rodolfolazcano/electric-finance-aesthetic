@@ -269,7 +269,7 @@ export type ResultadoYTM = {
   tem: number | null;
   tna: number | null;
   flujosFuturos: number;
-  flujos: { fecha: string; monto: number }[];
+  flujos: { fecha: string; monto: number; tipo?: string }[];
   diagnostico: string;
   fuente: string;
 };
@@ -377,6 +377,16 @@ export async function calcularYTM(tickerRaw: string, sessionId: string, precioMa
   const tem = Math.pow(1 + tir, 1 / 12) - 1;
   const tna = tem * 12;
 
+  // Advertencias de calidad de datos (series sin verificación oficial / letras sin capitalización)
+  const TICKERS_SIN_VERIFICAR = new Set(["GD46", "AA37", "AA37D", "GD46D"]);
+  const avisos: string[] = [];
+  if (TICKERS_SIN_VERIFICAR.has(ticker)) {
+    avisos.push("ATENCIÓN: términos financieros sin verificación contra fuente oficial — TIR orientativa.");
+  }
+  if (flujosFuturos.length === 1 && Math.abs(flujosFuturos[0]!.monto - 100) < 0.01) {
+    avisos.push("ATENCIÓN: pago único = 100 nominal (letra sin interés capitalizado en los datos) — TIR subestimada.");
+  }
+
   return {
     ticker: bono.ticker,
     nombre: bono.nombre,
@@ -394,8 +404,8 @@ export async function calcularYTM(tickerRaw: string, sessionId: string, precioMa
     tem: tem,
     tna: tna,
     flujosFuturos: flujosFuturos.length,
-    flujos: flujosFuturos.map((f) => ({ fecha: f.raw.fecha, monto: f.monto })),
-    diagnostico: `TIR calculada con Newton-Raphson ACT/365, ${flujosFuturos.length} flujos futuros, precio ${precioCrudo} ${precioMoneda}${fechaPrecio !== hoyIso() ? ` (cierre del ${fechaPrecio})` : ""} → ${precioParaTIR.toFixed(4)} ${monedaCalculo}, hoy ${hoy.toISOString().slice(0, 10)}`,
+    flujos: flujosFuturos.map((f) => ({ fecha: f.raw.fecha, monto: f.monto, tipo: f.raw.tipo })),
+    diagnostico: `TIR calculada con Newton-Raphson ACT/365, ${flujosFuturos.length} flujos futuros, precio ${precioCrudo} ${precioMoneda}${fechaPrecio !== hoyIso() ? ` (cierre del ${fechaPrecio})` : ""} → ${precioParaTIR.toFixed(4)} ${monedaCalculo}, hoy ${hoy.toISOString().slice(0, 10)}${avisos.length ? " | " + avisos.join(" ") : ""}`,
     fuente: `${fuentePrecio} + RENTA_FIJA_COMPLETA.json flujo_fondos (condiciones de emisión)`,
   };
 }

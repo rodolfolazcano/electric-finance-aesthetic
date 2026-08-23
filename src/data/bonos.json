@@ -18,16 +18,11 @@
         "montoEmision": 2193821728,
         "cuponAnual": 1,
         "valorPar": 100,
-        "valorResidualActual": 70,
+        "valorResidualActual": 60,
         "yieldConvention": "STREET",
         "tipoTasa": "fixed",
         "ajuste": null,
         "flujos_futuros_cada_100_vn": [
-            {
-                "fecha": "2026-07-09",
-                "monto": 10.35,
-                "tipoFlujo": "Cupon+Amortizacion"
-            },
             {
                 "fecha": "2027-01-09",
                 "monto": 10.3,
@@ -104,58 +99,58 @@
         "fechaEmision": "2020-09-04",
         "isin": "",
         "jurisdiccion": "ARG",
-        "tipoCupon": "Step-up",
+        "tipoCupon": "Fixed rate",
         "moneda": "USD",
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
         "convencionDias": "30/360",
         "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 0.125,
+        "cuponAnual": 0.75,
         "valorPar": 100,
-        "valorResidualActual": 0,
+        "valorResidualActual": 64,
         "yieldConvention": "STREET",
         "tipoTasa": "step-up",
         "ajuste": null,
         "flujos_futuros_cada_100_vn": [
             {
                 "fecha": "2027-01-09",
-                "monto": 8.38,
+                "monto": 8.24,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2027-07-09",
-                "monto": 8.16,
+                "monto": 8.21,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 7.51,
+                "monto": 8.42,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 6.91,
+                "monto": 8.35,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 6.36,
+                "monto": 8.28,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 5.85,
+                "monto": 8.21,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 5.38,
+                "monto": 8.14,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 4.95,
+                "monto": 8.07,
                 "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
@@ -180,16 +175,11 @@
         "montoEmision": 13501133049,
         "cuponAnual": 0.75,
         "valorPar": 100,
-        "valorResidualActual": 72,
+        "valorResidualActual": 64,
         "yieldConvention": "STREET",
         "tipoTasa": "step-up",
         "ajuste": null,
         "flujos_futuros_cada_100_vn": [
-            {
-                "fecha": "2026-07-09",
-                "monto": 8.27,
-                "tipoFlujo": "Cupon+Amortizacion"
-            },
             {
                 "fecha": "2027-01-09",
                 "monto": 8.24,
@@ -248,54 +238,54 @@
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
         "convencionDias": "30/360",
-        "tipoAmortizacion": "Bullet",
+        "tipoAmortizacion": "Sinkable",
         "montoEmision": 16090612053,
-        "cuponAnual": 0.125,
+        "cuponAnual": 0.75,
         "valorPar": 100,
-        "valorResidualActual": 72,
+        "valorResidualActual": 64,
         "yieldConvention": "STREET",
         "tipoTasa": "fixed",
         "ajuste": null,
         "flujos_futuros_cada_100_vn": [
             {
                 "fecha": "2027-01-09",
-                "monto": 3.5,
+                "monto": 8.24,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2027-07-09",
-                "monto": 3.5,
+                "monto": 8.21,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 3.5,
+                "monto": 8.42,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 3.5,
+                "monto": 8.35,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 3.5,
+                "monto": 8.28,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 3.5,
+                "monto": 8.21,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 3.5,
+                "monto": 8.14,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 103.5,
-                "tipoFlujo": "PagoUnico"
+                "monto": 8.07,
+                "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
         "historico": []
@@ -311,59 +301,59 @@
         "fechaEmision": "2020-09-04",
         "isin": "",
         "jurisdiccion": "ARG",
-        "tipoCupon": "Step-up",
+        "tipoCupon": "Fixed rate",
         "moneda": "USD",
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
         "convencionDias": "30/360",
-        "tipoAmortizacion": "Bullet",
+        "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 0.125,
+        "cuponAnual": 0.75,
         "valorPar": 100,
-        "valorResidualActual": 100,
+        "valorResidualActual": 64,
         "yieldConvention": "STREET",
         "tipoTasa": "step-up",
         "ajuste": null,
         "flujos_futuros_cada_100_vn": [
             {
                 "fecha": "2027-01-09",
-                "monto": 0.38,
-                "tipoFlujo": "Cupon"
+                "monto": 8.24,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2027-07-09",
-                "monto": 0.88,
-                "tipoFlujo": "Cupon"
+                "monto": 8.21,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 0.88,
-                "tipoFlujo": "Cupon"
+                "monto": 8.42,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 0.88,
-                "tipoFlujo": "Cupon"
+                "monto": 8.35,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 0.88,
-                "tipoFlujo": "Cupon"
+                "monto": 8.28,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 0.88,
-                "tipoFlujo": "Cupon"
+                "monto": 8.21,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 0.88,
-                "tipoFlujo": "Cupon"
+                "monto": 8.14,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 0.88,
-                "tipoFlujo": "Cupon"
+                "monto": 8.07,
+                "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
         "historico": []
@@ -373,12 +363,12 @@
         "mercado": "bCBA",
         "instrumento": "BONO",
         "tipo": "Hard Dollar",
-        "descripcion": "BONOS GLOBALES ARGENTINA USD AL 4.125% 2035 (DÃ“LAR CABLE)",
+        "descripcion": "BONOS GLOBALES DE LA REPUBLICA ARGENTINA EN DOLARES ESTADOUNIDENSES STEP UP 2035 (DOLAR CABLE)",
         "vencimiento": "2035-07-09",
         "fechaEmision": "2022-01-09",
         "isin": "US040114HT09",
         "jurisdiccion": "NY",
-        "tipoCupon": "Fixed rate",
+        "tipoCupon": "Step-up",
         "moneda": "USD",
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
@@ -404,82 +394,82 @@
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 2.0625,
+                "monto": 2.375,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 2.0625,
+                "monto": 2.375,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 2.0625,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 2.0625,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 2.0625,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 2.0625,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2031-01-09",
-                "monto": 2.0625,
-                "tipoFlujo": "Cupon"
+                "monto": 12.5,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-07-09",
-                "monto": 2.0625,
-                "tipoFlujo": "Cupon"
+                "monto": 12.25,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-01-09",
-                "monto": 2.0625,
-                "tipoFlujo": "Cupon"
+                "monto": 12,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-07-09",
-                "monto": 2.0625,
-                "tipoFlujo": "Cupon"
+                "monto": 11.75,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-01-09",
-                "monto": 2.0625,
-                "tipoFlujo": "Cupon"
+                "monto": 11.5,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-07-09",
-                "monto": 2.0625,
-                "tipoFlujo": "Cupon"
+                "monto": 11.25,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-01-09",
-                "monto": 2.0625,
-                "tipoFlujo": "Cupon"
+                "monto": 11,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-07-09",
-                "monto": 2.0625,
-                "tipoFlujo": "Cupon"
+                "monto": 10.75,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-01-09",
-                "monto": 2.0625,
-                "tipoFlujo": "Cupon"
+                "monto": 10.5,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-07-09",
-                "monto": 102.0625,
+                "monto": 10.25,
                 "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
@@ -501,9 +491,9 @@
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
         "convencionDias": "30/360",
-        "tipoAmortizacion": "Bullet",
+        "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 0.125,
+        "cuponAnual": 4.125,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "STREET",
@@ -512,93 +502,93 @@
         "flujos_futuros_cada_100_vn": [
             {
                 "fecha": "2027-01-09",
-                "monto": 1.81,
+                "monto": 2.0625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2027-07-09",
-                "monto": 1.81,
+                "monto": 2.0625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 1.81,
+                "monto": 2.375,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 1.81,
+                "monto": 2.375,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 1.81,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 1.81,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 1.81,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 1.81,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2031-01-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 12.5,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-07-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 12.25,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-01-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 12,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-07-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 11.75,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-01-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 11.5,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-07-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 11.25,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-01-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 11,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-07-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 10.75,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-01-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 10.5,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-07-09",
-                "monto": 1.81,
-                "tipoFlujo": "Cupon"
+                "monto": 10.25,
+                "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
         "historico": []
@@ -639,142 +629,142 @@
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.3214,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.2589,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.1964,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.1339,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.6607,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.5737,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.4866,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.3996,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.3125,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.2254,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.1384,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.0513,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.9643,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.8772,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.7902,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.7031,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2036-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.6161,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2036-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.529,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2037-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.442,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2037-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.3549,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2038-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.2679,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2038-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.1808,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2039-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.0938,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2039-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 4.0067,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2040-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 3.9196,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2040-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 3.8326,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2041-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 3.7455,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2041-07-09",
-                "monto": 101.75,
+                "monto": 3.6585,
                 "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
@@ -791,14 +781,14 @@
         "fechaEmision": "2020-09-04",
         "isin": "",
         "jurisdiccion": "ARG",
-        "tipoCupon": "Step-up",
+        "tipoCupon": "Fixed rate",
         "moneda": "USD",
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
         "convencionDias": "30/360",
-        "tipoAmortizacion": "Bullet",
+        "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 0.125,
+        "cuponAnual": 3.5,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "STREET",
@@ -817,143 +807,143 @@
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.3214,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.2589,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.1964,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.1339,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.6607,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.5737,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.4866,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.3996,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.3125,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.2254,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.1384,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.0513,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.9643,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.8772,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.7902,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.7031,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2036-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.6161,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2036-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.529,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2037-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.442,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2037-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.3549,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2038-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.2679,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2038-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.1808,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2039-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.0938,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2039-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.0067,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2040-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 3.9196,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2040-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 3.8326,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2041-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 3.7455,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2041-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 3.6585,
+                "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
         "historico": []
@@ -1825,133 +1815,133 @@
         "fechaEmision": "2020-09-04",
         "isin": "",
         "jurisdiccion": "ARG",
-        "tipoCupon": "Step-up",
+        "tipoCupon": "Fixed rate",
         "moneda": "USD",
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
         "convencionDias": "30/360",
         "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 0.125,
+        "cuponAnual": 5,
         "valorPar": 100,
-        "valorResidualActual": 0,
+        "valorResidualActual": 100,
         "yieldConvention": "STREET",
         "tipoTasa": "step-up",
         "ajuste": null,
         "flujos_futuros_cada_100_vn": [
             {
                 "fecha": "2027-01-09",
-                "monto": 2.12,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2027-07-09",
-                "monto": 6.67,
+                "monto": 7.0455,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 6.37,
+                "monto": 6.9318,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 6.08,
+                "monto": 6.8182,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 5.8,
+                "monto": 6.7045,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 5.54,
+                "monto": 6.5909,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 5.29,
+                "monto": 6.4773,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 5.05,
+                "monto": 6.3636,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-01-09",
-                "monto": 4.82,
+                "monto": 6.25,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-07-09",
-                "monto": 4.6,
+                "monto": 6.1364,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-01-09",
-                "monto": 4.39,
+                "monto": 6.0227,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-07-09",
-                "monto": 4.19,
+                "monto": 5.9091,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-01-09",
-                "monto": 4.0,
+                "monto": 5.7955,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-07-09",
-                "monto": 3.82,
+                "monto": 5.6818,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-01-09",
-                "monto": 3.64,
+                "monto": 5.5682,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-07-09",
-                "monto": 3.48,
+                "monto": 5.4545,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-01-09",
-                "monto": 3.32,
+                "monto": 5.3409,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-07-09",
-                "monto": 3.17,
+                "monto": 5.2273,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2036-01-09",
-                "monto": 3.02,
+                "monto": 5.1136,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2036-07-09",
-                "monto": 2.89,
+                "monto": 5,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2037-01-09",
-                "monto": 2.76,
+                "monto": 4.8864,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2037-07-09",
-                "monto": 2.63,
+                "monto": 4.7727,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2038-01-09",
-                "monto": 2.51,
+                "monto": 4.6591,
                 "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
@@ -2008,13 +1998,44 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 1,
         "valorPar": 100,
-        "valorResidualActual": 0,
+        "valorResidualActual": 60,
         "yieldConvention": "STREET",
         "tipoTasa": "fixed",
         "ajuste": null,
-        "flujos_futuros_cada_100_vn": [],
+        "flujos_futuros_cada_100_vn": [
+            {
+                "fecha": "2027-01-09",
+                "monto": 10.3,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2027-07-09",
+                "monto": 10.25,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-01-09",
+                "monto": 10.2,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2028-07-09",
+                "monto": 10.15,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-01-09",
+                "monto": 10.1,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2029-07-09",
+                "monto": 10.05,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
+        ],
         "historico": []
     },
     "AL35": {
@@ -2028,14 +2049,14 @@
         "fechaEmision": "2020-09-04",
         "isin": "",
         "jurisdiccion": "ARG",
-        "tipoCupon": "Fixed rate",
+        "tipoCupon": "Step-up",
         "moneda": "USD",
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
-        "convencionDias": "ACT/365",
-        "tipoAmortizacion": "Bullet",
+        "convencionDias": "30/360",
+        "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 7.125,
+        "cuponAnual": 4.125,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -2044,92 +2065,92 @@
         "flujos_futuros_cada_100_vn": [
             {
                 "fecha": "2027-01-09",
-                "monto": 3.5625,
+                "monto": 2.0625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2027-07-09",
-                "monto": 3.5625,
+                "monto": 2.0625,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 3.5625,
+                "monto": 2.375,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 3.5625,
+                "monto": 2.375,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 3.5625,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 3.5625,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 3.5625,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 3.5625,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2031-01-09",
-                "monto": 3.5625,
-                "tipoFlujo": "Cupon"
+                "monto": 12.5,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-07-09",
-                "monto": 3.5625,
-                "tipoFlujo": "Cupon"
+                "monto": 12.25,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-01-09",
-                "monto": 3.5625,
-                "tipoFlujo": "Cupon"
+                "monto": 12,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-07-09",
-                "monto": 3.5625,
-                "tipoFlujo": "Cupon"
+                "monto": 11.75,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-01-09",
-                "monto": 3.5625,
-                "tipoFlujo": "Cupon"
+                "monto": 11.5,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-07-09",
-                "monto": 3.5625,
-                "tipoFlujo": "Cupon"
+                "monto": 11.25,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-01-09",
-                "monto": 3.5625,
-                "tipoFlujo": "Cupon"
+                "monto": 11,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-07-09",
-                "monto": 3.5625,
-                "tipoFlujo": "Cupon"
+                "monto": 10.75,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-01-09",
-                "monto": 3.5625,
-                "tipoFlujo": "Cupon"
+                "monto": 10.5,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-07-09",
-                "monto": 103.5625,
+                "monto": 10.25,
                 "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
@@ -2146,14 +2167,14 @@
         "fechaEmision": "2020-09-04",
         "isin": "",
         "jurisdiccion": "ARG",
-        "tipoCupon": "Step-up",
+        "tipoCupon": "Fixed rate",
         "moneda": "USD",
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
         "convencionDias": "30/360",
-        "tipoAmortizacion": "Bullet",
+        "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 0.125,
+        "cuponAnual": 3.5,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "STREET",
@@ -2172,143 +2193,143 @@
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.3214,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.2589,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 1.75,
-                "tipoFlujo": "Cupon"
+                "monto": 5.1964,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.1339,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.6607,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.5737,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.4866,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.3996,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.3125,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.2254,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.1384,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 5.0513,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.9643,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.8772,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.7902,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.7031,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2036-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.6161,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2036-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.529,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2037-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.442,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2037-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.3549,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2038-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.2679,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2038-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.1808,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2039-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.0938,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2039-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 4.0067,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2040-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 3.9196,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2040-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 3.8326,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2041-01-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 3.7455,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2041-07-09",
-                "monto": 2.44,
-                "tipoFlujo": "Cupon"
+                "monto": 3.6585,
+                "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
         "historico": []
@@ -2331,7 +2352,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -2358,7 +2379,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -2385,7 +2406,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -2412,7 +2433,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Sinkable",
         "montoEmision": 2635028710,
-        "cuponAnual": 1.0,
+        "cuponAnual": 1,
         "valorPar": 100,
         "valorResidualActual": 60,
         "yieldConvention": "STREET",
@@ -2420,28 +2441,8 @@
         "ajuste": null,
         "flujos_futuros_cada_100_vn": [
             {
-                "fecha": "2025-01-09",
-                "monto": 10.50,
-                "tipoFlujo": "Cupon+Amortizacion"
-            },
-            {
-                "fecha": "2025-07-09",
-                "monto": 10.45,
-                "tipoFlujo": "Cupon+Amortizacion"
-            },
-            {
-                "fecha": "2026-01-09",
-                "monto": 10.40,
-                "tipoFlujo": "Cupon+Amortizacion"
-            },
-            {
-                "fecha": "2026-07-09",
-                "monto": 10.35,
-                "tipoFlujo": "Cupon+Amortizacion"
-            },
-            {
                 "fecha": "2027-01-09",
-                "monto": 10.30,
+                "monto": 10.3,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
@@ -2451,7 +2452,7 @@
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 10.20,
+                "monto": 10.2,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
@@ -2461,7 +2462,7 @@
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 10.10,
+                "monto": 10.1,
                 "tipoFlujo": "Cupon+Amortizacion"
             },
             {
@@ -2483,14 +2484,14 @@
         "fechaEmision": "2020-09-04",
         "isin": "",
         "jurisdiccion": "ARG",
-        "tipoCupon": "Step-up",
+        "tipoCupon": "Fixed rate",
         "moneda": "USD",
         "monedaPago": "USD",
         "frecuenciaPago": "Semiannual",
         "convencionDias": "30/360",
-        "tipoAmortizacion": "Bullet",
+        "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 0.125,
+        "cuponAnual": 5,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "STREET",
@@ -2499,118 +2500,118 @@
         "flujos_futuros_cada_100_vn": [
             {
                 "fecha": "2027-01-09",
-                "monto": 2.12,
+                "monto": 2.5,
                 "tipoFlujo": "Cupon"
             },
             {
                 "fecha": "2027-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 7.0455,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 6.9318,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2028-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 6.8182,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 6.7045,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2029-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 6.5909,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 6.4773,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2030-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 6.3636,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 6.25,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2031-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 6.1364,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 6.0227,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2032-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 5.9091,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 5.7955,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2033-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 5.6818,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 5.5682,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2034-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 5.4545,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 5.3409,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2035-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 5.2273,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2036-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 5.1136,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2036-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 5,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2037-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 4.8864,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2037-07-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 4.7727,
+                "tipoFlujo": "Cupon+Amortizacion"
             },
             {
                 "fecha": "2038-01-09",
-                "monto": 2.12,
-                "tipoFlujo": "Cupon"
+                "monto": 4.6591,
+                "tipoFlujo": "Cupon+Amortizacion"
             }
         ],
         "historico": []
@@ -2861,7 +2862,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -2888,7 +2889,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -2915,7 +2916,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -2942,7 +2943,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -2969,7 +2970,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 0,
         "yieldConvention": "TRUE",
@@ -2996,7 +2997,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Sinkable",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 0,
         "yieldConvention": "TRUE",
@@ -3023,7 +3024,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3050,7 +3051,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3077,7 +3078,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3104,7 +3105,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3131,7 +3132,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3158,7 +3159,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3185,7 +3186,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3212,7 +3213,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3239,7 +3240,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3266,7 +3267,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3293,7 +3294,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3320,7 +3321,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3347,7 +3348,7 @@
         "convencionDias": "30/360",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 0,
-        "cuponAnual": 0.0,
+        "cuponAnual": 0,
         "valorPar": 100,
         "valorResidualActual": 100,
         "yieldConvention": "TRUE",
@@ -3382,22 +3383,86 @@
         "tipoTasa": "fixed",
         "ajuste": null,
         "flujos_futuros_cada_100_vn": [
-            { "fecha": "2026-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2027-01-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2027-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2028-01-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2028-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2029-01-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2029-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2030-01-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2030-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2031-01-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2031-07-17", "monto": 4.125, "tipoFlujo": "Cupon" },
-            { "fecha": "2032-01-17", "monto": 34.125, "tipoFlujo": "Cupon+Amortizacion" },
-            { "fecha": "2032-07-17", "monto": 2.8875, "tipoFlujo": "Cupon" },
-            { "fecha": "2033-01-17", "monto": 32.8875, "tipoFlujo": "Cupon+Amortizacion" },
-            { "fecha": "2033-07-17", "monto": 1.65, "tipoFlujo": "Cupon" },
-            { "fecha": "2034-01-17", "monto": 41.65, "tipoFlujo": "Cupon+Amortizacion" }
+            {
+                "fecha": "2026-07-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-01-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-07-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-01-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-07-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-01-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-07-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-01-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-07-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-01-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-07-17",
+                "monto": 4.125,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2032-01-17",
+                "monto": 34.125,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2032-07-17",
+                "monto": 2.8875,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2033-01-17",
+                "monto": 32.8875,
+                "tipoFlujo": "Cupon+Amortizacion"
+            },
+            {
+                "fecha": "2033-07-17",
+                "monto": 1.65,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2034-01-17",
+                "monto": 41.65,
+                "tipoFlujo": "Cupon+Amortizacion"
+            }
         ],
         "historico": []
     },
@@ -3418,7 +3483,7 @@
         "convencionDias": "REAL/365",
         "tipoAmortizacion": "Bullet",
         "montoEmision": 65000000,
-        "cuponAnual": 8.0,
+        "cuponAnual": 8,
         "origenCupon": "prospecto_cnv",
         "escalaPrecioIOL": 10,
         "valorPar": 100,
@@ -3427,16 +3492,56 @@
         "tipoTasa": "fixed",
         "ajuste": null,
         "flujos_futuros_cada_100_vn": [
-            { "fecha": "2026-08-17", "monto": 4.0, "tipoFlujo": "Cupon" },
-            { "fecha": "2027-02-17", "monto": 4.0, "tipoFlujo": "Cupon" },
-            { "fecha": "2027-08-17", "monto": 4.0, "tipoFlujo": "Cupon" },
-            { "fecha": "2028-02-17", "monto": 4.0, "tipoFlujo": "Cupon" },
-            { "fecha": "2028-08-17", "monto": 4.0, "tipoFlujo": "Cupon" },
-            { "fecha": "2029-02-17", "monto": 4.0, "tipoFlujo": "Cupon" },
-            { "fecha": "2029-08-17", "monto": 4.0, "tipoFlujo": "Cupon" },
-            { "fecha": "2030-02-17", "monto": 4.0, "tipoFlujo": "Cupon" },
-            { "fecha": "2030-08-17", "monto": 4.0, "tipoFlujo": "Cupon" },
-            { "fecha": "2031-02-17", "monto": 104.0, "tipoFlujo": "PagoUnico" }
+            {
+                "fecha": "2026-08-17",
+                "monto": 4,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-02-17",
+                "monto": 4,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2027-08-17",
+                "monto": 4,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-02-17",
+                "monto": 4,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2028-08-17",
+                "monto": 4,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-02-17",
+                "monto": 4,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2029-08-17",
+                "monto": 4,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-02-17",
+                "monto": 4,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2030-08-17",
+                "monto": 4,
+                "tipoFlujo": "Cupon"
+            },
+            {
+                "fecha": "2031-02-17",
+                "monto": 104,
+                "tipoFlujo": "PagoUnico"
+            }
         ],
         "historico": []
     }

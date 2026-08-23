@@ -604,11 +604,17 @@ export async function describirImagenBase64(
       ? `Analiza esta imagen. Contexto del usuario: "${promptExtra}". Describe en español rioplatense todo lo visible: texto, números, gráficos, tickers, valores. Si es un gráfico de trading, extrae ticker, precio, tendencia, soportes/resistencias. Si es captura de portfolio, lista posiciones y valorizado. Sé preciso y cita cifras visibles.`
       : "Describe esta imagen en español rioplatense con máximo detalle: todo texto visible, números, gráficos, tickers, tablas. Si es gráfico financiero, extrae ticker, valores, tendencia. Si es portfolio, lista activos y montos. No inventes lo que no ves.";
     const result = await resilientVision(VISION_CHAIN, base64, mime, prompt);
-    if (!result.ok || !result.text.trim()) {
-      const reason = result.ok ? "respuesta vacía" : (result.error ?? "error desconocido");
+    for (const a of result.attempts ?? []) {
+      if (!a.ok) console.warn(`[VISION] intento fallido ${a.provider}/${a.model}: ${a.error ?? "error"}`);
+    }
+    const texto = String(result.value ?? "").trim();
+    if (!texto || texto.startsWith("[API no disponible")) {
+      const ultimo = result.attempts?.filter((a) => !a.ok).slice(-1)[0];
+      const reason = ultimo ? `${ultimo.provider}/${ultimo.model}: ${ultimo.error ?? "error"}` : "sin respuesta de modelos";
+      console.warn(`[VISION] fallo final: ${reason}`);
       return `[IMAGEN PRESENTE pero la visión no pudo procesarla: ${reason}. Adjuntá la imagen de nuevo o describí manualmente lo que necesitás.]`;
     }
-    return result.text.trim();
+    return texto;
   } catch (e) {
     return `[IMAGEN PRESENTE pero la visión falló: ${e instanceof Error ? e.message : String(e)}. Adjuntá la imagen de nuevo o describí manualmente lo que necesitás.]`;
   }
@@ -622,7 +628,16 @@ export async function transcribirAudioBase64(base64: string, mime: string): Prom
       mime,
       "Transcribí este audio/voz en español rioplatense, literal y con puntuación. Si es consulta financiera, transcribí tal cual.",
     );
-    return result.text.trim() || "[Audio recibido pero no se pudo transcribir]";
+    for (const a of result.attempts ?? []) {
+      if (!a.ok) console.warn(`[AUDIO] intento fallido ${a.provider}/${a.model}: ${a.error ?? "error"}`);
+    }
+    const texto = String(result.value ?? "").trim();
+    if (!texto || texto.startsWith("[API no disponible")) {
+      const ultimo = result.attempts?.filter((a) => !a.ok).slice(-1)[0];
+      console.warn(`[AUDIO] fallo final: ${ultimo ? `${ultimo.provider}/${ultimo.model}: ${ultimo.error}` : "sin respuesta"}`);
+      return "[Audio recibido pero no se pudo transcribir. Probá enviarlo de nuevo en formato OGG/MP3.]";
+    }
+    return texto;
   } catch (e) {
     return `[Error transcribiendo audio: ${e instanceof Error ? e.message : String(e)}]`;
   }

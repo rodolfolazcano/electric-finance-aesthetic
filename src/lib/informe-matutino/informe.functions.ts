@@ -200,18 +200,18 @@ export async function generateInformeMatutino(
       { role: "user", content: JSON.stringify(snapshot) },
     ];
 
-    const result = await resilientJson(REASONING_CHAIN, messages, {
-      schema: InformeMatutinoIASchema,
+    const result = await resilientJson<InformeMatutinoIA>(REASONING_CHAIN, messages, {
       temperature: 0.4,
       maxTokens: 16384,
     });
 
-    if (!result.ok) {
-      console.error("Informe matutino: fallo NVIDIA", result.error);
+    const valor = result.value;
+    if (!valor || typeof valor !== "object") {
+      console.error("Informe matutino: fallo NVIDIA", result.attempts?.slice(-1));
       return null;
     }
 
-    return result.data;
+    return InformeMatutinoIASchema.safeParse(valor).success ? valor : null;
   } catch (err) {
     console.error("Informe matutino: fallo llamada NVIDIA", err);
     return null;

@@ -1,6 +1,26 @@
 {
   "ciclos": [
     {
+      "fecha": "2026-08-23T18:59:22.090Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "momentum-tendencia"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-23T18:48:22.075Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "mean-reversion-atr"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
       "fecha": "2026-08-23T17:48:21.761Z",
       "disparo": "scheduler",
       "estrategias": [

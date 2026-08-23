@@ -1678,6 +1678,93 @@ function esTextoConDato(texto: string): boolean {
 }
 
 /** Ejecuta el turno completo del sistema multi-agente. */
+/**
+ * COMPUERTA DE RAZONAMIENTO PREVIO.
+ * Única llamada con thinking ON que interpreta el lenguaje natural humano
+ * ANTES de enrutar o ejecutar cualquier tool: intención real, entidades,
+ * inventario de adjuntos (con estado de visión), roles y herramientas
+ * sugeridas, y un prompt enriquecido para el resto del pipeline.
+ * Fail-open: ante cualquier error devuelve null y el flujo sigue como siempre.
+ */
+export type PlanRazonado = {
+  intencion: string;
+  entidades: string[];
+  adjuntos: Array<{ nombre: string; tipo: string; estado: string }>;
+  roles_sugeridos: string[];
+  herramientas_sugeridas: string[];
+  prompt_enriquecido: string;
+  complejidad: "rapida" | "media" | "profunda";
+};
+
+const RAZONAMIENTO_SYSTEM = `Sos la compuerta de razonamiento previo de un sistema multi-agente financiero argentino (Coronar Inversiones).
+Tu ÚNICO trabajo: interpretar el mensaje del usuario ANTES de que cualquier agente ejecute algo. Razone como humano: inferí intención, activos, preguntas implícitas y qué archivos adjunta.
+
+Marcadores de adjuntos posibles en el mensaje:
+- [IMAGEN ADJUNTA — descripción visión IA]: ... / [IMAGEN (documento)...] → visión exitosa (estado ok)
+- [IMAGEN PRESENTE pero la visión...falló...] → fallo de visión (estado fallo_vision)
+- [PDF adjunto: ...] / [ARCHIVO adjunto: ...] / [AUDIO...TRANSCRIPTO] / [VIDEO ADJUNTO...]
+
+Roles válidos (elegí solo estos): mercado, noticias, informe_matutino, conocimiento, valoracion, semaforo, cuantitativo.
+Herramientas sugeridas: usá nombres reales del sistema si los deducís (consultar_mercado, analizar_semaforo, consultar_base_conocimiento, grafico_chat, calcular_ytm_bono, noticias_activo, contexto_macro, ciclo_economico, analisis_completo); si no estás seguro, devolvé [].
+
+Devolvé EXCLUSIVAMENTE JSON válido (sin markdown):
+{"intencion":"una frase","entidades":["AL30"],"adjuntos":[{"nombre":"captura.png","tipo":"imagen","estado":"ok"}],"roles_sugeridos":["mercado"],"herramientas_sugeridas":[],"prompt_enriquecido":"instrucción refinada en español rioplatense para los agentes, citando lo visible en adjuntos","complejidad":"rapida|media|profunda"}`;
+
+export async function razonarTurnoPrevio(
+  apiKey: string,
+  modelId: string,
+  pregunta: string,
+  historial: ApiMsg[],
+): Promise<PlanRazonado | null> {
+  const p = pregunta.trim();
+  if (!p || p.length < 3) return null;
+  try {
+    const mensajes: ApiMsg[] = [
+      { role: "system", content: RAZONAMIENTO_SYSTEM },
+      ...historial.slice(-4),
+      { role: "user", content: p.slice(0, 6000) },
+    ];
+    const res = await llamarModelo(apiKey, modelId, mensajes, null, {
+      maxTokens: 1200,
+      enableThinking: true,
+      reasoningBudget: 2048,
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    const raw = (data.choices?.[0]?.message?.content ?? "").trim();
+    const m = raw.match(/\{[\s\S]*\}/);
+    if (!m) return null;
+    const parsed = JSON.parse(m[0]) as Partial<PlanRazonado>;
+    if (!parsed || typeof parsed !== "object") return null;
+    return {
+      intencion: String(parsed.intencion ?? ""),
+      entidades: Array.isArray(parsed.entidades) ? parsed.entidades.map(String).slice(0, 12) : [],
+      adjuntos: Array.isArray(parsed.adjuntos)
+        ? parsed.adjuntos.slice(0, 8).map((a) => ({
+            nombre: String(a?.nombre ?? "adjunto"),
+            tipo: String(a?.tipo ?? "ninguno"),
+            estado: String(a?.estado ?? "ok"),
+          }))
+        : [],
+      roles_sugeridos: Array.isArray(parsed.roles_sugeridos)
+        ? parsed.roles_sugeridos.map(String).slice(0, 4)
+        : [],
+      herramientas_sugeridas: Array.isArray(parsed.herramientas_sugeridas)
+        ? parsed.herramientas_sugeridas.map(String).slice(0, 6)
+        : [],
+      prompt_enriquecido: String(parsed.prompt_enriquecido ?? "").slice(0, 2500),
+      complejidad:
+        parsed.complejidad === "profunda" || parsed.complejidad === "media" || parsed.complejidad === "rapida"
+          ? parsed.complejidad
+          : "media",
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function orquestarTurno(opts: OpcionesOrquestador): Promise<ResultadoTurno> {
   const {
     pregunta,
@@ -1710,94 +1797,54 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   const paralMax = Math.max(adaptiveHint?.maxParallel ?? 0, envPar ?? 0, 6);
   const cola = new ColaDeTareas(paralMax);
 
-  // 1) Router: qué agentes convocar.
-  const activos = enrutar(pregunta);
-  const roles = [...activos] as RolAgente[];
+  // 0) COMPUERTA DE RAZONAMIENTO PREVIO: interpretar el lenguaje natural humano
+  // antes de ejecutar cualquier tool o despachar agentes. Fail-open a null.
+  let planRazonado: PlanRazonado | null = null;
+  try {
+    planRazonado = await Promise.race([
+      razonarTurnoPrevio(apiKey, orquestacion.modeloPlanner.id, pregunta, historial.map((m) => ({ role: m.role, content: m.content }))),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 14000)),
+    ]);
+  } catch { /* fail-open */ }
+  if (planRazonado) {
+    enviar({ t: "status", v: "thinking" });
+    console.log(`[RAZONAMIENTO] intencion="${planRazonado.intencion.slice(0, 80)}" roles=[${planRazonado.roles_sugeridos.join(",")}] complejidad=${planRazonado.complejidad} adjuntos=${planRazonado.adjuntos.length}`);
+  }
 
-  // Herramientas relevantes para ESTA pregunta (menos prefill por ronda).
-  const toolsTurno = filtrarToolsParaPregunta(pregunta, roles);
+  // 1) Router regex + fusión con el plan razonado (el razonamiento suma, el
+  // regex nunca queda solo si la compuerta produjo roles válidos).
+  const activos = enrutar(pregunta);
+  const rolesSet = new Set<string>(activos);
+  if (planRazonado?.roles_sugeridos?.length) {
+    for (const r of planRazonado.roles_sugeridos) {
+      try {
+        if (obtenerAgente(r)) rolesSet.add(r);
+      } catch { /* rol inválido */ }
+    }
+  }
+  const roles = [...rolesSet] as RolAgente[];
+
+  // Herramientas relevantes para ESTA pregunta (+ sugeridas por el razonamiento).
+  let toolsTurno = filtrarToolsParaPregunta(pregunta, roles);
+  if (planRazonado?.herramientas_sugeridas?.length) {
+    const presentes = new Set(toolsTurno.map((t) => t.function.name));
+    for (const h of planRazonado.herramientas_sugeridas) {
+      const spec = TOOLS.find((t) => t.function.name === h);
+      if (spec && !presentes.has(h)) {
+        toolsTurno.push(spec);
+        presentes.add(h);
+      }
+    }
+  }
   const nombresHerramientasTurno = toolsTurno.map((t) => t.function.name);
 
-  // ---- VÍA RÁPIDA: consulta puntual → tool determinística + UNA redacción ----
-  // Optimización rapidez/inteligencia: "calcula la TIR del AL30" o "dólar blue"
-  // no necesitan agentes paralelos ni coordinador. Dato real en segundos.
-  const viaRapida = detectarViaRapida(pregunta);
-  if (viaRapida) {
-    enviar({
-      t: "status",
-      v: estadoDeHerramienta(viaRapida.herramienta),
-      q: String(Object.values(viaRapida.argumentos)[0] ?? "").slice(0, 60),
-    });
-    const mensajesRapidos: ApiMsg[] = [
-      { role: "system", content: systemPrompt },
-      { role: "system", content: siteContext },
-    ];
-    if (orquestacion.promptSkillsSalida) {
-      mensajesRapidos.push({ role: "system", content: orquestacion.promptSkillsSalida });
-    }
-    const ctxMemoriaRapida = memoria.contextoMemoria();
-    if (ctxMemoriaRapida) mensajesRapidos.push({ role: "system", content: ctxMemoriaRapida });
-    if (ragMsg) mensajesRapidos.push(ragMsg);
-    mensajesRapidos.push(...historial.map((m) => ({ role: m.role, content: m.content })));
-    const callIdRapido = `rapida_${Date.now()}`;
-    const argsRawRapido = JSON.stringify(viaRapida.argumentos);
-    mensajesRapidos.push({
-      role: "assistant",
-      content: "",
-      tool_calls: [
-        { id: callIdRapido, function: { name: viaRapida.herramienta, arguments: argsRawRapido } },
-      ],
-    });
-    let textoDato = "";
-    try {
-      const ej = await ejecutarTool(viaRapida.herramienta, argsRawRapido, baseUrl, sessionId);
-      textoDato = ej.texto;
-      fuentes.push(...ej.fuentes);
-      if (ej.fuentes.length) enviar({ t: "sources", v: ej.fuentes });
-      enviarEventos(enviar, ej.eventos);
-      mensajesRapidos.push({
-        role: "tool",
-        tool_call_id: callIdRapido,
-        name: viaRapida.herramienta,
-        content: `Datos reales de ${viaRapida.herramienta} (fuentes externas):\n\n${textoDato}`,
-      });
-    } catch (e) {
-      mensajesRapidos.push({
-        role: "tool",
-        tool_call_id: callIdRapido,
-        name: viaRapida.herramienta,
-        content: `La herramienta falló (${e instanceof Error ? e.message : "error"}). Informalo con honestidad y ofrecé reintentar.`,
-      });
-    }
-    enviar({ t: "status", v: "searching" });
-    let finalRapido = "";
-    try {
-      // Redacción única SIN thinking y sin más tools: rapidez con dato real.
-      const resRapido = await llamarModelo(
-        apiKey,
-        orquestacion.modeloSalida.id,
-        mensajesRapidos,
-        null,
-        { maxTokens: Math.min(orquestacion.modeloSalida.maxTokens, 2048), enableThinking: false },
-      );
-      if (resRapido.ok) {
-        const dRapido = (await resRapido.json()) as {
-          choices?: Array<{ message?: { content?: string } }>;
-        };
-        finalRapido = (dRapido.choices?.[0]?.message?.content ?? "").trim();
-      }
-    } catch {
-      /* fallback determinístico abajo */
-    }
-    const datoValido = textoDato.trim() && !/^SIN RESULTADOS/i.test(textoDato.trim());
-    const final =
-      finalRapido ||
-      (datoValido
-        ? `${textoDato.slice(0, 1500)}`
-        : "No pude obtener el dato en este momento. Reintentá en unos segundos.");
-    memoria.escribirPizarra({ desde: "via_rapida", hacia: "coord", texto: final.slice(0, 400) });
-    return { final, fuentes };
-  }
+  // Inventario de adjuntos para honestidad downstream.
+  const huboAdjuntos = /\[(IMAGEN|PDF|AUDIO|ARCHIVO|VIDEO)[^\]]*\]/i.test(pregunta);
+  const falloVisionAdjunto =
+    !!planRazonado?.adjuntos.some((a) => a.estado === "fallo_vision") ||
+    /visión (no pudo|falló)/i.test(pregunta);
+
+  // ---- VÍA RÁPIDA ELIMINADA: todo turno pasa por razonamiento previo + agentes + coordinador. ----
 
   // 2) Despacho en paralelo a través de la cola de tareas.
   if (roles.length > 1) enviar({ t: "status", v: "cola", q: roles.length });
@@ -1852,6 +1899,26 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
     });
   }
   if (ragMsg) agentMessages.push(ragMsg);
+  if (planRazonado) {
+    const partesPlan = [
+      "[PLAN DE RAZONAMIENTO PREVIO — interpretación del mensaje humano; seguílo]",
+      `Intención detectada: ${planRazonado.intencion || "(no determinada)"}`,
+      planRazonado.entidades.length ? `Entidades: ${planRazonado.entidades.join(", ")}` : "",
+      planRazonado.adjuntos.length
+        ? `Adjuntos: ${planRazonado.adjuntos.map((a) => `${a.nombre} (${a.tipo}, estado: ${a.estado})`).join("; ")}`
+        : "",
+      falloVisionAdjunto
+        ? "ATENCIÓN: hay un adjunto cuya visión FALLÓ. Informalo con honestidad al usuario, no inventes su contenido, y pedile que reenvíe el archivo."
+        : "",
+      planRazonado.prompt_enriquecido,
+    ].filter(Boolean).join("\n");
+    agentMessages.push({ role: "system", content: partesPlan });
+  } else if (huboAdjuntos) {
+    agentMessages.push({
+      role: "system",
+      content: "El mensaje incluye adjuntos ([IMAGEN/PDF/AUDIO...]). Basá tu respuesta en esos contenidos citándolos; si la visión falló, decilo con honestidad.",
+    });
+  }
   agentMessages.push(...historial.map((m) => ({ role: m.role, content: m.content })));
 
   // Mensajes del redactor (copia base: crece con tool results y enfoque).
@@ -1870,8 +1937,26 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
     });
   }
   if (ragMsg) messages.push(ragMsg);
+  if (planRazonado) {
+    const partesPlanRedactor = [
+      "[PLAN DE RAZONAMIENTO PREVIO — contexto de la interpretación del mensaje]",
+      `Intención detectada: ${planRazonado.intencion || "(no determinada)"}`,
+      planRazonado.adjuntos.length
+        ? `Adjuntos: ${planRazonado.adjuntos.map((a) => `${a.nombre} (${a.tipo}, estado: ${a.estado})`).join("; ")}`
+        : "",
+      falloVisionAdjunto
+        ? "ATENCIÓN: hay un adjunto cuya visión FALLÓ. Informalo con honestidad al usuario, no inventes su contenido."
+        : "",
+      planRazonado.prompt_enriquecido,
+    ].filter(Boolean).join("\n");
+    messages.push({ role: "system", content: partesPlanRedactor });
+  } else if (huboAdjuntos) {
+    messages.push({
+      role: "system",
+      content: "El mensaje incluye adjuntos ([IMAGEN/PDF/AUDIO...]). Basá tu respuesta en esos contenidos citándolos; si la visión falló, decilo con honestidad.",
+    });
+  }
   messages.push(...historial.map((m) => ({ role: m.role, content: m.content })));
-
   let enfoque = "";
   let causaVerificada = false;
   let valoracionCalculada = false;
@@ -2909,8 +2994,9 @@ export async function orquestarTurno(opts: OpcionesOrquestador): Promise<Resulta
   }
 
   if (!final) {
-    final =
-      "No pude generar una respuesta confiable para eso. Podés escribirle directo a Cintia por WhatsApp.";
+    final = huboAdjuntos
+      ? "Recibí tu archivo pero el motor no pudo generar el análisis en este momento (falla transitoria). Reintentá en unos segundos o reenvialo."
+      : "No pude generar una respuesta confiable para eso. Podés escribirle directo a Cintia por WhatsApp.";
   }
 
   return { final, fuentes };
