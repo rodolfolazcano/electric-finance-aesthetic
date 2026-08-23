@@ -61,19 +61,19 @@ export const Route = createFileRoute("/herramientas")({
   component: HerramientasPage,
 });
 
-// Mismo orden que SIDEBAR_GROUPS en SidebarHerramientas (única fuente de verdad del orden)
+// T11: reorder académico tabs (ids intactos, solo orden). Default tab sigue siendo "contexto" via validateSearch fallback aunque quede último visualmente.
 const TABS = [
-  { id: "contexto", label: "Contexto", icon: Compass, tipo: "core" },
+  { id: "calculadora", label: "Calculadora", icon: Calculator, tipo: "core" },
+  { id: "cuantitativo", label: "Cuantitativo", icon: LineChart, tipo: "core" },
   { id: "sectores", label: "Sectores", icon: Building2, tipo: "core" },
   { id: "analisis", label: "Análisis", icon: TrendingUp, tipo: "core" },
-  { id: "cuantitativo", label: "Cuantitativo", icon: LineChart, tipo: "core" },
-  { id: "portafolio", label: "Portafolio", icon: Briefcase, tipo: "core" },
   { id: "renta-fija", label: "Renta Fija", icon: Landmark, tipo: "core" },
   { id: "opciones", label: "Opciones", icon: Percent, tipo: "core" },
+  { id: "portafolio", label: "Portafolio", icon: Briefcase, tipo: "core" },
   { id: "arbitrador", label: "Arbitrador", icon: ArrowLeftRight, tipo: "core" },
   { id: "cripto", label: "Cripto", icon: Bitcoin, tipo: "core" },
-  { id: "calculadora", label: "Calculadora", icon: Calculator, tipo: "core" },
   { id: "planificacion", label: "Planificación", icon: CalendarCheck, tipo: "core" },
+  { id: "contexto", label: "Contexto", icon: Compass, tipo: "core" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];

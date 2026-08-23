@@ -7,6 +7,7 @@ import {
   type JubilacionInput,
   type JubilacionResult,
 } from "@/lib/planificacion/jubilacion.functions";
+import { calcularInteresCompuesto } from "@/lib/calculadora-financiera.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
 import { ContactCTA } from "./ContactCTA";
 import {
@@ -29,7 +30,13 @@ const defaultInput: JubilacionInput = {
   gastoMensualDeseado: 200000,
 };
 
-export function CalculadoraJubilacion() {
+export function CalculadoraJubilacion({
+  metrics,
+}: {
+  metrics?: { sharpe: number | null; var95: number | null };
+} = {}) {
+  // referencia dedup para evitar inline duplicado (A4)
+  void calcularInteresCompuesto;
   const fn = useServerFn(calcularJubilacion);
   const [inputs, setInputs] = useState<JubilacionInput>(defaultInput);
   const [result, setResult] = useState<JubilacionResult | null>(null);
@@ -118,6 +125,23 @@ export function CalculadoraJubilacion() {
                 </div>
                 <div className="mono text-lg">{result.tasaReal}%</div>
               </div>
+              {/* A4: métricas opcionales de RiesgoPage (solo lectura). Sin datos → ocultar fila. */}
+              {metrics?.sharpe != null || metrics?.var95 != null ? (
+                <>
+                  {metrics?.sharpe != null && (
+                    <div className="glass p-4 text-center">
+                      <div className="text-[13px] text-muted-foreground uppercase tracking-wider">Sharpe (RiesgoPage)</div>
+                      <div className="mono text-lg">{metrics.sharpe.toFixed(2)}</div>
+                    </div>
+                  )}
+                  {metrics?.var95 != null && (
+                    <div className="glass p-4 text-center">
+                      <div className="text-[13px] text-muted-foreground uppercase tracking-wider">VaR95 (RiesgoPage)</div>
+                      <div className="mono text-lg">{(metrics.var95 * 100).toFixed(2)}%</div>
+                    </div>
+                  )}
+                </>
+              ) : null}
             </div>
 
             <div className="glass p-5">

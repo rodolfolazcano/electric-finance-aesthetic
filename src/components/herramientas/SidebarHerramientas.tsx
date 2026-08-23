@@ -39,18 +39,62 @@ interface SidebarGroup {
   items: SidebarItem[];
 }
 
-// Orden coherente: Contexto (punto de partida) -> Mercado -> Análisis -> Instrumentos -> Cliente
+// T11: reorder académico — grupos mantienen nombres, items siguen orden TABS: calculadora, cuantitativo, sectores, analisis, renta-fija, opciones, portafolio, arbitrador, cripto, planificacion, contexto
 const SIDEBAR_GROUPS: SidebarGroup[] = [
   {
-    id: "contexto",
-    title: "CONTEXTO",
+    id: "cliente",
+    title: "CLIENTE",
     items: [
       {
-        value: "contexto",
-        label: "01 · Contexto",
-        shortLabel: "Contexto",
-        icon: Compass,
+        value: "calculadora",
+        label: "01 · Calculadora",
+        shortLabel: "Calculadora",
+        icon: Calculator,
       },
+      {
+        value: "planificacion",
+        label: "10 · Planificación",
+        shortLabel: "Planificación",
+        icon: CalendarCheck,
+        subTabs: [
+          { value: "jubilacion", label: "Jubilación" },
+          { value: "hipoteca", label: "Hipoteca" },
+          { value: "inversiones", label: "Crecimiento" },
+          { value: "objetivos", label: "Objetivos" },
+          { value: "presupuesto", label: "Presupuesto" },
+          { value: "pasivos", label: "Deudas" },
+          { value: "patrimonio-neto", label: "Patrimonio" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "analisis",
+    title: "ANÁLISIS",
+    items: [
+      {
+        value: "cuantitativo",
+        label: "02 · Cuantitativo",
+        shortLabel: "Cuantitativo",
+        icon: LineChart,
+        subTabs: [
+          { value: "optimizador", label: "Optimizador" },
+          { value: "riesgo", label: "Riesgo" },
+          { value: "capm", label: "CAPM" },
+          { value: "cobertura", label: "Cobertura" },
+          { value: "clasificacion", label: "Clasificación" },
+          { value: "statarb", label: "Stat Arb" },
+          { value: "labadie", label: "Labadie" },
+          { value: "estimaciones", label: "Estimaciones" },
+        ],
+      },
+      {
+        value: "analisis",
+        label: "04 · Análisis",
+        shortLabel: "Análisis",
+        icon: TrendingUp,
+      },
+      { value: "portafolio", label: "07 · Portafolio", shortLabel: "Portafolio", icon: Briefcase },
     ],
   },
   {
@@ -59,7 +103,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       {
         value: "sectores",
-        label: "02 · Sectores",
+        label: "03 · Sectores",
         icon: Building2,
         shortLabel: "Sectores",
         subTabs: [
@@ -75,40 +119,11 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     ],
   },
   {
-    id: "analisis",
-    title: "ANÁLISIS",
-    items: [
-      {
-        value: "analisis",
-        label: "03 · Análisis",
-        shortLabel: "Análisis",
-        icon: TrendingUp,
-      },
-      {
-        value: "cuantitativo",
-        label: "04 · Cuantitativo",
-        shortLabel: "Cuantitativo",
-        icon: LineChart,
-        subTabs: [
-          { value: "optimizador", label: "Optimizador" },
-          { value: "riesgo", label: "Riesgo" },
-          { value: "capm", label: "CAPM" },
-          { value: "cobertura", label: "Cobertura" },
-          { value: "clasificacion", label: "Clasificación" },
-          { value: "statarb", label: "Stat Arb" },
-          { value: "labadie", label: "Labadie" },
-          { value: "estimaciones", label: "Estimaciones" },
-        ],
-      },
-      { value: "portafolio", label: "05 · Portafolio", shortLabel: "Portafolio", icon: Briefcase },
-    ],
-  },
-  {
     id: "instrumentos",
     title: "INSTRUMENTOS",
     items: [
-      { value: "renta-fija", label: "06 · Renta Fija", shortLabel: "Renta Fija", icon: Landmark },
-      { value: "opciones", label: "07 · Opciones", shortLabel: "Opciones", icon: Percent },
+      { value: "renta-fija", label: "05 · Renta Fija", shortLabel: "Renta Fija", icon: Landmark },
+      { value: "opciones", label: "06 · Opciones", shortLabel: "Opciones", icon: Percent },
       {
         value: "arbitrador",
         label: "08 · Arbitrador",
@@ -119,29 +134,14 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     ],
   },
   {
-    id: "cliente",
-    title: "CLIENTE",
+    id: "contexto",
+    title: "CONTEXTO",
     items: [
       {
-        value: "calculadora",
-        label: "10 · Calculadora",
-        shortLabel: "Calculadora",
-        icon: Calculator,
-      },
-      {
-        value: "planificacion",
-        label: "11 · Planificación",
-        shortLabel: "Planificación",
-        icon: CalendarCheck,
-        subTabs: [
-          { value: "jubilacion", label: "Jubilación" },
-          { value: "hipoteca", label: "Hipoteca" },
-          { value: "inversiones", label: "Crecimiento" },
-          { value: "objetivos", label: "Objetivos" },
-          { value: "presupuesto", label: "Presupuesto" },
-          { value: "pasivos", label: "Deudas" },
-          { value: "patrimonio-neto", label: "Patrimonio" },
-        ],
+        value: "contexto",
+        label: "11 · Contexto",
+        shortLabel: "Contexto",
+        icon: Compass,
       },
     ],
   },

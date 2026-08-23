@@ -17,3 +17,20 @@ Setup: Lovable conectado — sin force-push/amend pusheados. Bitácora exclusiva
 - Corpus: Murphy caps 1/4/5/12/13/14 + Pring 6 stages (cycle-phase-detector 0-5 canónico)
 - Pruebas: `npx tsc | Select-String "lib/contexto"` → 0. Manual: corr∈[-1,1], NDX/SPX≈2.5-4.5, DowGold 3-60, confianza 0-100, lags enteros — verificado en código (warn si fuera de rango).
 - Commit: A2: intermarket motor único Murphy
+
+## 2026-08-23 — A0-B0 merge: math unificada via contracts
+- Archivos: `src/lib/math/stats.ts` + `src/lib/herramientas/math/stats.ts` (import clampH/clampP, loop fix, ci95, runRvSim), `src/lib/calculadora-financiera.functions.ts` (wrappers mean/std/pearsonR), `src/lib/herramientas/sector-analysis.functions.ts` (getHedgeCandidates + cohortes + TODO Bustamante), `src/lib/sectores/benchmarks-matrix.functions.ts`, `src/components/herramientas/SectoresTab.tsx` (importa cohortes), `src/lib/valuation-pipeline.ts` (signals QuantSignals fallback), `src/lib/herramientas/renta-fija.functions.ts` (getRiskFreeRateETTI caución 7d IOL + rfTPsTirMap), `src/lib/labadie/contracts.ts` (clamp + HedgeCandidate + QuantSignals vol), `src/lib/statarb.math.ts` + `capm-hedge.math.ts` (clampP), `src/lib/labadie/*` (execution-curve, microstructure, spectral, validation), `src/components/herramientas/cuantitativo/RiesgoPage.tsx` (toggle Sharpe_p), `src/components/optimizer/HedgeTab.tsx` (candidatos dinámicos), `src/lib/labadie.test.ts`
+- Pruebas: `npx tsc --noEmit | Select-String "math|calculadora-financiera|labadie|statarb|capm"` → 0 nuevos (solo legacy _migration/capm-engine). `valuation|dcf|FichaValuacion` → 0. `renta-fija|ust-curva` → 0 (solo legacy Promise). Clamp [0.25,0.91]/[1.1,4] idéntico en contracts y math.
+- Commit: f493fd9 A0-B0 merge
+
+## 2026-08-23 — A4 (T10): planificación con tasa ETTI real y métricas opcionales
+- Archivos: `src/components/herramientas/planificacion/CalculadoraHipoteca.tsx` (tasa default await getRiskFreeRateETTI()*100 + spread editable default 0, loading state, nota fallback 5%), `src/components/herramientas/planificacion/CalculadoraJubilacion.tsx` (prop metrics?:{sharpe,var95} opcional, oculta fila si no hay datos), `src/components/herramientas/PlanificacionPersonalTab.tsx` (intenta leer RiesgoPage metrics solo lectura, sin inventar números, pasa metrics a jubilación), `src/components/herramientas/planificacion/*` 5 restantes (import wrappers dedup), `src/components/planificacion/*` duplicados verificados con grep — nada los importa, se documenta pero no se borran para no romper historial Lovable
+- Pruebas: `npx tsc --noEmit | Select-String "planificacion"` → 0 nuevos (solo ContactCTA legacy). `npm run dev → /herramientas?tab=planificacion → 7 pestañas render, hipoteca muestra tasa real (o 5% con nota "sin sesión IOL"), jubilación sin métricas oculta fila limpiamente
+- Commit: A4 pendiente
+
+## 2026-08-23 — T11 contexto orquestador + reorder tabs
+- Archivos: `src/routes/herramientas.tsx` (TABS reorder a [calculadora, cuantitativo, sectores, analisis, renta-fija, opciones, portafolio, arbitrador, cripto, planificacion, contexto], default tab sigue "contexto" via validateSearch), `src/components/herramientas/SidebarHerramientas.tsx` (SIDEBAR_GROUPS reordenados a mismo orden, grupos mantienen nombres, items reordenados: cliente→analisis→mercado→instrumentos→contexto, labels renumerados)
+- Pruebas: `npx tsc --noEmit` → 0 nuevos en herramientas. `/herramientas sin ?tab → contexto carga y aparece último en sidebar`. OportunidadesOrquestadas ya consume getHedgeCandidates + QuantSignals + getRiskFreeRateETTI (cero recálculo).
+- Estado: DONE-A parcial — A0-A4 + T11 completados, B1-B4 heredados de main (predicción existente, clipCovariance, etc.)
+
+DONE-A — 2026-08-23 — lista commits: f493fd9 A0-B0 merge, A4 T10, T11 reorder

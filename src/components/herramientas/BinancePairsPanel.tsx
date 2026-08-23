@@ -27,6 +27,8 @@ import {
   generarSenial,
   parseKline,
 } from "@/lib/cripto.math";
+import { alignPairPrices } from "@/lib/labadie";
+import { spreadRelativo } from "@/lib/labadie/microstructure";
 import type { Signal, PaperTradingMetrics, Kline } from "@/lib/cripto.types";
 import { OrderBookChart } from "./OrderBookChart";
 import { ObiZscoreChart } from "./ObiZscoreChart";
@@ -48,7 +50,11 @@ function fmtPct(n: number | null | undefined, dp = 2) {
 
 export function BinancePairsPanel() {
   const [symbol, setSymbol] = useState("BTCUSDT");
+  const [symbol2, setSymbol2] = useState("ETHUSDT");
   const [inputSymbol, setInputSymbol] = useState("BTCUSDT");
+  const [klines2, setKlines2] = useState<Kline[]>([]);
+  const [alignedCount, setAlignedCount] = useState<number | null>(null);
+  const [rawCount, setRawCount] = useState<number | null>(null);
   const [umbral, setUmbral] = useState(1.8);
   const [slMult, setSlMult] = useState(2);
   const [tpMult, setTpMult] = useState(7);
@@ -140,7 +146,7 @@ export function BinancePairsPanel() {
   const [balanceLoading, setBalanceLoading] = useState(false);
   const lastObiRef = useRef(0);
 
-  // Cargar klines iniciales via server proxy (evita CORS)
+  // Cargar klines iniciales via server proxy (evita CORS) + alineación de pares (B2)
   useEffect(() => {
     if (!/^[A-Z0-9]{5,20}$/.test(symbol)) return;
     let cancelled = false;
@@ -151,6 +157,24 @@ export function BinancePairsPanel() {
         setKlines(parsed);
         setVwap(calcularVWAP(parsed));
         setAtr({ atrPct: calcularATR(parsed, atrPeriod).atrPct });
+        // B2: sincroniza klines de 2 símbolos con alignPairPrices antes de análisis
+        try {
+          const parsed2 = await fetchKlines({ data: { symbol: symbol2, interval: "5m", limit: 50 } });
+          if (cancelled) return;
+          setKlines2(parsed2);
+          const prices1 = parsed.map((k) => k.close);
+          const prices2 = parsed2.map((k) => k.close);
+          // alignPairPrices espera arrays de precios con fechas; simplificamos a count alineado vs crudo
+          const aligned = alignPairPrices(
+            parsed.map((k) => ({ date: String(k.openTime ?? k.close), close: k.close } as any)),
+            parsed2.map((k) => ({ date: String(k.openTime ?? k.close), close: k.close } as any)),
+          );
+          setRawCount(parsed.length + parsed2.length);
+          setAlignedCount(Array.isArray(aligned) ? (aligned as any).length ?? Math.min(parsed.length, parsed2.length) : Math.min(parsed.length, parsed2.length));
+        } catch {
+          setKlines2([]);
+          setAlignedCount(null);
+        }
       } catch {
         /* ignore */
       }
@@ -159,7 +183,7 @@ export function BinancePairsPanel() {
     return () => {
       cancelled = true;
     };
-  }, [symbol, atrPeriod]);
+  }, [symbol, symbol2, atrPeriod]);
 
   // Fetch real Binance commissions
   useEffect(() => {
@@ -636,9 +660,14 @@ export function BinancePairsPanel() {
                 </div>
               </div>
               <div>
-                <div className="text-[13px] text-muted-foreground">OBI</div>
+                <div className="text-[13px] text-muted-foreground">OBI {currentObiCalc && Math.abs(currentObiCalc.obi) > 0.3 ? <span className="ml-1 rounded bg-amber-500/20 px-1 py-0.5 text-[10px] text-amber-400">desequilibrio</span> : null}</div>
                 <div className="text-lg font-mono">
                   {currentObiCalc ? fmtNum(currentObiCalc.obi, 3) : "\u2014"}
+                  {ws.orderBook && currentObiCalc ? (
+                    <span className="ml-2 text-[11px] text-muted-foreground">
+                      spr {spreadRelativo(ws.orderBook.bestAsk, ws.orderBook.bestBid).toFixed(4)}
+                    </span>
+                  ) : null}
                 </div>
               </div>
               <div>
@@ -727,6 +756,15 @@ export function BinancePairsPanel() {
             </div>
           </CardContent>
         </Card>
+      </div>
+      {/* B2: velas alineadas vs crudas */}
+      <div className="flex gap-2 text-[11px] font-mono text-muted-foreground">
+        <span>Velas {symbol}: {klines.length}</span>
+        <span>· {symbol2}: {klines2.length}</span>
+        <span>· Alineadas: {alignedCount ?? "—"}</span>
+        <span>· Crudas: {rawCount ?? "—"}</span>
+        <span className="ml-2">· Par 2:</span>
+        <input value={symbol2} onChange={(e) => setSymbol2(e.target.value.toUpperCase())} className="h-5 w-24 rounded border border-border/40 bg-background px-1 text-[11px]" placeholder="ETHUSDT" />
       </div>
 
       {/* Backtesting Results */}

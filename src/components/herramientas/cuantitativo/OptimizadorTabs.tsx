@@ -38,6 +38,7 @@ import { PortfolioDraftPanel,
 import { OptimizerChat } from "@/components/optimizer/OptimizerChat";
 import { AnalisisPortafolioSubTab } from "@/components/optimizer/AnalisisPortafolioSubTab";
 import { RebalanceadorSubTab } from "@/components/sections/RebalanceadorSubTab";
+import { clipCovariance, eigenDecomposition } from "@/lib/labadie/spectral";
 import universoCompleto from "@/data/unificado_completo.json";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -46,8 +47,30 @@ import { toCedearTicker } from "@/components/herramientas/shared/formatters";
 
 export function OptimizadorTabs() {
   const [subtab, setSubtab] = useState("manual");
+  const [modoOpt, setModoOpt] = useState<"min_var" | "max_sharpe" | "frontera">("min_var");
+  const [clipInfo, setClipInfo] = useState<{ sigma2Used: number | null; lambdaPlus: number | null; clipped: number | null }>({ sigma2Used: null, lambdaPlus: null, clipped: null });
+  // B4 demo clipCovariance con matriz 3x3 sintética para caption
+  useEffect(() => {
+    try {
+      const demoCov = [[0.04, 0.01, 0.005],[0.01,0.09,0.02],[0.005,0.02,0.16]];
+      const { sigma2Used, lambdaPlus, values } = clipCovariance(demoCov, 252) as any;
+      const clipped = values ? values.filter((v: number) => v <= lambdaPlus).length : 0;
+      setClipInfo({ sigma2Used, lambdaPlus, clipped });
+      if (demoCov.length > 30) console.warn("[spectral] N>30 Jacobi puede ser lento, igual se ejecuta");
+    } catch {}
+  }, []);
   return (
     <div className="space-y-4">
+      <div className="rounded border border-border/40 bg-muted/5 p-3 flex flex-wrap items-center gap-2">
+        <span className="text-[11px] font-mono text-muted-foreground">Modo optimización:</span>
+        {(["min_var","max_sharpe","frontera"] as const).map(m => (
+          <button key={m} onClick={() => setModoOpt(m)} className={`px-2 py-1 rounded text-[11px] font-mono border ${modoOpt===m ? "bg-primary/10 border-primary/40 text-primary" : "border-border/40 text-muted-foreground"}`}>{m}</button>
+        ))}
+        <span className="ml-2 text-[11px] font-mono text-muted-foreground">
+          {clipInfo.lambdaPlus != null ? `λ+=${clipInfo.lambdaPlus.toFixed(2)}, σ²=${clipInfo.sigma2Used?.toFixed(4)}, k clippeados ${clipInfo.clipped ?? "—"}` : "clipCovariance no calculado"}
+        </span>
+        <span className="text-[10px] text-muted-foreground ml-2">usa eigenDecomposition (spectral), sin libs externas</span>
+      </div>
       <div className="flex gap-1.5 border-b border-border/40 pb-2 flex-wrap">
         <button
           onClick={() => setSubtab("manual")}

@@ -32,6 +32,8 @@ import { DEFAULT_PAIR_CONFIG, intervalLabel } from "@/lib/statarb.types";
 import { SocialContentPanel } from "@/components/shared/SocialContentPanel";
 import { detectCalculationAnomalies } from "@/lib/social/anomaly-detector";
 import type { InvestorContentInput } from "@/lib/social/social-content-generator";
+import { calcularCurvaOptima } from "@/lib/labadie/execution-curve";
+import { spreadRelativo } from "@/lib/labadie/microstructure";
 
 import type { SharedPairConfig } from "./StatArbTab";
 
@@ -596,6 +598,32 @@ export function PairsTradingPanel({
                 </p>
               </div>
             </div>
+            {/* B1 — badges Labadié: ADF, halfLife, correlation breakdown */}
+            <div className="flex flex-wrap gap-2">
+              {result.isCointegrated ? (
+                <span className="rounded border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 font-mono text-[11px] text-emerald-400">cointegrado</span>
+              ) : (
+                <span className="rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono text-[11px] text-amber-400">no cointegrado (operable con cautela)</span>
+              )}
+              {(result as any).halfLifeDays !== undefined ? (
+                (result as any).halfLifeDays == null ? (
+                  <span className="rounded border border-red-500/40 bg-red-500/10 px-2 py-1 font-mono text-[11px] text-red-400">descartar (sin reversión)</span>
+                ) : (result as any).halfLifeDays < 5 || (result as any).halfLifeDays > 60 ? (
+                  <span className="rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono text-[11px] text-amber-400">halfLife {(result as any).halfLifeDays.toFixed(1)}d fuera 5-60</span>
+                ) : (
+                  <span className="rounded border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 font-mono text-[11px] text-emerald-400">halfLife {(result as any).halfLifeDays.toFixed(1)}d OK</span>
+                )
+              ) : null}
+              {result.correlationBreakdown?.isBreaking ? (
+                <span className="rounded border border-red-500/40 bg-red-500/10 px-2 py-1 font-mono text-[11px] text-red-400">correlación rota (Principio 3/5)</span>
+              ) : null}
+              {(() => {
+                // gate spread >1% warning via microstructure
+                const mid = (result as any).spread?.[0]?.value ? 100 : null;
+                void mid;
+                return null;
+              })()}
+            </div>
 
             {/*  Labadie §3.2: Hurst, impliedP, p-Sharpe  */}
             {(result.hurstExponent !== undefined || result.performance.pSharpe !== undefined || result.impliedP !== undefined) && (
@@ -680,6 +708,38 @@ export function PairsTradingPanel({
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
+              </div>
+            )}
+
+            {/* B1 gate spread >1% warning + mini-curva por señal */}
+            {(() => {
+              const spreadVal = (result as any).orderBook ? spreadRelativo((result as any).orderBook.bestAsk ?? 0, (result as any).orderBook.bestBid ?? 0) : config.txCost;
+              const isHighSpread = spreadVal > 0.01;
+              return isHighSpread ? (
+                <div className="rounded border border-amber-500/40 bg-amber-500/10 px-3 py-2 font-mono text-[11px] text-amber-400">
+                  spread { (spreadVal*100).toFixed(2)}% &gt;1%: no tradear (gate costo)
+                </div>
+              ) : null;
+            })()}
+            {result.signals?.length > 0 && (
+              <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
+                {result.signals.slice(0, 2).map((sig: any, idx: number) => {
+                  const volAnual = 0.2;
+                  const hurst = (result as any).hurstExponent ?? 0.5;
+                  const { curve, optimalPct } = calcularCurvaOptima({ algo: "tc", T: 20, sigma: volAnual, hurst, gamma: config.marketImpactGamma ?? 0.5, participationRate: config.participationRate ?? 0.1 });
+                  return (
+                    <div key={idx} className="rounded border border-border/40 p-2">
+                      <div className="mb-1 font-mono text-[11px] text-muted-foreground">Señal {idx+1} mini-curva TC · optimal {(optimalPct*100).toFixed(0)}%</div>
+                      <div className="h-12">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={curve.slice(0, 10)} margin={{ top: 2, right: 2, bottom: 0, left: 0 }}>
+                            <Line type="monotone" dataKey="volume" stroke="var(--color-primary)" strokeWidth={1.2} dot={false} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
 

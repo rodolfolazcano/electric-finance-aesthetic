@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+﻿import { useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import {
   type InversionesInput,
   type InversionesResult,
 } from "@/lib/planificacion/inversiones.functions";
+import { calcularInteresCompuesto } from "@/lib/calculadora-financiera.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
 import { ContactCTA } from "./ContactCTA";
 import {
@@ -59,7 +60,7 @@ export function CalculadoraInversiones() {
   return (
     <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <div className="glass p-5 space-y-4">
-        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Parámetros</h3>
+        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">ParÃ¡metros</h3>
         <div>
           <label className="text-xs text-muted-foreground">Monto inicial ($)</label>
           <Input
@@ -70,7 +71,7 @@ export function CalculadoraInversiones() {
           />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Aporte periódico ($)</label>
+          <label className="text-xs text-muted-foreground">Aporte periÃ³dico ($)</label>
           <Input
             type="number"
             value={inputs.aportePeriodico}
@@ -105,7 +106,7 @@ export function CalculadoraInversiones() {
           />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Plazo (años)</label>
+          <label className="text-xs text-muted-foreground">Plazo (aÃ±os)</label>
           <Input
             type="number"
             value={inputs.plazoAnos}
@@ -114,7 +115,7 @@ export function CalculadoraInversiones() {
           />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Tipo de interés</label>
+          <label className="text-xs text-muted-foreground">Tipo de interÃ©s</label>
           <select
             value={inputs.tipoInteres}
             onChange={(e) =>
@@ -127,7 +128,7 @@ export function CalculadoraInversiones() {
           </select>
         </div>
         <Button onClick={handleCalc} disabled={loading} className="w-full">
-          {loading ? "Calculando…" : "Proyectar"}
+          {loading ? "Calculandoâ€¦" : "Proyectar"}
         </Button>
       </div>
 
@@ -161,7 +162,7 @@ export function CalculadoraInversiones() {
 
             <div className="glass p-5">
               <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
-                Proyección: con aportes vs sin aportes
+                ProyecciÃ³n: con aportes vs sin aportes
               </div>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -230,3 +231,5 @@ export function CalculadoraInversiones() {
     </div>
   );
 }
+
+

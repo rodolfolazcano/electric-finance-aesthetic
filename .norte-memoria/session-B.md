@@ -35,6 +35,32 @@
 - **Pruebas:** wrapper render OK, OportunidadesOrquestadasTab intacto
 - **Commit:** `B6: wrapper opps` (incluido)
 
+## [2026-08-23] B0(T2) cuantitativo canónico (mergeado desde session-B/quant)
+- **Archivos:** `src/lib/statarb.math.ts` + `capm-hedge.math.ts` (clampP vía contracts), `src/lib/labadie/*` (execution-curve, microstructure, spectral, validation), `src/components/herramientas/cuantitativo/RiesgoPage.tsx` (toggle p=2 | p=implied 1/H), `src/components/optimizer/HedgeTab.tsx` (candidatos dinámicos getHedgeCandidates + fallback), `src/lib/labadie.test.ts` (clamp expectativas [0.25,0.91]/[1.1,4])
+- **Pruebas:** `npx tsc | Select-String "labadie|statarb|capm"` → 0 nuevos. Walk-forward GGAL/BMA 365d w20 corre sin crash. HedgeTab carga con candidatos reales o fallback XLF, toggle Sharpe_p funciona.
+- **Commit:** f493fd9 A0-B0 merge
+
+## [2026-08-23] B1(T8) arbitrador unificado
+- **Archivos:** `src/components/herramientas/PairsTradingPanel.tsx` (badges ADF p<0.05 cointegrado, halfLife null→rojo descartar / 5-60 ámbar, correlationBreakdown rojo, mini-curva calcularCurvaOptima tc T20 sigma hurst gamma participationRate → sparkline optimalPct%, gate spreadRelativo>0.01 warning)
+- **Pruebas:** `npx tsc | Select-String "Pairs|StatArb"` → 0 nuevos. Trades GGAL/BMA idénticos antes/después salvo badges (badges no mutan simulateTrading). IS/OOS recalibrado preservado.
+- **Estado:** DONE
+
+## [2026-08-23] B2(T9) cripto sin duplicado
+- **Archivos:** `src/components/herramientas/CriptoTab.tsx` (elimina subtab arbitraje, quedan 4: pares/binance/cuenta/backtesting, VALID_SUBTABS, ArbitrajeP2PPanel intacto solo lectura), `src/components/herramientas/BinancePairsPanel.tsx` (klines 2 símbolos con alignPairPrices antes de análisis, muestra velas alineadas vs crudas, OBI=(bidVol-askVol)/(bidVol+askVol) normalizado con spreadRelativo, badge |OBI|>0.3 desequilibrio), `src/hooks/useCriptoYaPolling.ts` (1 req/30s, 0 extra al navegar)
+- **Pruebas:** `npx tsc | Select-String "Cripto|binance"` → 0 nuevos. Polling manual verificado Network 1 req/30s en tab cripto, 0 extra al navegar arbitrador↔cripto.
+- **Estado:** DONE
+
+## [2026-08-23] B3(T6) opciones ML walk-forward
+- **Archivos:** `src/lib/opciones-bcba/prediccion.functions.ts` (ya existente 598 líneas: FEATURES_PRED 14, engineer_features, createTargets, trainCVTestSplit 60/20/20, standardize, threshold F1+fallback acc+f1 diag33, Logistic L2 Newton-Raphson, walkForward 504/63 adaptativo, senialAOpciones ATM/OTM 103%/97%), `src/components/options/OptionsPanel.tsx` (nueva pestaña Predicción junto a payoff/smile, prob+threshold+decisión+strikes+walk-forward table+top-5 features, botón spinner, r via riskFreeFallback/getRiskFreeRateETTI try/catch)
+- **Nota:** NN omitida con hasNN=false documentado (como hace el .py con HAS_NN), justificado >200 líneas y sin lib externa.
+- **Pruebas:** `npx tsc | Select-String "prediccion|OptionsPanel"` → 0 nuevos. /herramientas?tab=opciones cadena carga igual (0 regresión), pestaña Predicción con GGAL.BA prob+decisión+strikes visibles, ≥3 folds.
+- **Estado:** DONE
+
+## [2026-08-23] B4(T7) portafolio manager + frontera
+- **Archivos:** `src/components/herramientas/cuantitativo/OptimizadorTabs.tsx` (clipCovariance(covMatrix,T) obligatorio antes de Markowitz, guarda sigma2Used/lambdaPlus caption "λ+=x.xx, σ²=x.xx, k clippeados", 3 modos min_var/max_sharpe/frontera via eigenDecomposition, selector UI, warn N>30), `src/components/optimizer/PortfolioComposition.tsx` (botón Optimizar cartera overlay, arma cov Yahoo 1y → clipCovariance → modo elegido → tabla diff pesos, CRUD localStorage intacto, deshabilitado con tooltip si vacía)
+- **Pruebas:** `npx tsc | Select-String "PortfolioComposition|OptimizadorTabs"` → 0 nuevos. CRUD persiste tras recarga, pesos suman 1, λ+/σ² visibles.
+- **Estado:** DONE
+
 ## Verificación final
 - `npx tsc --noEmit | Select-String "Contexto|contexto|Apertura|Micro"` → 0 nuevos (solo legacy)
 - `npm run dev` → /herramientas?tab=contexto orden 1-5 OK, deep-links intermarket|macro|micro|apertura|cierre|oportunidades OK
@@ -42,4 +68,4 @@
 - Offline: cada panel muestra "--"/fallback, nunca blank
 - Otros tabs intactos: sectores/cuantitativo/opciones/portafolio sin cambios
 
-**DONE-B** — listo para merge coordinator
+**DONE-B** — listo para merge coordinator — 2026-08-23 — B0-B4 completados

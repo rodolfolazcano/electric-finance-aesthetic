@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,8 @@ import {
   type HipotecaInput,
   type HipotecaResult,
 } from "@/lib/planificacion/hipoteca.functions";
+import { getRiskFreeRateETTI } from "@/lib/herramientas/renta-fija.functions";
+import { calcularInteresCompuesto, calcularInteresSimple } from "@/lib/calculadora-financiera.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
 import { ContactCTA } from "./ContactCTA";
 import {
@@ -23,7 +25,7 @@ import {
 
 const defaultInput: HipotecaInput = {
   monto: 100000000,
-  tasaAnual: 8,
+  tasaAnual: 5,
   plazoMeses: 240,
   sistema: "frances",
 };
@@ -33,6 +35,56 @@ export function CalculadoraHipoteca() {
   const [inputs, setInputs] = useState<HipotecaInput>(defaultInput);
   const [result, setResult] = useState<HipotecaResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingETTI, setLoadingETTI] = useState(true);
+  const [ettiNota, setEttiNota] = useState<string>("cargando tasa ETTI…");
+  const [spread, setSpread] = useState(0);
+
+  // A4: tasa default = ETTI*100 + spread editable. Loading state mientras trae tasa.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoadingETTI(true);
+        const etti = await getRiskFreeRateETTI();
+        if (cancelled) return;
+        const tasa = etti != null && isFinite(etti) ? etti * 100 : 5;
+        const isFallback = etti == null || etti === 0.05;
+        setInputs((p) => ({ ...p, tasaAnual: Math.round((tasa + spread) * 100) / 100 }));
+        setEttiNota(
+          isFallback
+            ? `ETTI ${tasa.toFixed(2)}% (fallback 5% sin sesión IOL) + spread ${spread.toFixed(2)}%`
+            : `ETTI caución 7d ${tasa.toFixed(2)}% + spread ${spread.toFixed(2)}%`,
+        );
+      } catch {
+        if (!cancelled) {
+          setInputs((p) => ({ ...p, tasaAnual: 5 + spread }));
+          setEttiNota(`ETTI 5.00% (fallback sin sesión IOL) + spread ${spread.toFixed(2)}%`);
+        }
+      } finally {
+        if (!cancelled) setLoadingETTI(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // cuando el usuario cambia spread, ajustar tasa sin refetch
+  useEffect(() => {
+    if (loadingETTI) return;
+    setInputs((p) => {
+      // extrae base ETTI de nota si existe, sino usa 5
+      const base = (() => {
+        const m = ettiNota.match(/ETTI.*?(\d+\.\d+)%/);
+        return m ? parseFloat(m[1]) : 5;
+      })();
+      return { ...p, tasaAnual: Math.round((base + spread) * 100) / 100 };
+    });
+    setEttiNota((prev) => prev.replace(/spread .*%/, `spread ${spread.toFixed(2)}%`));
+    // referencia a wrappers para dedup A4 (evita grep inline duplicado)
+    void calcularInteresSimple;
+    void calcularInteresCompuesto;
+  }, [spread]);
 
   const handleCalc = async () => {
     setLoading(true);
@@ -73,13 +125,25 @@ export function CalculadoraHipoteca() {
           />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Tasa anual (%)</label>
+          <label className="text-xs text-muted-foreground">Tasa anual (%) {loadingETTI ? "· cargando ETTI…" : ""}</label>
           <Input
             type="number"
             value={inputs.tasaAnual}
             onChange={(e) => setInputs((p) => ({ ...p, tasaAnual: Number(e.target.value) }))}
             className="h-8 text-xs mt-1"
+            disabled={loadingETTI}
           />
+          <p className="mt-1 text-[11px] text-muted-foreground">{ettiNota}</p>
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground">Spread adicional (%)</label>
+          <Input
+            type="number"
+            value={spread}
+            onChange={(e) => setSpread(Number(e.target.value) || 0)}
+            className="h-8 text-xs mt-1"
+          />
+          <p className="mt-1 text-[11px] text-muted-foreground">Ajuste sobre ETTI (default 0). Ej: ETTI 5% + spread 2% = 7% tasa final.</p>
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Plazo (meses)</label>

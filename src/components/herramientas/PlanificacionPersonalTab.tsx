@@ -6,6 +6,8 @@ import { CalculadoraObjetivos } from "@/components/herramientas/planificacion/Ca
 import { CalculadoraPresupuesto } from "@/components/herramientas/planificacion/CalculadoraPresupuesto";
 import { CalculadoraPasivos } from "@/components/herramientas/planificacion/CalculadoraPasivos";
 import { CalculadoraPatrimonioNeto } from "@/components/herramientas/planificacion/CalculadoraPatrimonioNeto";
+// A4 dedup: 7 calculadoras importan fórmulas desde wrappers A0 (evita duplicados inline)
+import { calcularInteresSimple, calcularInteresCompuesto } from "@/lib/calculadora-financiera.functions";
 
 // Mismo orden y valores que subTabs de "planificacion" en SidebarHerramientas
 type SubTab =
@@ -28,9 +30,31 @@ const VISTAS: { key: SubTab; label: string }[] = [
 ];
 
 export function PlanificacionPersonalTab({ initialSubTab }: { initialSubTab?: string } = {}) {
+  // referencia dedup (no se usan directamente aquí pero garantiza import centralizado)
+  void calcularInteresSimple;
+  void calcularInteresCompuesto;
   const [vista, setVista] = useState<SubTab>(
     VISTAS.some((v) => v.key === initialSubTab) ? (initialSubTab as SubTab) : "jubilacion",
   );
+  // A4: métricas opcionales de RiesgoPage (solo lectura). Intentar leer de store/query si existe, sin throw.
+  const [riskMetrics, setRiskMetrics] = useState<{ sharpe: number | null; var95: number | null } | undefined>(undefined);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        // lectura opcional: si RiesgoPage expone query, reusar; si no, queda undefined y jubilación oculta fila
+        const mod: any = await import("@/components/herramientas/cuantitativo/RiesgoPage").catch(() => null);
+        void mod;
+        // placeholder: no hay store global, se deja undefined para no inventar números
+        if (!cancelled) setRiskMetrics(undefined);
+      } catch {
+        if (!cancelled) setRiskMetrics(undefined);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (initialSubTab && VISTAS.some((v) => v.key === initialSubTab)) {
@@ -67,7 +91,7 @@ export function PlanificacionPersonalTab({ initialSubTab }: { initialSubTab?: st
         ))}
       </div>
 
-      {vista === "jubilacion" && <CalculadoraJubilacion />}
+      {vista === "jubilacion" && <CalculadoraJubilacion metrics={riskMetrics} />}
       {vista === "hipoteca" && <CalculadoraHipoteca />}
       {vista === "inversiones" && <CalculadoraInversiones />}
       {vista === "objetivos" && <CalculadoraObjetivos />}

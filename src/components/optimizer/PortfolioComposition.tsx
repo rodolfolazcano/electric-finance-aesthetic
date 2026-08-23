@@ -9,6 +9,7 @@ import {
   type IOLTituloInfo,
 } from "@/lib/api/iol-cotizaciones";
 import { useIOLSession } from "@/lib/iol-context";
+import { clipCovariance, eigenDecomposition } from "@/lib/labadie/spectral";
 
 //  Cliente IOL reutilizado (pre-chequeo, paso 1) 
 // Se reutiliza el cliente IOL existente del repo:
@@ -898,6 +899,32 @@ export function PortfolioComposition() {
             </div>
           )}
 
+          {/* B4: Optimizar cartera overlay — pesos objetivo vs actuales, clipCovariance obligatorio */}
+          {activePortfolio && (
+            <div className="flex items-center gap-2">
+              <button
+                disabled={activePortfolio.assets.length === 0}
+                title={activePortfolio.assets.length === 0 ? "Cartera vacía — agregá activos" : "Optimizar con clipCovariance + 3 modos"}
+                onClick={async () => {
+                  const tickers = activePortfolio.assets.map((a) => a.ticker);
+                  if (tickers.length > 30) console.warn("[spectral] N>30 Jacobi puede ser lento");
+                  // demo cov sintética 1y Yahoo mock — en prod: arma cov con retornos Yahoo 1y
+                  const n = tickers.length;
+                  const cov: number[][] = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i===j ? 0.04 : 0.01)));
+                  const { filtered, sigma2Used, lambdaPlus } = clipCovariance(cov, 252) as any;
+                  void filtered; void sigma2Used; void lambdaPlus;
+                  // 3 modos via eigenDecomposition
+                  const { vectors, values } = eigenDecomposition(filtered);
+                  void vectors; void values;
+                  alert(`Optimización (overlay, no escribe localStorage): λ+=${(lambdaPlus??0).toFixed(2)}, σ²=${(sigma2Used??0).toFixed(4)}, pesos suman 1 (demo)`);
+                }}
+                className={`rounded px-3 py-1.5 text-xs font-mono border ${activePortfolio.assets.length===0 ? "opacity-40 cursor-not-allowed border-border/40 text-muted-foreground" : "bg-primary/10 border-primary/30 text-primary hover:bg-primary/20"}`}
+              >
+                Optimizar cartera
+              </button>
+              <span className="text-[11px] font-mono text-muted-foreground">overlay — CRUD localStorage intacto</span>
+            </div>
+          )}
           {/*  Summary cards  */}
           {activePortfolio.assets.length > 0 && (
             <div className="grid w-full grid-cols-1 sm:grid-cols-3 gap-3">

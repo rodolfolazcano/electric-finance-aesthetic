@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import {
   type PatrimonioNetoInput,
   type PatrimonioNetoResult,
 } from "@/lib/planificacion/patrimonio-neto.functions";
+import { calcularInteresCompuesto } from "@/lib/calculadora-financiera.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
 import { ContactCTA } from "./ContactCTA";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -39,7 +40,7 @@ export function CalculadoraPatrimonioNeto() {
       <div className="glass p-5 space-y-4">
         <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Activos</h3>
         <div>
-          <label className="text-xs text-muted-foreground">Líquidos (efectivo, cuentas)</label>
+          <label className="text-xs text-muted-foreground">LÃ­quidos (efectivo, cuentas)</label>
           <Input
             type="number"
             value={inputs.activos.liquidos}
@@ -87,7 +88,7 @@ export function CalculadoraPatrimonioNeto() {
           />
         </div>
         <Button onClick={handleCalc} disabled={loading} className="w-full">
-          {loading ? "Calculando…" : "Calcular patrimonio"}
+          {loading ? "Calculandoâ€¦" : "Calcular patrimonio"}
         </Button>
       </div>
 
@@ -133,7 +134,7 @@ export function CalculadoraPatrimonioNeto() {
 
             <div className="glass p-5">
               <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
-                Distribución de activos
+                DistribuciÃ³n de activos
               </div>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -173,3 +174,5 @@ export function CalculadoraPatrimonioNeto() {
     </div>
   );
 }
+
+

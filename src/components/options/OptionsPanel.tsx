@@ -31,6 +31,8 @@ import { GreeksSensitivity } from "./GreeksSensitivity";
 import { StrategyBuilder } from "./StrategyBuilder";
 import { ProbITMChart } from "./ProbITMChart";
 import { VaRChart } from "./VaRChart";
+import { ejecutarPrediccion, type Vela } from "@/lib/opciones-bcba/prediccion.functions";
+import { getRiskFreeRateETTI } from "@/lib/herramientas/renta-fija.functions";
 
 const CNV_DISCLAIMER =
   "El desempeño pasado no garantiza resultados futuros. Esta información es con fines educativos e informativos y no constituye recomendación de inversión.";
@@ -51,7 +53,7 @@ function DeltaBadge({ delta }: { delta: number | null }) {
   return <span className={color}>{delta.toFixed(4)}</span>;
 }
 
-type VizTab = "payoff" | "smile" | "prob-itm" | "var" | "griegas" | "estrategias";
+type VizTab = "payoff" | "smile" | "prob-itm" | "var" | "griegas" | "estrategias" | "prediccion";
 
 export function OptionsPanel() {
   const fetchOpciones = useServerFn(fetchOpcionesIOL);
@@ -339,6 +341,8 @@ export function OptionsPanel() {
         </div>
       </Card>
 
+      {/* Predicción ML (B3) */}
+      {useMemo(() => null, [])}
       {/* Visualizaciones */}
       <div className="flex gap-1.5 border-b border-border/20 overflow-x-auto pb-1">
         {[
@@ -348,6 +352,7 @@ export function OptionsPanel() {
           { key: "var" as const, label: "VaR" },
           { key: "griegas" as const, label: "Griegas" },
           { key: "estrategias" as const, label: "Estrategias" },
+          { key: "prediccion" as const, label: "Predicción" },
         ].map((t) => (
           <button key={t.key} onClick={() => setVizTab(t.key)} className={`shrink-0 text-[12px] font-medium px-3.5 py-2 rounded-t-lg border-b-2 transition-colors ${vizTab === t.key ? "bg-primary/10 text-primary border-primary" : "text-muted-foreground hover:text-foreground border-transparent"}`}>
             {t.label}
@@ -370,6 +375,7 @@ export function OptionsPanel() {
         <Card className="p-10 text-center border border-dashed"><p className="text-[13px] font-medium">Seleccioná una opción para ver sensibilidad de griegas</p><p className="text-[14px] text-muted-foreground mt-1">Delta, Gamma, Vega y Theta vs. Spot</p></Card>
       )}
       {vizTab === "estrategias" && <StrategyBuilder />}
+      {vizTab === "prediccion" && <PrediccionTab subyacente={subyacente} spot={spotPrice} />}
 
       {(highProb.itm.length > 0 || highProb.otm.length > 0) && (
         <Card className="border border-border/40 bg-card p-6">
@@ -399,7 +405,82 @@ export function OptionsPanel() {
         </Card>
       )}
 
-      <p className="text-[14px] text-muted-foreground text-center border-t border-border/10 pt-3">{CNV_DISCLAIMER} — Fuentes: IOL · BYMA · Yahoo Finance</p>
+      <p className="text-[14px] text-muted-foreground text-center border-t border-border/10 pt-3">{CNV_DISCLAIMER} — Fuentes: IOL · BYMA · Yahoo Finance · ML hasNN=false (NN omitida, ver bitácora)</p>
     </div>
+  );
+}
+
+function PrediccionTab({ subyacente, spot }: { subyacente: string; spot: number | null }) {
+  const [loading, setLoading] = useState(false);
+  const [res, setRes] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const fetchChart = useServerFn(fetchYahooChartServer);
+  const run = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const ticker = subyacente.includes(".") ? subyacente : `${subyacente}.BA`;
+      const chart: any = await fetchChart({ data: { ticker, range: "1y", interval: "1d" } } as any).catch(() => null);
+      const closes: number[] = chart?.indicators?.quote?.[0]?.close?.filter((c: any) => typeof c === "number" && isFinite(c)) ?? [];
+      const highs: number[] = chart?.indicators?.quote?.[0]?.high?.filter((c: any) => typeof c === "number" && isFinite(c)) ?? [];
+      const lows: number[] = chart?.indicators?.quote?.[0]?.low?.filter((c: any) => typeof c === "number" && isFinite(c)) ?? [];
+      const vols: number[] = chart?.indicators?.quote?.[0]?.volume?.filter((c: any) => typeof c === "number" && isFinite(c)) ?? [];
+      const timestamps: number[] = chart?.timestamp ?? [];
+      const velas: Vela[] = closes.map((c, i) => ({
+        fecha: timestamps[i] ? new Date(timestamps[i]*1000).toISOString().slice(0,10) : String(i),
+        close: c,
+        high: highs[i] ?? c,
+        low: lows[i] ?? c,
+        volume: vols[i] ?? 1000000,
+      })).filter(v => v.close > 0);
+      const v2 = velas.length < 80 ? velas : velas;
+      const out = ejecutarPrediccion(v2, subyacente, 5);
+      setRes(out);
+      if (velas.length < 504) setError("ventana reducida: Yahoo dio " + velas.length + " barras (<504), walk-forward adaptado");
+    } catch (e: any) {
+      setError(e.message ?? String(e));
+    } finally {
+      setLoading(false);
+    }
+  }, [subyacente, fetchChart]);
+  useEffect(() => { run(); }, [run]);
+  if (loading) return <Card className="p-6 text-center"><p className="text-sm">Calculando predicción…</p><div className="mt-2 h-1 w-full bg-muted/20 rounded overflow-hidden"><div className="h-full w-1/2 bg-primary animate-pulse" /></div></Card>;
+  if (!res) return <Card className="p-6 text-center"><p className="text-sm text-muted-foreground">Sin datos</p>{error && <p className="text-xs text-amber-400 mt-1">{error}</p>}<Button size="sm" onClick={run} className="mt-3">Reintentar</Button></Card>;
+  const decisionColor = res.decision?.direccion?.includes("CALL") ? "text-emerald-400" : res.decision?.direccion?.includes("PUT") ? "text-red-400" : "text-muted-foreground";
+  return (
+    <Card className="p-6 space-y-4 border border-border/40">
+      <div className="flex items-center justify-between">
+        <h3 className="text-[13px] font-semibold uppercase tracking-widest">Predicción ML — {subyacente} · Spot {spot != null ? `$${spot.toFixed(2)}` : "—"}</h3>
+        <Button size="sm" variant="outline" onClick={run} disabled={loading}>{loading ? "…" : "Recalcular"}</Button>
+      </div>
+      {error && <p className="text-xs text-amber-400">{error}</p>}
+      {res.error && <p className="text-xs text-red-400">{res.error}</p>}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="rounded border border-border/40 p-3 text-center"><div className="text-[11px] text-muted-foreground uppercase">Prob. suba</div><div className="mono text-lg">{res.probActual != null ? (res.probActual*100).toFixed(1)+"%" : "—"}</div></div>
+        <div className="rounded border border-border/40 p-3 text-center"><div className="text-[11px] text-muted-foreground uppercase">Threshold</div><div className="mono text-lg">{res.logThreshold.toFixed(2)}</div></div>
+        <div className={`rounded border p-3 text-center ${decisionColor} border-current/20`}><div className="text-[11px] uppercase">Decisión</div><div className="mono text-sm font-semibold">{res.decision?.direccion ?? "—"}</div></div>
+        <div className="rounded border border-border/40 p-3 text-center"><div className="text-[11px] text-muted-foreground uppercase">Strikes</div><div className="mono text-xs">ATM {res.decision?.strikeAtm ?? "—"} · OTM {res.decision?.strikeOtm ?? "—"}</div></div>
+      </div>
+      <div className="text-[11px] text-muted-foreground">Confianza {(res.decision?.confianza!=null ? (res.decision.confianza*100).toFixed(1) : "—")}% · Estrategia: {res.decision?.estrategia ?? "—"}</div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-[11px] font-mono">
+          <thead><tr className="text-muted-foreground border-b"><th className="text-left py-1">Métrica</th><th className="text-right py-1">Valor</th></tr></thead>
+          <tbody>
+            <tr><td>Filas útiles</td><td className="text-right">{res.filasUtiles}</td></tr>
+            <tr><td>CV acc/F1</td><td className="text-right">{res.logisticCv.acc.toFixed(3)} / {res.logisticCv.f1.toFixed(3)} ({res.logisticCv.filasCv} filas)</td></tr>
+            <tr><td>Test acc/F1</td><td className="text-right">{res.testAcc?.toFixed(3) ?? "—"} / {res.testF1?.toFixed(3) ?? "—"}</td></tr>
+            <tr><td>WF acc/F1 · ventanas</td><td className="text-right">{res.wfAcc?.toFixed(3) ?? "—"} / {res.wfF1?.toFixed(3) ?? "—"} · {res.wfVentanas}</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Top-5 features |coef|</div>
+        <div className="flex flex-wrap gap-1">
+          {res.featuresImportancia.map(([name, coef]: any) => (
+            <span key={name} className="rounded bg-muted/20 px-2 py-1 text-[11px] font-mono">{name}: {coef.toFixed(3)}</span>
+          ))}
+        </div>
+      </div>
+    </Card>
   );
 }

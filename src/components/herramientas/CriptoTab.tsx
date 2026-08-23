@@ -2,17 +2,19 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BinancePairsPanel } from "./BinancePairsPanel";
-import { ArbitrajeP2PPanel } from "./ArbitrajeP2PPanel";
 import { BinanceAccountPanel } from "./BinanceAccountPanel";
 import { EstrategiasPanel } from "./cripto/EstrategiasPanel";
-import { QuantLabPanel } from "./cripto/QuantLabPanel";
 import { PairsCryptoPanel } from "./cripto/PairsCryptoPanel";
 
-export function CriptoTab() {
-  const [subTab, setSubTab] = useState("pares");
+export const VALID_SUBTABS = ["pares", "binance", "cuenta", "backtesting"] as const;
+
+export function CriptoTab({ initialSubTab }: { initialSubTab?: string } = {}) {
+  const [subTab, setSubTab] = useState<(typeof VALID_SUBTABS)[number]>(() =>
+    (VALID_SUBTABS as readonly string[]).includes(initialSubTab ?? "") ? (initialSubTab as (typeof VALID_SUBTABS)[number]) : "pares"
+  );
 
   return (
-    <Tabs value={subTab} onValueChange={setSubTab} className="w-full">
+    <Tabs value={subTab} onValueChange={(v) => setSubTab(v as (typeof VALID_SUBTABS)[number])} className="w-full">
       <TabsList className="flex flex-wrap h-auto gap-1 p-1 bg-muted/20 rounded-lg w-full justify-start">
         <TabsTrigger
           value="pares"
@@ -21,52 +23,34 @@ export function CriptoTab() {
           Pares Binance
         </TabsTrigger>
         <TabsTrigger
-          value="arbitraje"
+          value="binance"
           className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
         >
-          Arbitraje P2P
+          Binance
         </TabsTrigger>
         <TabsTrigger
           value="cuenta"
           className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
         >
-          Cuenta Binance
+          Cuenta
         </TabsTrigger>
         <TabsTrigger
-          value="estrategias"
+          value="backtesting"
           className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
         >
-          Estrategias
-        </TabsTrigger>
-        <TabsTrigger
-          value="quantlab"
-          className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
-        >
-          Quant Lab
-        </TabsTrigger>
-        <TabsTrigger
-          value="pairs"
-          className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
-        >
-          Pairs Crypto
+          Backtesting
         </TabsTrigger>
       </TabsList>
       <TabsContent value="pares" className="mt-4">
         <BinancePairsPanel />
       </TabsContent>
-      <TabsContent value="arbitraje" className="mt-4">
-        <ArbitrajeP2PPanel />
+      <TabsContent value="binance" className="mt-4">
+        <BinanceAccountPanel />
       </TabsContent>
       <TabsContent value="cuenta" className="mt-4">
         <BinanceAccountPanel />
       </TabsContent>
-      <TabsContent value="estrategias" className="mt-4">
-        <EstrategiasPanel />
-      </TabsContent>
-      <TabsContent value="quantlab" className="mt-4">
-        <QuantLabPanel />
-      </TabsContent>
-      <TabsContent value="pairs" className="mt-4">
+      <TabsContent value="backtesting" className="mt-4">
         <PairsCryptoPanel />
       </TabsContent>
     </Tabs>

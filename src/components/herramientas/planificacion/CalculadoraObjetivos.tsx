@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+﻿import { useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import {
   type ObjetivosInput,
   type ObjetivosResult,
 } from "@/lib/planificacion/objetivos.functions";
+import { calcularInteresCompuesto } from "@/lib/calculadora-financiera.functions";
 import { PLANNED_EVENTS } from "@/lib/analytics";
 import { ContactCTA } from "./ContactCTA";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -41,7 +42,7 @@ export function CalculadoraObjetivos() {
   return (
     <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <div className="glass p-5 space-y-4">
-        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">Parámetros</h3>
+        <h3 className="mono text-[14px] uppercase tracking-[0.18em] text-foreground">ParÃ¡metros</h3>
         <div>
           <label className="text-xs text-muted-foreground">Monto objetivo ($)</label>
           <Input
@@ -79,7 +80,7 @@ export function CalculadoraObjetivos() {
           />
         </div>
         <Button onClick={handleCalc} disabled={loading} className="w-full">
-          {loading ? "Calculando…" : "Calcular"}
+          {loading ? "Calculandoâ€¦" : "Calcular"}
         </Button>
       </div>
 
@@ -113,7 +114,7 @@ export function CalculadoraObjetivos() {
 
             <div className="glass p-5">
               <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
-                Aporte necesario según tasa de retorno
+                Aporte necesario segÃºn tasa de retorno
               </div>
               <div className="h-52">
                 <ResponsiveContainer width="100%" height="100%">
@@ -172,3 +173,5 @@ export function CalculadoraObjetivos() {
     </div>
   );
 }
+
+
