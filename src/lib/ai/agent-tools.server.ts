@@ -8,10 +8,19 @@ import { searchLibrary } from "./context-library.server";
 import {
   sendTelegramMessage as _sendTelegramMessage,
   sendTelegramSignal as _sendTelegramSignal,
+  sendSenalInstitucional as _sendSenalInstitucional,
   formatSenalInstitucional as _formatSenalInstitucional,
   telegramGetBotInfo as _telegramGetBotInfo,
   telegramGetUpdates as _telegramGetUpdates,
 } from "@/lib/telegram.server";
+import {
+  ejecutarComparacionFinanciera as _ejecutarComparacionFinanciera,
+  tasaRealFisher as _tasaRealFisher,
+  capitalizacion as _capitalizacion,
+  valorActualRenta as _valorActualRenta,
+  perpetuidad as _perpetuidad,
+  perpetuidadCreciente as _perpetuidadCreciente,
+} from "@/lib/math/calculo-financiero.functions";
 
 const IS_WIN = process.platform === "win32";
 const MAX_OUT = 8_000;
@@ -456,6 +465,55 @@ export async function toolOrquestarSectorial(args: ToolOrquestarSectorialArgs): 
   }
 }
 
+export type ToolCalculoFinancieroArgs = {
+  operacion: "capitalizacion" | "tasa_real" | "va_renta" | "perpetuidad" | "perpetuidad_creciente" | "comparar";
+  Co?: number; TNA?: number; m?: number; t?: number;
+  ia?: number; pi?: number;
+  A?: number; i?: number; n?: number; g?: number;
+  alternativaA?: { nombre: string; tipo: "contado" | "cuotas" | "flujos"; montoContado?: number; cuotas?: { importe: number; cantidad: number; tasaPeriodica?: number } };
+  alternativaB?: { nombre: string; tipo: "contado" | "cuotas" | "flujos"; montoContado?: number; cuotas?: { importe: number; cantidad: number; tasaPeriodica?: number } };
+  tasaDescuento?: number;
+};
+
+export async function toolCalculoFinanciero(args: ToolCalculoFinancieroArgs): Promise<string> {
+  try {
+    switch (args.operacion) {
+      case "capitalizacion": {
+        const Co = args.Co ?? 100000;
+        const TNA = args.TNA ?? 0.6;
+        const m = args.m ?? 12;
+        const t = args.t ?? 1;
+        const res = _capitalizacion(Co, TNA, m, t);
+        return `Capitalización: Co=${Co} TNA=${(TNA*100).toFixed(2)}% m=${m} t=${t}a → Cf=${res.toFixed(2)} (factor ${(res/Co).toFixed(4)})`;
+      }
+      case "tasa_real": {
+        const ia = args.ia ?? 0.6, pi = args.pi ?? 0.3;
+        const r = _tasaRealFisher(ia, pi);
+        return `Fisher ${r.metodo}: ia=${(ia*100).toFixed(1)}% π=${(pi*100).toFixed(1)}% → real=${(r.real*100).toFixed(2)}% (${r.metodo}) — Regla Dumrauf: comparar solo efectivas, usar exacta si ia>20%`;
+      }
+      case "va_renta": {
+        const A = args.A ?? 10000, i = args.i ?? 0.05, n = args.n ?? 12;
+        const va = _valorActualRenta(A, i, n);
+        return `VA renta: A=${A} i=${(i*100).toFixed(2)}% n=${n} → VA=${va.toFixed(2)}`;
+      }
+      case "perpetuidad": {
+        const A = args.A ?? 1000, i = args.i ?? 0.10;
+        return `Perpetuidad: A=${A} i=${(i*100).toFixed(2)}% → V=${_perpetuidad(A,i).toFixed(2)}`;
+      }
+      case "perpetuidad_creciente": {
+        const A = args.A ?? 1000, g = args.g ?? 0.03, i = args.i ?? 0.10;
+        return `Perpetuidad creciente (Gordon): A=${A} g=${(g*100).toFixed(1)}% i=${(i*100).toFixed(1)}% → V=${_perpetuidadCreciente(A,g,i).toFixed(2)}`;
+      }
+      case "comparar": {
+        if (!args.alternativaA || !args.alternativaB) return "[ERROR] comparar requiere alternativaA y alternativaB";
+        const res = _ejecutarComparacionFinanciera(args.alternativaA as any, args.alternativaB as any, args.tasaDescuento ?? 0.5);
+        return `${res.detalle}\nGanador: ${res.ganador}\n${res.recomendacion}`;
+      }
+      default: return `[ERROR] operacion desconocida: ${args.operacion}`;
+    }
+  } catch (e:any) { return `[ERROR calculo-financiero]: ${e.message ?? String(e)}`; }
+}
+
 //  fetch_stock_data
 // Obtiene datos de Yahoo Finance directamente (sin depender del servidor Flask).
 
@@ -816,6 +874,29 @@ export const AGENT_TOOLS: ToolRecord[] = [
     },
     required: [],
     run: (a) => toolOrquestarSectorial(a as ToolOrquestarSectorialArgs),
+  },
+  {
+    name: "calculo_financiero",
+    description:
+      "CÁLCULO FINANCIERO Dumrauf (PT Administracion Financiera): capitalizacion (1+TNA/m)^m, tasa real Fisher exacta (1+ia)/(1+π)-1 (exacta si ia>20% para Argentina), VA renta, perpetuidad y Gordon, fondo amortización, TIR costo efectivo. Para comparar contado vs cuotas o dos alternativas, usar operacion=comparar con alternativaA/B y tasaDescuento TEA. Reglas: comparar solo efectivas, VA, ilusión nominal.",
+    params: {
+      operacion: { type: "string", description: "capitalizacion | tasa_real | va_renta | perpetuidad | perpetuidad_creciente | comparar" },
+      Co: { type: "number", description: "Capital inicial (capitalizacion)" },
+      TNA: { type: "number", description: "TNA decimal (0.6=60%)" },
+      m: { type: "number", description: "Capitalizaciones por año" },
+      t: { type: "number", description: "Años" },
+      ia: { type: "number", description: "Tasa aparente decimal" },
+      pi: { type: "number", description: "Inflación decimal" },
+      A: { type: "number", description: "Cuota/renta" },
+      i: { type: "number", description: "Tasa periódica decimal" },
+      n: { type: "number", description: "Periodos" },
+      g: { type: "number", description: "Crecimiento perpetuidad" },
+      alternativaA: { type: "object", description: "Alternativa A {nombre, tipo: contado|cuotas, montoContado, cuotas:{importe,cantidad}}" },
+      alternativaB: { type: "object", description: "Alternativa B idem" },
+      tasaDescuento: { type: "number", description: "TEA descuento decimal para comparar" },
+    },
+    required: ["operacion"],
+    run: (a) => toolCalculoFinanciero(a as ToolCalculoFinancieroArgs),
   },
   {
     name: "fetch_stock_data",

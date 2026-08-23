@@ -14,6 +14,14 @@ import {
   telegramGetBotInfo as _telegramGetBotInfo,
   telegramGetUpdates as _telegramGetUpdates,
 } from "@/lib/telegram.server";
+import {
+  ejecutarComparacionFinanciera as _ejecutarComparacionFinanciera,
+  tasaRealFisher as _tasaRealFisher,
+  capitalizacion as _capitalizacion,
+  valorActualRenta as _valorActualRenta,
+  perpetuidad as _perpetuidad,
+  perpetuidadCreciente as _perpetuidadCreciente,
+} from "@/lib/math/calculo-financiero.functions";
 
 const IS_WIN = process.platform === "win32";
 const MAX_OUT = 8_000;
@@ -384,6 +392,43 @@ export async function toolOrquestarSectorial(args: ToolOrquestarSectorialArgs): 
   } catch (e:any) { return `[ERROR orquestar_sectorial]: ${e.message ?? String(e)}`; }
 }
 
+export type ToolCalculoFinancieroArgs = {
+  operacion: "capitalizacion" | "tasa_real" | "va_renta" | "perpetuidad" | "perpetuidad_creciente" | "comparar";
+  Co?: number; TNA?: number; m?: number; t?: number;
+  ia?: number; pi?: number;
+  A?: number; i?: number; n?: number; g?: number;
+  alternativaA?: any; alternativaB?: any; tasaDescuento?: number;
+};
+
+export async function toolCalculoFinanciero(args: ToolCalculoFinancieroArgs): Promise<string> {
+  try {
+    switch (args.operacion) {
+      case "capitalizacion": {
+        const Co = args.Co ?? 100000; const TNA = args.TNA ?? 0.6; const m = args.m ?? 12; const t = args.t ?? 1;
+        const res = _capitalizacion(Co, TNA, m, t);
+        return `Capitalización: Co=${Co} TNA=${(TNA*100).toFixed(2)}% m=${m} t=${t}a → Cf=${res.toFixed(2)}`;
+      }
+      case "tasa_real": {
+        const ia = args.ia ?? 0.6, pi = args.pi ?? 0.3;
+        const r = _tasaRealFisher(ia, pi);
+        return `Fisher ${r.metodo}: ia=${(ia*100).toFixed(1)}% π=${(pi*100).toFixed(1)}% → real=${(r.real*100).toFixed(2)}%`;
+      }
+      case "va_renta": {
+        const A = args.A ?? 10000, i = args.i ?? 0.05, n = args.n ?? 12;
+        return `VA renta: A=${A} i=${(i*100).toFixed(2)}% n=${n} → VA=${_valorActualRenta(A,i,n).toFixed(2)}`;
+      }
+      case "perpetuidad": return `Perpetuidad: A=${args.A} i=${args.i} → V=${_perpetuidad(args.A??1000, args.i??0.1).toFixed(2)}`;
+      case "perpetuidad_creciente": return `Gordon: A=${args.A} g=${args.g} i=${args.i} → V=${_perpetuidadCreciente(args.A??1000, args.g??0.03, args.i??0.1).toFixed(2)}`;
+      case "comparar": {
+        if (!args.alternativaA || !args.alternativaB) return "[ERROR] comparar requiere alternativaA y alternativaB";
+        const res = _ejecutarComparacionFinanciera(args.alternativaA, args.alternativaB, args.tasaDescuento ?? 0.5);
+        return `${res.detalle}\nGanador: ${res.ganador}\n${res.recomendacion}`;
+      }
+      default: return `[ERROR] operacion desconocida`;
+    }
+  } catch (e:any) { return `[ERROR calculo-financiero]: ${e.message ?? String(e)}`; }
+}
+
 // --- fetch_stock_data ----------------------------------------------------------
 // Obtiene datos de Yahoo Finance directamente (sin depender del servidor Flask).
 
@@ -591,11 +636,54 @@ export const AGENT_TOOLS: ToolRecord[] = [
     run: (a) => toolOrquestarSectorial(a as ToolOrquestarSectorialArgs),
   },
   {
+    name: "calculo_financiero",
+    description: "CÁLCULO FINANCIERO Dumrauf: capitalizacion, tasa real Fisher exacta, VA renta, perpetuidad Gordon, comparar contado vs cuotas por VA. Usar operacion=comparar con alternativaA/B.",
+    params: {
+      operacion: { type: "string", description: "capitalizacion | tasa_real | va_renta | perpetuidad | perpetuidad_creciente | comparar" },
+      Co: { type: "number", description: "Capital inicial" },
+      TNA: { type: "number", description: "TNA decimal" },
+      m: { type: "number", description: "Capitalizaciones por año" },
+      t: { type: "number", description: "Años" },
+      ia: { type: "number", description: "Tasa aparente" },
+      pi: { type: "number", description: "Inflación" },
+      A: { type: "number", description: "Cuota" },
+      i: { type: "number", description: "Tasa periódica" },
+      n: { type: "number", description: "Periodos" },
+      g: { type: "number", description: "Crecimiento" },
+      alternativaA: { type: "object", description: "Alternativa A" },
+      alternativaB: { type: "object", description: "Alternativa B" },
+      tasaDescuento: { type: "number", description: "TEA descuento" },
+    },
+    required: ["operacion"],
+    run: (a) => toolCalculoFinanciero(a as ToolCalculoFinancieroArgs),
+  },
+  {
     name: "fetch_stock_data",
     description: "OBTIENE datos actuales de una accion/ETF desde Yahoo Finance directamente (sin depender del servidor Flask). USAR para consultar precio, variacion, P/E, market cap, beta, ROE, revenue growth, target precio, consenso de analistas. NO requiere servidor Flask. Recibe ticker (ej: AAPL, MSFT, SPY, GGAL.BA).",
     params: { ticker: { type: "string", description: "Ticker a consultar (ej: AAPL, MSFT, SPY, GGAL.BA)" }, period: { type: "string", description: "Periodo opcional (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, max)" } },
     required: ["ticker"],
     run: (a) => toolStockData(a as ToolStockDataArgs),
+  },
+  {
+    name: "consultar_principios_etico",
+    description: "CONSULTA los principios éticos y de asesoramiento financiero basados en manuales AFC 2022 (Códigos IAEF/IEAF, Ética Manual, Asesoramiento Financiero). Devuelve principios por categoría: integridad, independencia, conflictos de interés, confidencialidad, cumplimiento normativo, conocimiento del cliente, asesoramiento financiero. El agente debe actuar siempre bajo estos principios.",
+    params: { categoria: { type: "string", description: "Categoría opcional (ej: 'Integridad y Honestidad', 'Independencia y Objetividad'). Si no se especifica, devuelve todos." } },
+    required: [],
+    run: (a) => toolConsultarPrincipiosEtico(a as ToolConsultarPrincipiosEticoArgs),
+  },
+  {
+    name: "verificar_cumplimiento_etico",
+    description: "VERIFICA si una recomendación del agente cumple con los principios éticos del asesoramiento financiero. Detecta violaciones como promesas de rendimiento garantizado, falta de advertencia de riesgos, falta de consideración del perfil del cliente, o conflicto de intereses. El agente debe usar esta herramienta antes de emitir recomendaciones de inversión.",
+    params: { recomendacion: { type: "string", description: "Texto de la recomendación o respuesta del agente a verificar" } },
+    required: ["recomendacion"],
+    run: (a) => toolVerificarCumplimientoEtico(a as ToolVerificarCumplimientoEticoArgs),
+  },
+  {
+    name: "obtener_guia_comportamiento",
+    description: "OBTIENE la guía completa de comportamiento ético para el agente, con instrucciones específicas sobre cómo aplicar cada principio ético en la práctica. El agente debe consultar esta guía para asegurar que su comportamiento y respuestas cumplen con los estándares profesionales del asesoramiento financiero según manuales AFC 2022.",
+    params: {},
+    required: [],
+    run: (a) => toolObtenerGuiaComportamiento(a as ToolObtenerGuiaComportamientoArgs),
   },
   {
     name: "financial_query",
@@ -768,6 +856,88 @@ export function buildToolsSchema(): Record<string, any>[] {
       },
     },
   }));
+}
+
+// --- Ética y Asesoramiento Financiero ---------------------------------------
+
+export type ToolConsultarPrincipiosEticoArgs = { categoria?: string };
+
+export async function toolConsultarPrincipiosEtico(args: ToolConsultarPrincipiosEticoArgs): Promise<string> {
+  try {
+    const {
+      obtenerPrincipiosPorCategoria,
+      obtenerCategorias,
+      PRINCIPIOS_ETICOS,
+    } = await import("@/lib/principios-eticos");
+    
+    if (args.categoria) {
+      const principios = obtenerPrincipiosPorCategoria(args.categoria);
+      if (principios.length === 0) {
+        return `[ERROR] Categoría no encontrada: ${args.categoria}. Categorías disponibles: ${obtenerCategorias().join(", ")}`;
+      }
+      const lines = [`## ${args.categoria.toUpperCase()}\n`];
+      principios.forEach((p) => {
+        lines.push(`### ${p.titulo}`);
+        lines.push(`**Descripción:** ${p.descripcion}`);
+        lines.push(`**Aplicación del agente:** ${p.aplicacionAgente}\n`);
+      });
+      return lines.join("\n");
+    }
+    
+    // Devolver todos los principios organizados por categoría
+    const categorias = obtenerCategorias();
+    const lines = ["PRINCIPIOS ÉTICOS DEL ASESORAMIENTO FINANCIERO (AFC 2022)\n"];
+    categorias.forEach((cat) => {
+      lines.push(`## ${cat.toUpperCase()}\n`);
+      const principios = obtenerPrincipiosPorCategoria(cat);
+      principios.forEach((p) => {
+        lines.push(`- ${p.titulo}`);
+        lines.push(`  Aplicación: ${p.aplicacionAgente}`);
+      });
+      lines.push("");
+    });
+    return lines.join("\n");
+  } catch (e: any) {
+    return `[ERROR consultando principios éticos]: ${e.message ?? String(e)}`;
+  }
+}
+
+export type ToolVerificarCumplimientoEticoArgs = { recomendacion: string };
+
+export async function toolVerificarCumplimientoEtico(args: ToolVerificarCumplimientoEticoArgs): Promise<string> {
+  try {
+    const { verificarCumplimientoEtico } = await import("@/lib/principios-eticos");
+    const resultado = verificarCumplimientoEtico(args.recomendacion);
+    
+    if (resultado.cumple) {
+      return `[OK] La recomendación cumple con los principios éticos del asesoramiento financiero.`;
+    }
+    
+    const lines = [`[ALERTA] La recomendación viola principios éticos:\n`];
+    resultado.alertas.forEach((alerta, i) => {
+      lines.push(`${i + 1}. ${alerta}`);
+    });
+    lines.push("\nPor favor, revise la recomendación para asegurar que:");
+    lines.push("- No prometa rendimientos garantizados");
+    lines.push("- Advierta sobre los riesgos de inversión");
+    lines.push("- Considere el perfil del inversor");
+    lines.push("- Declare cualquier conflicto de interés potencial");
+    
+    return lines.join("\n");
+  } catch (e: any) {
+    return `[ERROR verificando cumplimiento ético]: ${e.message ?? String(e)}`;
+  }
+}
+
+export type ToolObtenerGuiaComportamientoArgs = Record<string, never>;
+
+export async function toolObtenerGuiaComportamiento(args: ToolObtenerGuiaComportamientoArgs): Promise<string> {
+  try {
+    const { generarGuiaComportamiento } = await import("@/lib/principios-eticos");
+    return generarGuiaComportamiento();
+  } catch (e: any) {
+    return `[ERROR obteniendo guía de comportamiento]: ${e.message ?? String(e)}`;
+  }
 }
 
 // --- CRM: clientes ---------------------------------------------------------
