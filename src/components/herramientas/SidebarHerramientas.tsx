@@ -38,15 +38,27 @@ interface SidebarGroup {
   items: SidebarItem[];
 }
 
-// Reorden coherente por flujo de inversión: Mercado -> Análisis -> Instrumentos -> Cliente
+// Orden coherente: Contexto (punto de partida) -> Mercado -> Análisis -> Instrumentos -> Cliente
 const SIDEBAR_GROUPS: SidebarGroup[] = [
+  {
+    id: "contexto",
+    title: "CONTEXTO",
+    items: [
+      {
+        value: "contexto",
+        label: "01 · Contexto",
+        shortLabel: "Contexto",
+        icon: Compass,
+      },
+    ],
+  },
   {
     id: "mercado",
     title: "MERCADO",
     items: [
       {
         value: "sectores",
-        label: "01 · Sectores",
+        label: "02 · Sectores",
         icon: Building2,
         shortLabel: "Sectores",
         subTabs: [
@@ -68,13 +80,13 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       {
         value: "analisis",
-        label: "02 · Análisis",
+        label: "03 · Análisis",
         shortLabel: "Análisis",
         icon: TrendingUp,
       },
       {
         value: "cuantitativo",
-        label: "03 · Cuantitativo",
+        label: "04 · Cuantitativo",
         shortLabel: "Cuantitativo",
         icon: Layers,
         subTabs: [
@@ -87,22 +99,22 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
           { value: "estimaciones", label: "Estimaciones" },
         ],
       },
-      { value: "portafolio", label: "04 · Portafolio", shortLabel: "Portafolio", icon: Briefcase },
+      { value: "portafolio", label: "05 · Portafolio", shortLabel: "Portafolio", icon: Briefcase },
     ],
   },
   {
     id: "instrumentos",
     title: "INSTRUMENTOS",
     items: [
-      { value: "renta-fija", label: "05 · Renta Fija", shortLabel: "Renta Fija", icon: BarChart3 },
-      { value: "opciones", label: "06 · Opciones", shortLabel: "Opciones", icon: Percent },
+      { value: "renta-fija", label: "06 · Renta Fija", shortLabel: "Renta Fija", icon: BarChart3 },
+      { value: "opciones", label: "07 · Opciones", shortLabel: "Opciones", icon: Percent },
       {
         value: "arbitrador",
-        label: "07 · Arbitrador",
+        label: "08 · Arbitrador",
         shortLabel: "Arbitrador",
         icon: ArrowLeftRight,
       },
-      { value: "cripto", label: "08 · Cripto", shortLabel: "Cripto", icon: Sparkles },
+      { value: "cripto", label: "09 · Cripto", shortLabel: "Cripto", icon: Sparkles },
     ],
   },
   {
@@ -111,13 +123,13 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       {
         value: "calculadora",
-        label: "09 · Calculadora",
+        label: "10 · Calculadora",
         shortLabel: "Calculadora",
         icon: Calculator,
       },
       {
         value: "planificacion",
-        label: "10 · Planificación",
+        label: "11 · Planificación",
         shortLabel: "Planificación",
         icon: CalendarCheck,
         subTabs: [
@@ -128,22 +140,6 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
           { value: "presupuesto", label: "Presupuesto" },
           { value: "pasivos", label: "Deudas" },
           { value: "patrimonio-neto", label: "Patrimonio" },
-        ],
-      },
-    ],
-  },
-  {
-    id: "contexto",
-    title: "CONTEXTO",
-    items: [
-      {
-        value: "contexto",
-        label: "11 · Contexto",
-        shortLabel: "Contexto",
-        icon: Compass,
-        subTabs: [
-          { value: "oportunidades", label: "Oportunidades" },
-          { value: "metodologia", label: "Metodología" },
         ],
       },
     ],

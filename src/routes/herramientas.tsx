@@ -42,7 +42,7 @@ const WHATSAPP =
 export const Route = createFileRoute("/herramientas")({
   validateSearch: (search: Record<string, unknown>) => {
     const out: { tab: string; subTab?: string; ticker?: string } = {
-      tab: (search["tab"] as string) || "analisis",
+      tab: (search["tab"] as string) || "contexto",
     };
     if (search["subTab"]) out.subTab = String(search["subTab"]);
     if (search["ticker"]) out.ticker = String(search["ticker"]);
@@ -63,6 +63,7 @@ export const Route = createFileRoute("/herramientas")({
 
 // Mismo orden que SIDEBAR_GROUPS en SidebarHerramientas (única fuente de verdad del orden)
 const TABS = [
+  { id: "contexto", label: "Contexto", icon: Compass, tipo: "core" },
   { id: "sectores", label: "Sectores", icon: Layers, tipo: "core" },
   { id: "analisis", label: "Análisis", icon: Activity, tipo: "core" },
   { id: "cuantitativo", label: "Cuantitativo", icon: LineChart, tipo: "core" },
@@ -73,7 +74,6 @@ const TABS = [
   { id: "cripto", label: "Cripto", icon: Bitcoin, tipo: "core" },
   { id: "calculadora", label: "Calculadora", icon: Calculator, tipo: "core" },
   { id: "planificacion", label: "Planificación", icon: CalendarCheck, tipo: "core" },
-  { id: "contexto", label: "Contexto", icon: Compass, tipo: "core" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -103,7 +103,7 @@ function HerramientasContenido() {
     isExpanded: true,
     isMobile: false,
   });
-  const activo = (TABS.some((t) => t.id === tab) ? tab : "analisis") as TabId;
+  const activo = (TABS.some((t) => t.id === tab) ? tab : "contexto") as TabId;
 
   const setTab = (newTab: string) => navigate({ to: "/herramientas", search: { tab: newTab } });
   const setSubTab = (newSub: string) =>
@@ -322,7 +322,7 @@ function HerramientasContenido() {
             {activo === "cripto" && <CriptoTab />}
             {activo === "calculadora" && <CalculadoraFinancieraTab />}
             {activo === "planificacion" && <PlanificacionPersonalTab initialSubTab={subTab} />}
-            {activo === "contexto" && <ContextoTab initialSubTab={subTab} />}
+            {activo === "contexto" && <ContextoTab />}
             <p className="mt-8 text-[14px] leading-snug text-muted-foreground border-t border-border/20 pt-4">
               Herramientas informativas con datos de terceros. No constituyen recomendación de
               inversión. Fuentes: BYMA · IOL · Yahoo Finance · BCRA · Delay 15-20’
