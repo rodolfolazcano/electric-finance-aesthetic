@@ -86,7 +86,7 @@
               "cupon": {
                 "tasa": 1,
                 "tipo": "Step-up",
-                "detalle": "1.0% hasta Jul-2024, luego 4.0%",
+                "detalle": "1.0% hasta Jul-2024, luego 4.0% anual (2.0 semestral)",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
                 "convencion": "ACT/365"
@@ -108,49 +108,49 @@
                 {
                   "fecha": "2027-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2027-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2028-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2028-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2029-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2029-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2030-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2030-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 104,
+                  "monto_por_cien": 102,
                   "moneda": "USD"
                 }
               ],
@@ -176,7 +176,7 @@
               "cupon": {
                 "tasa": 1,
                 "tipo": "Step-up",
-                "detalle": "1.0% hasta Jul-2024, luego 4.0%",
+                "detalle": "1.0% hasta Jul-2024, luego 4.0% anual (2.0 semestral)",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
                 "convencion": "ACT/365"
@@ -198,49 +198,49 @@
                 {
                   "fecha": "2027-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2027-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2028-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2028-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2029-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2029-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2030-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2030-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 104,
+                  "monto_por_cien": 102,
                   "moneda": "USD"
                 }
               ],
@@ -266,7 +266,7 @@
               "cupon": {
                 "tasa": 1,
                 "tipo": "Step-up",
-                "detalle": "1.0% hasta Jul-2024, luego 4.0%",
+                "detalle": "1.0% hasta Jul-2024, luego 4.0% anual (2.0 semestral)",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
                 "convencion": "ACT/365"
@@ -288,49 +288,49 @@
                 {
                   "fecha": "2027-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2027-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2028-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2028-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2029-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2029-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2030-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2030-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 104,
+                  "monto_por_cien": 102,
                   "moneda": "USD"
                 }
               ],
@@ -713,7 +713,7 @@
               "cupon": {
                 "tasa": 1,
                 "tipo": "Step-up",
-                "detalle": "1.0% hasta Jul-2024, luego 4.0%",
+                "detalle": "1.0% hasta Jul-2024, luego 4.0% anual (2.0 semestral)",
                 "frecuencia": "Semestral",
                 "dias_cupon": 182,
                 "convencion": "ACT/365"
@@ -735,49 +735,49 @@
                 {
                   "fecha": "2027-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2027-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2028-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2028-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2029-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2029-07-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2030-01-09",
                   "tipo": "Cupon",
-                  "monto_por_cien": 4,
+                  "monto_por_cien": 2,
                   "moneda": "USD"
                 },
                 {
                   "fecha": "2030-07-09",
                   "tipo": "Cupon+Amortizacion",
-                  "monto_por_cien": 104,
+                  "monto_por_cien": 102,
                   "moneda": "USD"
                 }
               ],

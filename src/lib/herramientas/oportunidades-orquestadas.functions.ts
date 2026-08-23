@@ -112,6 +112,55 @@ export const getOportunidadesOrquestadas = createServerFn({ method: "POST" })
         });
       }
 
+      // FUNDAMENTAL SOLO SOBRE SUBYACENTE EE.UU.: descartar BCBA/CEDEAR del análisis
+      // (Yahoo trae estados contables completos solo de NYSE/NASDAQ)
+      try {
+        const { getFlatTickerList } = await import("@/lib/universos");
+        const META = new Map(getFlatTickerList().map((t: any) => [t.ticker.toUpperCase(), t]));
+        const esUS = (tk: string) => {
+          const m = META.get(tk.toUpperCase()) as any;
+          if (m?.mercado) return String(m.mercado).includes("NYSE") || String(m.mercado).includes("NASDAQ");
+          return !tk.toUpperCase().endsWith(".BA");
+        };
+        tickersDesplegados = tickersDesplegados.filter(esUS);
+        porSector = Object.fromEntries(
+          Object.entries(porSector).map(([k, v]) => [k, (v as string[]).filter(esUS)]),
+        );
+
+        // Índices de equivalentes operables en BCBA (por nombre normalizado)
+        const norm = (s: string) =>
+          String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+        const bcba = getFlatTickerList().filter((t: any) => t.mercado === "BCBA");
+        const porNombre = new Map<string, any[]>();
+        for (const b of bcba) {
+          const k = norm(b.nombre);
+          if (!k || k === "NOMBRE NO ENCONTRADO") continue;
+          if (!porNombre.has(k)) porNombre.set(k, []);
+          porNombre.get(k)!.push(b);
+        }
+        const equivalente = (usTicker: string, usNombre: unknown): { ars?: string; usd?: string } => {
+          const out: { ars?: string; usd?: string } = {};
+          const base = usTicker.toUpperCase();
+          const cands = [
+            ...(porNombre.get(norm(usNombre as string)) ?? []),
+            ...bcba.filter((b: any) => b.ticker.toUpperCase() === base),
+            ...bcba.filter((b: any) => b.ticker.toUpperCase() === base + "D"),
+          ];
+          for (const c of cands as any[]) {
+            if (!out.ars && c.moneda === "ARS") out.ars = c.ticker;
+            if (!out.usd && c.moneda === "USD") out.usd = c.ticker;
+          }
+          return out;
+        };
+        const nombrePorTicker = new Map(
+          [...(META as Map<string, any>)].map(([k, v]) => [k, v.nombre]),
+        );
+        senalesOrdenadas = senalesOrdenadas.map((s: any) => ({
+          ...s,
+          operableBCBA: equivalente(s.ticker, nombrePorTicker.get(String(s.ticker).toUpperCase()) ?? s.ticker),
+        }));
+      } catch {}
+
       return {
         ...base,
         fase4: fase4ext,
