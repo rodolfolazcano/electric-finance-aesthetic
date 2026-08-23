@@ -22,7 +22,7 @@
     },
     {
       "path": "/api/cron/alerta-publicaciones?umbral=6&max=2",
-      "schedule": "30 15,18,21 * * 1-5"
+      "schedule": "30 15 * * 1-5"
     },
     {
       "path": "/api/cron/oportunidades-publicaciones?tema=cripto&max=4",
