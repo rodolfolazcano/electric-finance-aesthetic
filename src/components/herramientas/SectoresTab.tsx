@@ -15,6 +15,7 @@ import {
   Target,
   Activity,
   Zap,
+  ChevronDown,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -92,10 +93,22 @@ function enriquecerTicker(t: TickerJson): Required<TickerJson> {
   let moneda = (t.moneda || "").toUpperCase();
   let mercado = (t.mercado || "").toUpperCase();
   let pais = t.pais || "";
-  if (!tipo) tipo = tk.includes(".BA") ? "cedear" : tk.length <= 5 && /^[A-Z]+$/.test(tk) ? "accion" : "accion";
-  if (!moneda) moneda = tk.endsWith("D") && !tk.includes(".") ? "USD" : tk.includes(".BA") ? "ARS" : "USD";
+  if (!tipo)
+    tipo = tk.includes(".BA")
+      ? "cedear"
+      : tk.length <= 5 && /^[A-Z]+$/.test(tk)
+        ? "accion"
+        : "accion";
+  if (!moneda)
+    moneda = tk.endsWith("D") && !tk.includes(".") ? "USD" : tk.includes(".BA") ? "ARS" : "USD";
   if (!mercado) mercado = tk.includes(".BA") || moneda === "ARS" ? "BCBA" : "NYSE/NASDAQ";
-  if (!pais) pais = mercado === "BCBA" && moneda === "USD" ? "EE.UU." : mercado === "BCBA" ? "Argentina" : "EE.UU.";
+  if (!pais)
+    pais =
+      mercado === "BCBA" && moneda === "USD"
+        ? "EE.UU."
+        : mercado === "BCBA"
+          ? "Argentina"
+          : "EE.UU.";
   return { ticker: t.ticker, nombre: t.nombre || "—", tipo, moneda, mercado, pais };
 }
 function badgeTipo(tipo: string) {
@@ -103,11 +116,14 @@ function badgeTipo(tipo: string) {
   if (t === "cedear") return "bg-violet-500/20 text-violet-300 border-violet-500/30";
   if (t === "accion") return "bg-blue-500/20 text-blue-300 border-blue-500/30";
   if (t === "etf") return "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
-  if (t.includes("bono") || t.includes("on")) return "bg-amber-500/20 text-amber-300 border-amber-500/30";
+  if (t.includes("bono") || t.includes("on"))
+    return "bg-amber-500/20 text-amber-300 border-amber-500/30";
   return "bg-zinc-500/20 text-zinc-300 border-zinc-500/30";
 }
 function badgeMoneda(moneda: string) {
-  return moneda === "ARS" ? "bg-orange-500/15 text-orange-300 border-orange-500/30" : "bg-green-500/15 text-green-300 border-green-500/30";
+  return moneda === "ARS"
+    ? "bg-orange-500/15 text-orange-300 border-orange-500/30"
+    : "bg-green-500/15 text-green-300 border-green-500/30";
 }
 
 // ── Performance (live 5d) + SectorImpact + RelStrength ──
@@ -1251,19 +1267,27 @@ function IntermarketFull() {
 }
 
 export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
-  const valid = [
-    "panel",
-    "matriz",
-    "valuacion",
-    "oportunidades",
-    "benchmarks",
-    "etf-fit",
-    "performance",
-    "intermarket",
-  ];
-  const [tab, setTab] = useState(valid.includes(initialTab || "") ? initialTab! : "panel");
+  // Reorden metodológico (corpus pt): Panorama Murphy → Análisis Pascale →
+  // Valuación relativa → Estructura Bustamante → Cartera Elbaum
+  const valid = ["panorama", "analisis", "valuacion", "estructura", "cartera"];
+  const LEGACY_MAP: Record<string, string> = {
+    performance: "panorama",
+    intermarket: "panorama",
+    panel: "analisis",
+    etfFit: "analisis",
+    "etf-fit": "analisis",
+    matriz: "cartera",
+    benchmarks: "cartera",
+    valuacion: "valuacion",
+    oportunidades: "valuacion",
+  };
+  const inicial = initialTab ? (LEGACY_MAP[initialTab] ?? (valid.includes(initialTab) ? initialTab : undefined)) : undefined;
+  const [tab, setTab] = useState(inicial ?? "panorama");
   useEffect(() => {
-    if (initialTab && valid.includes(initialTab) && initialTab !== tab) setTab(initialTab);
+    if (initialTab) {
+      const mapped = LEGACY_MAP[initialTab] ?? initialTab;
+      if (valid.includes(mapped) && mapped !== tab) setTab(mapped);
+    }
   }, [initialTab]);
   // Shared sector state (Clarity parity)
   const [sectorFilter, setSectorFilter] = useState("");
@@ -1361,6 +1385,7 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
   ];
 
   // Comparación
+  const [comparacionAbierta, setComparacionAbierta] = useState(false);
   const [comparacionSectores, setComparacionSectores] = useState<string[]>([]);
   const [comparacionData, setComparacionData] = useState<
     Record<string, SectorAnalysisResult | null>
@@ -1500,71 +1525,86 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
           )}
         </div>
         <div className="glass p-3 flex-1 min-w-[220px] border rounded-lg bg-background/40">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
+          <button
+            onClick={() => setComparacionAbierta((v) => !v)}
+            aria-expanded={comparacionAbierta}
+            className="w-full flex items-center justify-between gap-2 rounded-md px-2 py-1.5 -mx-2 text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+          >
+            <span className="flex items-center gap-2">
               Comparar
+              {comparacionSectores.length > 0 && (
+                <span className="font-mono text-[10px] normal-case tracking-normal rounded-full bg-primary/10 text-primary border border-primary/20 px-2 py-0.5">
+                  {comparacionSectores.length} seleccionado
+                  {comparacionSectores.length === 1 ? "" : "s"}
+                </span>
+              )}
             </span>
-            <select
-              multiple
-              value={comparacionSectores}
-              onChange={(e) =>
-                setComparacionSectores(Array.from(e.target.selectedOptions, (o) => o.value))
-              }
-              className="flex-1 min-w-[120px] bg-background border border-border/60 text-[11px] rounded px-2 py-1.5"
-              size={3}
-            >
-              {sectorList
-                .filter((s) => s !== "No disponible")
-                .map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-            </select>
-            <Button
-              onClick={handleCompararSectores}
-              disabled={comparacionSectores.length < 2 || comparacionLoading}
-              size="sm"
-              className="h-8 text-[11px]"
-            >
-              {comparacionLoading ? "Cargando…" : `Comparar (${comparacionSectores.length})`}
-            </Button>
-          </div>
-          {comparacionError && (
-            <p className="text-[10px] text-amber-400 mt-1">{comparacionError}</p>
+            <ChevronDown
+              className={`h-4 w-4 transition-transform duration-200 ${comparacionAbierta ? "rotate-180" : ""}`}
+            />
+          </button>
+          {comparacionAbierta && (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <select
+                multiple
+                value={comparacionSectores}
+                onChange={(e) =>
+                  setComparacionSectores(Array.from(e.target.selectedOptions, (o) => o.value))
+                }
+                className="flex-1 min-w-[120px] bg-background border border-border/60 text-[11px] rounded px-2 py-1.5"
+                size={3}
+              >
+                {sectorList
+                  .filter((s) => s !== "No disponible")
+                  .map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+              </select>
+              <Button
+                onClick={handleCompararSectores}
+                disabled={comparacionSectores.length < 2 || comparacionLoading}
+                size="sm"
+                className="h-8 text-[11px]"
+              >
+                {comparacionLoading ? "Cargando…" : `Comparar (${comparacionSectores.length})`}
+              </Button>
+              {comparacionError && (
+                <p className="text-[10px] text-amber-400 mt-1 w-full">{comparacionError}</p>
+              )}
+            </div>
           )}
         </div>
       </div>
 
       <Tabs value={tab} onValueChange={setTab} className="w-full">
         <TabsList className="flex-wrap h-auto gap-1 p-1 w-full justify-start">
-          <TabsTrigger value="panel" className="text-[12px] px-3 py-1.5">
-            Panel
+          <TabsTrigger value="panorama" className="text-[12px] px-3 py-1.5">
+            1 · Panorama
           </TabsTrigger>
-          <TabsTrigger value="matriz" className="text-[12px] px-3 py-1.5">
-            Matriz
+          <TabsTrigger value="analisis" className="text-[12px] px-3 py-1.5">
+            2 · Análisis
           </TabsTrigger>
           <TabsTrigger value="valuacion" className="text-[12px] px-3 py-1.5">
-            Valuación
+            3 · Valuación
           </TabsTrigger>
-          <TabsTrigger value="oportunidades" className="text-[12px] px-3 py-1.5">
-            Oportunidades
+          <TabsTrigger value="estructura" className="text-[12px] px-3 py-1.5">
+            4 · Estructura
           </TabsTrigger>
-          <TabsTrigger value="benchmarks" className="text-[12px] px-3 py-1.5">
-            Benchmarks
-          </TabsTrigger>
-          <TabsTrigger value="etf-fit" className="text-[12px] px-3 py-1.5">
-            ETF Fit
-          </TabsTrigger>
-          <TabsTrigger value="performance" className="text-[12px] px-3 py-1.5">
-            Performance
-          </TabsTrigger>
-          <TabsTrigger value="intermarket" className="text-[12px] px-3 py-1.5">
-            Intermarket
+          <TabsTrigger value="cartera" className="text-[12px] px-3 py-1.5">
+            5 · Cartera
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="panel" className="mt-4">
+        {/* 1 · PANORAMA — Murphy intermarket: rotación, fuerza relativa, régimen */}
+        <TabsContent value="panorama" className="mt-4 space-y-6">
+          <PerformanceFullPanel sectorFilter={sectorFilter} tickersFromFilter={tickersFromFilter} />
+          <IntermarketFull />
+        </TabsContent>
+
+        {/* 2 · ANÁLISIS — Pascale U4: fundamentales comparables + caminos + ETF fit */}
+        <TabsContent value="analisis" className="mt-4 space-y-6">
           {!result && !loading && (
             <Card>
               <CardContent className="p-8 text-center text-sm text-muted-foreground">
@@ -1599,30 +1639,81 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
               handleCompararSectores={handleCompararSectores}
             />
           )}
-        </TabsContent>
-
-        <TabsContent value="matriz" className="mt-4">
-          <MatrizPanelFull sectorFilter={sectorFilter} />
-        </TabsContent>
-        <TabsContent value="valuacion" className="mt-4">
-          <ValuacionPanel />
-        </TabsContent>
-        <TabsContent value="oportunidades" className="mt-4">
-          <OportunidadesPanel2 />
-        </TabsContent>
-        <TabsContent value="benchmarks" className="mt-4">
-          <BenchmarksPanel sectorFilter={sectorFilter} />
-        </TabsContent>
-        <TabsContent value="etf-fit" className="mt-4">
           <EtfFitPanel sectorFilter={sectorFilter} />
         </TabsContent>
-        <TabsContent value="performance" className="mt-4">
-          <PerformanceFullPanel sectorFilter={sectorFilter} tickersFromFilter={tickersFromFilter} />
+
+        {/* 3 · VALUACIÓN — Pascale: múltiplos relativos + oportunidades screener */}
+        <TabsContent value="valuacion" className="mt-4 space-y-6">
+          <ValuacionPanel />
+          <OportunidadesPanel2 />
         </TabsContent>
-        <TabsContent value="intermarket" className="mt-4">
-          <IntermarketFull />
+
+        {/* 4 · ESTRUCTURA — Bustamante: capa cualitativa industrial */}
+        <TabsContent value="estructura" className="mt-4">
+          <EstructuraPanel
+            sectorFilter={sectorFilter}
+            onIrAnalisis={() => setTab("analisis")}
+          />
+        </TabsContent>
+
+        {/* 5 · CARTERA — Elbaum: correlaciones/benchmarks como diversificación */}
+        <TabsContent value="cartera" className="mt-4 space-y-6">
+          <BenchmarksPanel sectorFilter={sectorFilter} />
+          <MatrizPanelFull sectorFilter={sectorFilter} />
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+// ── Panel ESTRUCTURA (metodología Bustamante, corpus pt) ──────────────────────
+// Capa cualitativa previa a la valuación: modelo de ingresos → estructura de
+// mercado → mapa regulatorio → capa tecnológica → implicancia en múltiplos.
+function EstructuraPanel({ sectorFilter, onIrAnalisis }: { sectorFilter: string; onIrAnalisis: () => void }) {
+  const MARCO = [
+    { n: 1, titulo: "Modelo de ingresos", detalle: "¿Cómo gana plata el sector? Publicidad / suscripción / tarifas reguladas / volumen-precio / mixto. Define la calidad y recurrencia del flujo." },
+    { n: 2, titulo: "Estructura competitiva", detalle: "Oligopolio / monopolio natural / fragmentado. Cuanto más concentrado, más poder de fijación de precios y más vale un EBITDA equivalente." },
+    { n: 3, titulo: "Mapa regulatorio", detalle: "Quién fija precios o autoriza entrada (ENACOM/CNV/BCRA vs SEC/FCC). La regulación puede ser motor de precio o techo estructural." },
+    { n: 4, titulo: "Capa tecnológica y disrupción", detalle: "Intensidad de capex, obsolescencia, entrantes digitales. Riesgo de destrucción del modelo vigente." },
+    { n: 5, titulo: "Implicancia de valuación", detalle: "Conclusión: el mismo EV/EBITDA NO vale lo mismo según 1-4. Ajustar múltiplo objetivo y margen de seguridad." },
+  ];
+  const sector = sectorFilter || "(seleccioná un sector arriba)";
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-[14px]">Auditoría estructural del sector — metodología Bustamante (corpus pt)</CardTitle>
+          <p className="text-[13px] text-muted-foreground">
+            Capa cualitativa que ANTECEDE a la valuación: caracterizar la industria en 5 pasos antes de confiar en un múltiplo. Sector activo:{" "}
+            <span className="font-mono text-foreground">{sector}</span>
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {MARCO.map((m) => (
+            <div key={m.n} className="rounded-lg border border-border/50 bg-background/40 p-3">
+              <div className="flex items-baseline gap-2">
+                <span className="font-mono text-[11px] text-primary">PASO {m.n}</span>
+                <span className="text-sm font-semibold">{m.titulo}</span>
+              </div>
+              <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{m.detalle}</p>
+            </div>
+          ))}
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-[13px] text-amber-300">
+            Regla del corpus: PROHIBIDO recomendar sin identificar primero el modelo de ingresos y el
+            regulador dominante. El mismo EBITDA vale distinto según la estructura (pasos 1-4).
+          </div>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button size="sm" variant="outline" className="h-8 text-[11px]" onClick={onIrAnalisis} disabled={!sectorFilter}>
+              Ir al análisis cuantitativo del sector →
+            </Button>
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Esta capa es de razonamiento (no cálculo). Combinar con la pestaña Análisis para los
+            números y con el agente IA (skill analisis-sectorial-bustamante) para profundizar un
+            caso puntual.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

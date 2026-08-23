@@ -51,15 +51,49 @@ function safeNum(v: unknown): number | null {
 }
 
 import { getHistories } from "../history-cache.server";
+import { fetchYahooChart } from "../yahoo-http";
+
+/**
+ * Historia robusta: primero el método HTTP directo con cookie/crumb
+ * (el mismo motor que usa clarity-analysis y que sí funciona en prod),
+ * con fallback al cache batch de yfinance.
+ */
+async function historiaUno(ticker: string): Promise<{ date: string; close: number }[]> {
+  // 1) yahoo-http directo (robusto)
+  try {
+    const chart = await fetchYahooChart(ticker, "2y", "1d");
+    const res = chart?.chart?.result?.[0];
+    const ts = res?.timestamp ?? [];
+    const closes = res?.indicators?.quote?.[0]?.close ?? [];
+    const out: { date: string; close: number }[] = [];
+    for (let i = 0; i < ts.length; i++) {
+      const c = closes[i];
+      if (typeof c === "number" && isFinite(c)) {
+        out.push({ date: new Date(ts[i]! * 1000).toISOString().slice(0, 10), close: c });
+      }
+    }
+    if (out.length > 60) return out;
+  } catch {
+    /* caer al fallback */
+  }
+  // 2) fallback batch cache
+  try {
+    const r = await getHistories([ticker], 400);
+    if (r[ticker]?.length) return r[ticker];
+  } catch {
+    /* sin datos */
+  }
+  return [];
+}
 
 async function fetchHistoryMulti(tickers: string[]): Promise<Record<string, { date: string; close: number }[]>> {
-  try {
-    return await getHistories(tickers, 400);
-  } catch {
-    const result: Record<string, { date: string; close: number }[]> = {};
-    for (const t of tickers) result[t] = [];
-    return result;
-  }
+  const result: Record<string, { date: string; close: number }[]> = {};
+  await Promise.all(
+    tickers.map(async (t) => {
+      result[t] = await historiaUno(t);
+    }),
+  );
+  return result;
 }
 
 function computeLinearSlope(data: { close: number }[], days: number): number | null {
@@ -132,8 +166,17 @@ export const getSectorRelStrength = createServerFn({ method: "GET" }).handler(
         return { ...s, ratio: null, slope20d: null, slope60d: null, slope120d: null, trend20d: null, trend60d: null, regimColor: s.color };
       }
 
-      const minLen = Math.min(closes.length, spyCloses.length);
-      const ratios = Array.from({ length: minLen }, (_, i) => closes[i].close / spyCloses[i].close);
+      // Alinear POR FECHA (bug previo: alineaba por índice y mezclaba fechas
+      // cuando las series tenían longitudes distintas)
+      const spyByDate = new Map(spyCloses.map((d) => [d.date, d.close]));
+      const ratios: number[] = [];
+      for (const d of closes) {
+        const spy = spyByDate.get(d.date);
+        if (spy != null && spy > 0 && d.close > 0) ratios.push(d.close / spy);
+      }
+      if (ratios.length < 25) {
+        return { ...s, ratio: null, slope20d: null, slope60d: null, slope120d: null, trend20d: null, trend60d: null, regimColor: s.color };
+      }
 
       const ratioData = ratios.map((r) => ({ close: r }));
       const slope20 = computeLinearSlope(ratioData, Math.min(20, ratioData.length));
@@ -154,7 +197,10 @@ export const getSectorRelStrength = createServerFn({ method: "GET" }).handler(
 
     const regime = classifyRegime(sectors);
 
-    const sortedBySlope = [...sectors].sort((a, b) => (b.slope60d ?? -999) - (a.slope60d ?? -999));
+    // Líderes/retrasos SOLO con datos reales (bug previo: con todo null mostraba
+    // los 3 primeros del array como "líderes" falsos)
+    const conSlope = sectors.filter((s) => s.slope60d != null);
+    const sortedBySlope = [...conSlope].sort((a, b) => (b.slope60d ?? -999) - (a.slope60d ?? -999));
     const topSectors = sortedBySlope.slice(0, 3).map((s) => s.label);
     const bottomSectors = sortedBySlope.slice(-3).map((s) => s.label);
 

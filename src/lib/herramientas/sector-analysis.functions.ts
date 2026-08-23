@@ -548,7 +548,9 @@ export const getSectorAnalysis = createServerFn({ method: "POST" })
               return {
                 ticker: t.ticker,
                 nombre: t.nombre,
-                price: quote.price,
+                // Fallback: si quoteSummary falló (cookie/crumb/rate-limit),
+                // el precio sale del último cierre del histórico que SÍ se obtuvo
+                price: quote.price ?? (fullHist.length ? fullHist[fullHist.length - 1]!.close : null),
                 trailingPE: quote.trailingPE,
                 forwardPE: quote.forwardPE,
                 pegRatio: quote.pegRatio,
