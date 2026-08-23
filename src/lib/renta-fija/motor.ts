@@ -4,6 +4,7 @@
 
 import rentaFijaData from "@/../RENTA_FIJA_COMPLETA.json";
 import { iolLogin, iolCotizacion, iolCotizacionDetalle, type FuenteIOL, FUENTE_IOL } from "@/lib/iol.server";
+import { scrapearTecnicosBono, generarFlujosDesdeCondiciones } from "./tecnicos-iol";
 
 const IOL_USER_HARDCODED = process.env.IOL_USER ?? "boosandr97@gmail.com";
 const IOL_PASS_HARDCODED = process.env.IOL_PASS ?? "Chule348936_";
@@ -53,6 +54,53 @@ function buscarBono(ticker: string): BonoJSON | null {
     }
   }
   return null;
+}
+
+// Genera calendario de flujos futuros desde datos técnicos del cupón cuando
+// RENTA_FIJA_COMPLETA.json trae flujo_fondos: null (ej: AE38, AL41, GD35, GD41, GD29D...)
+// Usa: cupon.tasa (% anual), cupon.frecuencia, fecha_vencimiento, valor_nominal, amortizacion.
+function mesesPorFrecuencia(frecuencia: string): number {
+  const f = (frecuencia || "").toLowerCase();
+  if (f.includes("mes")) return 1; // mensual
+  if (f.includes("trimes")) return 3;
+  if (f.includes("cuatri")) return 4;
+  if (f.includes("semes")) return 6;
+  if (f.includes("anual") || f.includes("ano") || f.includes("año")) return 12;
+  return 6; // default semestral (mercado AR)
+}
+
+export function generarFlujosDesdeCupon(bono: BonoJSON): FlujoJSON[] {
+  const venc = parseFecha(bono.fecha_vencimiento);
+  const hoy = new Date();
+  hoy.setUTCHours(12, 0, 0, 0);
+  const meses = mesesPorFrecuencia(bono.cupon?.frecuencia);
+  const tasaAnual = bono.cupon?.tasa ?? 0; // % anual sobre VN 100
+  const cuponPeriodo = +(tasaAnual * (meses / 12)).toFixed(4);
+  const moneda = bono.moneda === "ARS" ? "ARS" : "USD";
+
+  // Fechas de pago: retrocediendo desde vencimiento en pasos de `meses`
+  const fechas: Date[] = [];
+  const cursor = new Date(venc);
+  while (cursor > hoy && fechas.length < 200) {
+    fechas.push(new Date(cursor));
+    cursor.setUTCMonth(cursor.getUTCMonth() - meses);
+  }
+  fechas.reverse();
+
+  // Amortización: Bullet → 100 al vencimiento. Sinkable sin cronograma → tratamos como bullet
+  // (los que tienen cronograma real traen flujo_fondos explícito en el JSON)
+  const esBullet = /bullet|sinkable|una/i.test(bono.amortizacion ?? "") || !bono.amortizacion;
+
+  const flujos: FlujoJSON[] = fechas.map((fecha, i) => {
+    const esUltimo = i === fechas.length - 1;
+    return {
+      fecha: fecha.toISOString().slice(0, 10),
+      tipo: esUltimo && esBullet ? "Cupon+Amortizacion" : "Cupon",
+      monto_por_cien: esUltimo && esBullet ? +(cuponPeriodo + 100).toFixed(4) : cuponPeriodo,
+      moneda,
+    };
+  });
+  return flujos;
 }
 
 async function asegurarSesionIOL(): Promise<boolean> {
@@ -179,15 +227,41 @@ export async function calcularTIRReal(tickerRaw: string, precioManual?: number):
   if (!bono) {
     throw new Error(`Bono ${ticker} no encontrado en RENTA_FIJA_COMPLETA.json`);
   }
+  let tecnicosScrapeado: any = null;
   if (!bono.flujo_fondos || !bono.flujo_fondos.length) {
     // Algunos D/C no tienen flujo duplicado, usar el base
     const baseTicker = ticker.replace(/D$|C$/i, "");
-    const base = buscarBono(baseTicker);
+    const base = baseTicker !== ticker ? buscarBono(baseTicker) : null;
     if (base?.flujo_fondos?.length) {
       bono.flujo_fondos = base.flujo_fondos;
     } else {
-      throw new Error(`Bono ${ticker} sin flujo_fondos en JSON`);
+      // Fallback 1 — scraping condiciones reales de emisión desde IOL (scraper bonos.py)
+      try {
+        tecnicosScrapeado =
+          (await scrapearTecnicosBono(ticker)) ??
+          (baseTicker !== ticker ? await scrapearTecnicosBono(baseTicker) : null);
+        if (tecnicosScrapeado?.vencimiento && tecnicosScrapeado.cuponAnualPct != null) {
+          bono.flujo_fondos = generarFlujosDesdeCondiciones({
+            vencimiento: tecnicosScrapeado.vencimiento,
+            cuponAnualPct: tecnicosScrapeado.cuponAnualPct,
+            frecuenciaPago: tecnicosScrapeado.frecuenciaPago,
+            residual: tecnicosScrapeado.residual ?? 100,
+            moneda: bono.moneda,
+          });
+          (bono as any).__tecnicosIol = tecnicosScrapeado;
+        }
+      } catch {}
+      // Fallback 2 — generar desde datos técnicos del JSON maestro
+      if ((!bono.flujo_fondos || !bono.flujo_fondos.length) && bono.cupon && bono.fecha_vencimiento) {
+        bono.flujo_fondos = generarFlujosDesdeCupon(bono);
+      }
+      if (!bono.flujo_fondos || !bono.flujo_fondos.length) {
+        throw new Error(`Bono ${ticker} sin flujos ni en JSON ni en IOL/web`);
+      }
     }
+  } else {
+    // Aun con flujos en JSON, intentamos enriquecer con scrape best-effort (condiciones)
+    try { tecnicosScrapeado = (bono as any).__tecnicosIol ?? null; } catch {}
   }
 
   const fechaValuacion = new Date();
