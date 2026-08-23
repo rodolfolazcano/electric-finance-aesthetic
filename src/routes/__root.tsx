@@ -13,6 +13,7 @@ import { ChatWidget } from "@/components/ChatWidget";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { IOLProvider } from "@/lib/iol-context";
+import { initAntiDev } from "@/lib/anti-dev";
 
 function NotFoundComponent() {
   return (
@@ -119,6 +120,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    initAntiDev();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

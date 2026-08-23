@@ -111,17 +111,6 @@ export function CalculadoraFinancieraTab({ initialSubTab }: { initialSubTab?: st
         >
           ← Simuladores
         </button>
-        <div className="flex items-center gap-1 rounded-full border border-border/30 bg-muted/20 p-1">
-          {CARDS.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setSubTab(c.id)}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${subTab === c.id ? "bg-card border border-border/40 shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {subTab === "comparador" && <ComparadorInversiones />}

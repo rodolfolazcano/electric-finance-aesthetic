@@ -38,26 +38,6 @@ export function CuantitativoTab({
 
   return (
     <div className="space-y-8 w-full">
-      {/* Tabs horizontales duplican el panel lateral — visibles solo en móvil (< lg) */}
-      <div className="flex flex-wrap gap-1.5 border-b border-border/40 pb-2 w-full lg:hidden" aria-label="Navegación cuantitativo (móvil)">
-        {SUBTABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => {
-              setSub(t.key);
-              onSubTabChange?.(t.key);
-            }}
-            className={`font-mono text-[14px] px-4 py-2 rounded-lg border transition-colors ${
-              sub === t.key
-                ? "border-primary/60 bg-primary/10 text-primary"
-                : "border-border/60 text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
       {sub === "optimizador" && <OptimizadorTabs />}
       {sub === "riesgo" && <RiesgoPage />}
       {sub === "capm" && <CapmTabs />}

@@ -39,3 +39,7 @@ pt/
 # Env — repo privado: .env con credenciales SI se versiona; .env.local/.dev.vars siguen ignorados
 .env.local
 .dev.vars
+
+# Build artifacts locales
+.vercel/
+.output/

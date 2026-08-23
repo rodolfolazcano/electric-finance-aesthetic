@@ -1091,11 +1091,6 @@ function Index() {
                     </div>
                   </details>
                 </div>
-
-                <p className="mt-4 text-center text-[12px] leading-relaxed text-muted-foreground">
-                  Estos profesionales son terceros independientes. Su actividad es ajena a la de
-                  Cintia Boos, regulada por la CNV.
-                </p>
               </div>
             </div>
           </section>

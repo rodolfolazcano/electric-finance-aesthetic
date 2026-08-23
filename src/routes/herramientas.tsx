@@ -32,6 +32,7 @@ import { RentaFijaPanel } from "@/components/sections/RentaFijaPanel";
 import { SidebarHerramientas } from "@/components/herramientas/SidebarHerramientas";
 import { ContextoTab } from "@/components/herramientas/ContextoTab";
 import { CNVDisclaimer } from "@/components/shared/CNVDisclaimer";
+import { PuertaEnDesarrollo } from "@/components/shared/PuertaEnDesarrollo";
 import retratoCintia from "@/assets/cintia-boos.png";
 
 const WHATSAPP =
@@ -86,7 +87,18 @@ const HOME_NAV = [
 ];
 
 function HerramientasPage() {
-  return <HerramientasContenido />;
+  if (!import.meta.env.PROD) return <HerramientasContenido />;
+  return (
+    <div className="relative min-h-screen overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none max-h-[100dvh] select-none overflow-hidden blur-[7px] brightness-[0.55]"
+      >
+        <HerramientasContenido />
+      </div>
+      <PuertaEnDesarrollo />
+    </div>
+  );
 }
 
 function HerramientasContenido() {
@@ -100,6 +112,13 @@ function HerramientasContenido() {
     isExpanded: true,
     isMobile: false,
   });
+  const [chatDocked, setChatDocked] = useState(false);
+  useEffect(() => {
+    const handler = (e: Event) =>
+      setChatDocked(Boolean((e as CustomEvent<{ docked?: boolean }>).detail?.docked));
+    window.addEventListener("chat:dock", handler);
+    return () => window.removeEventListener("chat:dock", handler);
+  }, []);
   const activo = (TABS.some((t) => t.id === tab) ? tab : "contexto") as TabId;
 
   const setTab = (newTab: string) => navigate({ to: "/herramientas", search: { tab: newTab } });
@@ -247,24 +266,6 @@ function HerramientasContenido() {
                 </li>
               ))}
             </ul>
-            <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
-              Herramientas
-            </p>
-            <ul className="flex flex-col">
-              {TABS.map((t) => (
-                <li key={t.id}>
-                  <Link
-                    to="/herramientas"
-                    search={{ tab: t.id }}
-                    onClick={() => setMenuAbierto(false)}
-                    className={`flex items-center gap-3 py-2.5 text-[13px] uppercase tracking-[0.14em] ${t.id === activo ? "text-primary" : "text-muted-foreground"}`}
-                  >
-                    <t.icon className="h-4 w-4" />
-                    {t.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
           </nav>
         )}
       </header>
@@ -286,6 +287,7 @@ function HerramientasContenido() {
             railState.isVisible &&
             (railState.isExpanded ? "ml-[252px]" : "ml-[64px]"),
           railState.isMobile && "ml-0",
+          chatDocked && "lg:mr-[400px]",
         )}
       >
         <div className={`${CONTAINER} pt-16 pb-16`}>

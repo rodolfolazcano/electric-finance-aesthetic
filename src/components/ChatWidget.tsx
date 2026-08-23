@@ -19,6 +19,7 @@ import {
   Pencil,
   RotateCw,
   Pause,
+  PanelRight,
   Play,
   BarChart3,
   LineChart,
@@ -29,6 +30,7 @@ import {
   Sparkles,
   Bot,
   Zap,
+  TriangleAlert,
 } from "lucide-react";
 import { CHAT_OPEN_EVENT_NAME } from "@/lib/chat-open";
 import {
@@ -56,6 +58,7 @@ const WHATSAPP = "https://wa.me/541162355944";
 
 const SESSION_STORAGE_KEY = "norte-session-id";
 const AUTO_MODE_STORAGE_KEY = "norte-auto-mode";
+const CHAT_MODE_STORAGE_KEY = "norte-chat-mode";
 
 function obtenerSessionId(): string {
   try {
@@ -99,7 +102,7 @@ type Msg = {
 const WELCOME: Msg = {
   role: "assistant",
   content:
-    "Soy **IA**, asistente del mercado de capitales argentino. Respondo sobre instrumentos, riesgo y cotizaciones con fuentes reales — y te muestro de dónde saqué cada dato.\n\n**Qué puedo hacer por vos:**\n- Cotizaciones: dólar blue/MEP/CCL, riesgo país, inflación, tasas del BCRA\n- **Gráficos** en el chat (línea, barras y **TradingView** interactivo)\n- Análisis: valor intrínseco, semáforo técnico, CAPM/beta, portafolios\n- **Tu cuenta de IOL**: iniciá sesión desde acá y veo tu portafolio, operaciones y podés simular órdenes\n- **Informes descargables** en PDF/Markdown\n\nProbá una sugerencia o preguntame directo. Información general. No constituye recomendación de inversión.",
+    "Soy **IA**, asistente del mercado de capitales argentino. Respondo sobre instrumentos, riesgo y cotizaciones con fuentes reales — y te muestro de dónde saqué cada dato.\n\n**Qué puedo hacer por vos:**\n- Cotizaciones: dólar blue/MEP/CCL, riesgo país, inflación, tasas del BCRA\n- **Gráficos** en el chat (línea, barras y **TradingView** interactivo)\n- Análisis: valor intrínseco, semáforo técnico, CAPM/beta, portafolios\n- **Tu cuenta de IOL**: iniciá sesión desde acá y veo tu portafolio, operaciones y podés simular órdenes\n- **Informes descargables** en PDF/Markdown\n\nProbá una sugerencia o preguntame directo.\n\n**Beta:** la plataforma está en desarrollo y puedo cometer errores — verificá los datos clave antes de decidir.\n\nInformación general. No constituye recomendación de inversión.",
 };
 
 const SUGGESTIONS = [
@@ -456,6 +459,15 @@ export function ChatWidget() {
     }
   });
   const [autonomoActivo, setAutonomoActivo] = useState(false);
+  const [chatModo, setChatModo] = useState<"lateral" | "copiloto">(() => {
+    try {
+      return window.localStorage.getItem(CHAT_MODE_STORAGE_KEY) === "copiloto"
+        ? "copiloto"
+        : "lateral";
+    } catch {
+      return "lateral";
+    }
+  });
 
   // ---- Simuladores bridge: el chat global también controla ¿Dónde invierto? y Mi plan ----
   function getSimuladorActive(): string {
@@ -525,6 +537,22 @@ export function ChatWidget() {
       /* sin storage */
     }
   }, [modoAutomatico]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(CHAT_MODE_STORAGE_KEY, chatModo);
+    } catch {
+      /* sin storage */
+    }
+  }, [chatModo]);
+
+  useEffect(() => {
+    const docked = open && !minimized && chatModo === "copiloto" && isDesktop;
+    window.dispatchEvent(new CustomEvent("chat:dock", { detail: { docked } }));
+    return () => {
+      window.dispatchEvent(new CustomEvent("chat:dock", { detail: { docked: false } }));
+    };
+  }, [open, minimized, chatModo, isDesktop]);
 
   // Impresión / guardado como PDF de un mensaje: se marca el objetivo y se
   // abre el diálogo de impresión (el CSS de impresión oculta el resto).
@@ -1041,16 +1069,22 @@ export function ChatWidget() {
   return (
     <>
       {!open && (
-        <button
-          onClick={() => {
-            setOpen(true);
-            setMinimized(false);
-          }}
-          aria-label="Abrir asistente virtual"
-          className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-transform hover:scale-105"
-        >
-          <MessageCircle className="h-6 w-6" />
-        </button>
+        <>
+          <div className="fixed bottom-[5.75rem] right-5 z-50 flex max-w-[230px] items-center gap-2 rounded-full border border-gold/40 bg-background/85 px-3 py-1.5 text-[10.5px] font-semibold leading-tight text-gold shadow-lg backdrop-blur-md sm:max-w-none">
+            <Bot className="h-3.5 w-3.5 shrink-0" />
+            IA en desarrollo · puede cometer errores
+          </div>
+          <button
+            onClick={() => {
+              setOpen(true);
+              setMinimized(false);
+            }}
+            aria-label="Abrir asistente virtual"
+            className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-transform hover:scale-105"
+          >
+            <MessageCircle className="h-6 w-6" />
+          </button>
+        </>
       )}
 
       {open && (
@@ -1070,7 +1104,9 @@ export function ChatWidget() {
         className={`fixed right-0 z-40 flex flex-col border-border bg-background/70 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_0_60px_rgba(0,0,0,0.6)] transition-all duration-300 ${
           minimized
             ? "bottom-0 h-16 w-full border-t sm:w-[460px] sm:rounded-t-2xl sm:border-l"
-            : "top-0 h-[100dvh] w-full border-l sm:w-[460px]"
+            : chatModo === "copiloto"
+              ? "top-16 h-[calc(100dvh-4rem)] w-full border-l sm:w-[400px]"
+              : "top-0 h-[100dvh] w-full border-l sm:w-[460px]"
         } ${open ? "translate-x-0" : "pointer-events-none translate-x-full"}`}
       >
         {open && !minimized && isDesktop && (
@@ -1126,6 +1162,34 @@ export function ChatWidget() {
               {autonomoActivo && <span className="animate-pulse text-primary">● razonando</span>}
             </p>
           </div>
+          <div className="flex items-center rounded-lg border border-border/60 p-0.5">
+            <button
+              onClick={() => setChatModo("lateral")}
+              aria-label="Modo ventana lateral"
+              aria-pressed={chatModo === "lateral"}
+              title="Ventana lateral flotante"
+              className={`rounded-md p-1.5 transition-colors ${
+                chatModo === "lateral"
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => setChatModo("copiloto")}
+              aria-label="Modo copiloto anclado"
+              aria-pressed={chatModo === "copiloto"}
+              title="Copiloto anclado: el contenido se ajusta al panel"
+              className={`rounded-md p-1.5 transition-colors ${
+                chatModo === "copiloto"
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <PanelRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
           <button
             onClick={() => {
               abortRef.current?.abort();
@@ -1171,6 +1235,11 @@ export function ChatWidget() {
 
         {!minimized && (
           <>
+            <p className="flex items-center gap-2 border-b border-gold/25 bg-gold/[0.07] px-4 py-1.5 text-[11px] font-medium leading-snug text-gold">
+              <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
+              Agente en desarrollo — puede cometer errores. Verificá los datos clave antes de
+              decidir.
+            </p>
             <div ref={scrollRef} className="chat-cq flex-1 space-y-3 overflow-y-auto px-4 py-4">
               {messages.map((m, i) => {
                 const isStreamingTurn =

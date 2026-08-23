@@ -6,7 +6,10 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+const enVercel = process.env.VERCEL === "1";
+
 export default defineConfig({
+  nitro: enVercel ? { preset: "vercel" } : undefined,
   vite: {
     define: {
       // Polyfill para `process` en cliente: server code usa `process.env`/`process.cwd()` y se cuela al bundle cliente

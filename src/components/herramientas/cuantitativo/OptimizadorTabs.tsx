@@ -35,7 +35,6 @@ import { PortfolioAssetTable } from "@/components/herramientas/PortfolioAssetTab
 import { PortfolioDraftPanel,
   type DraftAsset,
 } from "@/components/optimizer/PortfolioDraftPanel";
-import { OptimizerChat } from "@/components/optimizer/OptimizerChat";
 import { AnalisisPortafolioSubTab } from "@/components/optimizer/AnalisisPortafolioSubTab";
 import { RebalanceadorSubTab } from "@/components/sections/RebalanceadorSubTab";
 import { clipCovariance, eigenDecomposition } from "@/lib/labadie/spectral";
@@ -1772,18 +1771,6 @@ function PortafolioPage() {
   };
   const removeTicker = (sym: string) => setSelectedTickers((prev) => prev.filter((t) => t !== sym));
 
-  // Aplica la lista generada por el asistente IA (chat lateral) al optimizador
-  const handleAiApplyTickers = (tickers: string[], _especie: "ARS" | "USD") => {
-    if (!tickers || tickers.length === 0) return;
-    setSelectedTickers((prev) => {
-      const next = [...prev];
-      tickers.forEach((t) => {
-        if (t && !next.includes(t)) next.push(t);
-      });
-      return next;
-    });
-  };
-
   // Importar portafolio sincronizado de IOL dentro del tab unificado "OptimizaciÃ³n"
   const iolSync = useIOLSync();
   const [iolPending, setIolPending] = useState(false);
@@ -1856,7 +1843,7 @@ function PortafolioPage() {
     resultARS && resultUSD ? viewCurrency : resultARS ? "ARS" : resultUSD ? "USD" : "";
 
   return (
-    <div className="grid w-full grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]">
+    <div className="w-full">
       <div className="min-w-0 space-y-4">
         <div className="mono text-[14px] uppercase tracking-[0.22em] text-primary/80">
           Optimizador de portafolios
@@ -2454,13 +2441,6 @@ function PortafolioPage() {
               </p>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Asistente IA lateral: detecta tickers de un portafolio pegado, los pasa a especie D/.BA y preconfigura el optimizador */}
-      <div className="min-w-0 xl:sticky xl:top-20">
-        <div className="h-[calc(100vh-9rem)]">
-          <OptimizerChat onApplyTickers={handleAiApplyTickers} currentTickers={selectedTickers} />
         </div>
       </div>
     </div>

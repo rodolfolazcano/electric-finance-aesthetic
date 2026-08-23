@@ -46,7 +46,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       {
         value: "calculadora",
-        label: "01 · Simuladores",
+        label: "Simuladores",
         shortLabel: "Simuladores",
         icon: Calculator,
         subTabs: [
@@ -62,7 +62,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       {
         value: "cuantitativo",
-        label: "02 · Cuantitativo",
+        label: "Cuantitativo",
         shortLabel: "Cuantitativo",
         icon: LineChart,
         subTabs: [
@@ -78,11 +78,11 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
       },
       {
         value: "analisis",
-        label: "04 · Análisis",
+        label: "Análisis",
         shortLabel: "Análisis",
         icon: TrendingUp,
       },
-      { value: "portafolio", label: "07 · Portafolio", shortLabel: "Portafolio", icon: Briefcase },
+      { value: "portafolio", label: "Portafolio", shortLabel: "Portafolio", icon: Briefcase },
     ],
   },
   {
@@ -91,7 +91,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       {
         value: "sectores",
-        label: "03 · Sectores",
+        label: "Sectores",
         icon: Building2,
         shortLabel: "Sectores",
         subTabs: [
@@ -110,17 +110,17 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     id: "instrumentos",
     title: "INSTRUMENTOS",
     items: [
-      { value: "renta-fija", label: "05 · Renta Fija", shortLabel: "Renta Fija", icon: Landmark },
-      { value: "opciones", label: "06 · Opciones", shortLabel: "Opciones", icon: Percent },
+      { value: "renta-fija", label: "Renta Fija", shortLabel: "Renta Fija", icon: Landmark },
+      { value: "opciones", label: "Opciones", shortLabel: "Opciones", icon: Percent },
       {
         value: "arbitrador",
-        label: "08 · Arbitrador",
+        label: "Arbitrador",
         shortLabel: "Arbitrador",
         icon: ArrowLeftRight,
       },
       {
         value: "cripto",
-        label: "09 · Cripto",
+        label: "Cripto",
         shortLabel: "Cripto",
         icon: Bitcoin,
         subTabs: [
@@ -145,7 +145,7 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       {
         value: "contexto",
-        label: "11 · Contexto",
+        label: "Contexto",
         shortLabel: "Contexto",
         icon: Compass,
       },

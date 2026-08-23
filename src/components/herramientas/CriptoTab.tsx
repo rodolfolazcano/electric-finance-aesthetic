@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { BinancePairsPanel } from "./BinancePairsPanel";
 import { BinanceAccountPanel } from "./BinanceAccountPanel";
@@ -34,20 +34,6 @@ const LEGACY_MAP: Record<string, SubTab> = {
   binance: "cuenta",
   backtesting: "pairs",
 };
-
-const SUBTABS: { key: SubTab; label: string }[] = [
-  { key: "hft", label: "HFT Bot" },
-  { key: "pares", label: "Pares OBI" },
-  { key: "estrategias", label: "BB+RSI" },
-  { key: "mae-mfe", label: "MAE/MFE" },
-  { key: "pairs", label: "Pairs" },
-  { key: "quant-lab", label: "Quant Lab" },
-  { key: "scanner", label: "Scanner" },
-  { key: "mtf", label: "MTF" },
-  { key: "capm", label: "CAPM" },
-  { key: "reversal", label: "Reversal" },
-  { key: "cuenta", label: "Cuenta" },
-];
 
 function Placeholder({ label }: { label: string }) {
   return (
@@ -88,22 +74,6 @@ export function CriptoTab({
 
   return (
     <Tabs value={subTab} onValueChange={handleChange} className="w-full">
-      {/* Tabs horizontales duplican el panel lateral — visibles solo en móvil (< lg) */}
-      <TabsList
-        className="flex flex-wrap h-auto gap-1 p-1 bg-muted/20 rounded-lg w-full justify-start lg:hidden"
-        aria-label="Navegación cripto (móvil)"
-      >
-        {SUBTABS.map((t) => (
-          <TabsTrigger
-            key={t.key}
-            value={t.key}
-            className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
-          >
-            {t.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-
       <TabsContent value="hft" className="mt-4">
         <HftTradingPanel />
       </TabsContent>
