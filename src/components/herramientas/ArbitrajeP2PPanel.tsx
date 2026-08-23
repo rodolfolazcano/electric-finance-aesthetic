@@ -12,6 +12,8 @@ import type {
 import { ExchangeCompareTable } from "./ExchangeCompareTable";
 import { ArbitrajeCalculadora } from "./ArbitrajeCalculadora";
 import { SpreadHistoryChart } from "./SpreadHistoryChart";
+import { useServerFn } from "@tanstack/react-start";
+import { enviarSenalCripto } from "@/lib/cripto-telegram.functions";
 
 function fmtNum(n: number | null | undefined, dp = 2) {
   if (n == null || !Number.isFinite(n)) return "\u2014";
@@ -143,6 +145,29 @@ export function ArbitrajeP2PPanel() {
 
     return result;
   }, [dolar, usdtExchanges]);
+
+  // Enviar señales a Telegram para oportunidades viables en exchanges (throttle 10 min por tipo)
+  const fnTelegram = useServerFn(enviarSenalCripto);
+  const lastTelegramRef = useRef<Record<string, number>>({});
+  useEffect(() => {
+    for (const o of oportunidades) {
+      if (!o.viable || o.spreadNeto < 0.005) continue; // >0.5% neto
+      const last = lastTelegramRef.current[o.tipo] ?? 0;
+      if (Date.now() - last < 10 * 60 * 1000) continue; // 10 min throttle
+      lastTelegramRef.current[o.tipo] = Date.now();
+      fnTelegram({
+        data: {
+          tipo: o.tipo,
+          descripcion: o.descripcion,
+          spreadNeto: o.spreadNeto,
+          precioCompra: o.precioCompra,
+          precioVenta: o.precioVenta,
+          exchangeCompra: o.exchangeCompra,
+          exchangeVenta: o.exchangeVenta,
+        },
+      }).catch(() => {});
+    }
+  }, [oportunidades, fnTelegram]);
 
   // Acumular histórico de spreads
   useEffect(() => {
@@ -324,16 +349,40 @@ export function ArbitrajeP2PPanel() {
         </CardContent>
       </Card>
 
-      {/* Panel comparación tipos de cambio */}
+      {/* Panel comparación tipos de cambio — CriptoYa /api/dolar completo (mayorista, oficial, ahorro, tarjeta, blue, cripto, mep, ccl) */}
       {dolar && (
         <Card className="bg-surface border-border/60">
           <CardHeader className="pb-2">
             <CardTitle className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
-              Comparación Tipos de Cambio
+              Comparación Tipos de Cambio — CriptoYa /api/dolar
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4 text-[14px] font-mono">
+              <div className="rounded-md bg-background/40 border border-border/60 p-2">
+                <div className="text-[13px] text-muted-foreground">Mayorista</div>
+                <div>
+                  ${fmtNum(dolar.mayorista.compra)} / ${fmtNum(dolar.mayorista.venta)}
+                </div>
+              </div>
+              <div className="rounded-md bg-background/40 border border-border/60 p-2">
+                <div className="text-[13px] text-muted-foreground">Oficial</div>
+                <div>
+                  ${fmtNum(dolar.oficial.compra)} / ${fmtNum(dolar.oficial.venta)}
+                </div>
+              </div>
+              <div className="rounded-md bg-background/40 border border-border/60 p-2">
+                <div className="text-[13px] text-muted-foreground">Ahorro</div>
+                <div>
+                  ${fmtNum(dolar.ahorro.compra)} / ${fmtNum(dolar.ahorro.venta)}
+                </div>
+              </div>
+              <div className="rounded-md bg-background/40 border border-border/60 p-2">
+                <div className="text-[13px] text-muted-foreground">Tarjeta</div>
+                <div>
+                  ${fmtNum(dolar.tarjeta.compra)} / ${fmtNum(dolar.tarjeta.venta)}
+                </div>
+              </div>
               <div className="rounded-md bg-background/40 border border-border/60 p-2">
                 <div className="text-[13px] text-muted-foreground">Blue</div>
                 <div>
@@ -341,18 +390,18 @@ export function ArbitrajeP2PPanel() {
                 </div>
               </div>
               <div className="rounded-md bg-background/40 border border-border/60 p-2">
-                <div className="text-[13px] text-muted-foreground">MEP</div>
+                <div className="text-[13px] text-muted-foreground">Cripto (USDT)</div>
+                <div>
+                  ${fmtNum(dolar.cripto.compra)} / ${fmtNum(dolar.cripto.venta)}
+                </div>
+              </div>
+              <div className="rounded-md bg-background/40 border border-border/60 p-2">
+                <div className="text-[13px] text-muted-foreground">MEP (AL30 CI)</div>
                 <div>${fmtNum(dolar.mep)}</div>
               </div>
               <div className="rounded-md bg-background/40 border border-border/60 p-2">
-                <div className="text-[13px] text-muted-foreground">CCL</div>
+                <div className="text-[13px] text-muted-foreground">CCL (AL30 CI)</div>
                 <div>${fmtNum(dolar.ccl)}</div>
-              </div>
-              <div className="rounded-md bg-background/40 border border-border/60 p-2">
-                <div className="text-[13px] text-muted-foreground">Oficial</div>
-                <div>
-                  ${fmtNum(dolar.oficial.compra)} / ${fmtNum(dolar.oficial.venta)}
-                </div>
               </div>
             </div>
             <div className="mt-2 space-y-1 text-[14px] font-mono">

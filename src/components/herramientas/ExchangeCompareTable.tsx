@@ -27,25 +27,26 @@ export function ExchangeCompareTable({
   const [sortKey, setSortKey] = useState<SortKey>("venta");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
-  if (!data) return null;
-
-  const exchanges: ExchangeRow[] = Object.entries(data)
-    .filter(([_, v]) => v.bid > 0 && v.ask > 0 && v.totalAsk > 0 && v.totalBid > 0)
-    .map(([exchange, v]) => {
-      const feeCompra = ((v.totalAsk - v.ask) / v.ask) * 100;
-      const feeVenta = ((v.bid - v.totalBid) / v.bid) * 100;
-      const spread = ((v.bid - v.ask) / v.ask) * 100;
-      const totalFee = feeCompra + feeVenta;
-      return {
-        exchange,
-        compra: v.ask,
-        venta: v.bid,
-        spread,
-        feeCompra,
-        feeVenta,
-        spreadNeto: spread - totalFee,
-      };
-    });
+  const exchanges: ExchangeRow[] = useMemo(() => {
+    if (!data) return [];
+    return Object.entries(data)
+      .filter(([_, v]) => v.bid > 0 && v.ask > 0 && v.totalAsk > 0 && v.totalBid > 0)
+      .map(([exchange, v]) => {
+        const feeCompra = ((v.totalAsk - v.ask) / v.ask) * 100;
+        const feeVenta = ((v.bid - v.totalBid) / v.bid) * 100;
+        const spread = ((v.bid - v.ask) / v.ask) * 100;
+        const totalFee = feeCompra + feeVenta;
+        return {
+          exchange,
+          compra: v.ask,
+          venta: v.bid,
+          spread,
+          feeCompra,
+          feeVenta,
+          spreadNeto: spread - totalFee,
+        };
+      });
+  }, [data]);
 
   const sorted = useMemo(() => {
     const arr = [...exchanges];
@@ -59,6 +60,8 @@ export function ExchangeCompareTable({
     });
     return arr;
   }, [exchanges, sortKey, sortDir]);
+
+  if (!data) return null;
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) {

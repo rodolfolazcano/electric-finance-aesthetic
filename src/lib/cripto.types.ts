@@ -78,15 +78,28 @@ export interface PaperTradingMetrics {
   avgRR: number;
 }
 
+export interface CriptoYaDolarRaw {
+  mayorista: { price: number; variation: number; timestamp: number };
+  oficial: { price: number; ask: number; bid: number; variation: number; timestamp: number };
+  ahorro: { ask: number; bid: number; variation: number; timestamp: number };
+  tarjeta: { price: number; variation: number; timestamp: number };
+  blue: { ask: number; bid: number; variation: number; timestamp: number };
+  cripto: { ccb: { ask: number; bid: number }; usdt: { ask: number; bid: number }; usdc: { ask: number; bid: number } };
+  mep: { al30: { ci: { price: number }; "24hs": { price: number } }; gd30: any; letras: any; bpo27: any };
+  ccl: { al30: { ci: { price: number }; "24hs": { price: number } }; gd30: any; letras: any; bpo27: any };
+}
+
 export interface CriptoYaDolar {
   mayorista: { compra: number; venta: number };
   oficial: { compra: number; venta: number };
-  ahorro: number;
-  tarjeta: number;
+  ahorro: { compra: number; venta: number };
+  tarjeta: { compra: number; venta: number };
   blue: { compra: number; venta: number };
-  cripto: number;
+  cripto: { compra: number; venta: number };
   mep: number;
   ccl: number;
+  // raw para acceso completo
+  raw?: CriptoYaDolarRaw;
 }
 
 export interface UsdtExchange {
