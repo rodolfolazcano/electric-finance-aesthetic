@@ -488,6 +488,62 @@ const SKILLS: Skill[] = [
 - Conectá SIEMPRE diagnóstico macro → implicancia concreta de cartera (qué clase/sector gana o pierde en ese régimen), citando el dato real de la herramienta.
 - Educativo, no recomendación.`,
   },
+  {
+    id: "options-analysis",
+    nombre: "Options Analysis BYMA",
+    descripcion: "Análisis completo de opciones BYMA/BCBA con Black-Scholes, griegas, IV, Monte Carlo, sonrisa y prob ITM/profit. Genera gráficos y PDF.",
+    instrucciones: `[SKILL · Options Analysis BYMA — Labadie + opciones2]
+- TRIGGER: "opciones GGAL/GGAL.BA", "GGAL 5700", "pricing GGAL", "griegas", "volatilidad implicita", "montecarlo", "prob ITM", "sonrisa"
+- PIPELINE AUTÓNOMO: ejecutar SIEMPRE analizar_opciones_completo({ticker, strike, vencimiento, tipo}) en este turno. Ej: GGAL.BA strike 5700 vencimiento 2026-03-11 Call. Si faltan strike/vencimiento, usar spot±30% y T=0.25.
+- CALCULO (Labadie dunbar BS + stochastic_processes Euler + opciones2/js/utils/math.js): d1=[ln(S/K)+(r+½σ²)T]/σ√T, d2=d1-σ√T, Call=S·N(d1)-K·e^{-rT}·N(d2), Greeks Δ/Γ/Θ/Vega/Rho, IV Newton-Raphson, Monte Carlo 10k Euler GBM S_{t+Δ}=S_t·exp((μ-½σ²)Δ+σ√Δ·Z), histograma KDE, sonrisa IV(K), prob ITM = P(S_T>K), prob profit = P(S_T>K+prima).
+- APIs: yfinance spot/histVol, IOL cadena iol-options.api.ts si disponible, r=BADLAR/BCRA.
+- OUTPUT: tabla Strike|Prima mkt|BS|IV%|Δ|Γ|Θ|Vega|ProbITM/Profit + 3 gráficos grafico_chat(linea sonrisa IV, barras hist Monte Carlo, linea prob) + informe PDF generar_informe. Ofrecer telegram_enviar_senal si prob≥55% y IV>hist.
+- No inventar primas: si IOL no devuelve, usar BS±5% spread demo y advertir.`,
+  },
+  {
+    id: "alonso-capital-trabajo",
+    nombre: "Capital de.Trabajo y Tesorería — Alonso",
+    descripcion: "Gestión de capital de trabajo y tesorería según Alonso Unidad 3: costos de financiamiento, ciclo de conversión, decisiones de crédito, inventarios y scoring de colocaciones.",
+    instrucciones: `[SKILL · Capital de Trabajo y Tesorería — Alonso Unidad 3]
+- TRIGGER: capital de trabajo, tesorería, financiamiento, crédito comercial, ciclo de conversión, inventario EOQ, scoring tesorería, "dónde invertir caja", "colocar excedentes".
+- PIPELINE AUTÓNOMO: (1) consultar_base_conocimiento("capital de trabajo Alonso [tema]") para el marco; (2) ejecutarAnalisisTesoreria con datos del usuario (costos de financiamiento, plazos, montos); (3) si hay datos de inventario → calcular punto de reorden y EOQ; (4) si hay datos de clientes → evaluar decisiones de crédito.
+- METODOLOGÍA (Alonso U3):
+  · Antinomia rentabilidad-liquidez: no existe el activo perfecto; la decisión es un trade-off entre rendimiento y disponibilidad de fondos.
+  · Costo efectivo de financiamiento: comparar alternativas por VA (valor actual), no solo tasa nominal. Incluir costos implícitos (descuento por pronto pago, comisiones).
+  · Ciclo de conversión de caja: CCC = días inventario + días cuentas por cobrar - días cuentas por pagar. Reducir CCC mejora liquidez operativa.
+  · Decisiones de crédito: evaluar cliente por probabilidad de default y costo de oportunidad del capital. Política de crédito = balance entre ventas y riesgo de incobrabilidad.
+  · Gestión de inventarios: punto de reorden = demanda diaria × lead time + stock de seguridad; EOQ = √(2×D×S/H) para minimizar costo total.
+  · Scoring de tesorería: modelo ponderado por riesgo, rentabilidad, liquidez y plazo para clasificar colocaciones.
+- Reportá comparación de alternativas con VA, recomendación de política de crédito, y ranking de colocaciones. Educativo, no recomendación personalizada.`,
+  },
+  {
+    id: "analisis-sectorial-bustamante",
+    nombre: "Análisis Sectorial Estructural — Bustamante",
+    descripcion: "Economía industrial del sector audiovisual (Bustamante): modelos de ingresos, estructura oligopólica, regulación y disrupción tecnológica. Capa de razonamiento, no cálculo.",
+    instrucciones: `[SKILL · Análisis Sectorial Estructural — Bustamante]
+- TRIGGER: valuar empresa, análisis sectorial, "qué modelo de ingresos tiene X", oligopolio, regulación, disrupción, telecom/cable/media, BAESA/Cablevisión.
+- PIPELINE: (1) consultar_base_conocimiento("Bustamante [industria] modelo de ingresos/estructura/regulación") para marco; (2) caracterizar INDUSTRIA en 5 pasos: modelo ingresos (publicidad/suscripción/tarifas/mixto) → estructura (oligopolio/monopolio/fragmentado) → mapa regulatorio (BCRA/CNV/ENACOM vs SEC/FCC) → capa tecnológica (disrupción/capex) → regla EBITDA vale distinto según estructura; (3) si hay bono corporativo → combinar con Elbaum Cap 10 covenants.
+- PROHIBIDO recomendar sin identificar primero modelo de ingresos y regulador dominante. Es capa de razonamiento; no tocar motores de cálculo ni generar señales cuantitativas desde esta skill.
+- Alimenta informe semanal: auditoría titulares (anunciado vs firmado vs regulado) y conclusión por dinámicas estructurales (regulación como motor de precio).
+- Sinergia: BAESA/Cablevisión + telecom AR (TECO2) = Bustamante estructura + Elbaum riesgo crediticio.`,
+  },
+  {
+    id: "elbaum-renta-fija",
+    nombre: "Renta Fija Completa — Elbaum Cap 10",
+    descripcion: "Análisis profesional de renta fija según Elbaum Cap 10: duration, convexidad, DV01, bootstrapping, IPD, GS-ESS, curva argentina y covenants.",
+    instrucciones: `[SKILL · Renta Fija Completa — Elbaum Cap 10]
+- TRIGGER: bono, renta fija, duration, convexidad, DV01, curva spot, forward, IPD, spread de equilibrio, covenants, "análisis de bono", TIR, YTM.
+- PIPELINE AUTÓNOMO: (1) consultar_base_conocimiento("renta fija Elbaum [tema]") para el marco; (2) ejecutarAnalisisRentaFija con flujos del bono, precio y spread; (3) si hay múltiples bonos → curvaArgentina para ajustar la curva; (4) si es corporativo → evaluarCovenants con estados contables.
+- METODOLOGÍA (Elbaum Cap 10):
+  · Sensibilidad de precio: ΔP/P ≈ -Dmod·Δy + 0.5·Convexidad·(Δy)². Para cambios >100bps, incluir convexidad.
+  · DV01 = P·Dmod·0.0001: cambio en precio por 1bp. Usar para arbitraje y hedging.
+  · Bootstrapping: construir curva spot desde bonos cupón cero; forwards implícitos desde spots.
+  · IPD (Implicit Probability of Default): [S(1+r)]/[S(1+r)+(1+r-R)] con R≈20.8% para Argentina.
+  · GS-ESS spread de equilibrio: Spread eq = -691.3·GROWTH + 165·DEFAULT + 500. Comparar spread actual vs equilibrio.
+  · Curva argentina: TIR = a + b·ln(Duration) (regresión log-lin). R² > 0.8 indica buen ajuste.
+  · Covenants: EBITDA/Deuda ≥ 6.5×, Cobertura ≥ 1.75×, Liquidez ≥ 1×. Alerta si 1+ en rojo.
+- Reportá TIR/TEA/TNA, duration, convexidad, DV01, IPD, comparación spread vs equilibrio, covenants y recomendación. Educativo, no recomendación de inversión.`,
+  },
 ];
 
 const POR_ID = new Map(SKILLS.map((s) => [s.id, s]));
