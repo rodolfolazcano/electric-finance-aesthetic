@@ -1,4 +1,5 @@
 // @ts-nocheck
+// CANONICAL: usar esta versión para todo UI nuevo (AnalisisTab, SemaforoCard). Incluye fecha/vecesTocado/esEstimado + fallback 52w.
 export interface SoporteResistencia {
   tipo: "soporte" | "resistencia";
   precio: number;

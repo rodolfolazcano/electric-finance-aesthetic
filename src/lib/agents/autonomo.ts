@@ -47,7 +47,7 @@ export function esSmallTalkOConsultaSinMeta(pregunta: string): boolean {
   if (!p || p.length > 140) return false;
   const n = p.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const saludoPuro =
-    /^(hola+|holis|buenas(\s+(tardes|noches|dias|dia))?|buen\s*dia|buenos\s*dias|hey|hi|hello|que\s*tal\??|como\s+andas?\??|todo\s+bien\??|chau|hasta\s+luego|gracias[\s!.]*|dale|ok(ay)?[\s!.]*|jaja+)[\s!.?¿¡]*$/;
+    /^(hola+|holis|buenas(\s+(tardes|noches|dias|dia))?|buen\s*dia|buenos\s*dias|hey|hi|hello|que\s*tal\??|como\s+andas?\??|todo\s+bien\??|chau|hasta\s+luego)[\s!.?¿¡]*$/;
   if (saludoPuro.test(n)) return true;
   // Consultas de capacidades sin ningún activo/ticker/dato detectable
   const capacidad =

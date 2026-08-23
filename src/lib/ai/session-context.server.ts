@@ -154,16 +154,53 @@ function simpleHash(s: string): string {
   return h.toString(16);
 }
 
-//  Mapa global de sesiones (volátil, server-side) 
+//  Mapa global de sesiones (volátil, server-side) + fallback file para cold-start (Telegram) 
 const sessions = new Map<string, SessionContext>();
+const SESS_FILE = ".data/sessions-labadie.json";
+
+function loadFromFileSafe(): void {
+  try {
+    // @ts-ignore node fs only server
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const p = path.join(process.cwd(), SESS_FILE);
+    if (!fs.existsSync(p)) return;
+    const raw = JSON.parse(fs.readFileSync(p, "utf-8"));
+    for (const [sid, data] of Object.entries(raw as Record<string, any>)) {
+      if (!sessions.has(sid)) sessions.set(sid, SessionContext.fromJSON(data));
+    }
+  } catch {}
+}
+function saveToFileSafe(): void {
+  try {
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const p = path.join(process.cwd(), SESS_FILE);
+    fs.mkdirSync(path.replace(/\/[^/]+$/, ""), { recursive: true });
+    const obj: Record<string, any> = {};
+    for (const [k, v] of sessions) obj[k] = v.toJSON();
+    fs.writeFileSync(p, JSON.stringify(obj).slice(0, 200_000));
+  } catch {}
+}
+// cargar al boot si existe
+loadFromFileSafe();
 
 export function getSessionContext(sessionId: string): SessionContext {
   if (!sessions.has(sessionId)) {
     sessions.set(sessionId, new SessionContext());
   }
-  return sessions.get(sessionId)!;
+  const ctx = sessions.get(sessionId)!;
+  // persist cada acceso (throttle implicito: solo si size>0)
+  if (ctx.getResumen().length > 0) saveToFileSafe();
+  return ctx;
 }
 
 export function clearSessionContext(sessionId: string) {
   sessions.delete(sessionId);
+  saveToFileSafe();
+}
+
+// helper usado por agente para persistir tras tool calls
+export function persistSessionContext(sessionId: string): void {
+  saveToFileSafe();
 }

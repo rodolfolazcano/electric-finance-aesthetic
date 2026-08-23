@@ -3942,9 +3942,10 @@ export async function ejecutarYTM(argsRaw: string, sessionId: string): Promise<{
     const { calcularYTM } = await import("@/lib/renta-fija/ytm-calculator");
     const r = await calcularYTM(ticker, sessionId);
     const L: string[] = [];
+    const esPrecioDeHoy = r.fechaPrecio === new Date().toISOString().slice(0, 10);
     L.push(`=== YTM / TIR — ${r.ticker} — ${r.nombre} ===`);
     L.push(`Emisor: ${r.emisor} | Moneda: ${r.moneda} | Especie: ${r.especie} | Vto: ${r.fechaVencimiento}`);
-    L.push(`Precio IOL: ${r.precio?.toFixed(2) ?? "--"} ${r.precioMoneda} (fuente: IOL CotizacionDetalle, sesión ${sessionId.slice(0, 8)}… ${r.fuente.includes("hardcoded") ? "— fallback hardcodeado boosandr97@gmail.com" : ""})`);
+    L.push(`Precio: ${r.precio?.toFixed(2) ?? "--"} ${r.precioMoneda} ${esPrecioDeHoy ? "(en vivo)" : `(último cierre del ${r.fechaPrecio})`} — fuente: ${r.fuentePrecio}. Si el precio no es de hoy, aclaralo al usuario.`);
     L.push(`TIR anual (YTM): **${r.tirPct}** — TEM ${(r.tem! * 100).toFixed(2)}% — TNA ${(r.tna! * 100).toFixed(2)}%`);
     L.push(`Flujos futuros: ${r.flujosFuturos} — ${r.diagnostico}`);
     L.push(`Flujos (próx. 5): ${r.flujos.slice(0, 5).map((f) => `${f.fecha}:${f.monto}`).join(" | ")}`);

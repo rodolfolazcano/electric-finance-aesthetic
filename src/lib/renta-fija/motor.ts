@@ -196,7 +196,7 @@ export async function calcularTIRReal(tickerRaw: string, precioManual?: number):
   const fechaValStr = fechaValuacion.toISOString().slice(0, 10);
 
   // Precio
-  let precioInfo: { precio: number | null; monedaPrecio: string; detalle: any; fuente: string };
+  let precioInfo: { precio: number | null; monedaPrecio: string; detalle: any; fuente: string } | null = null;
   let precio: number | null = precioManual ?? null;
   let fuentePrecio = precioManual != null ? "manual" : "";
   let detallePrecio: any = null;

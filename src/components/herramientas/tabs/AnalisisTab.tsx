@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import MarketDataInput from "@/components/market-data/MarketDataInput";
 import HistoricalChart from "@/components/market-data/HistoricalChart";
+import { computeHurst } from "@/lib/math/stats";
 import {
   getSemaforo,
   getSemaforoBatch,
@@ -344,8 +345,14 @@ function AnalisisPage({
             />
           )}
 
-          {/* Single-ticker result */}
-          {semaforo.data && !semaforoBatch.data && (
+          {/* Single-ticker result — Labadié Hurst filter (§3.2 p=1/H) */}
+          {semaforo.data && !semaforoBatch.data && (() => {
+            const closes = (semaforo.data.history ?? []).map((h: any) => h.close).filter((v: number) => isFinite(v));
+            const H = closes.length >= 30 ? computeHurst(closes) : 0.5;
+            const p = H > 0 ? 1 / H : 2;
+            const regime = H < 0.45 ? "mean-reverting" : H > 0.55 ? "trending" : "random";
+            const hurstWarn = closes.length < 100;
+            return (
             <div className="space-y-4">
               <div className="rounded-md border border-border/40 bg-background/40 p-4">
                 <Suspense
@@ -358,11 +365,20 @@ function AnalisisPage({
                   <TradingViewWidget symbol={tvSymbol} interval={tvInterval} height={480} />
                 </Suspense>
               </div>
+              {/* Labadié Hurst filter badge */}
+              <div className="flex flex-wrap items-center gap-2 rounded-md border border-border/40 bg-background/40 px-3 py-2 font-mono text-xs">
+                <span className="uppercase tracking-widest text-muted-foreground">Labadié H</span>
+                <span className="font-semibold">{H.toFixed(3)}</span>
+                <span className="text-muted-foreground">p=1/H {p.toFixed(2)}</span>
+                <span className={`rounded-full border px-2 py-0.5 text-[11px] ${regime === "mean-reverting" ? "border-emerald-500/40 text-emerald-400" : regime === "trending" ? "border-amber-500/40 text-amber-400" : "border-border text-muted-foreground"}`}>{regime}</span>
+                {hurstWarn && <span className="text-amber-500">n&lt;100 sesgado</span>}
+                <span className="ml-auto text-[11px] text-muted-foreground hidden sm:inline">H&lt;0.45 favorece reversal (pairs), H&gt;0.55 penalizar contra-tendencia — 1205.3482v6 §3.2</span>
+              </div>
               <SemaforoCard data={semaforo.data} onNavigateToFundamental={(ticker) => {
                 navigate({ search: { tab: "herramientas", subTab: "fundamental", ticker } });
               }} />
             </div>
-          )}
+            );})()}
 
           {/* IOL data display (no cotización available, just historical chart) */}
           {!semaforo.data && !semaforo.isPending && !semaforoBatch.data && !semaforoBatch.isPending && historical.length > 0 && !quote && (

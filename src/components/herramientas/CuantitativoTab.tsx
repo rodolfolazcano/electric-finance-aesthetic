@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OptimizadorTabs } from "@/components/herramientas/cuantitativo/OptimizadorTabs";
 import { RiesgoPage } from "@/components/herramientas/cuantitativo/RiesgoPage";
 import { CapmTabs } from "@/components/herramientas/cuantitativo/CapmTabs";
 import { HedgeTab } from "@/components/optimizer/HedgeTab";
 import { StrategyClassificationTab } from "@/components/optimizer/StrategyClassificationTab";
 import { StatArbTab } from "@/components/herramientas/StatArbTab";
+import { LabadieTab } from "@/components/herramientas/labadie/LabadieTab";
 import { EstimacionesTab } from "@/components/herramientas/EstimacionesTab";
 
-type SubTab = "optimizador" | "riesgo" | "capm" | "cobertura" | "clasificacion" | "statarb" | "estimaciones";
+type SubTab =
+  "optimizador" | "riesgo" | "capm" | "cobertura" | "clasificacion" | "statarb" | "labadie" | "estimaciones";
 
 const SUBTABS: { key: SubTab; label: string }[] = [
   { key: "optimizador", label: "Optimizador" },
@@ -16,11 +18,20 @@ const SUBTABS: { key: SubTab; label: string }[] = [
   { key: "cobertura", label: "Cobertura" },
   { key: "clasificacion", label: "Clasificación" },
   { key: "statarb", label: "Stat-Arb" },
+  { key: "labadie", label: "Labadié" },
   { key: "estimaciones", label: "Estimaciones" },
 ];
 
-export function CuantitativoTab() {
-  const [sub, setSub] = useState<SubTab>("optimizador");
+export function CuantitativoTab({ initialSubTab }: { initialSubTab?: string } = {}) {
+  const [sub, setSub] = useState<SubTab>(
+    SUBTABS.some((t) => t.key === initialSubTab) ? (initialSubTab as SubTab) : "optimizador",
+  );
+
+  useEffect(() => {
+    if (initialSubTab && SUBTABS.some((t) => t.key === initialSubTab)) {
+      setSub(initialSubTab as SubTab);
+    }
+  }, [initialSubTab]);
 
   return (
     <div className="space-y-8 w-full">
@@ -30,8 +41,8 @@ export function CuantitativoTab() {
           Análisis cuantitativo
         </h2>
         <p className="mt-1 max-w-3xl text-[17px] leading-relaxed text-muted-foreground lg:text-[19px]">
-          Optimización de carteras (Markowitz, mínima varianza, máx. Sharpe), análisis de riesgo
-          con distribuciones y regresiones CAPM sobre series reales de Yahoo Finance.
+          Optimización de carteras (Markowitz, mínima varianza, máx. Sharpe), análisis de riesgo con
+          distribuciones y regresiones CAPM sobre series reales de Yahoo Finance.
         </p>
         <div aria-hidden className="electric-line mt-6 max-w-3xl" />
       </div>
@@ -59,6 +70,7 @@ export function CuantitativoTab() {
       {sub === "cobertura" && <HedgeTab />}
       {sub === "clasificacion" && <StrategyClassificationTab />}
       {sub === "statarb" && <StatArbTab />}
+      {sub === "labadie" && <LabadieTab />}
       {sub === "estimaciones" && <EstimacionesTab />}
     </div>
   );

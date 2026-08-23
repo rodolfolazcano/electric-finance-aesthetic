@@ -10,6 +10,7 @@
 
 import rentaFijaData from "../../../RENTA_FIJA_COMPLETA.json";
 import { ensureIOLSession, iolCotizacionDetalle, iolCotizacion } from "@/lib/iol.server";
+import { guardarPrecio, leerPrecios, hoyIso } from "@/lib/renta-fija/precios.server";
 
 type FlujoFondo = {
   fecha: string;
@@ -29,6 +30,7 @@ type BonoJSON = {
   cupon: { tasa: number; tipo: string; detalle: string; frecuencia: string };
   valor_nominal: number;
   flujo_fondos: FlujoFondo[] | null;
+  especies_relacionadas?: Record<string, string>;
   activo: boolean;
 };
 
@@ -158,6 +160,83 @@ async function fetchPrecioIOL(ticker: string, sessionId: string): Promise<{ prec
   return { precio: null, moneda: "ARS", detalle: null };
 }
 
+/** Especie inferida del sufijo del ticker (AL30→Pesos, AL30D→Dolar, AL30C→Cable). */
+function especieDeTicker(t: string): string {
+  const u = t.toUpperCase();
+  if (/D$/.test(u) && /^[A-Z]{2,4}D$/.test(u)) return "Dolar";
+  if (/C$/.test(u) && /^[A-Z]{2,4}C$/.test(u)) return "Cable";
+  return "Pesos";
+}
+
+export type PrecioResuelto = {
+  precioCrudo: number;
+  precioMoneda: string;
+  detalle: any;
+  /** Especie del título cuyo precio se obtuvo (define la conversión ARS↔USD). */
+  especieEfectiva: string;
+  /** Fecha del precio: hoy = en vivo; fecha anterior = último cierre persistido. */
+  fechaPrecio: string;
+  fuentePrecio: string;
+};
+
+/**
+ * Cadena de resolución de precio para el motor de TIR:
+ * 1. IOL en vivo del ticker pedido (sesión usuario → fallback hardcodeado).
+ * 2. IOL en vivo de una ESPECIE HERMANA (AL30↔AL30D/AL30C): los flujos son los
+ *    mismos; si sólo hay cotización de la especie D/C se calcula la TIR en USD.
+ * 3. Caché persistido (.data/renta-fija/precios.json): último cierre conocido
+ *    (hoy por el cron diario o una consulta previa), informando su fecha.
+ */
+async function resolverPrecio(bono: BonoJSON, sessionId: string): Promise<PrecioResuelto | null> {
+  const candidatos: Array<{ t: string; especie: string }> = [
+    { t: bono.ticker.toUpperCase(), especie: bono.especie },
+  ];
+  for (const v of Object.values(bono.especies_relacionadas ?? {})) {
+    const t = String(v).toUpperCase();
+    if (!candidatos.some((c) => c.t === t)) candidatos.push({ t, especie: especieDeTicker(t) });
+  }
+
+  // 1+2) precio EN VIVO por candidato; cada acierto se persiste al instante.
+  for (const c of candidatos) {
+    const r = await fetchPrecioIOL(c.t, sessionId);
+    if (r.precio != null) {
+      void guardarPrecio({
+        ticker: c.t,
+        precio: r.precio,
+        moneda: String(r.moneda ?? "ARS"),
+        fecha: hoyIso(),
+        timestamp: new Date().toISOString(),
+        fuente: "IOL",
+      });
+      return {
+        precioCrudo: r.precio,
+        precioMoneda: String(r.moneda ?? "ARS"),
+        detalle: r.detalle,
+        especieEfectiva: c.especie,
+        fechaPrecio: hoyIso(),
+        fuentePrecio: `IOL en vivo (${c.t})`,
+      };
+    }
+  }
+
+  // 3) último cierre persistido (cron diario o consulta previa).
+  const precios = await leerPrecios();
+  for (const c of candidatos) {
+    const e = precios[c.t];
+    if (e && Number(e.precio) > 0) {
+      return {
+        precioCrudo: Number(e.precio),
+        precioMoneda: String(e.moneda ?? "ARS"),
+        detalle: null,
+        especieEfectiva: c.especie,
+        fechaPrecio: e.fecha,
+        fuentePrecio: `caché ${e.fuente} del ${e.fecha}`,
+      };
+    }
+  }
+  return null;
+}
+
 export type ResultadoYTM = {
   ticker: string;
   nombre: string;
@@ -168,6 +247,9 @@ export type ResultadoYTM = {
   precio: number | null;
   precioMoneda: string;
   precioDetalle: any;
+  /** Fecha del precio usado (hoy = en vivo; anterior = último cierre). */
+  fechaPrecio: string;
+  fuentePrecio: string;
   tirAnual: number | null;
   tirPct: string;
   tem: number | null;
@@ -191,30 +273,29 @@ export async function calcularYTM(tickerRaw: string, sessionId: string): Promise
   const hoy = new Date();
   hoy.setHours(12, 0, 0, 0);
 
-  // Precio en vivo desde IOL
-  const { precio: precioCrudo, precioMoneda, precioDetalle } = await fetchPrecioIOL(ticker, sessionId);
-
-  if (precioCrudo == null) {
-    throw new Error(`No se pudo obtener precio de ${ticker} desde IOL (sesión: ${sessionId}). Verificá que el bono cotice o probá con otro ticker.`);
+  // Precio con cadena completa: IOL vivo → especie hermana → último cierre persistido.
+  const resPrecio = await resolverPrecio(bono, sessionId);
+  if (!resPrecio) {
+    throw new Error(
+      `Sin precio para ${ticker}: IOL sin cotización (sesión caída o mercado cerrado) y sin cierre previo en caché. El cron diario /api/cron/actualiza-renta-fija lo rellena; reintentá en unos minutos.`,
+    );
   }
+  const { precioCrudo, precioMoneda, detalle: precioDetalle, fechaPrecio, fuentePrecio } = resPrecio;
 
-  // Convertir precio a USD si es necesario para el cálculo
-  // AL30 (Pesos) cotiza en ARS pero flujos son USD → convertir precio ARS a USD via MEP
-  // AL30D (Dolar) cotiza en USD → usar directo
+  // Convertir precio a USD si es necesario para el cálculo.
+  // La conversión depende de la ESPECIE del precio obtenido (puede ser una
+  // especie hermana): Pesos + flujos USD → dividir por MEP; D/C → ya en USD.
   let precioParaTIR = precioCrudo;
-  let monedaCalculo: string = bono.moneda; // USD
+  let monedaCalculo: string = bono.moneda;
 
-  if (bono.especie === "Pesos" && bono.moneda === "USD") {
-    // Precio en ARS, flujos en USD → convertir
+  if (resPrecio.especieEfectiva === "Pesos" && bono.moneda === "USD") {
     const mep = await getDolarMEP();
     precioParaTIR = precioCrudo / mep;
     monedaCalculo = "USD (convertido desde ARS via MEP " + mep.toFixed(2) + ")";
-  } else if (bono.especie === "Dolar" || bono.especie === "Cable") {
-    // Ya en USD
+  } else if (resPrecio.especieEfectiva !== "Pesos") {
     precioParaTIR = precioCrudo;
     monedaCalculo = "USD";
   } else {
-    // CER, etc. — usar precio directo
     monedaCalculo = precioMoneda;
   }
 
@@ -251,13 +332,15 @@ export async function calcularYTM(tickerRaw: string, sessionId: string): Promise
     precio: precioCrudo,
     precioMoneda,
     precioDetalle,
+    fechaPrecio,
+    fuentePrecio,
     tirAnual: tir,
     tirPct: `${(tir * 100).toFixed(2)}%`,
     tem: tem,
     tna: tna,
     flujosFuturos: flujosFuturos.length,
     flujos: flujosFuturos.map((f) => ({ fecha: f.raw.fecha, monto: f.monto })),
-    diagnostico: `TIR calculada con Newton-Raphson ACT/365, ${flujosFuturos.length} flujos futuros, precio ${precioCrudo} ${precioMoneda} → ${precioParaTIR.toFixed(4)} ${monedaCalculo}, hoy ${hoy.toISOString().slice(0, 10)}`,
-    fuente: "RENTA_FIJA_COMPLETA.json flujo_fondos + IOL CotizacionDetalle (hardcoded fallback boosandr97@gmail.com si no hay sesión)",
+    diagnostico: `TIR calculada con Newton-Raphson ACT/365, ${flujosFuturos.length} flujos futuros, precio ${precioCrudo} ${precioMoneda}${fechaPrecio !== hoyIso() ? ` (cierre del ${fechaPrecio})` : ""} → ${precioParaTIR.toFixed(4)} ${monedaCalculo}, hoy ${hoy.toISOString().slice(0, 10)}`,
+    fuente: `${fuentePrecio} + RENTA_FIJA_COMPLETA.json flujo_fondos (condiciones de emisión)`,
   };
 }

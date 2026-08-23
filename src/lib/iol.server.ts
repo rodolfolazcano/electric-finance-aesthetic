@@ -12,11 +12,16 @@
 const BASE = "https://api.invertironline.com";
 const TOKEN_URL = `${BASE}/token`;
 
-// Credenciales hardcodeadas para YTM / precio de bonos desde Telegram (fallback cuando el usuario no inició sesión)
-// Solicitadas explícitamente para recalcular TIR desde RENTA_FIJA_COMPLETA.json
-const IOL_HARDCODED_USER = "boosandr97@gmail.com";
-const IOL_HARDCODED_PASS = "Chule348936_";
+// Credenciales hardcodeadas para YTM / precio de bonos cuando el usuario no
+// inició sesión (chat web y Telegram). Override opcional por .env:
+// IOL_USERNAME / IOL_PASSWORD. La contraseña debe coincidir con la vigente en
+// invertironline.com; si cambia, actualizar acá o definirla por entorno.
+const IOL_HARDCODED_USER = process.env["IOL_USERNAME"] || "boosandr97@gmail.com";
+const IOL_HARDCODED_PASS = process.env["IOL_PASSWORD"] || "Chule348936_";
 const IOL_HARDCODED_SESSION = "__hardcoded_ytm__";
+/** Cooldown tras un login fallido: evita reintentar contra IOL en cada llamada. */
+let ultimoFalloHardcoded = 0;
+const COOLDOWN_FALLO_MS = 60_000;
 
 export type FuenteIOL = { dominio: string; url: string; title: string };
 
@@ -96,7 +101,16 @@ export async function ensureIOLSession(sessionId: string): Promise<string> {
   if (iolSesionActiva(sessionId)) return sessionId;
   // Intentar login hardcodeado como fallback (no expone credenciales al modelo)
   if (!iolSesionActiva(IOL_HARDCODED_SESSION)) {
-    await iolLogin(IOL_HARDCODED_SESSION, IOL_HARDCODED_USER, IOL_HARDCODED_PASS);
+    // Cooldown: si acaba de fallar, no reintentar (evita latencia por llamada).
+    if (Date.now() - ultimoFalloHardcoded > COOLDOWN_FALLO_MS) {
+      const r = await iolLogin(IOL_HARDCODED_SESSION, IOL_HARDCODED_USER, IOL_HARDCODED_PASS);
+      if (!r.ok) {
+        ultimoFalloHardcoded = Date.now();
+        console.warn(
+          `[IOL] login hardcodeado FALLÓ para ${IOL_HARDCODED_USER.replace(/(.{2}).*(@.*)/, "$1***$2")}: ${r.detalle}. Los precios de bonos caerán al último cierre persistido.`,
+        );
+      }
+    }
   }
   if (iolSesionActiva(IOL_HARDCODED_SESSION)) return IOL_HARDCODED_SESSION;
   return sessionId; // sin sesión, el caller recibirá 401 y podrá manejarlo

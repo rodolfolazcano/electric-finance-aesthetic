@@ -61,7 +61,10 @@ Aplicás la metodología profesional de asesoramiento (perfiles de riesgo, plani
 - Pensá como planificación financiera: situación actual → objetivo concreto (con plazo y monto) → horizonte → riesgo asumible → alternativas → seguimiento; recordale que objetivos y perfiles cambian y el plan se revisa periódicamente.
 
 [REGLA DE ORO]
-Si la pregunta depende de un dato que cambia (cotización, noticia, normativa vigente), la herramienta se invoca SIEMPRE en ese turno, sin excepción, incluso si creés saber la respuesta. No mezcles las herramientas para acciones o bonos puntuales (ej. AL30): para eso no hay fuente estable integrada y decilo con honestidad.
+Si la pregunta depende de un dato que cambia (cotización, noticia, normativa vigente), la herramienta se invoca SIEMPRE en ese turno, sin excepción, incluso si creés saber la respuesta.
+- BONOS soberanos argentinos (AL30, GD30, AL35, GD35, AE38, TX26...) y su YTM/TIR/precio: usá calcular_ytm_bono(ticker) EN ESTE TURNO. Está prohibido decir "no dispongo del dato" o preguntar qué herramienta usar: el cálculo existe y corre en vivo (RENTA_FIJA_COMPLETA.json + IOL).
+- ACCIONES / CEDEARs / ADRs puntuales: usá datos_financieros(fuente="yfinance") o valor_intrinseco_real(simbolo) en este turno.
+- Solo si la herramienta FALLA (error o SIN RESULTADOS) informás con honestidad que el dato no está disponible ahora, sin sugerirle al usuario qué herramienta ejecutar.
 
 [RAZONAR Y EJECUTAR - PROHIBIDO RESPONDER EN GENÉRICO]
 - Razoná la pregunta y ejecutá la herramienta que corresponda ANTES de escribir la respuesta. Nunca respondas un hecho verificable con un resumen genérico del contenido del sitio ni con "en general...", sin haber ejecutado la herramienta en este turno.
@@ -214,7 +217,9 @@ Modo de trabajo:
 
 Reglas de decisión:
 - Pregunta sobre POR QUÉ subió/bajó/se movió un activo o "qué pasó con X": SIEMPRE invocar buscar_noticias con query = nombre del activo y periodo = "hoy". La causa que se reporta debe ser EXCLUSIVAMENTE la que aparece en los resultados de esa búsqueda, citada por nombre de fuente. Prohibido usar categorías genéricas de mercado (resultados trimestrales, gasto en IA, tipo de cambio, "entorno macro") salvo que la búsqueda las confirme como causa real de ese día. Si la búsqueda no trae una causa clara, el enfoque debe indicar decir "no encontré una razón puntual confirmada hoy" en vez de inventar una.
-- Cotizaciones y tasas actuales (dólar, UVA, riesgo país, plazo fijo, FCI, euro, letras, tasas BCRA, caución a 30 días): consultar_mercado.
+ - Cotizaciones y tasas actuales (dólar, UVA, riesgo país, plazo fijo, FCI, euro, letras, tasas BCRA, caución a 30 días): consultar_mercado.
+ - YTM/TIR/precio de un bono soberano o corporativo argentino (AL30, GD30, AL35, GD35, AE38, TX26...): invocar SIEMPRE calcular_ytm_bono(ticker) EN ESTE TURNO. PROHIBIDO dejar el enfoque sin haber ejecutado el cálculo ni decir que "no hay fuente": la herramienta calcula en vivo con RENTA_FIJA_COMPLETA.json + IOL. Curva soberana spot/forward: consultar_curva_etti. Duración/convexidad/total return/stripped: calcular_total_return / calcular_stripped_yield / calcular_yield_call. Riesgo de un bono: consultar_semaforo_riesgo_bono.
+ - Acciones/CEDEARs puntuales (precio, fundamentales): datos_financieros(fuente="yfinance") o valor_intrinseco_real(simbolo); NUNCA responder "no dispongo del dato" sin haber ejecutado una herramienta en este turno.
 - Valoración de empresas ("cuánto vale X", valor intrínseco, DCF de X, analizá el valor de X, comparar alternativas de inversión): invocar SIEMPRE valor_intrinseco_real(simbolo = ticker o nombre de la empresa). El sistema obtiene los datos reales de Yahoo Finance (FCF, deuda neta, beta, WACC, crecimiento de analistas), aplica el paper correspondiente y busca noticias de sustento. NO pedir al usuario flujos de caja ni supuestos; NO evadir el cálculo. Solo si el usuario declara supuestos propios y quiere probar un escenario puntual, usar calcular_dcf. El resultado de valor_intrinseco_real ya incluye precio de mercado actual y consenso de analistas: no hace falta validar por separado con buscar_web.
 - Normativa vigente, verificación de entidades, sitios oficiales: buscar_web.
 - Verificación de brokers/entidades en la CNV ("¿está regulado por la CNV?", "matrícula", "registro público de agentes", "¿puedo confiar en este bróker?"): invocar SIEMPRE buscar_web con consulta hacia el Registro Público de la CNV (cnv.gov.ar). Prohibido dejar el enfoque sin haber ejecutado esa búsqueda: el redactor debe responder SOLO con lo que devuelva, citando la fuente, y si no hay resultado decir "no está confirmado" y sugerir verificarlo en cnv.gov.ar.
@@ -225,7 +230,8 @@ Reglas de decisión:
 - Fuentes directas: datos_financieros(fuente) para yfinance/argentinadatos/criptoya/bcra_cambiarias/bcra_monetarias; iol_login/iol_cuenta/iol_mercado para la cuenta IOL del usuario (si pide su portafolio/cuenta/operaciones sin sesión iniciada, el enfoque debe indicar pedirle credenciales); iol_operar SOLO con confirmación explícita del usuario.
  - Gráficos: si el usuario pide visualizar una serie o comparar, el enfoque debe incluir usar grafico_chat (linea/barras/tradingview).
  - Informes: si el usuario pide informe/reporte/resumen ejecutivo, primero reuní TODOS los datos con las herramientas y luego indicá en el enfoque redactarlo con generar_informe.
- - Señales unificadas: para "señal de X", "qué compro hoy", "top señales", "analizá completa" invocar SIEMPRE generar_senal_unificada(simbolo) si es 1 ticker, o generar_senales_unificadas(simbolos, topN) si son varios / batch. NO uses generar_senales_cedear ni valor_intrinseco_real aislado: el motor unificado ya ejecuta las 4 capas en orden (Intermarket → Fundamental Pascale gate → Semaforo → CAPM/Riesgo) y devuelve COMPRA/VENTA con score.
+  - Señales unificadas: para "señal de X", "qué compro hoy", "top señales", "analizá completa" invocar SIEMPRE generar_senal_unificada(simbolo) si es 1 ticker, o generar_senales_unificadas(simbolos, topN) si son varios / batch. NO uses generar_senales_cedear ni valor_intrinseco_real aislado: el motor unificado ya ejecuta las 4 capas en orden (Intermarket → Fundamental Pascale gate → Semaforo → CAPM/Riesgo) y devuelve COMPRA/VENTA con score.
+  - Telegram: para "enviá señal de X a Telegram", "notificá por el bot", "avisá al bot" invocar EN ESTE TURNO telegram_enviar_senal(ticker) — si no indicás 'senal', el sistema genera la unificada 4 capas y la publica con gráfico adjunto; texto libre → telegram_enviar_mensaje(text); diagnóstico del bot → telegram_estado. NO pidas confirmación para señales informativas.
  - Pipeline maestro F0→F10: para "análisis completo de X", "análisis integral", "ficha coronar", "pipeline maestro" invocar SIEMPRE analisis_completo(simbolo) — ejecuta en orden la jerarquía académica completa: F0 macro ampliado BCRA v4 + ciclo intermarket → F1 Fowler Newton/Biondi cualitativo 6D gate 5.0 + 15 ratios → F2 Dumrauf VAN/TIR/YTM → F3 Pascale/Alonso WACC+DCF+múltiplos+APV → F4 sectores score+benchmarks → F5/F6 CAPM/factores/riesgo/Hurst → F7 ETTI renta fija → F8 derivados BS → F9 Labadie quant → F10 ficha MOS calibrado → T validación determinística anti-alucinación. Reforzar con validar_analisis(simbolo). El texto del tool es la ÚNICA fuente de verdad.
  - Jerga interna NO es tool: si el usuario menciona RazonesFinancierasTab, toggle moneda constante, resolverTIRConRestricciones u otros nombres de UI, traducilos a las tools reales (analizar_fundamental, calcular_ytm_bono, analisis_completo) y ejecutá esas. PROHIBIDO fabricar sus salidas o citarlas como ejecutadas. NUNCA inventes flujos de fondos de una empresa: los flujos solo existen si el usuario los aporta o si salen de un tool.
  - Regla de CTA: como máximo UN cierre suave (WhatsApp de Cintia o el Test del Inversor, nunca ambos), y solo si el usuario está en condición de recibirlo; si la pregunta es conceptual o de datos puntuales, el enfoque puede omitir la CTA.`;
@@ -298,6 +304,8 @@ export const Route = createFileRoute("/api/chat")({
         orquestacion.promptSkillsPlanner = promptSkillsPlannerFinal;
 
         const memoria = MemoriaDeSesion.obtener(sessionId);
+        // Espera la carga desde disco antes de mutar estado (evita pisar memoria).
+        await memoria.preparar();
         memoria.nuevoTurno();
         memoria.agregarTimeline({ rol: "usuario", texto: pregunta });
 
@@ -382,9 +390,9 @@ export const Route = createFileRoute("/api/chat")({
             }
 
             const final = resultado.final;
-            for (let i = 0; i < final.length; i += 24) {
-              send({ t: "text", v: final.slice(i, i + 24) });
-              await new Promise((r) => setTimeout(r, 12));
+            for (let i = 0; i < final.length; i += 160) {
+              send({ t: "text", v: final.slice(i, i + 160) });
+              await new Promise((r) => setTimeout(r, 8));
             }
 
             // Observabilidad final: snapshot adaptativo

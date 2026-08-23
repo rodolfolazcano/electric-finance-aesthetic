@@ -1077,6 +1077,55 @@ export const AGENT_TOOLS: ToolRecord[] = [
     required: [],
     run: (a) => toolAgendaEconomica(a as { fecha?: string }),
   },
+  {
+    name: "pairs_trading_labadie",
+    description:
+      "LABADIÉ StatArb (1205.3482v6 §2-4 + 5 Stages): analiza par mean-reversion spread = a1 - beta*a2, μ±aσ entry, μ±bσ stop, ventana rolling, TxCost, beta OLS, ADF cointegration, Hurst H y p=1/H, impacto I(v)=σ|v/V|^γ τ^(1/p). Usa yahoo-finance2 live. JAMÁS pidas ticker si ya lo tenés; ejecuta directo. Para backtest usar window/entryThresh/stopThresh/txCost/pValue/gamma/participationRate.",
+    params: {
+      asset1: { type: "string", description: "Ticker 1 (ej: GGAL.BA)" },
+      asset2: { type: "string", description: "Ticker 2 (ej: BMA.BA)" },
+      window: { type: "integer", description: "Ventana rolling (default 20)" },
+      entryThresh: { type: "number", description: "a entry (default 1.5)" },
+      stopThresh: { type: "number", description: "b stop, debe ser >a (default 2.5)" },
+      txCost: { type: "number", description: "Costo por trade % (default 0.15)" },
+      pValue: { type: "number", description: "p=1/H (default 2, auto si Hurst)" },
+      gamma: { type: "number", description: "Market impact gamma 0.1-1 (default 0.5)" },
+      participationRate: { type: "number", description: "PVol 0-0.5 (default 0.1)" },
+    },
+    required: ["asset1", "asset2"],
+    run: async (a: any) => {
+      const { analyzePair } = await import("@/lib/labadie");
+      // Fetch closes via yahoo-http
+      const { fetchYahooChart } = await import("@/lib/yahoo-http");
+      const p1: any = await fetchYahooChart(a.asset1, "1y", "1d");
+      const p2: any = await fetchYahooChart(a.asset2, "1y", "1d");
+      const closes1 = (p1?.chart?.result?.[0]?.indicators?.quote?.[0]?.close ?? []).map((c: number, i: number) => ({ date: p1.chart.result[0].timestamp[i], close: c })).filter((x: any) => isFinite(x.close)).map((x: any) => ({ date: new Date(x.date * 1000).toISOString().slice(0, 10), close: x.close }));
+      const closes2 = (p2?.chart?.result?.[0]?.indicators?.quote?.[0]?.close ?? []).map((c: number, i: number) => ({ date: p2.chart.result[0].timestamp[i], close: c })).filter((x: any) => isFinite(x.close)).map((x: any) => ({ date: new Date(x.date * 1000).toISOString().slice(0, 10), close: x.close }));
+      if (!closes1.length || !closes2.length) return `[ERROR pairs_trading_labadie]: sin datos Yahoo para ${a.asset1}/${a.asset2}`;
+      const res = analyzePair(closes1, closes2, { asset1: a.asset1, asset2: a.asset2, period: "1y", interval: "1d", window: a.window ?? 20, entryThresh: a.entryThresh ?? 1.5, stopThresh: a.stopThresh ?? 2.5, txCost: a.txCost ?? 0.15, pValue: a.pValue, marketImpactGamma: a.gamma, participationRate: a.participationRate, capitalPerPair: 10000, inSampleRatio: 0.7 } as any);
+      return JSON.stringify({ correlation: res.correlation.toFixed(3), beta: res.beta.toFixed(3), adfP: res.adfPValue, cointegrated: res.isCointegrated, hurst: res.hurstExponent?.toFixed(3), impliedP: res.impliedP?.toFixed(2), trades: res.trades.length, winRate: res.performance.winRate.toFixed(1) + "%", sharpe: res.performance.sharpe.toFixed(2), robustness: res.correlationBreakdown }, null, 2).slice(0, 7500);
+    },
+  },
+  {
+    name: "curva_ejecucion_labadie",
+    description:
+      "LABADIÉ curva ejecución óptima (1205.3482v6 §2.3-2.5) TC forward / IS backward con shooting 1D, p=1/H, impacto I=σ|v/V|^γ τ^(1/p) y PVol cap. Devuelve curva volume/cumulative + optimalPct. Usar hurst real del spread.",
+    params: {
+      algo: { type: "string", description: "tc = Target Close forward, is = Implementation Shortfall backward" },
+      T: { type: "integer", description: "Horizon steps (default 100)" },
+      sigma: { type: "number", description: "Vol anualizada (default 0.2)" },
+      hurst: { type: "number", description: "H ∈(0,1) real (default 0.5)" },
+      gamma: { type: "number", description: "Gamma impacto (default 0.5)" },
+      participationRate: { type: "number", description: "PVol cap (default 0.1)" },
+    },
+    required: ["algo"],
+    run: async (a: any) => {
+      const { calcularCurvaOptima } = await import("@/lib/labadie/execution-curve");
+      const { curve, optimalPct } = calcularCurvaOptima({ algo: (a.algo as any) ?? "tc", T: a.T ?? 100, sigma: a.sigma ?? 0.2, hurst: a.hurst ?? 0.5, gamma: a.gamma ?? 0.5, participationRate: a.participationRate ?? 0.1 });
+      const head = curve.slice(0, 10).map((p) => `step ${p.step}: vol ${(p.volume * 100).toFixed(1)}% cum ${(p.cumulative * 100).toFixed(1)}%`).join("\n");
+      return `Curva ${a.algo ?? "tc"} H=${a.hurst ?? 0.5} optimalPct=${(optimalPct * 100).toFixed(1)}%\n${head}\n... ${curve.length} steps total (truncado)`;
+    },
+  },
 ];
 
 //  Modelos locales (Ollama)

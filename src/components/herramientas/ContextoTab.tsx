@@ -1,304 +1,602 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Activity, ArrowDownRight, ArrowUpRight, Compass, Globe2, RefreshCw, DollarSign, TrendingUp, BarChart3 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-  contextoMacroFn,
-  cicloEconomicoFn,
-  performanceSectorialFn,
-} from "@/lib/herramientas/clara.functions";
-import { TendenciasMacroPanel } from "@/components/herramientas/TendenciasMacroPanel";
-import { MarketNewsPanel } from "@/components/herramientas/MarketNewsPanel";
-import { cn } from "@/lib/utils";
+  Compass,
+  Search,
+  Loader2,
+  TrendingUp,
+  BookOpen,
+  Scale,
+  Lightbulb,
+  ShieldCheck,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  getDailyOportunidades,
+  type DailyOportunidadesResult,
+} from "@/lib/herramientas/daily-opportunities.functions";
+import {
+  getFlatTickerList,
+  getIndustriasBySector,
+  getUniqueSectores,
+  type TickerInfo,
+} from "@/lib/herramientas/universos";
 
-function fmtPct(v: number | null | undefined, dec = 1): string {
-  if (v == null || !isFinite(v)) return "s/d";
-  return `${v >= 0 ? "+" : ""}${v.toFixed(dec)}%`;
+// ── Subtabs (mismos valores que subTabs de "contexto" en SidebarHerramientas) ──
+type SubTab = "oportunidades" | "metodologia";
+
+const SUBTABS: { key: SubTab; label: string }[] = [
+  { key: "oportunidades", label: "Oportunidades" },
+  { key: "metodologia", label: "Metodología" },
+];
+
+const MAX_TICKERS = 50; // límite de getDailyOportunidades
+
+// ── Carteras modelo (Hernán Schvarz, "Tácticas para ver oportunidades en el mercado") ──
+const CARTERAS_MODELO = [
+  {
+    nombre: "Conservadora",
+    filas: [
+      ["Renta Variable", "10%"],
+      ["Cedears SPY/DJ", "35%"],
+      ["Renta Fija", "35%"],
+      ["Caución", "20%"],
+    ],
+  },
+  {
+    nombre: "Intermedia",
+    filas: [
+      ["Renta Variable", "20%"],
+      ["Cedears SPY/DJ", "30%"],
+      ["Renta Fija", "30%"],
+      ["Caución", "20%"],
+    ],
+  },
+  {
+    nombre: "Arriesgada",
+    filas: [
+      ["Renta Variable", "30%"],
+      ["Cedears SPY/DJ", "25%"],
+      ["Renta Fija", "30%"],
+      ["Caución", "15%"],
+    ],
+  },
+] as const;
+
+function scoreColor(score: number | null): string {
+  if (score == null) return "text-muted-foreground";
+  if (score >= 70) return "text-emerald-400";
+  if (score >= 50) return "text-amber-400";
+  return "text-red-400";
 }
 
-function dolar(v: { compra: number | null; venta: number | null } | null): string {
-  if (!v || (v.compra == null && v.venta == null)) return "s/d";
-  const c = v.compra != null ? `$${v.compra.toFixed(2)}` : "—";
-  const ve = v.venta != null ? `$${v.venta.toFixed(2)}` : "—";
-  return `${c} / ${ve}`;
+function fmtNum(v: number | null, digits = 2): string {
+  if (v == null || !isFinite(v)) return "--";
+  return v.toLocaleString("es-AR", { maximumFractionDigits: digits });
 }
 
-function regimenColor(regimen: string): string {
-  if (regimen === "FAVORABLE") return "text-emerald-400 border-emerald-500/40 bg-emerald-500/10";
-  if (regimen === "ADVERSO") return "text-red-400 border-red-500/40 bg-red-500/10";
-  return "text-amber-400 border-amber-500/40 bg-amber-500/10";
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Subtab OPORTUNIDADES — screener AT/AF sobre universo real (unificado_completo)
+// Metodología: Hernán Schvarz — AT = precio y volumen · AF = flujo vs stock
+// ─────────────────────────────────────────────────────────────────────────────
+function OportunidadesPanel() {
+  const fn = useServerFn(getDailyOportunidades);
+  const sectores = useMemo(() => getUniqueSectores(), []);
+  const [sector, setSector] = useState("");
+  const [industria, setIndustria] = useState("");
+  const [universo, setUniverso] = useState<{
+    tickers: string[];
+    nombres: Map<string, TickerInfo>;
+  } | null>(null);
 
-function MacroCard() {
-  const fn = useServerFn(contextoMacroFn);
+  const industrias = useMemo(() => (sector ? getIndustriasBySector(sector) : []), [sector]);
+
+  const construirUniverso = () => {
+    const flat = getFlatTickerList();
+    const filtrados = flat.filter(
+      (t) =>
+        t.sector === sector &&
+        (!industria || t.industria === industria) &&
+        !/Nombre no encontrado/i.test(t.nombre),
+    );
+    // Dedupe por ticker (el JSON repite ARS/USD y .BA)
+    const map = new Map<string, TickerInfo>();
+    for (const t of filtrados) if (!map.has(t.ticker)) map.set(t.ticker, t);
+    return { tickers: [...map.keys()].slice(0, MAX_TICKERS), nombres: map };
+  };
+
   const q = useQuery({
-    queryKey: ["clara-macro"],
-    queryFn: () => fn(),
+    queryKey: ["contexto-oportunidades", universo?.tickers.join(",")],
+    queryFn: (): Promise<DailyOportunidadesResult> => fn({ data: { tickers: universo!.tickers } }),
+    enabled: !!universo && universo.tickers.length > 0,
     staleTime: 15 * 60_000,
     refetchOnWindowFocus: false,
   });
 
-  if (q.isPending) return <Skeleton className="h-72 w-full rounded-2xl" />;
-  if (q.isError || !q.data)
-    return (
-      <div className="glass rounded-2xl p-6 text-[15px] text-muted-foreground">
-        No se pudo cargar el contexto macro. Intentá de nuevo.
-      </div>
-    );
+  const rows = useMemo(() => {
+    if (!q.data?.rows || !universo) return [];
+    return [...q.data.rows].sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+  }, [q.data, universo]);
 
-  const d = q.data;
+  const totalEnUniverso = universo ? new Set(q.data?.rows.map((r) => r.ticker)).size : 0;
+  void totalEnUniverso;
+
   return (
-    <div className="glass overflow-hidden rounded-2xl w-full">
-      <div className="flex flex-row items-center justify-between pb-3 border-b border-border/20 px-6 pt-6">
-        <h3 className="flex items-center gap-2 text-[16px] font-semibold">
-          <Globe2 className="h-5 w-5 text-primary" />
-          Contexto macro argentino
-        </h3>
-        <Badge variant="outline" className={cn("font-mono text-[15px] px-2.5 py-1", regimenColor(d.regimen_macro))}>
-          {d.regimen_macro}
-        </Badge>
-      </div>
-      <div className="grid w-full grid-cols-2 gap-4 md:grid-cols-3 p-6 w-full">
-        <Dato etiqueta="Riesgo país" valor={d.riesgo_pais != null ? `${d.riesgo_pais.toFixed(0)} bps` : "s/d"} />
-        <Dato etiqueta="Inflación mensual" valor={d.inflacion_mensual != null ? `${d.inflacion_mensual.toFixed(1)}%` : "s/d"} />
-        <Dato etiqueta="Tasa pasiva BCRA" valor={d.tasa_pasiva != null ? `${d.tasa_pasiva.toFixed(1)}% TEM` : "s/d"} />
-        <Dato etiqueta="Tasa real Fisher (anual)" valor={d.tasa_real_anual_fisher != null ? `${d.tasa_real_anual_fisher.toFixed(1)}%` : "s/d"} />
-        <Dato etiqueta="Dólar oficial" valor={dolar(d.dolar_oficial)} />
-        <Dato etiqueta="Dólar blue" valor={dolar(d.dolar_blue)} />
-        <Dato etiqueta="Dólar MEP" valor={dolar(d.dolar_mep)} />
-        <Dato etiqueta="Dólar CCL" valor={dolar(d.dolar_ccl)} />
-        <Dato etiqueta="Tasa libre de riesgo local" valor={d.tasa_libre_riesgo_local != null ? `${d.tasa_libre_riesgo_local.toFixed(2)}%` : "s/d"} />
-      </div>
-      {d.senal_regimen.length > 0 && (
-        <div className="border-t border-border/20 bg-muted/20 pt-3 px-6">
-          <ul className="space-y-1.5 text-[15px] text-muted-foreground">
-            {d.senal_regimen.map((s, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                {s}
-              </li>
-            ))}
-          </ul>
-        </div>
+    <div className="space-y-5">
+      {/* Selector de universo */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <p className="text-[13px] leading-relaxed text-muted-foreground">
+            Screener de oportunidades sobre el universo real de{" "}
+            <span className="font-mono text-foreground">unificado_completo.json</span>. Combina el
+            análisis técnico (precio y volumen) con el fundamental (valuación y catalizadores) según
+            la metodología Schvarz. Máximo {MAX_TICKERS} tickers por corrida.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={sector}
+              onChange={(e) => {
+                setSector(e.target.value);
+                setIndustria("");
+              }}
+              className="flex-1 min-w-[180px] bg-background border border-border/60 text-foreground text-xs rounded-md px-2 py-1.5"
+            >
+              <option value="">Seleccionar sector</option>
+              {sectores.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+            {sector && (
+              <select
+                value={industria}
+                onChange={(e) => setIndustria(e.target.value)}
+                className="flex-1 min-w-[180px] bg-background border border-border/60 text-foreground text-xs rounded-md px-2 py-1.5"
+              >
+                <option value="">Todas las industrias</option>
+                {industrias.map((i) => (
+                  <option key={i} value={i}>
+                    {i}
+                  </option>
+                ))}
+              </select>
+            )}
+            <Button
+              onClick={() => setUniverso(construirUniverso())}
+              disabled={!sector}
+              size="sm"
+              className="h-8 text-[11px]"
+            >
+              {q.isFetching ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Search className="h-3 w-3" />
+              )}{" "}
+              Buscar oportunidades
+            </Button>
+            {universo && universo.tickers.length === MAX_TICKERS && (
+              <span className="text-[10px] text-amber-400">
+                Universo truncado a {MAX_TICKERS} tickers — afiná el filtro por industria.
+              </span>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {q.isPending && universo && <Skeleton className="h-72 w-full" />}
+
+      {q.isError && (
+        <Card>
+          <CardContent className="p-4 text-sm text-danger">
+            Error al obtener datos: {(q.error as Error)?.message ?? "intente nuevamente"}
+          </CardContent>
+        </Card>
       )}
-      <div className="border-t border-border/20 bg-muted/10 px-4 py-2.5 flex flex-wrap gap-5 text-[15px] text-muted-foreground">
-        <span>Fuentes: <span className="text-foreground">BCRA</span> · <span className="text-foreground">IOL</span> · <span className="text-foreground">ArgentinaDatos</span></span>
-        <span className="ml-auto">Actualizado: {new Date().toLocaleString("es-AR")} · Delay 15’</span>
-      </div>
-    </div>
-  );
-}
 
-function Dato({ etiqueta, valor }: { etiqueta: string; valor: string }) {
-  return (
-    <div className="surface-card rounded-xl p-5 w-full">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{etiqueta}</div>
-      <div className="font-mono text-[16px] font-semibold mt-1 tabular-nums">{valor}</div>
-    </div>
-  );
-}
-
-const ETAPA_LABEL = ["", "Inicio", "Expansión", "Auge", "Alerta", "Defensa", "Contracción"];
-
-function CicloBanner() {
-  const fn = useServerFn(cicloEconomicoFn);
-  const q = useQuery({
-    queryKey: ["clara-ciclo"],
-    queryFn: () => fn(),
-    staleTime: 60 * 60_000,
-    refetchOnWindowFocus: false,
-  });
-
-  if (q.isPending) return <Skeleton className="h-44 w-full rounded-2xl" />;
-  if (q.isError || !q.data)
-    return (
-      <div className="glass rounded-2xl p-6 text-[15px] text-muted-foreground">
-        Ciclo económico no disponible en este momento.
-      </div>
-    );
-
-  const d = q.data;
-  return (
-    <div className="glass overflow-hidden rounded-2xl w-full">
-      <div className="pb-3 border-b border-border/20 px-6 pt-6">
-        <h3 className="flex items-center gap-2 text-[16px] font-semibold">
-          <Compass className="h-5 w-5 text-primary" />
-          Ciclo económico intermarket
-          <span className="font-mono text-[14px] font-normal text-muted-foreground">
-            Pring / Stovall · 6 etapas
-          </span>
-        </h3>
-      </div>
-      <div className="space-y-6 p-6">
-        <div className="flex items-baseline gap-5">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-[15px] font-bold text-primary">{d.stage}</span>
-          <div>
-            <div className="font-semibold text-[17px]">
-              Etapa {d.stage} — {d.label}
-            </div>
-            <div className="text-[13px] text-muted-foreground capitalize">{d.categoria} · {ETAPA_LABEL[d.stage] ?? ""}</div>
+      {q.data && universo && (
+        <>
+          {/* Contexto macro real (ArgentinaDatos / BCRA) */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              ["Dólar CCL", q.data.macro.dolarCCL],
+              ["Dólar MEP", q.data.macro.dolarMEP],
+              ["Dólar Blue", q.data.macro.dolarBlue],
+              ["Riesgo país", q.data.macro.riesgoPais],
+            ].map(([label, val]) => (
+              <span
+                key={String(label)}
+                className="rounded-lg border border-border/40 bg-background/40 px-3 py-1.5 text-[12px]"
+              >
+                <span className="text-muted-foreground">{label}: </span>
+                <span className="font-mono text-foreground">
+                  {val != null ? fmtNum(Number(val)) : "--"}
+                </span>
+              </span>
+            ))}
           </div>
-        </div>
-        <div className="grid w-full gap-4 text-[15px] md:grid-cols-3 w-full">
-          <Lista titulo="Activos favorecidos" items={d.activosFavorecidos} />
-          <Lista titulo="Sectores favorecidos" items={d.sectoresFavorecidos} />
-          <Lista titulo="Riesgos" items={d.riesgos} />
-        </div>
-      </div>
-      <div className="border-t border-border/20 bg-muted/10 px-4 py-2.5 text-[15px] text-muted-foreground">
-        Fuente: <span className="text-foreground">Intermarket · Pring</span> · Metodología Stovall
-      </div>
-    </div>
-  );
-}
 
-function Lista({ titulo, items }: { titulo: string; items: string[] }) {
-  return (
-    <div className="surface-card rounded-xl p-5 w-full">
-      <div className="mb-2 eyebrow !text-muted-foreground !tracking-[0.14em]">
-        {titulo}
-      </div>
-      <ul className="space-y-1 text-[15px] leading-relaxed">
-        {items.map((it, i) => (
-          <li key={i} className="flex gap-2"><span className="text-primary">•</span>{it}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+          {/* Tabla de oportunidades */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Compass className="h-4 w-4 text-primary" /> Oportunidades detectadas ({rows.length}
+                )
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {rows.length === 0 ? (
+                <p className="p-4 text-[13px] text-muted-foreground">
+                  Sin datos para este universo.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Ticker</TableHead>
+                        <TableHead>Precio</TableHead>
+                        <TableHead>Var %</TableHead>
+                        <TableHead>Rvol</TableHead>
+                        <TableHead>Beta</TableHead>
+                        <TableHead>Score</TableHead>
+                        <TableHead>Catalizador</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {rows.map((r) => {
+                        const info = universo.nombres.get(r.ticker);
+                        return (
+                          <TableRow key={r.ticker}>
+                            <TableCell>
+                              <Link
+                                to="/herramientas"
+                                search={{ tab: "analisis", ticker: r.ticker }}
+                                className="font-mono text-[12px] font-semibold text-primary hover:underline"
+                              >
+                                {r.ticker}
+                              </Link>
+                              <div className="max-w-[220px] truncate text-[11px] text-muted-foreground">
+                                {info?.nombre ?? "--"}
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-mono text-[12px]">
+                              {fmtNum(r.precio)}
+                            </TableCell>
+                            <TableCell
+                              className={`font-mono text-[12px] ${
+                                (r.varPct ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"
+                              }`}
+                            >
+                              {r.varPct != null ? `${fmtNum(r.varPct)}%` : "--"}
+                            </TableCell>
+                            <TableCell className="font-mono text-[12px]">
+                              {fmtNum(r.rvol)}
+                            </TableCell>
+                            <TableCell className="font-mono text-[12px]">
+                              {fmtNum(r.beta)}
+                            </TableCell>
+                            <TableCell>
+                              <span
+                                className={`font-mono text-[13px] font-semibold ${scoreColor(r.score)}`}
+                              >
+                                {r.score != null ? r.score : "--"}
+                              </span>
+                              <div className="mt-0.5 flex gap-1">
+                                {(["volumen", "valuacion", "momentum"] as const).map((k) => (
+                                  <span
+                                    key={k}
+                                    title={`${k}: ${r.detalleScore[k] ?? "s/d"}`}
+                                    className={`h-1 w-6 rounded-full ${
+                                      r.detalleScore[k] != null
+                                        ? scoreColor(r.detalleScore[k])
+                                        : "bg-muted"
+                                    } inline-block`}
+                                    style={
+                                      r.detalleScore[k] != null
+                                        ? { opacity: 0.35 + (r.detalleScore[k]! / 100) * 0.65 }
+                                        : undefined
+                                    }
+                                  />
+                                ))}
+                              </div>
+                            </TableCell>
+                            <TableCell className="max-w-[200px] text-[11px] leading-snug text-muted-foreground">
+                              {r.catalizadorLabel}
+                              {r.proximoEarnings && (
+                                <div className="font-mono text-[10px]">
+                                  Earnings: {r.proximoEarnings}
+                                </div>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+              {(q.data.errors.length > 0 || q.data.warnings.length > 0) && (
+                <div className="mt-3 space-y-1">
+                  {[...q.data.errors, ...q.data.warnings].slice(0, 5).map((e, i) => (
+                    <p key={i} className="text-[10px] text-amber-400/80">
+                      {e}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-function PerformanceSectorial() {
-  const fn = useServerFn(performanceSectorialFn);
-  const q = useQuery({
-    queryKey: ["clara-perf-sectorial"],
-    queryFn: () => fn({ data: { periodo: "5d" } }),
-    staleTime: 5 * 60_000,
-    refetchInterval: 5 * 60_000,
-    refetchOnWindowFocus: false,
-  });
-
-  if (q.isPending) return <Skeleton className="h-64 w-full rounded-2xl" />;
-  if (q.isError || !q.data)
-    return (
-      <div className="glass rounded-2xl p-6 text-[15px] text-muted-foreground">
-        Performance sectorial no disponible.
-      </div>
-    );
-
-  const max = Math.max(...q.data.items.map((i) => Math.abs(i.changePercent ?? 0)), 0.01);
-  return (
-    <div className="glass overflow-hidden rounded-2xl w-full">
-      <div className="flex flex-row items-center justify-between pb-3 border-b border-border/20 px-6 pt-6">
-        <h3 className="flex items-center gap-2 text-[16px] font-semibold">
-          <Activity className="h-5 w-5 text-primary" />
-          Performance sectorial EE.UU. (5 días)
-        </h3>
-        <Button variant="ghost" size="icon" onClick={() => void q.refetch()} aria-label="Refrescar">
-          <RefreshCw className={cn("h-4 w-4", q.isFetching && "animate-spin")} />
-        </Button>
-      </div>
-      <div className="space-y-2.5 p-6 w-full">
-        {q.data.items.map((it) => {
-          const v = it.changePercent ?? 0;
-          const positivo = v >= 0;
-          const ancho = Math.max(6, (Math.abs(v) / max) * 100);
-          return (
-            <div key={it.etf} className="flex items-center gap-4 text-[15px]">
-              <div className="w-44 shrink-0 truncate text-muted-foreground text-[14px]">{it.sector}</div>
-              <div className="relative h-5 flex-1 overflow-hidden rounded bg-muted/30">
-                <div
-                  className={cn(
-                    "absolute inset-y-0 left-0 rounded",
-                    positivo ? "bg-emerald-500/30" : "bg-red-500/30",
-                  )}
-                  style={{ width: `${ancho}%` }}
-                />
-              </div>
-              <div className={cn("flex w-24 shrink-0 items-center justify-end gap-1 font-mono text-[14px]", positivo ? "text-emerald-400" : "text-red-400")}>
-                {positivo ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
-                {fmtPct(it.changePercent)}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <div className="border-t border-border/20 bg-muted/10 px-4 py-2.5 text-[15px] text-muted-foreground">
-        Fuente: <span className="text-foreground">Yahoo Finance</span> · ETFs SPDR XLB/XLE/XLF/XLI/XLK/XLP/XLU · 5 días
-      </div>
-    </div>
-  );
-}
-
-function DivisasTasasPanel() {
-  const fn = useServerFn(contextoMacroFn);
-  const q = useQuery({ queryKey: ["clara-macro-divisas"], queryFn: () => fn(), staleTime: 15 * 60_000 });
-  if (q.isPending) return <Skeleton className="h-64 w-full rounded-2xl" />;
-  if (q.isError || !q.data) return <div className="glass rounded-2xl p-6 text-[15px] text-muted-foreground">Divisas no disponibles.</div>;
-  const d = q.data;
-  const items = [
-    { label: "Dólar Oficial", value: dolar(d.dolar_oficial), sub: "BCRA · BYMA" },
-    { label: "Dólar Blue", value: dolar(d.dolar_blue), sub: "Ámbito · Informal" },
-    { label: "Dólar MEP", value: dolar(d.dolar_mep), sub: "BYMA MEP" },
-    { label: "Dólar CCL", value: dolar(d.dolar_ccl), sub: "BYMA CCL" },
-    { label: "Tasa Pasiva", value: d.tasa_pasiva != null ? `${d.tasa_pasiva.toFixed(2)}% TEM` : "s/d", sub: "BCRA" },
-    { label: "Tasa Real Fisher", value: d.tasa_real_anual_fisher != null ? `${d.tasa_real_anual_fisher.toFixed(1)}%` : "s/d", sub: "Fisher anual" },
-    { label: "Riesgo País", value: d.riesgo_pais != null ? `${d.riesgo_pais.toFixed(0)} bps` : "s/d", sub: "EMBI" },
-    { label: "Tasa Libre Riesgo", value: d.tasa_libre_riesgo_local != null ? `${d.tasa_libre_riesgo_local.toFixed(2)}%` : "s/d", sub: "Local" },
-  ];
-  return (
-    <div className="grid w-full gap-4 md:grid-cols-2 lg:grid-cols-4 w-full">
-      {items.map((it) => (
-        <div key={it.label} className="glass overflow-hidden rounded-2xl w-full flex flex-col">
-          <div className="p-6 flex-1">
-            <div className="eyebrow !tracking-[0.14em] !text-muted-foreground flex items-center gap-1.5"><DollarSign className="h-4 w-4 text-primary" />{it.label}</div>
-            <div className="font-mono text-[17px] font-semibold mt-2 tabular-nums">{it.value}</div>
-            <div className="text-[13px] text-muted-foreground mt-1">{it.sub}</div>
+          {/* Lectura metodológica */}
+          <div className="grid gap-3 md:grid-cols-2">
+            <Card>
+              <CardContent className="p-4 flex gap-3">
+                <TrendingUp className="h-4 w-4 shrink-0 text-primary mt-0.5" />
+                <p className="text-[12px] leading-relaxed text-muted-foreground">
+                  <span className="font-semibold text-foreground">Capa técnica (AT): </span>
+                  precio y volumen en una fecha dada. Rvol alto indica interés del mercado; el
+                  momentum y el gap muestran si el movimiento tiene fuerza. Estudiá el gráfico antes
+                  de operar: no te limites a las señales armadas.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 flex gap-3">
+                <Scale className="h-4 w-4 shrink-0 text-primary mt-0.5" />
+                <p className="text-[12px] leading-relaxed text-muted-foreground">
+                  <span className="font-semibold text-foreground">Capa fundamental (AF): </span>
+                  valuación por percentil de P/E frente a su historia y catalizadores (upgrades de
+                  brokers, earnings). Clave: mirar el <em>flujo</em>, no solo el EPS ni los
+                  revenues. Buscá ventajas competitivas: monopolios o empresas de un solo producto.
+                </p>
+              </CardContent>
+            </Card>
           </div>
-          <div className="border-t border-border/20 bg-muted/10 px-4 py-1.5 text-[13px] text-muted-foreground">Fuente: {it.sub}</div>
-        </div>
-      ))}
+        </>
+      )}
+
+      {!universo && !q.isPending && (
+        <Card>
+          <CardContent className="p-6 text-[13px] text-muted-foreground">
+            Seleccioná un sector y presioná{" "}
+            <span className="text-foreground">Buscar oportunidades</span> para analizar el universo
+            con datos en vivo.
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
 
-export function ContextoTab() {
+// ─────────────────────────────────────────────────────────────────────────────
+// Subtab METODOLOGÍA — "Tácticas para ver oportunidades en el mercado"
+// ─────────────────────────────────────────────────────────────────────────────
+function MetodologiaPanel() {
+  return (
+    <div className="space-y-5">
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <BookOpen className="h-4 w-4 text-primary" /> Marco general
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-[13px] leading-relaxed text-muted-foreground">
+          <p>
+            Basado en{" "}
+            <span className="text-foreground">“Tácticas para ver oportunidades en el mercado”</span>{" "}
+            (Hernán Schvarz, Consultora ETR). Argentina presenta problemas estructurales
+            persistentes y, al no ir de la mano la inflación con el tipo de cambio, diseñar una
+            cartera es complejo:{" "}
+            <span className="text-foreground">la clave está en la diversificación</span>. La
+            sobre-diversificación es enemiga del retorno, pero nunca nadie se fundió por tener un
+            bajo rendimiento.
+          </p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>ETFs en pesos: buena alternativa para cubrirse de devaluaciones.</li>
+            <li>Bonos CER / BONCAR: buena alternativa para cubrirse de la inflación.</li>
+            <li>
+              Estar actualizado con las normas cambiarias permite encontrar oportunidades (nuevos
+              ETFs, ventajas regulatorias).
+            </li>
+            <li>
+              Nadie determina el futuro: la misión es dar previsibilidad a partir de activos
+              subvaluados.
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <ShieldCheck className="h-4 w-4 text-primary" /> Carteras modelo por perfil de riesgo
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-3">
+            {CARTERAS_MODELO.map((c) => (
+              <div
+                key={c.nombre}
+                className="rounded-lg border border-border/40 bg-background/40 p-3"
+              >
+                <p className="mb-2 text-[12px] font-semibold uppercase tracking-widest text-primary">
+                  {c.nombre}
+                </p>
+                <ul className="space-y-1.5">
+                  {c.filas.map(([clase, peso]) => (
+                    <li key={clase} className="flex items-center justify-between text-[12px]">
+                      <span className="text-muted-foreground">{clase}</span>
+                      <span className="font-mono text-foreground">{peso}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <TrendingUp className="h-4 w-4 text-primary" /> Análisis Técnico (AT)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-[13px] leading-relaxed text-muted-foreground">
+            <p>
+              Precio y volumen en una fecha dada. Es fundamental entenderlo y estudiarlo, luego
+              determinar si efectivamente se cumple — no comprar “porque el MACD dio compra” sin
+              entender qué es una media ni dónde buscar la información.
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Scale className="h-4 w-4 text-primary" /> Análisis Fundamental (AF)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-[13px] leading-relaxed text-muted-foreground">
+            <p>
+              Mucho más complejo: conlleva múltiples análisis y estimaciones.{" "}
+              <span className="text-foreground">Clave = Stock vs Flujo.</span> No limitarse al EPS
+              ni a los revenues (ej. NFLX 2021: cayó por desaceleración proyectada de suscriptores
+              ante más competencia → menos flujo futuro). Ejemplos de stock puro: CRESUD; flujo
+              claro: empresa constructora con contratos a valor presente.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <Lightbulb className="h-4 w-4 text-primary" /> Métodos para valuar empresas
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-2">
+            {[
+              [
+                "WACC",
+                "Actualiza rendimientos netos estimados descontados al costo promedio ponderado del capital, deduciendo el valor de mercado de la deuda. Ventaja: simplicidad.",
+              ],
+              [
+                "APV",
+                "Más riguroso: soslaya la dificultad de determinar objetivamente el costo de capital. La empresa se financia exclusivamente con capital propio y se ajusta por escudos fiscales.",
+              ],
+              [
+                "Múltiplos implícitos",
+                "Comparar Market Cap / EBITDA con empresas similares del mismo sector en un mercado normal (EE.UU.): la que se desvía puede estar sobre o sub-valuada — esa es la tarea del AF.",
+              ],
+              [
+                "Valuación técnica de activos",
+                "Criterio relegado pero no obsoleto: valores corrientes de los activos netos de deudas operativas, cuando los valores contables no son representativos.",
+              ],
+            ].map(([titulo, texto]) => (
+              <div key={titulo} className="rounded-lg border border-border/40 bg-background/40 p-3">
+                <p className="mb-1 text-[12px] font-semibold text-foreground">{titulo}</p>
+                <p className="text-[12px] leading-relaxed text-muted-foreground">{texto}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Caso 2021 · SCP</CardTitle>
+          </CardHeader>
+          <CardContent className="text-[13px] leading-relaxed text-muted-foreground">
+            Sociedad Comercial del Plata: al borde de la quiebra (1999-2003), llegó a cotizar a
+            $0,05. Reestructurada desde 2018 hacia construcción y petróleo. En 2021 comenzó a pagar
+            dividendos y el precio se acomodó a su valor: la valuación por WACC daba ~$6,50 a fines
+            de 2020 y dejó una renta del 80% en dólares. El “batacazo” surgió del AF aplicado con
+            disciplina.
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Caso 2021 · MELI</CardTitle>
+          </CardHeader>
+          <CardContent className="text-[13px] leading-relaxed text-muted-foreground">
+            Cotizaba desde ~USD 50 (2007) y recién superó USD 100 en 2013. La euforia minoritaria
+            entró entre USD 1.200 y 2.000 (2020-2021); presentó patrimonio negativo en Q1-2021 y fue
+            uno de los peores CEDEARs del año (-50% desde máximos en USD). Por WACC estaba “en
+            precio”, por múltiplos “barata”: el método importa tanto como el análisis.
+          </CardContent>
+        </Card>
+      </div>
+
+      <p className="text-[11px] text-muted-foreground/70">
+        Fuente: “Tácticas para ver oportunidades en el mercado” — Hernán Schvarz (31/01/2022).
+        Agente Productor N°1025 · Cdor. Público · MBA, MFA · Fundador Consultora ETR. Contenido
+        informativo, no constituye recomendación de inversión.
+      </p>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function ContextoTab({ initialSubTab }: { initialSubTab?: string } = {}) {
+  const [sub, setSub] = useState<SubTab>(
+    SUBTABS.some((t) => t.key === initialSubTab) ? (initialSubTab as SubTab) : "oportunidades",
+  );
+
+  useEffect(() => {
+    if (initialSubTab && SUBTABS.some((t) => t.key === initialSubTab)) {
+      setSub(initialSubTab as SubTab);
+    }
+  }, [initialSubTab]);
+
   return (
     <div className="space-y-8 w-full">
       <div>
-        <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight">Contexto de mercado</h2>
-        <p className="text-[17px] leading-relaxed text-muted-foreground mt-1 lg:text-[19px]">
-          Régimen macro argentino, ciclo intermarket y rotación sectorial — <span className="text-foreground">Fuentes: BCRA · IOL · Yahoo Finance · ArgentinaDatos · CriptoYa · Delay 15-20’</span>
+        <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight">
+          Contexto de mercado
+        </h2>
+        <p className="mt-1 max-w-3xl text-[17px] leading-relaxed text-muted-foreground lg:text-[19px]">
+          Oportunidades con datos reales (Yahoo Finance, ArgentinaDatos, BCRA) sobre el universo
+          completo de CEDEARs, acciones y bonos, aplicando la metodología de detección de
+          oportunidades del mercado local.
         </p>
         <div aria-hidden className="electric-line mt-6 max-w-3xl" />
       </div>
 
-      <Tabs defaultValue="tendencias" className="w-full">
-        <TabsList className="flex flex-wrap h-auto gap-1 p-1 bg-muted/20 rounded-lg w-full justify-start">
-          <TabsTrigger value="tendencias" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"><TrendingUp className="h-4 w-4 mr-1.5" />Tendencias</TabsTrigger>
-          <TabsTrigger value="performance" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"><BarChart3 className="h-4 w-4 mr-1.5" />Sectores</TabsTrigger>
-          <TabsTrigger value="noticias" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Noticias</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="tendencias" className="mt-4 w-full">
-          <TendenciasMacroPanel />
-        </TabsContent>
-
-        <TabsContent value="performance" className="mt-4 w-full">
-          <PerformanceSectorial />
-        </TabsContent>
-
-        <TabsContent value="noticias" className="mt-4 w-full">
-          <MarketNewsPanel />
-        </TabsContent>
-      </Tabs>
-
-      <div className="glass rounded-2xl border border-dashed p-6 text-[15px] leading-relaxed text-muted-foreground">
-        <span className="font-medium text-foreground">Fuentes y metodología:</span> BCRA (tasa pasiva, FX oficial), IOL (MEP/CCL, caución), Yahoo Finance (ETFs SPDR, performance 5d), ArgentinaDatos/CriptoYa (blue, riesgo país). Delay 15-20’. No constituye recomendación de inversión. <span className="text-foreground">Verificar en cada fuente.</span>
+      <div className="flex flex-wrap gap-1.5 border-b border-border/40 pb-2 w-full">
+        {SUBTABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setSub(t.key)}
+            className={`font-mono text-[14px] px-4 py-2 rounded-lg border transition-colors ${
+              sub === t.key
+                ? "border-primary/60 bg-primary/10 text-primary"
+                : "border-border/60 text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
+
+      {sub === "oportunidades" && <OportunidadesPanel />}
+      {sub === "metodologia" && <MetodologiaPanel />}
     </div>
   );
 }

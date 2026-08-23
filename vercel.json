@@ -21,6 +21,10 @@
       "schedule": "0 13 * * 1-5"
     },
     {
+      "path": "/api/cron/actualiza-renta-fija",
+      "schedule": "0 21 * * 1-5"
+    },
+    {
       "path": "/api/cron/tuning-senales",
       "schedule": "0 3 * * 0"
     }

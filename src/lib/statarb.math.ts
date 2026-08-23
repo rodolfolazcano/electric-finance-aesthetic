@@ -557,9 +557,10 @@ export function analyzePair(
   const impliedP = hurst > 0 ? Math.min(10, Math.max(1.1, 1 / hurst)) : 2;
   const impliedPFromReturnsVal = r1.length >= 100 ? impliedPFromReturns(r1) : undefined;
 
-  //  Labadie §4 (eq. 21): Regresión del implied p 
+  //  Labadie §4 (eq. 21) — EXPERIMENTAL: Regresión heurística no-paper 
   // implied p ≈ 2.35 + 0.14 × avg_market_impact − 1.79 × volatility
-  // Sirve para estimar p automáticamente desde datos de mercado
+  // NO es identidad del paper (la identidad es p=1/H). Mantener solo como referencia,
+  // UI debe etiquetar como "experimental" y priorizar impliedP = 1/H
   const priceVolatility = std(r1) * Math.sqrt(252); // volatilidad anualizada del activo 1
   // market impact aproximado como desviación media del spread / precio medio
   const avgPrice = c1.length > 0 ? mean(c1) : 1;

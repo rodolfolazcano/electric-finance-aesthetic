@@ -49,16 +49,24 @@ export class MemoriaDeSesion {
   private timeline: EntradaTimeline[] = [];
   private pizarra: PizarraEntrada[] = [];
   private dirty = false;
+  /** Promesa de la carga inicial: evita que guardar() pise lo leído del disco. */
+  private carga: Promise<void>;
 
-  private constructor(private readonly sessionId: string) {}
+  private constructor(private readonly sessionId: string) {
+    this.carga = this.cargar();
+  }
 
   static obtener(sessionId: string): MemoriaDeSesion {
     const existente = CACHE.get(sessionId);
     if (existente) return existente;
     const nueva = new MemoriaDeSesion(sessionId);
     CACHE.set(sessionId, nueva);
-    void nueva.cargar();
     return nueva;
+  }
+
+  /** Espera a que termine la carga inicial desde disco (llamar antes de usar). */
+  async preparar(): Promise<void> {
+    await this.carga;
   }
 
   private dir() {
@@ -96,6 +104,7 @@ export class MemoriaDeSesion {
   }
 
   private async guardar() {
+    await this.carga;
     if (!this.dirty) return;
     try {
       const base = this.dir();
@@ -121,6 +130,9 @@ export class MemoriaDeSesion {
   /** Registra un turno nuevo y lo marca en el timeline. Devuelve el número de turno. */
   nuevoTurno(): number {
     this.estado.turno += 1;
+    // La pizarra es del TURNO en curso (ver doc de cabecera): se limpia para
+    // que notas viejas no contaminen al coordinador/redactor de este turno.
+    this.pizarra = [];
     this.dirty = true;
     return this.estado.turno;
   }

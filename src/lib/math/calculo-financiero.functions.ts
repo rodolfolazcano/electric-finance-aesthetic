@@ -31,7 +31,9 @@ export function tnaDesdeTEA(TEA: number, m: number): number {
 
 // ── 2) Tasa real Fisher ─────────────────────────────────────────────────
 /**
- * Fisher exacta: (1+ia)/(1+π)-1. Usar exacta si ia>20% (Argentina), aprox ia-π si no.
+ * Fisher exacta: (1+ia)/(1+π)-1. Único método correcto para Argentina (π>20%).
+ * Se mantiene `tasaRealFisherAprox` solo por compatibilidad didáctica Dumrauf.
+ * `tasaRealFisher` ahora SIEMPRE usa exacta (corrige bug umbral 20% que subestima real con π alta).
  * ia = tasa nominal/aparente, π = inflación
  */
 export function tasaRealFisherExacta(ia: number, pi: number): number {
@@ -40,10 +42,11 @@ export function tasaRealFisherExacta(ia: number, pi: number): number {
 export function tasaRealFisherAprox(ia: number, pi: number): number {
   return ia - pi;
 }
-export function tasaRealFisher(ia: number, pi: number, umbralExacta = 0.20): { real: number; metodo: "exacta" | "aprox"; ia: number; pi: number } {
-  const metodo = Math.abs(ia) > umbralExacta || Math.abs(pi) > 0.10 ? "exacta" : "aprox";
-  const real = metodo === "exacta" ? tasaRealFisherExacta(ia, pi) : tasaRealFisherAprox(ia, pi);
-  return { real, metodo, ia, pi };
+export function tasaRealFisher(ia: number, pi: number, _umbralExacta = 0.20): { real: number; metodo: "exacta" | "aprox"; ia: number; pi: number } {
+  // Corrección Labadié/Dumrauf §2: en régimen inflacionario siempre exacta.
+  // Ignoramos umbral y forzamos exacta para evitar ilusión nominal.
+  const real = tasaRealFisherExacta(ia, pi);
+  return { real, metodo: "exacta", ia, pi };
 }
 
 // ── 3) Rentas ───────────────────────────────────────────────────────────

@@ -36,23 +36,22 @@ const BATCH = 8;
 
 function categoriaDe(rutaRelativa) {
   const a = rutaRelativa.toLowerCase();
-  if (a.includes("pascale")) return "Pascale - Finanzas de la empresa";
-  if (a.includes("carteras")) return "Carteras - Elbaum";
-  if (a.includes("calculo financiero")) return "Calculo financiero - Dumrauf";
-  if (a.includes("administracion financiera")) return "Administracion financiera - Alonso/Dumrauf";
-  if (a.includes("contables fundamentales")) return "Contabilidad - Fowler Newton";
-  if (a.includes("estados contables")) return "Estados contables - Biondi";
-  if (a.includes("macroeconom")) {
-    return a.includes("dornsbusch") || a.includes("dornbusch")
-      ? "Macroeconomia - Dornbusch-Fischer"
-      : "Macroeconomia LATAM - Blanchard/Perez-Enrri";
-  }
-  if (a.includes("televisi")) return "Financiacion y mercados - Bustamante";
-  if (a.includes("instrumentos")) return "Instrumentos financieros";
+  // Labadié primero (prioridad)
+  if (a.includes("labadie") || a.includes("1205.") || a.includes("1303.") || a.includes("spectral_theory") || a.includes("machine_learning") || a.includes("lectures_2016") || a.includes("lectures_2017") || a.includes("lectures_2021") || a.includes("memoire_master") || a.includes("optimisation_problems") || a.includes("high-frequency") || a.includes("high_frequency") || a.includes("hft") || a.includes("financial-zoology") || a.includes("algo_trading") || a.includes("etf_v4") || a.includes("zoology") || a.includes("stochastic_processes") || a.includes("dunbar")) return "Labadié - Quant & Microstructure";
+  if (a.includes("pascale") || a.includes("dfin_pascale")) return "Pascale - Finanzas de la empresa";
+  if (a.includes("carteras") || a.includes("elbaum") || a.includes("ifaci")) return "Carteras - Elbaum";
+  if (a.includes("calculo financiero") || a.includes("dumrauf") || a.includes("matf") || a.includes("lopez_dumrauf")) return "Calculo financiero - Dumrauf";
+  if (a.includes("administracion financiera") || a.includes("alonso")) return "Administracion financiera - Alonso/Dumrauf";
+  if (a.includes("contables fundamentales") || a.includes("fowler_newton") || a.includes("conii") || a.includes("icon_") || a.includes("cf_fowler")) return "Contabilidad - Fowler Newton";
+  if (a.includes("estados contables") || a.includes("biondi") || a.includes("geft_biondi")) return "Estados contables - Biondi";
+  if (a.includes("macroeconom") || a.includes("blanchard") || a.includes("dornsbusch") || a.includes("dornbusch") || a.includes("fpub")) return a.includes("dornsbusch") || a.includes("dornbusch") ? "Macroeconomia - Dornbusch-Fischer" : "Macroeconomia LATAM - Blanchard/Perez-Enrri";
+  if (a.includes("televisi") || a.includes("bustamante") || a.includes("ecc_") || a.includes("pcom_") || a.includes("geft")) return "Financiacion y mercados - Bustamante";
+  if (a.includes("instrumentos") || a.includes("instrum") || a.includes("murphy") || a.includes("intermarket")) return "Intermarket - Murphy";
+  if (a.includes("metodologias") || a.includes("glosario") || a.includes("perfil_inversor") || a.includes("17851") || a.includes("valueinvesting") || a.includes("tacticas") || a.includes("tecnicaspara") || a.includes("sesinde")) return "Metodologias - Coronar";
   return "Corpus academico";
 }
 
-/** Recorre el directorio recursivamente devolviendo rutas de PDFs con su ruta relativa. */
+/** Recorre el directorio recursivamente devolviendo rutas de PDFs y TXTs con su ruta relativa. */
 function* walkPdfs(dir, baseDir) {
   let entries;
   try {
@@ -63,7 +62,7 @@ function* walkPdfs(dir, baseDir) {
   for (const entry of entries) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) yield* walkPdfs(full, baseDir);
-    else if (entry.isFile() && entry.name.toLowerCase().endsWith(".pdf"))
+    else if (entry.isFile() && (entry.name.toLowerCase().endsWith(".pdf") || entry.name.toLowerCase().endsWith(".txt")))
       yield { full: full, rel: path.relative(baseDir, full) };
   }
 }
@@ -137,6 +136,13 @@ function chunkearTexto(texto) {
 }
 
 async function procesarPdf(pdfPath) {
+  if (pdfPath.toLowerCase().endsWith(".txt")) {
+    const text = fs.readFileSync(pdfPath, "utf-8").replace(/\s+/g, " ").trim();
+    // Split txt into pseudo-pages of ~3000 chars to keep chunking uniform
+    const pages = [];
+    for (let i = 0; i < text.length; i += 3000) pages.push(text.slice(i, i + 3000));
+    return pages.length ? pages : [text];
+  }
   const buffer = fs.readFileSync(pdfPath);
   const parser = new PDFParse({ data: new Uint8Array(buffer) });
   try {

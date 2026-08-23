@@ -121,6 +121,32 @@ async function obtenerTC(): Promise<number> {
   return 1000;
 }
 
+/**
+ * Obtiene MEP/CCL live para Dollar-Linked y ladder.
+ * Orden: argentinadatos bolsa → contadoconliqui → criptoya → fallback oficial*1.25
+ */
+export async function obtenerMEP(): Promise<number> {
+  // 1) argentinadatos bolsa (MEP)
+  const mep = await fetchJson("https://api.argentinadatos.com/v1/cotizaciones/dolares/bolsa");
+  if (Array.isArray(mep) && mep.length) {
+    const v = mep[mep.length - 1]?.venta;
+    if (typeof v === "number" && v > 100) return v;
+  }
+  // 2) ccl como proxy
+  const ccl = await fetchJson("https://api.argentinadatos.com/v1/cotizaciones/dolares/contadoconliqui");
+  if (Array.isArray(ccl) && ccl.length) {
+    const v = ccl[ccl.length - 1]?.venta;
+    if (typeof v === "number" && v > 100) return v;
+  }
+  // 3) criptoya
+  const cy = await fetchJson("https://criptoya.com/api/dolar");
+  if (cy?.mep?.price && cy.mep.price > 100) return cy.mep.price;
+  if (cy?.ccl?.price && cy.ccl.price > 100) return cy.ccl.price;
+  // 4) fallback oficial*spread histórico ~1.25
+  const oficial = await obtenerTC();
+  return Math.round(oficial * 1.25);
+}
+
 function proyectarTC(tc: number, fechaActual: Date, fechaObjetivo: Date, tasaAnual = 0.3): number {
   const dias = diffDias(fechaObjetivo, fechaActual);
   const anios = dias / 365;
@@ -409,7 +435,7 @@ function buildPaymentMatrix(
   bonds: LadderBondInput[],
   valuation: Date,
   _months: number,
-  fxMep: number = 1529.3,
+  fxMep: number = 1529.3, // @deprecated hardcode histórico — usar obtenerMEP() live. Se mantiene default para compatibilidad/backtest
 ): { A: number[][]; monthKeys: string[]; monthDates: Date[] } {
   const monthKeys: string[] = [];
   const monthDates: Date[] = [];
@@ -481,11 +507,17 @@ export function buildLadder({
   currency,
   months,
   valuation,
-  fxMep = 1529.3,
+  fxMep = 1529.3, // @deprecated usar obtenerMEP() live; default se mantiene solo para tests
   manualFaceUnits,
   liveUsdPriceMap,
   liveTirValMap,
 }: BuildOpts): LadderResultExpanded {
+  if (fxMep === 1529.3) {
+    // Nota: caller debería pasar obtenerMEP() live. Log warning en dev para detectar hardcode residual.
+    if (typeof process !== "undefined" && process.env?.NODE_ENV !== "production") {
+      console.warn("[bond-ladder] fxMep hardcode 1529.3 usado — considerar obtenerMEP() live");
+    }
+  }
   const { A, monthKeys, monthDates } = buildPaymentMatrix(bonds, valuation, months, fxMep);
 
   const targetUsd = currency === "USD" ? targetPerMonth : targetPerMonth / fxMep;

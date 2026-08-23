@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { cn } from "@/lib/utils";
 import {
   BarChart3,
@@ -9,11 +8,13 @@ import {
   Calculator,
   Briefcase,
   TrendingUp,
+  Percent,
+  CalendarCheck,
+  Compass,
   ChevronLeft,
   ChevronRight,
   Menu,
   X,
-  Info,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
@@ -70,10 +71,6 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
         label: "02 · Análisis",
         shortLabel: "Análisis",
         icon: TrendingUp,
-        subTabs: [
-          { value: "tecnico", label: "Técnico" },
-          { value: "fundamental", label: "Fundamental" },
-        ],
       },
       {
         value: "cuantitativo",
@@ -98,8 +95,13 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     title: "INSTRUMENTOS",
     items: [
       { value: "renta-fija", label: "05 · Renta Fija", shortLabel: "Renta Fija", icon: BarChart3 },
-      { value: "opciones", label: "06 · Opciones", shortLabel: "Opciones", icon: TrendingUp },
-      { value: "arbitrador", label: "07 · Arbitrador", shortLabel: "Arbitrador", icon: ArrowLeftRight },
+      { value: "opciones", label: "06 · Opciones", shortLabel: "Opciones", icon: Percent },
+      {
+        value: "arbitrador",
+        label: "07 · Arbitrador",
+        shortLabel: "Arbitrador",
+        icon: ArrowLeftRight,
+      },
       { value: "cripto", label: "08 · Cripto", shortLabel: "Cripto", icon: Sparkles },
     ],
   },
@@ -108,10 +110,16 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     title: "CLIENTE",
     items: [
       {
-        value: "planificacion",
-        label: "09 · Planificación",
-        shortLabel: "Planificación",
+        value: "calculadora",
+        label: "09 · Calculadora",
+        shortLabel: "Calculadora",
         icon: Calculator,
+      },
+      {
+        value: "planificacion",
+        label: "10 · Planificación",
+        shortLabel: "Planificación",
+        icon: CalendarCheck,
         subTabs: [
           { value: "jubilacion", label: "Jubilación" },
           { value: "hipoteca", label: "Hipoteca" },
@@ -120,6 +128,22 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
           { value: "presupuesto", label: "Presupuesto" },
           { value: "pasivos", label: "Deudas" },
           { value: "patrimonio-neto", label: "Patrimonio" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "contexto",
+    title: "CONTEXTO",
+    items: [
+      {
+        value: "contexto",
+        label: "11 · Contexto",
+        shortLabel: "Contexto",
+        icon: Compass,
+        subTabs: [
+          { value: "oportunidades", label: "Oportunidades" },
+          { value: "metodologia", label: "Metodología" },
         ],
       },
     ],
@@ -133,7 +157,11 @@ interface SidebarHerramientasProps {
   activeSubTab?: string;
   onTabChange: (tab: string) => void;
   onSubTabChange: (subTab: string) => void;
-  onRailStateChange?: (state: { isVisible: boolean; isExpanded: boolean; isMobile: boolean }) => void;
+  onRailStateChange?: (state: {
+    isVisible: boolean;
+    isExpanded: boolean;
+    isMobile: boolean;
+  }) => void;
 }
 
 export function SidebarHerramientas({
@@ -147,7 +175,7 @@ export function SidebarHerramientas({
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const detectionZoneRef = useRef<HTMLDivElement>(null);
 
@@ -233,14 +261,33 @@ export function SidebarHerramientas({
         >
           <Menu className="h-5 w-5" />
         </button>
-        {isMobileOpen && <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={() => setIsMobileOpen(false)} />}
-        <div className={cn("fixed top-0 left-0 z-50 h-full w-80 bg-background border-r border-border/60 shadow-xl transition-transform duration-300", isMobileOpen ? "translate-x-0" : "-translate-x-full")}>
+        {isMobileOpen && (
+          <div
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            onClick={() => setIsMobileOpen(false)}
+          />
+        )}
+        <div
+          className={cn(
+            "fixed top-0 left-0 z-50 h-full w-80 bg-background border-r border-border/60 shadow-xl transition-transform duration-300",
+            isMobileOpen ? "translate-x-0" : "-translate-x-full",
+          )}
+        >
           <div className="flex flex-col h-full">
             <div className="flex items-center justify-between p-6 border-b border-border/60">
               <span className="font-semibold text-[13px] tracking-wide">HERRAMIENTAS</span>
-              <button onClick={() => setIsMobileOpen(false)} className="p-1.5 rounded-lg hover:bg-muted" aria-label="Cerrar menú"><X className="h-5 w-5" /></button>
+              <button
+                onClick={() => setIsMobileOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-muted"
+                aria-label="Cerrar menú"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
-            <nav className="flex-1 overflow-y-auto p-5 space-y-5" aria-label="Navegación de herramientas">
+            <nav
+              className="flex-1 overflow-y-auto p-5 space-y-5"
+              aria-label="Navegación de herramientas"
+            >
               {SIDEBAR_GROUPS.map((group) => (
                 <div key={group.id}>
                   <p className="px-2 mb-2 eyebrow !text-muted-foreground/70">{group.title}</p>
@@ -250,15 +297,43 @@ export function SidebarHerramientas({
                       const hasSub = !!(item.subTabs && item.subTabs.length > 0);
                       return (
                         <div key={item.value}>
-                          <button onClick={() => handleTabClick(item.value)} className={cn("w-full flex items-center gap-5 rounded-xl px-3 py-2.5 text-[13px] transition-colors", isActive ? "bg-primary/10 text-primary font-medium border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-muted/40")}>
+                          <button
+                            onClick={() => handleTabClick(item.value)}
+                            className={cn(
+                              "w-full flex items-center gap-5 rounded-xl px-3 py-2.5 text-[13px] transition-colors",
+                              isActive
+                                ? "bg-primary/10 text-primary font-medium border border-primary/20"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/40",
+                            )}
+                          >
                             <item.icon className="h-4 w-4 shrink-0" />
                             <span>{item.label}</span>
                           </button>
                           {isActive && hasSub && (
                             <div className="ml-4 mt-1.5 flex flex-col gap-0.5 border-l border-border/30 pl-3">
                               {item.subTabs!.map((sub) => (
-                                <button key={sub.value} onClick={() => { onSubTabChange(sub.value); setIsMobileOpen(false); }} className={cn("flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[14px] text-left transition-colors", activeSubTab === sub.value ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/20")}>
-                                  <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", activeSubTab === sub.value ? "bg-primary" : "bg-muted-foreground/40")} />{sub.label}
+                                <button
+                                  key={sub.value}
+                                  onClick={() => {
+                                    onSubTabChange(sub.value);
+                                    setIsMobileOpen(false);
+                                  }}
+                                  className={cn(
+                                    "flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[14px] text-left transition-colors",
+                                    activeSubTab === sub.value
+                                      ? "text-primary bg-primary/10 font-medium"
+                                      : "text-muted-foreground hover:text-foreground hover:bg-muted/20",
+                                  )}
+                                >
+                                  <span
+                                    className={cn(
+                                      "h-1.5 w-1.5 rounded-full shrink-0",
+                                      activeSubTab === sub.value
+                                        ? "bg-primary"
+                                        : "bg-muted-foreground/40",
+                                    )}
+                                  />
+                                  {sub.label}
                                 </button>
                               ))}
                             </div>
@@ -270,12 +345,6 @@ export function SidebarHerramientas({
                 </div>
               ))}
             </nav>
-            <div className="p-5 border-t border-border/30 bg-muted/10">
-              <p className="flex items-center gap-1.5 text-[14px] leading-snug text-muted-foreground">
-                <Info className="h-3.5 w-3.5 shrink-0" /> Fuentes: BYMA · IOL · Yahoo Finance · BCRA
-              </p>
-              <p className="text-[13px] text-muted-foreground/70 mt-1">Delay 15-20’ • No es recomendación</p>
-            </div>
           </div>
         </div>
       </>
@@ -285,11 +354,23 @@ export function SidebarHerramientas({
   return (
     <>
       <div ref={detectionZoneRef} className="fixed left-0 top-16 bottom-0 w-4 z-20" />
-      <div ref={railRef} className={cn("fixed left-0 top-16 bottom-0 z-30 glass border-r border-border/60 flex flex-col transition-all duration-200", isVisible ? "translate-x-0" : "-translate-x-full", isExpanded ? "w-[252px]" : "w-[64px]")}>
-        <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-5" aria-label="Navegación de herramientas">
+      <div
+        ref={railRef}
+        className={cn(
+          "fixed left-0 top-16 bottom-0 z-30 glass border-r border-border/60 flex flex-col transition-all duration-200",
+          isVisible ? "translate-x-0" : "-translate-x-full",
+          isExpanded ? "w-[252px]" : "w-[64px]",
+        )}
+      >
+        <nav
+          className="flex-1 overflow-y-auto py-4 px-2 space-y-5"
+          aria-label="Navegación de herramientas"
+        >
           {SIDEBAR_GROUPS.map((group) => (
             <div key={group.id}>
-              {isExpanded && <p className="px-2 mb-2 eyebrow !text-muted-foreground/60">{group.title}</p>}
+              {isExpanded && (
+                <p className="px-2 mb-2 eyebrow !text-muted-foreground/60">{group.title}</p>
+              )}
               {!isExpanded && <div className="h-px bg-border/30 mx-2 mb-2" />}
               <div className="space-y-1">
                 {group.items.map((item) => {
@@ -297,15 +378,46 @@ export function SidebarHerramientas({
                   const hasSub = !!(item.subTabs && item.subTabs.length > 0);
                   return (
                     <div key={item.value}>
-                      <button onClick={() => handleTabClick(item.value)} title={!isExpanded ? item.label : undefined} className={cn("w-full flex items-center gap-5 rounded-xl px-3 py-2.5 text-[13px] transition-colors", isActive ? "bg-primary/10 text-primary font-medium border border-primary/15" : "text-muted-foreground hover:text-foreground hover:bg-muted/30", !isExpanded && "justify-center px-2")}>
+                      <button
+                        onClick={() => handleTabClick(item.value)}
+                        title={!isExpanded ? item.label : undefined}
+                        className={cn(
+                          "w-full flex items-center gap-5 rounded-xl px-3 py-2.5 text-[13px] transition-colors",
+                          isActive
+                            ? "bg-primary/10 text-primary font-medium border border-primary/15"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/30",
+                          !isExpanded && "justify-center px-2",
+                        )}
+                      >
                         <item.icon className="h-[18px] w-[18px] shrink-0" />
-                        {isExpanded && <span className="whitespace-nowrap text-left leading-none">{item.label}</span>}
+                        {isExpanded && (
+                          <span className="whitespace-nowrap text-left leading-none">
+                            {item.label}
+                          </span>
+                        )}
                       </button>
                       {isActive && isExpanded && hasSub && (
                         <div className="ml-5 mt-1 flex flex-col gap-0.5 border-l border-border/30 pl-3">
                           {item.subTabs!.map((sub) => (
-                            <button key={sub.value} onClick={() => onSubTabChange(sub.value)} className={cn("flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[14px] text-left leading-none transition-colors", activeSubTab === sub.value ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/20")}>
-                              <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", activeSubTab === sub.value ? "bg-primary" : "bg-muted-foreground/40")} />{sub.label}
+                            <button
+                              key={sub.value}
+                              onClick={() => onSubTabChange(sub.value)}
+                              className={cn(
+                                "flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[14px] text-left leading-none transition-colors",
+                                activeSubTab === sub.value
+                                  ? "text-primary bg-primary/10 font-medium"
+                                  : "text-muted-foreground hover:text-foreground hover:bg-muted/20",
+                              )}
+                            >
+                              <span
+                                className={cn(
+                                  "h-1.5 w-1.5 rounded-full shrink-0",
+                                  activeSubTab === sub.value
+                                    ? "bg-primary"
+                                    : "bg-muted-foreground/40",
+                                )}
+                              />
+                              {sub.label}
                             </button>
                           ))}
                         </div>
@@ -318,16 +430,18 @@ export function SidebarHerramientas({
           ))}
         </nav>
 
-        <div className="border-t border-border/30 p-2 space-y-2">
-          {isExpanded && (
-            <div className="rounded-lg bg-muted/10 border border-border/20 p-2.5">
-              <p className="flex items-center gap-1.5 text-[14px] font-medium text-foreground"><Info className="h-3.5 w-3.5 text-primary" /> Fuentes</p>
-              <p className="text-[14px] leading-snug text-muted-foreground mt-1">BYMA · IOL · Yahoo Finance · BCRA</p>
-              <p className="text-[13px] text-muted-foreground/70">Delay 15-20’ • Datos informativos</p>
-            </div>
-          )}
-          <button onClick={() => setIsExpanded(!isExpanded)} className="w-full flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-[14px] text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-border/20 transition-colors">
-            {isExpanded ? <><ChevronLeft className="h-4 w-4" /> Colapsar</> : <ChevronRight className="h-4 w-4" />}
+        <div className="border-t border-border/30 p-2">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="w-full flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-[14px] text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-border/20 transition-colors"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronLeft className="h-4 w-4" /> Colapsar
+              </>
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
           </button>
         </div>
       </div>

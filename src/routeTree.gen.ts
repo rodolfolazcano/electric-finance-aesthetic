@@ -23,6 +23,7 @@ import { Route as ApiPrediccionRouteImport } from './routes/api/prediccion'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as ApiSugerenciasRouteImport } from './routes/api/sugerencias'
 import { Route as ApiTelegramRouteImport } from './routes/api/telegram'
+import { Route as ApiCronActualizaRentaFijaRouteImport } from './routes/api/cron/actualiza-renta-fija'
 import { Route as ApiCronContextoTelegramRouteImport } from './routes/api/cron/contexto-telegram'
 import { Route as ApiCronSenalesUnificadasRouteImport } from './routes/api/cron/senales-unificadas'
 import { Route as ApiCronTuningSenalesRouteImport } from './routes/api/cron/tuning-senales'
@@ -101,6 +102,12 @@ const ApiTelegramRoute = ApiTelegramRouteImport.update({
   path: '/api/telegram',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCronActualizaRentaFijaRoute =
+  ApiCronActualizaRentaFijaRouteImport.update({
+    id: '/api/cron/actualiza-renta-fija',
+    path: '/api/cron/actualiza-renta-fija',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiCronContextoTelegramRoute = ApiCronContextoTelegramRouteImport.update({
   id: '/api/cron/contexto-telegram',
   path: '/api/cron/contexto-telegram',
@@ -153,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
   '/api/telegram': typeof ApiTelegramRouteWithChildren
+  '/api/cron/actualiza-renta-fija': typeof ApiCronActualizaRentaFijaRoute
   '/api/cron/contexto-telegram': typeof ApiCronContextoTelegramRoute
   '/api/cron/senales-unificadas': typeof ApiCronSenalesUnificadasRoute
   '/api/cron/tuning-senales': typeof ApiCronTuningSenalesRoute
@@ -176,6 +184,7 @@ export interface FileRoutesByTo {
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
   '/api/telegram': typeof ApiTelegramRouteWithChildren
+  '/api/cron/actualiza-renta-fija': typeof ApiCronActualizaRentaFijaRoute
   '/api/cron/contexto-telegram': typeof ApiCronContextoTelegramRoute
   '/api/cron/senales-unificadas': typeof ApiCronSenalesUnificadasRoute
   '/api/cron/tuning-senales': typeof ApiCronTuningSenalesRoute
@@ -200,6 +209,7 @@ export interface FileRoutesById {
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
   '/api/telegram': typeof ApiTelegramRouteWithChildren
+  '/api/cron/actualiza-renta-fija': typeof ApiCronActualizaRentaFijaRoute
   '/api/cron/contexto-telegram': typeof ApiCronContextoTelegramRoute
   '/api/cron/senales-unificadas': typeof ApiCronSenalesUnificadasRoute
   '/api/cron/tuning-senales': typeof ApiCronTuningSenalesRoute
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/api/search'
     | '/api/sugerencias'
     | '/api/telegram'
+    | '/api/cron/actualiza-renta-fija'
     | '/api/cron/contexto-telegram'
     | '/api/cron/senales-unificadas'
     | '/api/cron/tuning-senales'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/api/search'
     | '/api/sugerencias'
     | '/api/telegram'
+    | '/api/cron/actualiza-renta-fija'
     | '/api/cron/contexto-telegram'
     | '/api/cron/senales-unificadas'
     | '/api/cron/tuning-senales'
@@ -271,6 +283,7 @@ export interface FileRouteTypes {
     | '/api/search'
     | '/api/sugerencias'
     | '/api/telegram'
+    | '/api/cron/actualiza-renta-fija'
     | '/api/cron/contexto-telegram'
     | '/api/cron/senales-unificadas'
     | '/api/cron/tuning-senales'
@@ -295,6 +308,7 @@ export interface RootRouteChildren {
   ApiSearchRoute: typeof ApiSearchRoute
   ApiSugerenciasRoute: typeof ApiSugerenciasRoute
   ApiTelegramRoute: typeof ApiTelegramRouteWithChildren
+  ApiCronActualizaRentaFijaRoute: typeof ApiCronActualizaRentaFijaRoute
   ApiCronContextoTelegramRoute: typeof ApiCronContextoTelegramRoute
   ApiCronSenalesUnificadasRoute: typeof ApiCronSenalesUnificadasRoute
   ApiCronTuningSenalesRoute: typeof ApiCronTuningSenalesRoute
@@ -403,6 +417,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTelegramRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cron/actualiza-renta-fija': {
+      id: '/api/cron/actualiza-renta-fija'
+      path: '/api/cron/actualiza-renta-fija'
+      fullPath: '/api/cron/actualiza-renta-fija'
+      preLoaderRoute: typeof ApiCronActualizaRentaFijaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/cron/contexto-telegram': {
       id: '/api/cron/contexto-telegram'
       path: '/api/cron/contexto-telegram'
@@ -482,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSearchRoute: ApiSearchRoute,
   ApiSugerenciasRoute: ApiSugerenciasRoute,
   ApiTelegramRoute: ApiTelegramRouteWithChildren,
+  ApiCronActualizaRentaFijaRoute: ApiCronActualizaRentaFijaRoute,
   ApiCronContextoTelegramRoute: ApiCronContextoTelegramRoute,
   ApiCronSenalesUnificadasRoute: ApiCronSenalesUnificadasRoute,
   ApiCronTuningSenalesRoute: ApiCronTuningSenalesRoute,

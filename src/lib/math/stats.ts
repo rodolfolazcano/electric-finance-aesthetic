@@ -205,10 +205,12 @@ export function bollingerBands(serie: number[], periodo: number = 20, k: number 
 // computeHurst: Exponente de Hurst vía R/S analysis (Labadie 1205.3482v6 §3.2)
 // H ∈ (0,1). H=0.5 → random walk; H<0.5 → mean-reverting; H>0.5 → trending
 // Identidad del paper: p = 1/H
+// Nota: R/S es sesgado en n<100 y en series con tendencia. Futuro: DFA/Whittle.
+// Clamp estrecho documentado: Labadié recomienda p∈[1.1,4] → H∈[0.25,0.91]
 // ============================================================================
 export function computeHurst(serie: number[]): number {
   const n = serie.length;
-  if (n < 100) return 0.5; // mín 100 obs para estimación confiable
+  if (n < 100) return 0.5; // mín 100 obs; con <100 el estimador es ruido — retornar H neutral
 
   // Log-spaced lags: potencias de 2 desde 4 hasta n/2
   const maxLag = Math.floor(n / 2);
@@ -256,7 +258,8 @@ export function computeHurst(serie: number[]): number {
 
   // Regresión lineal: log(R/S) = log(c) + H * log(n)
   const result = linregress(logLags, logRS);
-  return Math.min(0.99, Math.max(0.01, result.slope));
+  // Clamp Labadié: H∈[0.05,0.95] evita p=1/H explosivo; UI debe mostrar warning si n<100 o R²<0.6
+  return Math.min(0.95, Math.max(0.05, result.slope));
 }
 
 // ============================================================================

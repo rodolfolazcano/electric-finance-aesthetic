@@ -1,5 +1,9 @@
 /** Detección de niveles de soporte y resistencia por pivotes y agrupamiento.
- *  Puro (sin red): se usa desde el motor del semáforo técnico. */
+ *  Puro (sin red): se usa desde el motor del semáforo técnico.
+ *  @canonical Para código nuevo usar `src/lib/herramientas/soportes-resistencias.ts` (AnalisisSR con fecha/vecesTocado/esEstimado).
+ *  Esta versión legacy (hist:number[]) se mantiene para `risk.ts` y semáforo clásico; ambas comparten pivotes window=5 tol=2%.
+ *  TODO: unificar en v2 a una sola API {date,close}[].
+ */
 
 export interface SoportesResistencias {
   /** Niveles de soporte (por debajo del precio), ordenados del más cercano al más lejano. */
