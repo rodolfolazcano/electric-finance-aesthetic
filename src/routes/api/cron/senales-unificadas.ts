@@ -113,6 +113,11 @@ async function manejar(request: Request): Promise<Response> {
     }
 
     const fecha = obtenerFechaART();
+    // Persistencia historial diario (filesystem + Supabase) para backtesting y tuning walk-forward 504/63
+    try {
+      const { guardarSenalesDelDia } = await import("@/lib/senales/persistencia.server");
+      await guardarSenalesDelDia({ fecha, generadoEn: new Date().toISOString(), resumen, senales: senales as any });
+    } catch (e) { console.error("[senales] persistencia fallo", e); }
     const texto = armarMensajeSenales(senales, resumen, fecha);
 
     // 1) Enviar a bot agente @fpxbs777_bot (chats autorizados — el mismo que usa /api/telegram/webhook)

@@ -1,12 +1,35 @@
 {
   "crons": [
     {
+      "path": "/api/cron/informe-matutino?broadcast=true",
+      "schedule": "0 11 * * 1-5"
+    },
+    {
+      "path": "/api/cron/contexto-telegram",
+      "schedule": "30 9 * * 1-5"
+    },
+    {
       "path": "/api/cron/contexto-telegram",
       "schedule": "30 13 * * 1-5"
     },
     {
       "path": "/api/cron/contexto-telegram",
       "schedule": "30 20 * * 1-5"
+    },
+    {
+      "path": "/api/cron/senales-unificadas?topN=6&filtro=todos",
+      "schedule": "0 13 * * 1-5"
+    },
+    {
+      "path": "/api/cron/tuning-senales",
+      "schedule": "0 3 * * 0"
     }
-  ]
+  ],
+  "functions": {
+    "src/routes/api/telegram/webhook.ts": { "maxDuration": 60 },
+    "src/routes/api/chat.ts": { "maxDuration": 60 },
+    "src/routes/api/cron/contexto-telegram.ts": { "maxDuration": 60 },
+    "src/routes/api/cron/senales-unificadas.ts": { "maxDuration": 60 },
+    "src/routes/api/cron/tuning-senales.ts": { "maxDuration": 60 }
+  }
 }
