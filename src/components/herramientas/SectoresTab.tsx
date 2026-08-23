@@ -51,6 +51,41 @@ import { getMatrizCAPM } from "@/lib/herramientas/capm.functions";
 import type { MatrizCAPMResult } from "@/lib/herramientas/capm.functions";
 import sectoresData from "@/lib/herramientas/sectores.json";
 import { cn } from "@/lib/utils";
+import { getFlatTickerList } from "@/lib/universos";
+
+// ── Cohortes homogéneas (nunca comparar tipo/moneda/mercado distintos) ────────
+// Guía: unificado_completo.json (tipo: accion|cedear · moneda: ARS|USD ·
+// mercado: BCBA|NYSE/NASDAQ). Fowler Newton: moneda homogénea. Pascale:
+// comparables homogéneos. Un CEDEAR replica al subyacente: NO es comparable
+// con la acción local ni con la acción US original.
+type CohorteKey = "BCBA_ARS" | "CEDear_ARS" | "CEDear_USD" | "US_USD";
+const COHORTES: Record<CohorteKey, { label: string; corto: string }> = {
+  BCBA_ARS: { label: "Acciones BCBA · ARS", corto: "BCBA ARS" },
+  CEDear_ARS: { label: "CEDEARs BCBA · ARS", corto: "CEDEAR ARS" },
+  CEDear_USD: { label: "CEDEARs BCBA · USD", corto: "CEDEAR USD" },
+  US_USD: { label: "Acciones EE.UU. · USD", corto: "EE.UU. USD" },
+};
+
+// Meta por ticker desde unificado_completo.json (una sola vez)
+const META_TICKER = new Map<string, { tipo?: string; moneda?: string; mercado?: string }>(
+  getFlatTickerList().map((t) => [t.ticker.toUpperCase(), { tipo: t.tipo, moneda: t.moneda, mercado: t.mercado }]),
+);
+
+export function clasificarCohorte(ticker: string): CohorteKey {
+  const tk = ticker.toUpperCase();
+  const meta = META_TICKER.get(tk);
+  if (meta?.mercado === "BCBA") {
+    if (meta.tipo === "cedear") return meta.moneda === "USD" ? "CEDear_USD" : "CEDear_ARS";
+    return "BCBA_ARS";
+  }
+  if (meta?.mercado === "NYSE/NASDAQ") return "US_USD";
+  // Fallback determinístico si no está en el mapa
+  if (tk.endsWith(".BA")) return "BCBA_ARS";
+  if (/^[A-Z0-9]{1,6}D$/.test(tk)) return "CEDear_USD"; // sufijo D = dólar CED
+  return "US_USD";
+}
+
+const ORDEN_COHORTES: CohorteKey[] = ["BCBA_ARS", "CEDear_ARS", "CEDear_USD", "US_USD"];
 // Sector components (Clarity parity)
 import { SectorPerformanceBars } from "@/components/sectores/SectorPerformanceBars";
 import { SectorRelStrengthPanel } from "@/components/sectores/SectorRelStrengthPanel";
@@ -1313,8 +1348,39 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
     return all;
   }, [sectorFilter, industryFilter]);
 
+  // Segmentación en cohortes homogéneas — cada cohorte se analiza por separado
+  const cohortes = useMemo(() => {
+    const grupos = new Map<CohorteKey, TickerJson[]>();
+    for (const t of tickersFromFilter) {
+      const k = clasificarCohorte(t.ticker);
+      if (!grupos.has(k)) grupos.set(k, []);
+      grupos.get(k)!.push(t);
+    }
+    return ORDEN_COHORTES.filter((k) => (grupos.get(k)?.length ?? 0) > 0).map((k) => ({
+      key: k,
+      label: COHORTES[k].label,
+      corto: COHORTES[k].corto,
+      tickers: grupos.get(k)!,
+    }));
+  }, [tickersFromFilter]);
+
+  const [cohorteActiva, setCohorteActiva] = useState<string | null>(null);
+  // Cohorte efectiva: la elegida o, por defecto, la más numerosa
+  useEffect(() => {
+    if (!cohortes.length) { setCohorteActiva(null); return; }
+    if (!cohortes.find((c) => c.key === cohorteActiva)) {
+      const mayor = [...cohortes].sort((a, b) => b.tickers.length - a.tickers.length)[0];
+      setCohorteActiva(mayor.key);
+    }
+  }, [cohortes]);
+  const cohorteSel = cohortes.find((c) => c.key === cohorteActiva) ?? null;
+  const tickersHomogeneos = useMemo(
+    () => (cohorteSel ? tickersFromFilter.filter((t) => clasificarCohorte(t.ticker) === cohorteSel.key) : []),
+    [cohorteSel, tickersFromFilter],
+  );
+
   const handleRun = useCallback(async () => {
-    if (tickersFromFilter.length < 2) return;
+    if (tickersHomogeneos.length < 2) return;
     setLoading(true);
     setError("");
     setResult(null);
@@ -1323,7 +1389,7 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
         data: {
           sector: sectorFilter,
           industry: industryFilter || "Todas las industrias",
-          tickers: tickersFromFilter,
+          tickers: tickersHomogeneos,
         } as any,
       });
       setResult(data as any);
@@ -1332,16 +1398,16 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
     } finally {
       setLoading(false);
     }
-  }, [tickersFromFilter, fn, sectorFilter, industryFilter]);
+  }, [tickersHomogeneos, fn, sectorFilter, industryFilter]);
 
   useEffect(() => {
-    if (tickersFromFilter.length < 2) {
+    if (tickersHomogeneos.length < 2) {
       setResult(null);
       setError("");
       return;
     }
     handleRun();
-  }, [sectorFilter, industryFilter]);
+  }, [sectorFilter, industryFilter, cohorteActiva]);
 
   const [periodoNorm, setPeriodoNorm] = useState<"1Y" | "2Y" | "5Y" | "10Y">("2Y");
   const normPathKey = `normPath${periodoNorm}` as
@@ -1405,7 +1471,8 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
             const seen = new Set<string>();
             for (const ind of Object.keys(secData))
               for (const t of secData[ind])
-                if (!seen.has(t.ticker)) {
+                // Comparación solo intra-cohorte: misma moneda, tipo y mercado
+                if (!seen.has(t.ticker) && clasificarCohorte(t.ticker) === cohorteActiva) {
                   seen.add(t.ticker);
                   tickers.push(t);
                 }
@@ -1430,7 +1497,7 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
     } finally {
       setComparacionLoading(false);
     }
-  }, [comparacionSectores, fn]);
+  }, [comparacionSectores, fn, cohorteActiva]);
 
   return (
     <div className="space-y-8 w-full">
@@ -1577,6 +1644,47 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
           )}
         </div>
       </div>
+
+      {/* Segmentación por cohorte homogénea — nunca cruzar tipo/moneda/mercado */}
+      {cohortes.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+              Cohorte homogénea:
+            </span>
+            {cohortes.map((c) => (
+              <button
+                key={c.key}
+                type="button"
+                onClick={() => setCohorteActiva(c.key)}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-[11px] font-mono transition-colors",
+                  c.key === cohorteActiva
+                    ? "border-primary/60 bg-primary/15 text-primary"
+                    : "border-border/60 bg-background/50 text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {c.corto} · {c.tickers.length}
+              </button>
+            ))}
+          </div>
+          {cohorteSel && cohortes.length > 1 && (
+            <p className="text-[11px] leading-relaxed text-amber-400/90">
+              ⚠️ El sector mezcla activos de distinto tipo, moneda y mercado. Por coherencia
+              metodológica (Fowler Newton: moneda homogénea · Pascale: comparables homogéneos) el
+              análisis y la comparación corren <b>solo</b> sobre{" "}
+              <b>{cohorteSel.label}</b> ({cohorteSel.tickers.length} activos). Un CEDEAR replica a su
+              subyacente: no es comparable ni con la acción local ni con la original de EE.UU.
+            </p>
+          )}
+          {cohorteSel && tickersHomogeneos.length > 0 && (
+            <p className="font-mono text-[10px] text-muted-foreground">
+              Analizando: {tickersHomogeneos.map((t) => t.ticker).slice(0, 24).join(" · ")}
+              {tickersHomogeneos.length > 24 ? ` · +${tickersHomogeneos.length - 24} más` : ""}
+            </p>
+          )}
+        </div>
+      )}
 
       <Tabs value={tab} onValueChange={setTab} className="w-full">
         <TabsList className="flex-wrap h-auto gap-1 p-1 w-full justify-start">
