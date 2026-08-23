@@ -553,12 +553,79 @@ export function AnalisisTab({ tickerInicial }: { tickerInicial?: string | null }
       </p>
 
       {ticker && (
-        <div className="space-y-5">
-          <FichaCard ticker={ticker} />
-          <div className="grid w-full gap-4 lg:grid-cols-2">
+        <div className="space-y-6">
+          {/* ── ANÁLISIS TÉCNICO — disponible para TODO el universo ── */}
+          <section className="space-y-3">
+            <div className="flex items-baseline gap-2">
+              <h3 className="text-[13px] font-semibold tracking-widest text-primary uppercase">
+                Análisis técnico
+              </h3>
+              <span className="text-[11px] text-muted-foreground">
+                precios · RSI · MACD · medias · soportes — cualquier activo listado
+              </span>
+            </div>
             <SemaforoPanel ticker={ticker} />
             <NoticiasPanel ticker={ticker} />
-          </div>
+          </section>
+
+          {/* ── ANÁLISIS FUNDAMENTAL — solo EE.UU. (Yahoo trae estados contables
+              completos de NYSE/NASDAQ; para BCBA/CEDEAR los datos son parciales y
+              las monedas no son comparables) ── */}
+          <section className="space-y-3">
+            <div className="flex items-baseline gap-2">
+              <h3 className="text-[13px] font-semibold tracking-widest text-primary uppercase">
+                Análisis fundamental &amp; valuación
+              </h3>
+              <span className="text-[11px] text-muted-foreground">
+                estados contables · DCF · múltiplos — empresas de EE.UU.
+              </span>
+            </div>
+            {(() => {
+              const meta = UNIVERSO.find((u) => u.ticker.toUpperCase() === ticker.toUpperCase());
+              const esUS =
+                meta?.mercado === "NYSE/NASDAQ" ||
+                (!ticker.toUpperCase().endsWith(".BA") &&
+                  !meta?.mercado); // tickers US sin meta (ej. KO)
+              if (esUS) return <FichaCard ticker={ticker} />;
+              const subyacente = ticker.toUpperCase().replace(/\.BA$/, "");
+              const subyacenteUS = UNIVERSO.find(
+                (u) =>
+                  u.ticker.toUpperCase() === subyacente &&
+                  (u.mercado ?? "").includes("NYSE"),
+              );
+              return (
+                <Card className="border-amber-500/30 bg-amber-500/5">
+                  <CardContent className="flex flex-col gap-2 p-5 text-sm">
+                    <div className="font-medium text-amber-400">
+                      Fundamental completo no disponible para {ticker}
+                    </div>
+                    <p className="leading-relaxed text-muted-foreground">
+                      {meta?.tipo === "cedear"
+                        ? "Es un CEDEAR: replica una acción extranjera. Su fundamental real es el del subyacente."
+                        : "Es una acción local (BCBA): Yahoo Finance trae estados contables parciales y en moneda distinta, lo que invalida DCF, múltiplos y comparaciones."}
+                    </p>
+                    {subyacenteUS && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-fit"
+                        onClick={() => {
+                          setInput(subyacenteUS.ticker);
+                          setTicker(subyacenteUS.ticker);
+                          navigate({
+                            to: "/herramientas",
+                            search: { tab: "analisis", ticker: subyacenteUS.ticker },
+                          });
+                        }}
+                      >
+                        Analizar el subyacente {subyacenteUS.ticker} ({subyacenteUS.nombre}) →
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })()}
+          </section>
         </div>
       )}
     </div>
