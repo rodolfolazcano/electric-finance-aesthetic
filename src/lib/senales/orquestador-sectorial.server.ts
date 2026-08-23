@@ -60,7 +60,7 @@ async function cargarUniverso(): Promise<Record<string, any>> {
   return {};
 }
 
-function extraerTickersPorSector(universo: Record<string, any>, sectoresFav: string[]): {tickers: string[]; porSector: Record<string,string[]>} {
+async function extraerTickersPorSector(universo: Record<string, any>, sectoresFav: string[]): {tickers: string[]; porSector: Record<string,string[]>} {
   const tickers: string[] = [];
   const porSector: Record<string, string[]> = {};
   const favNorm = sectoresFav.map(normalizarSector);
@@ -78,7 +78,20 @@ function extraerTickersPorSector(universo: Record<string, any>, sectoresFav: str
       }
     }
     if (lista.length) {
-      porSector[sector] = [...new Set(lista)].slice(0, 50);
+      let unicos = [...new Set(lista)];
+      // Primer filtro al superar el tope: LIQUIDEZ (mayor volumen primero)
+      if (unicos.length > 50) {
+        try {
+          const { getQuotes } = await import("../history-cache.server");
+          const quotes = (await getQuotes(unicos)) as Record<string, any>;
+          const vol = (tk: string) =>
+            Number(quotes?.[tk]?.regularMarketVolume ?? quotes?.[tk]?.volume ?? 0) || 0;
+          unicos = unicos.sort((a, b) => vol(b) - vol(a));
+        } catch {
+          /* sin quotes: se conserva el orden original */
+        }
+      }
+      porSector[sector] = unicos.slice(0, 50);
       tickers.push(...porSector[sector]);
     }
   }
@@ -142,7 +155,7 @@ export async function orquestarSectorial(opts: { topN?: number; filtro?: "todos"
   // FASE 3 — Mapear universo
   const universo = await cargarUniverso();
   const totalUniverso = Object.keys(universo).length;
-  const { tickers: tickersDesplegados, porSector } = extraerTickersPorSector(universo, sectoresFav);
+  const { tickers: tickersDesplegados, porSector } = await extraerTickersPorSector(universo, sectoresFav);
 
   // FASE 4 — Fundamental completo (Pascale 6D + WACC + DCF + múltiplos + margen seguridad)
   const aprobados: string[] = [];
