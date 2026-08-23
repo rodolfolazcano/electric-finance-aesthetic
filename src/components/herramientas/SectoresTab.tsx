@@ -52,6 +52,7 @@ import type { MatrizCAPMResult } from "@/lib/herramientas/capm.functions";
 import sectoresData from "@/lib/herramientas/sectores.json";
 import { cn } from "@/lib/utils";
 import { getFlatTickerList } from "@/lib/universos";
+import { CHAT_OPEN_EVENT_NAME } from "@/lib/chat-open";
 
 // ── Cohortes homogéneas (nunca comparar tipo/moneda/mercado distintos) ────────
 // Guía: unificado_completo.json (tipo: accion|cedear · moneda: ARS|USD ·
@@ -296,6 +297,10 @@ function PanelFull({
   comparacionError,
   handleCompararSectores,
 }: any) {
+  // Orden coherente para lectura: mejor score fundamental primero
+  const filasOrdenadas = [...(result?.tickers ?? [])].sort(
+    (a: any, b: any) => (b.fundScore ?? -1) - (a.fundScore ?? -1),
+  );
   return (
     <div className="space-y-4">
       {result && (
@@ -325,9 +330,16 @@ function PanelFull({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(result.tickers ?? []).map((t: any) => (
+                    {filasOrdenadas.map((t: any, idx: number) => (
                       <TableRow key={t.ticker}>
-                        <TableCell className="font-mono font-medium">{t.ticker}</TableCell>
+                        <TableCell className="font-mono font-medium">
+                          {idx < 3 && t.fundScore != null && (
+                            <span className="mr-1 rounded bg-emerald-500/15 px-1 text-[10px] text-emerald-400">
+                              #{idx + 1}
+                            </span>
+                          )}
+                          {t.ticker}
+                        </TableCell>
                         <TableCell className="text-right font-mono">
                           {t.price?.toFixed(2) ?? "s/d"}
                         </TableCell>
@@ -346,7 +358,7 @@ function PanelFull({
                           {t.fundScore?.toFixed(1) ?? "s/d"}
                         </TableCell>
                         <TableCell className="text-[11px] text-muted-foreground">
-                          {t.industry ?? result.industry}
+{t.industry ?? result.industry}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -478,6 +490,49 @@ function PanelFull({
           <SectorRelStrengthPanel />
         </CardContent>
       </Card>
+
+      {/* Lectura metodológica (Bustamante) + interpretación por agentes IA */}
+      <details className="group rounded-lg border border-border/60 bg-background/40">
+        <summary className="flex cursor-pointer items-center justify-between px-4 py-2.5 text-[13px] font-medium text-foreground">
+          <span>Lectura estructural antes de confiar en el múltiplo (Bustamante, corpus pt)</span>
+          <span className="text-muted-foreground transition-transform group-open:rotate-180">▾</span>
+        </summary>
+        <div className="border-t border-border/50 px-4 py-3 text-[13px] leading-relaxed text-muted-foreground">
+          Antes de rankear por P/E o score, caracterizar la industria en 5 pasos:{" "}
+          <b className="text-foreground">1</b> modelo de ingresos (recurrencia del flujo) →{" "}
+          <b className="text-foreground">2</b> estructura competitiva (oligopolio = más poder de
+          precios = EBITDA vale más) → <b className="text-foreground">3</b> regulador dominante que
+          fija precios o entrada → <b className="text-foreground">4</b> disrupción tecnológica y
+          capex exigido → <b className="text-foreground">5</b> ajustar el múltiplo objetivo y el
+          margen de seguridad según 1-4. Regla del corpus: sin pasos 1-3 no hay recomendación.
+        </div>
+      </details>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 text-[11px]"
+          onClick={() => {
+            const filas = [...(result.tickers ?? [])]
+              .sort((a: any, b: any) => (b.fundScore ?? -1) - (a.fundScore ?? -1))
+              .slice(0, 8)
+              .map(
+                (t: any) =>
+                  `${t.ticker} (score ${t.fundScore?.toFixed(0) ?? "s/d"}, P/E ${t.trailingPE?.toFixed(1) ?? "s/d"}, ROE ${t.returnOnEquity != null ? (t.returnOnEquity * 100).toFixed(0) + "%" : "s/d"})`,
+              )
+              .join("; ");
+            const pregunta = `Interpretá estos resultados de análisis sectorial (${result.sector} · ${result.industry}, comparables homogéneos): ${filas}. Con metodología Pascale (valuación relativa de comparables) decime quiénes lideran y por qué, cuáles están caros respecto del grupo, qué alertas fundamentales ves, y qué riesgos estructurales tiene este sector (modelo de ingresos, concentración, regulación). Cerrá con una lectura de cartera diversificada, no recomendación puntual.`;
+            window.dispatchEvent(
+              new CustomEvent(CHAT_OPEN_EVENT_NAME, { detail: { question: pregunta } }),
+            );
+          }}
+        >
+          Interpretar estos resultados con IA →
+        </Button>
+        <span className="text-[10px] text-muted-foreground">
+          Envía el ranking al agente orquestado (Pascale + Bustamante) y abre el chat.
+        </span>
+      </div>
     </div>
   );
 }
@@ -911,10 +966,16 @@ function BenchmarksPanel({ sectorFilter }: { sectorFilter?: string } = {}) {
             <BarChart3 className="h-4 w-4 text-primary" /> Benchmarks principales
           </CardTitle>
           <p className="text-[13px] text-muted-foreground">
-            Correlación 2Y semanal · {data.betas.length} activos · Régimen:{" "}
-            <span className="font-medium text-foreground">{data.macroFilter.regimeLabel}</span>{" "}
-            {data.macroFilter.crbBondsTrend &&
-              `· CRB/Bonds ${(data.macroFilter.crbBondsChange1m! * 100).toFixed(1)}% (1M)`}
+            {metricLabels[matrixMetric]} 2Y semanal · {data.betas.length} activos
+            {matrixMetric !== "correlation" && (
+              <>
+                {" "}
+                vs{" "}
+                <span className="font-medium text-foreground">
+                  {selectedBenchmark} ({etfName(selectedBenchmark)})
+                </span>
+              </>
+            )}
           </p>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -1304,7 +1365,7 @@ function IntermarketFull() {
 export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
   // Reorden metodológico (corpus pt): Panorama Murphy → Análisis Pascale →
   // Valuación relativa → Estructura Bustamante → Cartera Elbaum
-  const valid = ["panorama", "analisis", "valuacion", "estructura", "cartera"];
+  const valid = ["panorama", "analisis", "valuacion", "cartera"];
   const LEGACY_MAP: Record<string, string> = {
     performance: "panorama",
     intermarket: "panorama",
@@ -1315,6 +1376,7 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
     benchmarks: "cartera",
     valuacion: "valuacion",
     oportunidades: "valuacion",
+    estructura: "analisis",
   };
   const inicial = initialTab ? (LEGACY_MAP[initialTab] ?? (valid.includes(initialTab) ? initialTab : undefined)) : undefined;
   const [tab, setTab] = useState(inicial ?? "panorama");
@@ -1697,14 +1759,12 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
           <TabsTrigger value="valuacion" className="text-[12px] px-3 py-1.5">
             3 · Valuación
           </TabsTrigger>
-          <TabsTrigger value="estructura" className="text-[12px] px-3 py-1.5">
-            4 · Estructura
-          </TabsTrigger>
           <TabsTrigger value="cartera" className="text-[12px] px-3 py-1.5">
-            5 · Cartera
+            4 · Cartera
           </TabsTrigger>
         </TabsList>
 
+        {/* 2 · ANÁLISIS — Pascale U4: fundamentales comparables + caminos + ETF fit */}
         {/* 1 · PANORAMA — Murphy intermarket: rotación, fuerza relativa, régimen */}
         <TabsContent value="panorama" className="mt-4 space-y-6">
           <PerformanceFullPanel sectorFilter={sectorFilter} tickersFromFilter={tickersFromFilter} />
@@ -1756,15 +1816,7 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
           <OportunidadesPanel2 />
         </TabsContent>
 
-        {/* 4 · ESTRUCTURA — Bustamante: capa cualitativa industrial */}
-        <TabsContent value="estructura" className="mt-4">
-          <EstructuraPanel
-            sectorFilter={sectorFilter}
-            onIrAnalisis={() => setTab("analisis")}
-          />
-        </TabsContent>
-
-        {/* 5 · CARTERA — Elbaum: correlaciones/benchmarks como diversificación */}
+        {/* 4 · CARTERA — Elbaum: correlaciones/benchmarks como diversificación */}
         <TabsContent value="cartera" className="mt-4 space-y-6">
           <BenchmarksPanel sectorFilter={sectorFilter} />
           <MatrizPanelFull sectorFilter={sectorFilter} />
@@ -1774,54 +1826,3 @@ export function SectoresTab({ initialTab }: { initialTab?: string } = {}) {
   );
 }
 
-// ── Panel ESTRUCTURA (metodología Bustamante, corpus pt) ──────────────────────
-// Capa cualitativa previa a la valuación: modelo de ingresos → estructura de
-// mercado → mapa regulatorio → capa tecnológica → implicancia en múltiplos.
-function EstructuraPanel({ sectorFilter, onIrAnalisis }: { sectorFilter: string; onIrAnalisis: () => void }) {
-  const MARCO = [
-    { n: 1, titulo: "Modelo de ingresos", detalle: "¿Cómo gana plata el sector? Publicidad / suscripción / tarifas reguladas / volumen-precio / mixto. Define la calidad y recurrencia del flujo." },
-    { n: 2, titulo: "Estructura competitiva", detalle: "Oligopolio / monopolio natural / fragmentado. Cuanto más concentrado, más poder de fijación de precios y más vale un EBITDA equivalente." },
-    { n: 3, titulo: "Mapa regulatorio", detalle: "Quién fija precios o autoriza entrada (ENACOM/CNV/BCRA vs SEC/FCC). La regulación puede ser motor de precio o techo estructural." },
-    { n: 4, titulo: "Capa tecnológica y disrupción", detalle: "Intensidad de capex, obsolescencia, entrantes digitales. Riesgo de destrucción del modelo vigente." },
-    { n: 5, titulo: "Implicancia de valuación", detalle: "Conclusión: el mismo EV/EBITDA NO vale lo mismo según 1-4. Ajustar múltiplo objetivo y margen de seguridad." },
-  ];
-  const sector = sectorFilter || "(seleccioná un sector arriba)";
-  return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-[14px]">Auditoría estructural del sector — metodología Bustamante (corpus pt)</CardTitle>
-          <p className="text-[13px] text-muted-foreground">
-            Capa cualitativa que ANTECEDE a la valuación: caracterizar la industria en 5 pasos antes de confiar en un múltiplo. Sector activo:{" "}
-            <span className="font-mono text-foreground">{sector}</span>
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {MARCO.map((m) => (
-            <div key={m.n} className="rounded-lg border border-border/50 bg-background/40 p-3">
-              <div className="flex items-baseline gap-2">
-                <span className="font-mono text-[11px] text-primary">PASO {m.n}</span>
-                <span className="text-sm font-semibold">{m.titulo}</span>
-              </div>
-              <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{m.detalle}</p>
-            </div>
-          ))}
-          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-[13px] text-amber-300">
-            Regla del corpus: PROHIBIDO recomendar sin identificar primero el modelo de ingresos y el
-            regulador dominante. El mismo EBITDA vale distinto según la estructura (pasos 1-4).
-          </div>
-          <div className="flex flex-wrap gap-2 pt-1">
-            <Button size="sm" variant="outline" className="h-8 text-[11px]" onClick={onIrAnalisis} disabled={!sectorFilter}>
-              Ir al análisis cuantitativo del sector →
-            </Button>
-          </div>
-          <p className="text-[10px] text-muted-foreground">
-            Esta capa es de razonamiento (no cálculo). Combinar con la pestaña Análisis para los
-            números y con el agente IA (skill analisis-sectorial-bustamante) para profundizar un
-            caso puntual.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
