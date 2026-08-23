@@ -364,6 +364,26 @@ export async function toolGenerarSenalUnificada(args: ToolGenerarSenalArgs): Pro
   }
 }
 
+export type ToolOrquestarSectorialArgs = { topN?: number; enviarTelegram?: boolean; filtro?: string };
+
+export async function toolOrquestarSectorial(args: ToolOrquestarSectorialArgs): Promise<string> {
+  try {
+    const { orquestarSectorial } = await import("@/lib/senales/orquestador-sectorial.server");
+    const res = await orquestarSectorial({ topN: args.topN ?? 6, filtro: (args.filtro as any) ?? "todos" });
+    const header = `ORQUESTADOR SECTORIAL 5 FASES — ${res.fecha}\nF1 Contexto: ${res.fase1.razonamiento.slice(0,400)}\nF2 Sectores fav: ${res.fase2.sectoresFavorecidos.join(", ")}\nF3 Tickers: ${res.fase3.tickersDesplegados.length}\nF4 Aprobados: ${res.fase4.aprobados.length}\nF5 Señales: ${res.fase5.senales.length}`;
+    const senalesTxt = res.fase5.senales.map(s=> `${s.ticker} ${s.senal} ${s.scoreTotal.toFixed(1)}/10 Entrada ${s.tecnica.entrada?.toFixed(2)} SL ${s.tecnica.sl?.toFixed(2)} TP1 ${s.tecnica.tp1?.toFixed(2)}`).join("\n");
+    let out = header + "\n\n" + res.fase5.resumen + "\n" + senalesTxt;
+    if (args.enviarTelegram && res.fase5.senales.length) {
+      const { sendSenalInstitucional } = await import("@/lib/telegram.server");
+      for (const s of res.fase5.senales.slice(0,4)) {
+        const r = await sendSenalInstitucional({ ticker: s.ticker, senal: s.senal, precio: s.precio, variacion1d: s.variacion1d, scoreTotal: s.scoreTotal, scores: s.scores, tecnica: s.tecnica, motivo: s.motivo.slice(0,150), confianza: s.confianza });
+        out += `\n[TELEGRAM ${s.ticker}] ${r}`;
+      }
+    }
+    return out;
+  } catch (e:any) { return `[ERROR orquestar_sectorial]: ${e.message ?? String(e)}`; }
+}
+
 // --- fetch_stock_data ----------------------------------------------------------
 // Obtiene datos de Yahoo Finance directamente (sin depender del servidor Flask).
 
@@ -558,6 +578,17 @@ export const AGENT_TOOLS: ToolRecord[] = [
     },
     required: ["ticker"],
     run: (a) => toolGenerarSenalUnificada(a as ToolGenerarSenalArgs),
+  },
+  {
+    name: "orquestar_senales_sectoriales",
+    description: "ORQUESTA 5 FASES sectorial: Geopolítico→Intermarket→Sectores→Tickers→Fundamental Value→Técnica. Mapea unificado_completo.json y filtra por sectores favorecidos Pring/Murphy. Envía top con SL/TP y grafico.",
+    params: {
+      topN: { type: "integer", description: "Top N (default 6)" },
+      enviarTelegram: { type: "boolean", description: "Si true envía a Telegram" },
+      filtro: { type: "string", description: "todos o solo_compras" },
+    },
+    required: [],
+    run: (a) => toolOrquestarSectorial(a as ToolOrquestarSectorialArgs),
   },
   {
     name: "fetch_stock_data",
