@@ -6,11 +6,13 @@ import { CalculadoraObjetivos } from "@/components/herramientas/planificacion/Ca
 import { CalculadoraPresupuesto } from "@/components/herramientas/planificacion/CalculadoraPresupuesto";
 import { CalculadoraPasivos } from "@/components/herramientas/planificacion/CalculadoraPasivos";
 import { CalculadoraPatrimonioNeto } from "@/components/herramientas/planificacion/CalculadoraPatrimonioNeto";
+import { MiPlanPanel } from "@/components/herramientas/planificacion/MiPlanPanel";
 // A4 dedup: 7 calculadoras importan fórmulas desde wrappers A0 (evita duplicados inline)
 import { calcularInteresSimple, calcularInteresCompuesto } from "@/lib/calculadora-financiera.functions";
 
 // Mismo orden y valores que subTabs de "planificacion" en SidebarHerramientas
 type SubTab =
+  | "mi-plan"
   | "jubilacion"
   | "hipoteca"
   | "inversiones"
@@ -20,6 +22,7 @@ type SubTab =
   | "patrimonio-neto";
 
 const VISTAS: { key: SubTab; label: string }[] = [
+  { key: "mi-plan", label: "Mi Plan" },
   { key: "jubilacion", label: "Jubilación" },
   { key: "hipoteca", label: "Hipoteca" },
   { key: "inversiones", label: "Crecimiento" },
@@ -37,7 +40,7 @@ export function PlanificacionPersonalTab({
   void calcularInteresSimple;
   void calcularInteresCompuesto;
   const [vista, setVista] = useState<SubTab>(
-    VISTAS.some((v) => v.key === initialSubTab) ? (initialSubTab as SubTab) : "jubilacion",
+    VISTAS.some((v) => v.key === initialSubTab) ? (initialSubTab as SubTab) : "mi-plan",
   );
   // A4: métricas opcionales de RiesgoPage (solo lectura). Intentar leer de store/query si existe, sin throw.
   const [riskMetrics, setRiskMetrics] = useState<{ sharpe: number | null; var95: number | null } | undefined>(undefined);
@@ -92,6 +95,7 @@ export function PlanificacionPersonalTab({
         ))}
       </div>
 
+      {vista === "mi-plan" && <MiPlanPanel />}
       {vista === "jubilacion" && <CalculadoraJubilacion metrics={riskMetrics} />}
       {vista === "hipoteca" && <CalculadoraHipoteca />}
       {vista === "inversiones" && <CalculadoraInversiones />}

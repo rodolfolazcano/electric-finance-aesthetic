@@ -272,6 +272,7 @@ async function fetchLecaps(sessionId?: string, badlarRate?: number | null): Prom
 
 export interface PlazoFijoItem { entidad: string; tnaClientes: number | null; tnaNoClientes: number | null; logo: string | null; link?: string | null }
 export interface PlazoFijoUvaItem { id: string; entidad: string; logo: string; nombre: string; plazoMinDias: number; plazoMaxDias: number; tna: number; tea: number }
+function normPfTna(v: any): number | null { const n = typeof v === "number" ? v : null; if (n == null || !isFinite(n)) return null; return n > 0 && n < 5 ? +(n*100).toFixed(2) : n; }
 export const fetchPlazoFijoTasas = createServerFn({ method: "GET" }).handler(async (): Promise<PlazoFijoItem[]> => {
   const cached = getCached<PlazoFijoItem[]>("plazoFijoTasas");
   if (cached) return cached;
@@ -279,7 +280,7 @@ export const fetchPlazoFijoTasas = createServerFn({ method: "GET" }).handler(asy
     const r = await fetch(`${AD}/v1/finanzas/tasas/plazoFijo`, { cache: "no-store" });
     if (!r.ok) return [];
     const arr: any[] = await r.json();
-    const out: PlazoFijoItem[] = arr.map((x) => ({ entidad: x.entidad ?? "", tnaClientes: x.tnaClientes ?? null, tnaNoClientes: x.tnaNoClientes ?? null, logo: x.logo ?? null, link: x.link ?? null }));
+    const out: PlazoFijoItem[] = arr.map((x) => ({ entidad: x.entidad ?? "", tnaClientes: normPfTna(x.tnaClientes), tnaNoClientes: normPfTna(x.tnaNoClientes), logo: x.logo ?? null, link: x.link ?? null }));
     setCache("plazoFijoTasas", out, 15 * 60 * 1000);
     return out;
   } catch { return []; }
@@ -293,7 +294,11 @@ export const fetchPlazoFijoUva = createServerFn({ method: "GET" }).handler(async
     const arr: any[] = await r.json();
     const out: PlazoFijoUvaItem[] = [];
     for (const prov of arr) {
-      for (const t of prov.tasas ?? []) out.push({ id: prov.id ?? "", entidad: prov.entidad ?? "", logo: prov.logo ?? "", nombre: t.nombre ?? "", plazoMinDias: t.plazoMinDias ?? 0, plazoMaxDias: t.plazoMaxDias ?? 0, tna: t.tna ?? 0, tea: t.tea ?? 0 });
+      for (const t of prov.tasas ?? []) {
+        const ntna = typeof t.tna === "number" && t.tna > 0 && t.tna < 1 ? +(t.tna*100).toFixed(2) : t.tna ?? 0;
+        const ntea = typeof t.tea === "number" && t.tea > 0 && t.tea < 1 ? +(t.tea*100).toFixed(2) : t.tea ?? 0;
+        out.push({ id: prov.id ?? "", entidad: prov.entidad ?? "", logo: prov.logo ?? "", nombre: t.nombre ?? "", plazoMinDias: t.plazoMinDias ?? 0, plazoMaxDias: t.plazoMaxDias ?? 0, tna: ntna, tea: ntea });
+      }
     }
     setCache("plazoFijoUva", out, 15 * 60 * 1000);
     return out;

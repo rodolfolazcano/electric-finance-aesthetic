@@ -13,6 +13,11 @@ export interface TasasVivasPlanificacion {
   timestamp: string;
 }
 
+function normTna(v: number | null | undefined): number {
+  if (v == null || !isFinite(v)) return 0;
+  // ArgentinaDatos suele dar % (ej 45 = 45% anual). Si viene fracción (0.24 = 24%) → ×100. Umbral 5 distingue.
+  return v > 0 && v < 5 ? v * 100 : v;
+}
 async function fetchPlazoFijo(): Promise<TasasVivasPlanificacion["mejorPF"]> {
   try {
     const r = await fetch("https://api.argentinadatos.com/v1/finanzas/tasas/plazoFijo", { cache: "no-store" });
@@ -20,11 +25,11 @@ async function fetchPlazoFijo(): Promise<TasasVivasPlanificacion["mejorPF"]> {
     const arr: any[] = await r.json();
     let best: any = null; let bestT = -1;
     for (const x of arr) {
-      const t = x.tnaClientes ?? x.tnaNoClientes ?? 0;
-      if (t > bestT) { bestT = t; best = x; }
+      const t = normTna(x.tnaClientes ?? x.tnaNoClientes ?? 0);
+      if (t > bestT) { bestT = t; best = { ...x, _tnaNorm: t }; }
     }
     if (!best) return null;
-    return { entidad: best.entidad ?? "", tna: best.tnaClientes ?? best.tnaNoClientes ?? 0, tnaNoClientes: best.tnaNoClientes ?? null };
+    return { entidad: best.entidad ?? "", tna: best._tnaNorm ?? normTna(best.tnaClientes ?? best.tnaNoClientes ?? 0), tnaNoClientes: normTna(best.tnaNoClientes) || null };
   } catch { return null; }
 }
 async function fetchFciMM(): Promise<TasasVivasPlanificacion["fciMM"]> {
@@ -87,8 +92,16 @@ export const getTasasVivasPlanificacion = createServerFn({ method: "GET" }).hand
     fetchInflacion(),
     fetchLecapTea(),
   ]);
+  // fallback escalonado: si caución es fallback 0.05 sin IOL, usa PF vivo como proxy r (no ideal pero mejor que 5% fijo)
+  let caucionNorm = typeof cau === "number" && isFinite(cau) ? cau : 0.05;
+  const pfTnaDec = pf?.tna != null ? pf.tna / 100 : 0;
+  const isFallback = caucionNorm === 0.05;
+  if (isFallback && pfTnaDec > 0) {
+    // PF TNA → tasa diaria equivalente para 7d aprox: r7d ≈ TNA *7/365
+    caucionNorm = pfTnaDec * 7 / 365;
+  }
   const out: TasasVivasPlanificacion = {
-    caucion7d: typeof cau === "number" && isFinite(cau) ? cau : 0.05,
+    caucion7d: caucionNorm,
     mejorPF: pf,
     fciMM: fci,
     lecapTea: ltea,
