@@ -19,7 +19,11 @@ export function setBonosData(data: any) {
 }
 
 import localBonosJson from "@/data/bonos.json";
+import rentaFijaCompletaJson from "@/data/RENTA_FIJA_COMPLETA.json";
 _bonosJson = localBonosJson;
+
+// Merge RENTA_FIJA_COMPLETA.json (fuente más completa para soberanos) — reciclaje Elbaum U4
+let _rentaFijaCompleta: any = rentaFijaCompletaJson as any;
 
 // ============================================================================
 // TIPOS COMPARTIDOS
@@ -202,6 +206,27 @@ function parseFlujosDetallados(
 // BUILD DB
 // ============================================================================
 
+function mapRentaFijaTipo(entry: any): TipoBono {
+  const moneda = entry.moneda as string;
+  const tipo = entry.tipo as string;
+  const subtipo = entry.subtipo as string;
+  if (moneda === "CER") return "CER";
+  if (tipo === "LECAP" || tipo === "LECAP_CAPITALIZABLE") return "LECAP";
+  if (subtipo === "Dólar Linked" || tipo === "Bonte" && moneda === "USD") return "Dollar-Linked";
+  return "Hard Dollar";
+}
+
+function parseRentaFijaFlujos(flujos: Array<{ fecha: string; monto_por_cien: number; tipo: string }>): FlujoFuturo[] {
+  return (flujos ?? []).map((f) => {
+    const tf = f.tipo as string;
+    let tipo: FlujoFuturo["tipo"] = "cupon+amortizacion";
+    if (tf === "Cupon") tipo = "cupon";
+    else if (tf === "Amortizacion") tipo = "amortizacion";
+    else if (tf === "PagoUnico") tipo = "cupon+amortizacion";
+    return { fecha: f.fecha, monto: f.monto_por_cien, tipo };
+  });
+}
+
 function buildBonosDB(): Record<string, BonoConfig> {
   const db: Record<string, BonoConfig> = {};
   const jsonData = _bonosJson as BonosJson;
@@ -264,6 +289,72 @@ function buildBonosDB(): Record<string, BonoConfig> {
       flujosDetallados: parseFlujosDetallados(entry.flujos_futuros_cada_100_vn),
       historico: entry.historico ?? [],
     };
+  }
+
+  // --- Merge RENTA_FIJA_COMPLETA.json (reciclaje) — prioriza flujos completos soberanos ---
+  try {
+    const completa: any = _rentaFijaCompleta;
+    const cats: any[] = completa?.categorias ?? [];
+    for (const cat of cats) {
+      const subs: any[] = cat.subcategorias ?? [];
+      for (const sub of subs) {
+        const bonos: any[] = sub.bonos ?? [];
+        for (const b of bonos) {
+          const ticker: string = b.ticker;
+          if (!ticker) continue;
+          const existente = db[ticker];
+          const flujosRenta = parseRentaFijaFlujos(b.flujo_fondos ?? []);
+          // Si no existe o el existente tiene flujos truncados (<4) o monto sospechoso (0.38), sobreescribir con RENTA_FIJA completa
+          const esMejor =
+            !existente ||
+            flujosRenta.length > (existente.flujosPorCada100VN?.length ?? 0) ||
+            (existente.flujosPorCada100VN?.some((f: any) => f.monto < 1) ?? false);
+          if (!esMejor && existente) continue;
+          // Mapear a BonoConfig si es nuevo
+          if (!existente) {
+            const tipoRf = mapRentaFijaTipo(b);
+            db[ticker] = {
+              ticker,
+              tickerApi: ticker,
+              mercado: "bCBA",
+              tipo: tipoRf,
+              descripcion: b.nombre ?? b.descripcion ?? ticker,
+              vencimiento: b.fecha_vencimiento,
+              monedaFlujos: (b.moneda === "USD" ? "USD" : "ARS") as any,
+              flujosPorCada100VN: flujosRenta,
+              isin: b.isin,
+              jurisdiccion: b.ley === "Nueva_York" ? "NY" : "ARG",
+              tipoCupon: b.cupon?.tipo ?? "Fixed rate",
+              moneda: b.moneda,
+              frecuenciaPago: b.cupon?.frecuencia ?? "Semiannual",
+              convencionDias: b.cupon?.convencion ?? "ACT/365",
+              tipoAmortizacion: b.amortizacion?.includes("Bullet") ? "Bullet" : "Sinkable",
+              montoEmision: b.montoEmision,
+              cuponAnual: b.cupon?.tasa ?? 0,
+              valorPar: b.valor_nominal ?? 100,
+              valorResidualActual: 100,
+              yieldConvention: (b.moneda === "USD" ? "STREET" : "TRUE") as any,
+              tipoTasa: (b.cupon?.tipo === "Step-up" ? "step-up" : "fixed") as any,
+              ajuste: (b.moneda === "CER" ? "CER" : null) as any,
+              instrumento: "BONO",
+              monedaPago: b.moneda,
+              fechaEmision: b.fecha_emision,
+              flujosDetallados: flujosRenta.map((f) => ({ fecha: f.fecha, monto: f.monto, tipoFlujo: "Cupon+Amortizacion" as any })),
+              historico: [],
+            } as any;
+          } else {
+            // Actualizar flujos del existente con los completos
+            existente.flujosPorCada100VN = flujosRenta;
+            existente.flujosDetallados = flujosRenta.map((f) => ({ fecha: f.fecha, monto: f.monto, tipoFlujo: "Cupon+Amortizacion" as any }));
+            if (b.cupon?.tasa) existente.cuponAnual = b.cupon.tasa;
+            if (b.fecha_vencimiento) existente.vencimiento = b.fecha_vencimiento;
+            if (b.descripcion) existente.descripcion = b.nombre ?? b.descripcion;
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Merge RENTA_FIJA_COMPLETA falló", e);
   }
 
   return db;

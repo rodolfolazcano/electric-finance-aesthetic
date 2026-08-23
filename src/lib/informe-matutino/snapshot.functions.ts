@@ -4,21 +4,15 @@ import { getArgentinaContext } from "../argentina-context.functions";
 import { getMarketScreeners, getMacroContextAR } from "../daily-opportunities.functions";
 import { getMarketNews } from "../market-news.functions";
 import { getCached, setCache } from "../cache";
-import type {
-  MarketContextSnapshot,
-  Cierre,
-  Commodity,
-  Tasa,
-  NoticiaCruda,
-} from "./types";
+import type { MarketContextSnapshot, Cierre, Commodity, Tasa, NoticiaCruda } from "./types";
 import type { QuoteData } from "../market-data.types";
 import type { MarketNewsItem } from "../market-news.functions";
 import { getAgendaSemana } from "./agenda-economica";
+import { getCalendarioEconomicoHoy } from "./calendario-economico.functions";
+import { getEarningsHoy } from "./earnings.functions";
+import { getIndecDatos } from "./indec.functions";
 
-function settledTicker(
-  r: PromiseSettledResult<QuoteData>,
-  ticker: string,
-): Cierre | null {
+function settledTicker(r: PromiseSettledResult<QuoteData>, ticker: string): Cierre | null {
   if (r.status === "rejected" || !r.value.precio) return null;
   return { ticker, precio: r.value.precio, variacionPct: r.value.variacionPct };
 }
@@ -32,10 +26,7 @@ function settledCommodity(
   return { ticker, nombre, precio: r.value.precio, variacionPct: r.value.variacionPct };
 }
 
-function settledTasa(
-  r: PromiseSettledResult<QuoteData>,
-  nombre: string,
-): Tasa | null {
+function settledTasa(r: PromiseSettledResult<QuoteData>, nombre: string): Tasa | null {
   if (r.status === "rejected" || r.value.precio == null) return null;
   return { nombre, valor: r.value.precio };
 }
@@ -52,21 +43,33 @@ function normalizarNoticia(n: MarketNewsItem): NoticiaCruda {
 const CACHE_KEY = "informe-snapshot";
 const CACHE_TTL = 15 * 60 * 1000;
 
-export const buildMarketSnapshot = createServerFn({ method: "GET" })
-  .handler(async (): Promise<MarketContextSnapshot> => {
+export const buildMarketSnapshot = createServerFn({ method: "GET" }).handler(
+  async (): Promise<MarketContextSnapshot> => {
     const cached = getCached<MarketContextSnapshot>(CACHE_KEY, CACHE_TTL);
     if (cached) return cached;
 
     const [
-      spy, qqq, dia, vix,
-      n225, hsi, gdaxi, ibex,
-      cl, gc,
+      spy,
+      qqq,
+      dia,
+      vix,
+      n225,
+      hsi,
+      gdaxi,
+      ibex,
+      cl,
+      bz,
+      gc,
       tnx,
+      tyx,
       mervalRes,
       argentinaContext,
       screeners,
       macroAR,
       noticias,
+      calendario,
+      earnings,
+      indec,
     ] = await Promise.allSettled([
       getYahooQuoteServer({ data: { symbol: "SPY" } }),
       getYahooQuoteServer({ data: { symbol: "QQQ" } }),
@@ -77,13 +80,18 @@ export const buildMarketSnapshot = createServerFn({ method: "GET" })
       getYahooQuoteServer({ data: { symbol: "^GDAXI" } }),
       getYahooQuoteServer({ data: { symbol: "^IBEX" } }),
       getYahooQuoteServer({ data: { symbol: "CL=F" } }),
+      getYahooQuoteServer({ data: { symbol: "BZ=F" } }),
       getYahooQuoteServer({ data: { symbol: "GC=F" } }),
       getYahooQuoteServer({ data: { symbol: "^TNX" } }),
+      getYahooQuoteServer({ data: { symbol: "^TYX" } }),
       getYahooQuoteServer({ data: { symbol: "^MERV" } }),
       getArgentinaContext(),
       getMarketScreeners(),
       getMacroContextAR(),
       getMarketNews(),
+      getCalendarioEconomicoHoy(),
+      getEarningsHoy(),
+      getIndecDatos(),
     ]);
 
     const cn = argentinaContext.status === "fulfilled" ? argentinaContext.value : null;
@@ -103,22 +111,26 @@ export const buildMarketSnapshot = createServerFn({ method: "GET" })
 
         commodities: [
           settledCommodity(cl, "Petróleo WTI", "Petróleo"),
+          settledCommodity(bz, "Petróleo Brent", "Brent"),
           settledCommodity(gc, "Oro", "Oro"),
         ].filter((x): x is Commodity => x != null),
 
-        tasas: [settledTasa(tnx, "UST 10Y")].filter((x): x is Tasa => x != null),
+        tasas: [settledTasa(tnx, "UST 10Y"), settledTasa(tyx, "UST 30Y")].filter(
+          (x): x is Tasa => x != null,
+        ),
       },
 
       local: {
-        dolares: cn && cn.dolarOficial?.venta
-          ? {
-              oficial: cn.dolarOficial.venta,
-              blue: cn.dolarBlue?.venta ?? 0,
-              mep: cn.dolarMEP?.venta ?? 0,
-              ccl: cn.dolarCCL?.venta ?? 0,
-              brechaCCLPct: cn.brechaCCLPct ?? 0,
-            }
-          : { oficial: 0, blue: 0, mep: 0, ccl: 0, brechaCCLPct: 0 },
+        dolares:
+          cn && cn.dolarOficial?.venta
+            ? {
+                oficial: cn.dolarOficial.venta,
+                blue: cn.dolarBlue?.venta ?? 0,
+                mep: cn.dolarMEP?.venta ?? 0,
+                ccl: cn.dolarCCL?.venta ?? 0,
+                brechaCCLPct: cn.brechaCCLPct ?? 0,
+              }
+            : { oficial: 0, blue: 0, mep: 0, ccl: 0, brechaCCLPct: 0 },
 
         riesgoPais: cn?.riesgoPais
           ? { valor: cn.riesgoPais.valor, variacionPuntos: cn.riesgoPais.variacion }
@@ -155,24 +167,44 @@ export const buildMarketSnapshot = createServerFn({ method: "GET" })
 
       agendaDelDia: getAgendaSemana(new Date().toISOString().slice(0, 10)),
 
-      screeners: screeners.status === "fulfilled"
-        ? screeners.value
-        : await getMarketScreeners().catch(() => ({
-            day_gainers: [], day_losers: [], most_actives: [],
-            most_shorted: [], undervalued: [], generatedAt: new Date().toISOString(),
-          })),
+      calendarioHoy: calendario.status === "fulfilled" ? calendario.value : [],
 
-      macroContextoAR: macroAR.status === "fulfilled"
-        ? macroAR.value
-        : { dolarCCL: null, dolarMEP: null, dolarBlue: null, riesgoPais: null, generatedAt: new Date().toISOString() },
+      resultadosCorporativos: earnings.status === "fulfilled" ? earnings.value : [],
 
-      noticiasCrudas: noticias.status === "fulfilled"
-        ? noticias.value.items.slice(0, 10).map(normalizarNoticia)
-        : [],
+      indec: indec.status === "fulfilled" ? indec.value : { emae: null, comercioExterior: null },
+
+      screeners:
+        screeners.status === "fulfilled"
+          ? screeners.value
+          : await getMarketScreeners().catch(() => ({
+              day_gainers: [],
+              day_losers: [],
+              most_actives: [],
+              most_shorted: [],
+              undervalued: [],
+              generatedAt: new Date().toISOString(),
+            })),
+
+      macroContextoAR:
+        macroAR.status === "fulfilled"
+          ? macroAR.value
+          : {
+              dolarCCL: null,
+              dolarMEP: null,
+              dolarBlue: null,
+              riesgoPais: null,
+              generatedAt: new Date().toISOString(),
+            },
+
+      noticiasCrudas:
+        noticias.status === "fulfilled"
+          ? noticias.value.items.slice(0, 10).map(normalizarNoticia)
+          : [],
 
       clienteActivo: null,
     };
 
     setCache(CACHE_KEY, snapshot);
     return snapshot;
-  });
+  },
+);

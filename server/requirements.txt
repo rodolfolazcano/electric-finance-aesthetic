@@ -4,3 +4,6 @@ yfinance
 numpy
 pandas
 scipy
+scikit-learn
+requests
+pandas-market-calendars

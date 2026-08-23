@@ -2726,6 +2726,22 @@ except ImportError:
     EARTH2_AVAILABLE = False
 
 
+# ─── Opciones IOL + Predicción ML (reciclado de PROTOTIPO) ───────────────────
+try:
+    from server.iol_service import (
+        autenticar, obtener_tasas_caucion, obtener_opciones,
+    )
+    from server.opciones_service import (
+        black_scholes, binomial_pricing, procesar_cadena_opciones,
+        calcular_sesgo, calcular_volatilidad_historica_serie,
+        calcular_volatilidad_dinamica,
+    )
+    from server.prediccion_service import ejecutar_prediccion
+    OPCIONES_LOADED = True
+except ImportError:
+    OPCIONES_LOADED = False
+
+
 
 
 # ─── Contexto Macro API ───────────────────────────────────────────────────────
@@ -2872,6 +2888,133 @@ def earth2_analyze_hotspot():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# ─── Opciones IOL + Predicción ML API ────────────────────────────────────────
+
+def _datos_subyacente(simbolo, periodo="1y"):
+    """Spot + volatilidades desde yfinance (reciclado de obtener_datos_subyacente)."""
+    ticker = yf.Ticker(f"{simbolo}.BA")
+    hist = ticker.history(period=periodo)
+    if hist.empty or len(hist) < 60:
+        return None, None, None, None
+    if isinstance(hist.columns, pd.MultiIndex):
+        hist.columns = [c[0] for c in hist.columns]
+    hist = calcular_volatilidad_historica_serie(hist)
+    hist = calcular_volatilidad_dinamica(hist)
+    spot = float(hist["Close"].iloc[-1])
+    vol_h = float(hist["VolatilidadHistorica"].iloc[-1])
+    vol_d = float(hist["VolatilidadDinamica"].iloc[-1])
+    if vol_h > 1.0:
+        vol_h = min(vol_h, 0.5)
+    if abs(vol_h - vol_d) / max(vol_h, vol_d) > 0.5:
+        vol_h = vol_d = (vol_h + vol_d) / 2
+    return spot, vol_h, vol_d, hist
+
+
+@app.route("/api/iol/status")
+def iol_status():
+    if not OPCIONES_LOADED:
+        return jsonify({"available": False, "note": "servicios de opciones no cargados"})
+    token = autenticar()
+    if not token:
+        return jsonify({"available": False, "autenticado": False})
+    tasa = obtener_tasas_caucion(token)
+    return jsonify({"available": True, "autenticado": True, "tasa_caucion": tasa})
+
+
+@app.route("/api/opciones/precio", methods=["POST"])
+def opciones_precio():
+    """Pricing puntual: BS + griegas y binomial opcional."""
+    try:
+        body = request.get_json(force=True) or {}
+        tipo = body.get("tipo", "Call")
+        S = float(body["S"]); K = float(body["K"])
+        T = float(body["T"]); r = float(body.get("r", 0.05))
+        sigma = float(body["sigma"]); q = float(body.get("q", 0))
+        bs = black_scholes(tipo, S, K, T, r, sigma, q)
+        resultado = {
+            "BlackScholes": bs[0], "Delta": bs[1], "Gamma": bs[2],
+            "Vega": bs[3], "Theta_diario": bs[4], "Rho": bs[5], "Prob_ITM": bs[6],
+        }
+        if body.get("binomial", False):
+            resultado["Binomial"] = binomial_pricing(
+                tipo, S, K, T, r, sigma,
+                N=int(body.get("pasos", 100)), q=q, americana=bool(body.get("americana", False)))
+        return jsonify(resultado)
+    except KeyError as e:
+        return jsonify({"error": f"falta parámetro {e}"}), 400
+    except Exception as e:
+        import traceback
+        return jsonify({"error": str(e), "detail": traceback.format_exc()}), 500
+
+
+@app.route("/api/opciones/cadena", methods=["POST"])
+def opciones_cadena():
+    """Cadena completa de opciones BCBA: IV, griegas, VaR y sesgo por vencimiento."""
+    try:
+        body = request.get_json(force=True) or {}
+        simbolo = str(body.get("simbolo", "GGAL")).upper()
+        if not OPCIONES_LOADED:
+            return jsonify({"error": "servicios de opciones no disponibles"}), 503
+        token = autenticar()
+        tasa_riesgo = obtener_tasas_caucion(token) if token else 0.05
+        spot, vol_h, vol_d, hist = _datos_subyacente(simbolo)
+        if not spot:
+            return jsonify({"error": f"sin datos del subyacente {simbolo}.BA"}), 404
+        df_api = obtener_opciones(token, simbolo=simbolo) if token else pd.DataFrame()
+        sesgo = None
+        cadena = []
+        if not df_api.empty:
+            df_proc = procesar_cadena_opciones(
+                df_api, spot, vol_h, vol_d, 0.0,
+                tasa_riesgo=tasa_riesgo, pasos_binomial=int(body.get("pasos", 100)))
+            if not df_proc.empty:
+                sesgo = calcular_sesgo(df_proc, spot)
+                cols = ["simbolo", "tipoOpcion", "strike", "fechaVencimiento", "T",
+                        "precioOpcion", "bid", "ask", "Moneyness",
+                        "volatilidadImplicita", "BlackScholes", "Delta", "Gamma",
+                        "Vega", "Theta", "Rho", "Prob_ITM", "Prob_OTM", "VaR", "Binomial"]
+                cols = [c for c in cols if c in df_proc.columns]
+                cadena = df_proc[cols].replace({np.nan: None}).to_dict(orient="records")
+        return jsonify({
+            "simbolo": simbolo,
+            "spot": round(spot, 2),
+            "volatilidad_historica": round(vol_h, 4),
+            "volatilidad_dinamica": round(vol_d, 4),
+            "tasa_riesgo": tasa_riesgo,
+            "iol_autenticado": bool(token),
+            "sesgo_volatilidad": round(sesgo, 2) if sesgo is not None else None,
+            "opciones": cadena,
+            "total": len(cadena),
+        })
+    except Exception as e:
+        import traceback
+        return jsonify({"error": str(e), "detail": traceback.format_exc()}), 500
+
+
+@app.route("/api/prediccion", methods=["POST"])
+def api_prediccion():
+    """Pipeline ML completo: Logistic/Ridge/NN + walk-forward + señal de opciones."""
+    try:
+        body = request.get_json(force=True) or {}
+        simbolo = str(body.get("simbolo", "GGAL")).upper()
+        horizonte = int(body.get("horizonte", 5))
+        if not OPCIONES_LOADED:
+            return jsonify({"error": "servicios de predicción no disponibles"}), 503
+        _, _, _, hist = _datos_subyacente(simbolo)
+        if hist is None:
+            return jsonify({"error": f"sin datos del subyacente {simbolo}.BA"}), 404
+        spot = float(hist["Close"].iloc[-1])
+        resultado = ejecutar_prediccion(hist, spot, horizonte=horizonte)
+        if "error" in resultado:
+            return jsonify(resultado), 400
+        resultado["simbolo"] = simbolo
+        resultado["spot"] = round(spot, 2)
+        return jsonify(resultado)
+    except Exception as e:
+        import traceback
+        return jsonify({"error": str(e), "detail": traceback.format_exc()}), 500
 
 
 @app.route("/health")

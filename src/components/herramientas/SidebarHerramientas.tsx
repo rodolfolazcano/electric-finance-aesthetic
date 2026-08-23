@@ -245,7 +245,7 @@ export function SidebarHerramientas({
             <nav className="flex-1 overflow-y-auto p-5 space-y-5" aria-label="Navegación de herramientas">
               {SIDEBAR_GROUPS.map((group) => (
                 <div key={group.id}>
-                  <p className="px-2 mb-2 text-[13px] font-semibold tracking-[0.14em] text-muted-foreground/70">{group.title}</p>
+                  <p className="px-2 mb-2 eyebrow !text-muted-foreground/70">{group.title}</p>
                   <div className="space-y-1">
                     {group.items.map((item) => {
                       const isActive = activeTab === item.value;
@@ -287,11 +287,11 @@ export function SidebarHerramientas({
   return (
     <>
       <div ref={detectionZoneRef} className="fixed left-0 top-16 bottom-0 w-4 z-20" />
-      <div ref={railRef} className={cn("fixed left-0 top-16 bottom-0 z-30 bg-background/95 backdrop-blur-xl border-r border-border/60 flex flex-col transition-all duration-200", isVisible ? "translate-x-0" : "-translate-x-full", isExpanded ? "w-[252px]" : "w-[64px]")}>
+      <div ref={railRef} className={cn("fixed left-0 top-16 bottom-0 z-30 glass border-r border-border/60 flex flex-col transition-all duration-200", isVisible ? "translate-x-0" : "-translate-x-full", isExpanded ? "w-[252px]" : "w-[64px]")}>
         <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-5" aria-label="Navegación de herramientas">
           {SIDEBAR_GROUPS.map((group) => (
             <div key={group.id}>
-              {isExpanded && <p className="px-2 mb-2 text-[13px] font-semibold tracking-[0.14em] text-muted-foreground/60">{group.title}</p>}
+              {isExpanded && <p className="px-2 mb-2 eyebrow !text-muted-foreground/60">{group.title}</p>}
               {!isExpanded && <div className="h-px bg-border/30 mx-2 mb-2" />}
               <div className="space-y-1">
                 {group.items.map((item) => {

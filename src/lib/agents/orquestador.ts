@@ -62,6 +62,8 @@ import {
   ejecutarGenerarInforme,
   ejecutarPairsTradingLabadie,
   ejecutarCurvaEjecucionLabadie,
+  ejecutarPrediccionSubyacente,
+  ejecutarCadenaOpcionesBCBA,
   ejecutarCierreMercado,
   ejecutarInformeMatutino,
   ejecutarAgendaEconomica,
@@ -717,6 +719,14 @@ export async function ejecutarTool(
   switch (name) {
     case "consultar_mercado":
       return { ...(await ejecutarMercado(query)), ok: true };
+    case "predecir_direccion": {
+      const res = await ejecutarPrediccionSubyacente(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "cadena_opciones_bcba": {
+      const res = await ejecutarCadenaOpcionesBCBA(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
     case "buscar_noticias":
       return { ...(await ejecutarNoticias(query, periodo)), ok: true };
     case "consultar_base_conocimiento":

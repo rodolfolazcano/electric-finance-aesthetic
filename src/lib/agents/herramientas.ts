@@ -1340,6 +1340,48 @@ export const TOOLS: ToolSpec[] = [
   {
     type: "function",
     function: {
+      name: "predecir_direccion",
+      description:
+        "Predicción direccional ML del subyacente BCBA (metodología Labadie ML 2018 Secc 2-5): regresión logística L2 con 15 features técnicos sobre 2 años de precios diarios, split temporal 60/20/20 sin leakage, umbral F1 óptimo en CV y validación walk-forward. Devuelve probabilidad de subida, señal Call/Put/Neutral con confianza, strikes sugeridos y métricas de validación (CV/test/walk-forward). Para '¿sube o baja GGAL?', 'probabilidad de subida de PAMP', 'predicción del subyacente YPFD'. Incluye guardrail anti-alucinación: si walk-forward <55% lo marca sin ventaja estadística.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description: "Ticker del subyacente BCBA (ej. GGAL, PAMP, YPFD, COME, BMA). Sin sufijo .BA.",
+          },
+          horizonte: {
+            type: "number",
+            description: "Horizonte de predicción en días hábiles (1-60). Default 5.",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "cadena_opciones_bcba",
+      description:
+        "Cadena de opciones listada en BCBA vía API IOL (requiere credenciales configuradas): spot, volatilidad EWMA anual, tasa de caución 7d real, strikes con precio/bid/ask, volatilidad implícita por bisección, griegas Black-Scholes, VaR delta-gamma 95% y skew/sesgo de volatilidad OTM (>+10% alcista, <-10% bajista) con lectura interpretada. Para 'opciones de GGAL', 'volatilidad implícita PAMP', 'sesgo de opciones', 'IV smile YPFD'. Solo símbolos con opciones listadas.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description: "Subyacente BCBA con opciones listadas (GGAL, PAMP, YPFD, COME, BMA).",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "consultar_cierre_mercado",
       description:
         "Reporte de CIERRE DE MERCADO automático (EE.UU. + global) con datos en vivo de Yahoo Finance: 7 índices (S&P 500, Nasdaq 100, DJIA, Russell 2000, Mid/Small/Micro Cap) con precio, % HOY/1M/YTD y serie para sparkline; 11 sectores SPDR ordenados por % HOY; Top 6 ganadores/perdedores; DXY/VIX/tasas 5Y/10Y/30Y; renta fija gobierno (MUB/GOVT/TIP) y corporativa (CWB/LQD/HYG); 7 desarrollados y 8 emergentes; 7 commodities (oro/plata/BTC/WTI/Brent/gas/soja). Cacheado al último cierre de Wall Street (16:15 ET). Usar para 'cierre de hoy', 'cómo cerró el mercado', 'resumen del mercado'.",

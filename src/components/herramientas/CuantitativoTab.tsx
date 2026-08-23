@@ -23,16 +23,17 @@ export function CuantitativoTab() {
   const [sub, setSub] = useState<SubTab>("optimizador");
 
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-8 w-full">
       {/* Header */}
       <div>
-        <h2 className="font-display text-[clamp(1.6rem,2.5vw,2rem)] font-semibold tracking-tight">
+        <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight">
           Análisis cuantitativo
         </h2>
-        <p className="mt-1 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
+        <p className="mt-1 max-w-3xl text-[17px] leading-relaxed text-muted-foreground lg:text-[19px]">
           Optimización de carteras (Markowitz, mínima varianza, máx. Sharpe), análisis de riesgo
           con distribuciones y regresiones CAPM sobre series reales de Yahoo Finance.
         </p>
+        <div aria-hidden className="electric-line mt-6 max-w-3xl" />
       </div>
 
       {/* Sub-tabs */}
@@ -41,9 +42,9 @@ export function CuantitativoTab() {
           <button
             key={t.key}
             onClick={() => setSub(t.key)}
-            className={`font-mono text-[14px] px-4 py-2 rounded-md border transition-colors ${
+            className={`font-mono text-[14px] px-4 py-2 rounded-lg border transition-colors ${
               sub === t.key
-                ? "border-primary/60 bg-primary/10 text-foreground"
+                ? "border-primary/60 bg-primary/10 text-primary"
                 : "border-border/60 text-muted-foreground hover:text-foreground"
             }`}
           >

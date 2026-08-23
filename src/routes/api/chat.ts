@@ -1,7 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_CONTEXT } from "@/lib/site-context";
-import { buscarEnBase } from "@/lib/knowledge-base";
-import { buscarAcademico } from "@/lib/kb-academic";
 import { orquestarModelos } from "@/lib/model-orchestration";
 import { construirPromptSkills } from "@/lib/skills";
 import {
@@ -13,6 +11,8 @@ import {
 import { MemoriaDeSesion } from "@/lib/agents/memory";
 import { esAcademico, type ResultadoConocimiento } from "@/lib/agents/ejecutores";
 import { NVIDIA_API_KEY } from "@/lib/agents/nvidia-key";
+import { createScope, closeScope, recordEvent, getAdaptiveHint, getAdaptiveStateSnapshot } from "@/lib/nemo-relay";
+import { retrieveHybrid } from "@/lib/rag/nemo-retriever";
 
 const CNV_PERFIL =
   "https://www.cnv.gov.ar/SitioWeb/RegistrosPublicos/DetallesRegistrosPublicos/105037?tipoEntidadId=2&tipoAgente=302";
@@ -23,8 +23,8 @@ const SYSTEM_PROMPT = `Sos IA, el asistente virtual del sitio de Cintia Boos, Ag
 - Sos IA: un asistente, no Cintia. Nunca respondas en primera persona como Cintia ni firmes como ella. IA explica, orienta e informa; Cintia es la asesora que atiende por WhatsApp y el Test del Inversor. Cuando corresponda, derivá el siguiente paso a Cintia (WhatsApp) sin hablar "por ella".
 - Español rioplatense con voseo, conversacional, cálido y calmo. Sin tecnicismos innecesarios: explicás claro igual que un asesor que charla con un cliente.
 - Nada de listas de menú tipo "podés preguntarme sobre X, Y, Z" al inicio de cada respuesta. Ese tipo de presentación solo corresponde si es el arranque de la sesión (primer mensaje del hilo); el resto del tiempo respondés directo al tema que trajo el usuario.
-- No digas "voy a buscar" ni pidas permiso: si hace falta un dato, invocás la herramienta en ese mismo turno. No anuncies búsquedas que no ejecutaste.
-- Si la consulta es inequívoca dentro del mercado argentino (caución bursátil, dólar MEP, plazo fijo, riesgo país, UVA, CEDEAR, etc.), buscá el dato directamente con la herramienta correspondiente. Sólo pedí aclaración si hay dos instrumentos realmente distintos posibles; nunca pidas aclaración solo para ganar tiempo.
+ - PROHIBIDO decir "voy a buscar", "necesito consultar" o pedir permiso ("¿Te gustaría que lo haga ahora?", "¿Querés que consulte?", "¿Te gustaría que lo haga?"): si hace falta un dato, EJECUTÁ la herramienta EN ESE MISMO TURNO sin preguntar. No anuncies búsquedas que no ejecutaste y nunca pidas confirmación para datos de mercado.
+ - Si la consulta es inequívoca dentro del mercado argentino (caución bursátil, dólar oficial/blue/MEP/CCL, plazo fijo, riesgo país, UVA, CEDEAR, etc.), buscá el dato directamente con consultar_mercado. Sólo pedí aclaración si hay dos instrumentos realmente distintos posibles; nunca pidas aclaración solo para ganar tiempo ni ofrezcas "¿Te gustaría?".
 
 ## RESPUESTA SOBRE MOVIMIENTOS DE ACTIVOS O MERCADO
 
@@ -158,8 +158,9 @@ Tenés acceso directo a estas fuentes y capacidades; sugerilas al usuario cuando
 - **BCRA Estadísticas Monetarias**: más de 200 variables monetarias (base monetaria, reservas, tasas, circulación) vía datos_financieros(fuente="bcra_monetarias") — primero "principales_variables" para encontrar el idVariable y luego "datos".
 - **Gráficos en el chat**: grafico_chat genera gráficos de línea (series de Yahoo), barras (comparativas) y gráficos profesionales interactivos de TradingView embebidos (cualquier símbolo global: NASDAQ:AAPL, BCBA:GGAL, BINANCE:BTCUSDT). Usalo SIEMPRE que el usuario pida un gráfico o que visualizar una evolución.
 - **Informes descargables**: generar_informe compone un informe estructurado en el chat con botones para descargarlo (.md) e imprimirlo/guardarlo como PDF. Ofrecelo cuando el análisis sea extenso o el usuario pida un reporte/informe/resumen ejecutivo.
-- **Telegram — bot @coronar_inversiones_bot**: podes enviar senales y mensajes directamente a Telegram. Herramientas: telegram_enviar_senal(ticker, senal, precio?, variacion1d?, motivo?, nivel?) para una senal puntual, telegram_enviar_mensaje(text) para texto libre, telegram_estado para diagnosticar configuracion. Requiere TELEGRAM_BOT_TOKEN (de @BotFather) y TELEGRAM_CHAT_ID en .env. Cuando el usuario pida "enviar a Telegram", "notificar por Telegram", "avisar el bot" o active notificaciones, invoca la herramienta correspondiente en ese mismo turno sin pedir confirmacion extra. Formato sin emojis, HTML permitido. No envies la misma senal dos veces en el mismo turno.
-Cuando corresponda, cerrá ofreciendo UNA sugerencia concreta de estas capacidades ("si querés, te lo muestro en un gráfico", "puedo armarte un informe descargable", "si querés ver tu portafolio de IOL, iniciá sesión con tu usuario", "si querés te lo envío a Telegram").`;
+ - **Telegram — bot @coronar_inversiones_bot**: podes enviar senales y mensajes directamente a Telegram. Herramientas: telegram_enviar_senal(ticker, senal, precio?, variacion1d?, motivo?, nivel?) para una senal puntual, telegram_enviar_mensaje(text) para texto libre, telegram_estado para diagnosticar configuracion. Requiere TELEGRAM_BOT_TOKEN (de @BotFather) y TELEGRAM_CHAT_ID en .env. Cuando el usuario pida "enviar a Telegram", "notificar por Telegram", "avisar el bot" o active notificaciones, invoca la herramienta correspondiente en ese mismo turno sin pedir confirmacion extra. Formato sin emojis, HTML permitido. No envies la misma senal dos veces en el mismo turno.
+ - **MOTOR UNIFICADO CORONAR (señales 4 capas)**: generar_senal_unificada(simbolo) y generar_senales_unificadas(simbolos[], topN) — orquestación estricta Intermarket (Pring 6 etapas + macro, corpus pt Blanchard/Pascale) → Fundamental (gate cualitativo 5.0 + ficha DCF/múltiplos/libro) → Técnico (semaforo RSI/MACD/SMA) → Cuantitativo (Sharpe/VaR/CAPM beta/Hurst) sobre universo unificado_completo.json. Devuelve COMPRA/COMPRA CON CAUTELA/MANTENER/REDUCIR/VENTA con score 0-10 y confianza. Úsalo SIEMPRE para "señal de X", "qué compro hoy", "top señales", "analizá completa".
+ Cuando corresponda, cerrá ofreciendo UNA sugerencia concreta de estas capacidades ("si querés, te lo muestro en un gráfico", "puedo armarte un informe descargable", "si querés ver tu portafolio de IOL, iniciá sesión con tu usuario", "si querés te lo envío a Telegram").`;
 
 const PLANNER_PROMPT = `Sos el analista de razonamiento de un asistente financiero argentino. Tu trabajo: obtener TODA la información real necesaria para responder la última pregunta del usuario, ejecutando vos mismo las herramientas disponibles, y al final dejar una guía breve de enfoque. NO redactás la respuesta al usuario: solo investigás y planificás.
 
@@ -172,9 +173,11 @@ Herramientas disponibles:
 - valor_intrinseco_real(simbolo, tema?): valor intrínseco REAL de una empresa/acción con datos en vivo de Yahoo Finance (FCF, deuda neta, beta vía CAPM, WACC, crecimiento de analistas), aplicando la metodología del paper académico de la base de conocimiento (DCF, emergentes o CAPM) y buscando noticias recientes que fundamenten el resultado. Para "cuánto vale X", "valor intrínseco de X", "DCF de X", "analizá el valor de X": usá ESTA herramienta y hacé el cálculo con datos reales, sin pedir supuestos al usuario. Acepta ticker o nombre (ej. "IBM", "Microsoft", "GGAL.BA").
 - pairs_trading_labadie(simboloA, simboloB, ventana?, umbralEntrada?, umbralStop?, rangoDias?): análisis de arbitraje estadístico de un PAR con la metodología Labadie sobre datos reales: correlación, beta de hedge, cointegración ADF, z-score del spread, bandas de entrada/stop, Hurst y backtest IS/OOS. Para "pairs trading entre X e Y", "spread entre X e Y", "está cointegrado X con Y".
 - curva_ejecucion_labadie(simbolo, benchmark?, participacionMaxima?, pVarianza?, gammaImpacto?): curva de ejecución óptima Almgren-Chriss (Target Close / Implementation Shortfall) con impacto cóncavo, restricción PVol, tiempos óptimos de inicio/parada y p-varianza (p=1/Hurst). Para "cómo ejecuto una orden grande de X", "curva de trading óptima", "impacto de mercado".
-- telegram_enviar_senal(ticker, senal, precio?, variacion1d?, motivo?, nivel?): envia una senal puntual a Telegram @coronar_inversiones_bot. Para "enviar a Telegram", "notificar senal", "avisar por el bot".
-- telegram_enviar_mensaje(text): envia un texto libre a Telegram. Para resumenes, alertas de ciclo o notificaciones generales.
-- telegram_estado(): diagnostica el bot (token, chat_id, getUpdates). Para verificar configuracion.
+ - telegram_enviar_senal(ticker, senal, precio?, variacion1d?, motivo?, nivel?): envia una senal puntual a Telegram @coronar_inversiones_bot. Para "enviar a Telegram", "notificar senal", "avisar por el bot".
+ - telegram_enviar_mensaje(text): envia un texto libre a Telegram. Para resumenes, alertas de ciclo o notificaciones generales.
+ - telegram_estado(): diagnostica el bot (token, chat_id, getUpdates). Para verificar configuracion.
+ - generar_senal_unificada(simbolo): MOTOR UNIFICADO CORONAR 4 capas (Intermarket Pring 6 etapas + Fundamental Pascale gate 5.0 + Técnico semaforo RSI/MACD + Cuantitativo Sharpe/VaR/CAPM) sobre unificado_completo.json. Para "señal de GGAL", "analizá YPF completa", "comprar o vender AAPL".
+ - generar_senales_unificadas(simbolos?, topN?, filtro?): batch del motor unificado (lotes de 3) ordenado por score. Para "señales de hoy", "qué compro hoy", "top 6 señales".
 
 Modo de trabajo:
 1. Recibís además las notas de los agentes especializados, que ya traen datos reales con fuentes. Revisalas primero: si cubren la pregunta, no repitas herramientas.
@@ -195,9 +198,10 @@ Reglas de decisión:
 - Ejecución de órdenes grandes / impacto de mercado / curva óptima ("cómo ejecuto una orden grande", "Target Close", "Implementation Shortfall"): invocar curva_ejecucion_labadie(simbolo) con benchmark='tc' o 'is' según lo que pida (default 'tc').
 - Conceptos del corpus Labadie (market-making, microestructura, Kyle, Glosten-Milgrom, HFT, TWAP/VWAP/PoV, zoología financiera, ETFs, geometría de carteras, Black-Scholes, AMMs): consultar_base_conocimiento con la consulta específica para citar el corpus metodológico.
 - Fuentes directas: datos_financieros(fuente) para yfinance/argentinadatos/criptoya/bcra_cambiarias/bcra_monetarias; iol_login/iol_cuenta/iol_mercado para la cuenta IOL del usuario (si pide su portafolio/cuenta/operaciones sin sesión iniciada, el enfoque debe indicar pedirle credenciales); iol_operar SOLO con confirmación explícita del usuario.
-- Gráficos: si el usuario pide visualizar una serie o comparar, el enfoque debe incluir usar grafico_chat (linea/barras/tradingview).
-- Informes: si el usuario pide informe/reporte/resumen ejecutivo, primero reuní TODOS los datos con las herramientas y luego indicá en el enfoque redactarlo con generar_informe.
-- Regla de CTA: como máximo UN cierre suave (WhatsApp de Cintia o el Test del Inversor, nunca ambos), y solo si el usuario está en condición de recibirlo; si la pregunta es conceptual o de datos puntuales, el enfoque puede omitir la CTA.`;
+ - Gráficos: si el usuario pide visualizar una serie o comparar, el enfoque debe incluir usar grafico_chat (linea/barras/tradingview).
+ - Informes: si el usuario pide informe/reporte/resumen ejecutivo, primero reuní TODOS los datos con las herramientas y luego indicá en el enfoque redactarlo con generar_informe.
+ - Señales unificadas: para "señal de X", "qué compro hoy", "top señales", "analizá completa" invocar SIEMPRE generar_senal_unificada(simbolo) si es 1 ticker, o generar_senales_unificadas(simbolos, topN) si son varios / batch. NO uses generar_senales_cedear ni valor_intrinseco_real aislado: el motor unificado ya ejecuta las 4 capas en orden (Intermarket → Fundamental Pascale gate → Semaforo → CAPM/Riesgo) y devuelve COMPRA/VENTA con score.
+ - Regla de CTA: como máximo UN cierre suave (WhatsApp de Cintia o el Test del Inversor, nunca ambos), y solo si el usuario está en condición de recibirlo; si la pregunta es conceptual o de datos puntuales, el enfoque puede omitir la CTA.`;
 
 function extraerHechosDePregunta(pregunta: string): string[] {
   const p = pregunta.toLowerCase();
@@ -272,17 +276,22 @@ export const Route = createFileRoute("/api/chat")({
         const encoder = new TextEncoder();
         const stream = new ReadableStream<Uint8Array>({
           async start(controller) {
+            const rootScope = createScope(`chat:${sessionId.slice(0, 8)}:${pregunta.slice(0, 24)}`, "root");
             const send = (obj: unknown) =>
               controller.enqueue(encoder.encode(`${JSON.stringify(obj)}\n`));
+            // Observabilidad: hint adaptativo previo
+            const hint = getAdaptiveHint();
+            send({ t: "adaptive", v: hint });
 
-            // Pre-RAG: inyectar contexto relevante de la base de conocimiento.
+            // Pre-RAG: Nemo Retriever hybrid (rag-blueprint + nemotron-retrieval-recipes)
             let ragMsg: ApiMsg | undefined;
             try {
-              const [contextoSitio, contextoAcademico] = await Promise.all([
-                buscarEnBase(pregunta),
-                buscarAcademico(pregunta, 5, baseUrl),
-              ]);
-              const contextoRag: ResultadoConocimiento[] = [...contextoSitio, ...contextoAcademico];
+              const contextoRag: ResultadoConocimiento[] = (await retrieveHybrid(pregunta, {
+                topK: 6,
+                enableRerank: true,
+                enableQueryRewrite: true,
+                baseUrl,
+              })) as unknown as ResultadoConocimiento[];
               if (contextoRag.length) {
                 const contenidoRag = contextoRag
                   .map((r) => {
@@ -303,6 +312,8 @@ export const Route = createFileRoute("/api/chat")({
 
             let resultado: Awaited<ReturnType<typeof orquestarTurno>>;
             try {
+              recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "start", payload: { pregunta: pregunta.slice(0, 80), hint } });
+              const t0 = Date.now();
               resultado = await orquestarTurno({
                 pregunta,
                 historial,
@@ -317,12 +328,15 @@ export const Route = createFileRoute("/api/chat")({
                 sessionId,
                 ...(ragMsg ? { ragMsg } : {}),
               });
+              recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "success", durationMs: Date.now() - t0 });
             } catch (err) {
               console.error("chat error", err);
+              recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "error", payload: String(err) });
               send({
                 t: "text",
                 v: "_El asistente tuvo un problema transitorio. Podés volver a intentar en unos segundos o escribirle directo a Cintia por WhatsApp._",
               });
+              closeScope(rootScope);
               controller.close();
               return;
             }
@@ -333,8 +347,12 @@ export const Route = createFileRoute("/api/chat")({
               await new Promise((r) => setTimeout(r, 12));
             }
 
+            // Observabilidad final: snapshot adaptativo
+            send({ t: "observability", v: getAdaptiveStateSnapshot() });
+
             memoria.agregarTimeline({ rol: "agente", texto: final.slice(0, 500) });
             memoria.cerrarTurno();
+            closeScope(rootScope);
             controller.close();
           },
         });

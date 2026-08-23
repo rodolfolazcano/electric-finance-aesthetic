@@ -379,6 +379,56 @@ export const YAHOO_RANGE_MAP = {
   "5A": { range: "5y", interval: "1wk" },
 } as const;
 
+/** Normaliza rangos en español/variantes del usuario a valores Yahoo válidos. */
+export function normalizarRangoYahoo(raw: string): string {
+  const s = (raw ?? "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ");
+  const map: Record<string, string> = {
+    "1 dia": "1d",
+    "1 dia": "1d",
+    "1d": "1d",
+    "1 mes": "1mo",
+    "1m": "1mo",
+    "1mo": "1mo",
+    "3 meses": "3mo",
+    "3m": "3mo",
+    "3mo": "3mo",
+    "6 meses": "6mo",
+    "6m": "6mo",
+    "6mo": "6mo",
+    "1 ano": "1y",
+    "1 anio": "1y",
+    "1a": "1y",
+    "1y": "1y",
+    "1ytd": "1y",
+    "2 anos": "2y",
+    "2 anios": "2y",
+    "2a": "2y",
+    "2y": "2y",
+    "5 anos": "5y",
+    "5 anios": "5y",
+    "5a": "5y",
+    "5y": "5y",
+    "max": "max",
+    "historico": "max",
+    "historico completo": "max",
+  };
+  if (map[s]) return map[s];
+  // Patrones "1 año", "3M", "6M", "1A"
+  if (/^1\s*a/.test(s)) return "1y";
+  if (/^3\s*m/.test(s)) return "3mo";
+  if (/^6\s*m/.test(s)) return "6mo";
+  if (/^5\s*a/.test(s)) return "5y";
+  if (/^2\s*a/.test(s)) return "2y";
+  // Ya es valor Yahoo valido
+  if (["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "max"].includes(s)) return s;
+  return "1y";
+}
+
 async function yahooQuoteInner(
   symbol: string,
   cacheKey: string,

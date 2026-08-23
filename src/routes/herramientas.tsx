@@ -24,6 +24,7 @@ import { AnalisisTab } from "@/components/herramientas/AnalisisTab";
 import { CuantitativoTab } from "@/components/herramientas/CuantitativoTab";
 import { SectoresTab } from "@/components/herramientas/SectoresTab";
 import { PlanificacionFinancieraTab } from "@/components/herramientas/PlanificacionFinancieraTab";
+import { CalculadoraFinancieraTab } from "@/components/herramientas/CalculadoraFinancieraTab";
 import { CriptoTab } from "@/components/herramientas/CriptoTab";
 import { ArbitrajeP2PPanel } from "@/components/herramientas/ArbitrajeP2PPanel";
 import { OptionsPanel } from "@/components/options/OptionsPanel";
@@ -68,7 +69,8 @@ const TABS = [
   { id: "opciones", label: "Opciones", icon: PieChart, tipo: "core" },
   { id: "arbitrador", label: "Arbitrador", icon: ArrowLeftRight, tipo: "core" },
   { id: "cripto", label: "Cripto", icon: Bitcoin, tipo: "core" },
-  { id: "planificacion", label: "Planificación", icon: Calculator, tipo: "core" },
+  { id: "calculadora", label: "Calculadora", icon: Calculator, tipo: "core" },
+  { id: "planificacion", label: "Planificación", icon: Activity, tipo: "core" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -145,10 +147,10 @@ function HerramientasContenido() {
                 Cintia <em className="italic text-primary">Boos</em>
               </span>
             </Link>
-            <div aria-hidden className="hidden h-5 w-px bg-border/60 lg:block" />
-            <nav className="hidden lg:flex items-center gap-4 ml-1" aria-label="Navegación Inicio">
+            <div aria-hidden className="hidden h-5 w-px bg-border/60 md:block" />
+            <nav className="hidden items-center gap-8 md:flex" aria-label="Navegación Inicio">
               {HOME_NAV.map((n) => (
-                <a key={n.label} href={n.href} className="text-[14px] uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground transition-colors">
+                <a key={n.label} href={n.href} className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground transition-colors">
                   {n.label}
                 </a>
               ))}
@@ -157,7 +159,7 @@ function HerramientasContenido() {
 
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-2 mr-1">
-              <span className="hidden lg:inline text-[13px] uppercase tracking-wide text-muted-foreground/70">Herramientas</span>
+              <span className="hidden lg:inline text-[11px] uppercase tracking-[0.16em] text-muted-foreground/70">Herramientas</span>
               <span className="h-4 w-px bg-border/40 hidden lg:block" />
             </div>
             <IOLLoginButton />
@@ -221,6 +223,7 @@ function HerramientasContenido() {
             {activo === "opciones" && <OptionsPanel />}
             {activo === "arbitrador" && <ArbitrajeP2PPanel />}
             {activo === "cripto" && <CriptoTab />}
+            {activo === "calculadora" && <CalculadoraFinancieraTab />}
             {activo === "planificacion" && <PlanificacionFinancieraTab />}
             <p className="mt-8 text-[14px] leading-snug text-muted-foreground border-t border-border/20 pt-4">
               Herramientas informativas con datos de terceros. No constituyen recomendación de inversión. Fuentes: BYMA · IOL · Yahoo Finance · BCRA · Delay 15-20’

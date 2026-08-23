@@ -68,5 +68,25 @@
     "desde": "conocimiento",
     "hacia": "coord",
     "texto": "¡Hola! ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "desde": "conocimiento",
+    "hacia": "coord",
+    "texto": "Aquí tienes el gráfico de **BCBA:GGAL** en TradingView (intervalo diario).  \n\n- **Símbolo:** BCBA:GGAL  \n- **Temporalidad:** Diario (D)  \n- **Rango:** últimos 6 meses  \n\nSi deseas ver otro período (por ejemplo, 1 mes, 1 año) o cambiar el símbolo, solo indícalo y lo actualizo al instante."
+  },
+  {
+    "desde": "noticias",
+    "hacia": "coord",
+    "texto": "Según las noticias de **hoy**, lo que más pesa sobre Meta son **frentes legales y regulatorios**:\n\n- **Juicio por adicción a redes sociales** en EE. UU. (y Chile lidera ranking de uso problemático) — *Cooperativa, ayer 22:25*  \n- **“Meta, en el banquillo de los acusados”** — *La Vanguardia, ayer 19:05*  \n- **“Si se demuestra que Meta crea adicción, habrá una oleada masiva de demandas”** — *El Diario Vasco, hoy 01:57*  \n- Presión para que **Apple y Google verifiquen la edad de menores** en México — *Yahoo, ayer 18:14*\n\nEsas novedades (litigios, riesgo de multas/daños reputacionales y mayor escrutinio regulatorio) son las que la prensa destaca hoy como catalizadores negativos para la acción. No hay en los resultados un dato único de “ganancias decepcionantes” o “guidance bajado” de hoy; el foco está en el **riesgo legal**."
+  },
+  {
+    "desde": "mercado",
+    "hacia": "coord",
+    "texto": "Inflación mensual del BCRA con gráfico"
+  },
+  {
+    "desde": "conocimiento",
+    "hacia": "coord",
+    "texto": "¡Hola! ¿En qué puedo ayudarte hoy?"
   }
 ]

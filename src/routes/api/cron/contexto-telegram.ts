@@ -77,8 +77,11 @@ function armarMensaje(snapshot: MarketContextSnapshot, ia: InformeMatutinoIA): s
   const momento = horaART() >= 12 ? "Cierre" : "Apertura";
   const S: Seccion[] = [];
 
+  const tituloInforme =
+    momento === "Apertura" ? "Lo que hay que saber esta mañana" : "Lo que hay que saber del cierre";
+
   S.push({
-    titulo: "Resumen",
+    titulo: tituloInforme,
     lineas: [`Humor de mercado: <b>${ia.humorMercado}</b>`, ia.resumenEjecutivo],
   });
 
@@ -151,17 +154,65 @@ function armarMensaje(snapshot: MarketContextSnapshot, ia: InformeMatutinoIA): s
     });
   }
 
-  const agenda = [...(ia.agendaDelDia ?? [])]
-    .sort((a, b) => (a.relevancia === "alta" ? -1 : b.relevancia === "alta" ? 1 : 0))
-    .slice(0, 6);
-  if (agenda.length) {
+  // Resultados corporativos que reportan hoy (con consenso si hay).
+  const earnings = snapshot.resultadosCorporativos ?? [];
+  if (earnings.length) {
     S.push({
-      titulo: "Agenda economica",
-      lineas: agenda.map(
-        (a) => `${a.relevancia === "alta" ? "[!] " : ""}${a.hora} ${escapeHtml(a.evento)}`,
-      ),
+      titulo: "Resultados de hoy",
+      lineas: earnings.slice(0, 6).map((e) => {
+        const eps = e.epsConsenso != null ? ` | EPS cons. ${num(e.epsConsenso)}` : "";
+        const hora = e.hora !== "--" ? ` (${escapeHtml(e.hora)})` : "";
+        return `- <b>${escapeHtml(e.ticker)}</b>${hora}${eps}`;
+      }),
     });
   }
+
+  // Agenda del día: prioriza el calendario con consenso/previo; cae a la
+  // estática curada si el feed no trajo eventos.
+  const cal = (snapshot.calendarioHoy ?? []).slice(0, 8);
+  if (cal.length) {
+    S.push({
+      titulo: "Agenda economica de hoy",
+      lineas: cal.map((c) => {
+        const extra = [
+          c.consenso != null ? `cons. ${c.consenso}` : null,
+          c.previo != null ? `ant. ${c.previo}` : null,
+          c.pais || null,
+        ]
+          .filter(Boolean)
+          .join(" | ");
+        return `${c.relevancia === "alta" ? "[!] " : ""}${c.hora} ${escapeHtml(c.evento)}${extra ? ` — ${escapeHtml(extra)}` : ""}`;
+      }),
+    });
+  } else {
+    const agenda = [...(ia.agendaDelDia ?? [])]
+      .sort((a, b) => (a.relevancia === "alta" ? -1 : b.relevancia === "alta" ? 1 : 0))
+      .slice(0, 6);
+    if (agenda.length) {
+      S.push({
+        titulo: "Agenda economica",
+        lineas: agenda.map(
+          (a) => `${a.relevancia === "alta" ? "[!] " : ""}${a.hora} ${escapeHtml(a.evento)}`,
+        ),
+      });
+    }
+  }
+
+  // Datos INDEC: actividad y sector externo.
+  const indec = snapshot.indec;
+  const indecLineas: string[] = [];
+  if (indec?.emae) {
+    indecLineas.push(
+      `EMAE (${escapeHtml(indec.emae.fechaDato)}): var mensual ${pct(indec.emae.varMensualPct)} / interanual ${pct(indec.emae.varInteranualPct)}`,
+    );
+  }
+  if (indec?.comercioExterior) {
+    const ce = indec.comercioExterior;
+    indecLineas.push(
+      `Comercio exterior (${escapeHtml(ce.fechaDato)}): expo USD ${num(ce.exportacionesUSD)} (${pct(ce.varExportacionesInteranualPct)}) | impo USD ${num(ce.importacionesUSD)} (${pct(ce.varImportacionesInteranualPct)}) | saldo USD ${num(ce.saldoUSD)} | acumulado año USD ${num(ce.saldoAcumuladoAnioUSD)}`,
+    );
+  }
+  if (indecLineas.length) S.push({ titulo: "Sector real (INDEC)", lineas: indecLineas });
 
   const opps = ia.oportunidadesDelDia ?? [];
   if (opps.length) {

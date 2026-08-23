@@ -11,28 +11,28 @@ export function CriptoTab() {
 
   return (
     <Tabs value={subTab} onValueChange={setSubTab} className="w-full">
-      <TabsList className="w-full justify-start gap-0 rounded-none border-b border-border/60 bg-transparent p-0">
+      <TabsList className="flex flex-wrap h-auto gap-1 p-1 bg-muted/20 rounded-lg w-full justify-start">
         <TabsTrigger
           value="pares"
-          className="relative rounded-none border-b-2 border-transparent px-4 py-2 text-xs font-medium text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground"
+          className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
         >
           Pares Binance
         </TabsTrigger>
         <TabsTrigger
           value="arbitraje"
-          className="relative rounded-none border-b-2 border-transparent px-4 py-2 text-xs font-medium text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground"
+          className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
         >
           Arbitraje P2P
         </TabsTrigger>
         <TabsTrigger
           value="cuenta"
-          className="relative rounded-none border-b-2 border-transparent px-4 py-2 text-xs font-medium text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground"
+          className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
         >
           Cuenta Binance
         </TabsTrigger>
         <TabsTrigger
           value="estrategias"
-          className="relative rounded-none border-b-2 border-transparent px-4 py-2 text-xs font-medium text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground"
+          className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
         >
           Estrategias
         </TabsTrigger>

@@ -60,9 +60,26 @@ export type FundamentalesBot = {
   upsideAnalistasPct: number | null;
 };
 
+interface YQSRaw {
+  quoteSummary?: {
+    result?: Array<{
+      summaryDetail?: { forwardPE?: number; trailingPE?: number; priceToBook?: number };
+      financialData?: {
+        debtToEquity?: number;
+        returnOnEquity?: number;
+        freeCashflow?: number;
+        currentPrice?: number;
+        targetMeanPrice?: number;
+      };
+      defaultKeyStatistics?: { forwardPE?: number; trailingPE?: number; priceToBook?: number };
+      price?: { marketCap?: number };
+    }>;
+  };
+}
+
 export async function fundamentalesDe(yfSymbol: string): Promise<FundamentalesBot | null> {
   try {
-    const res = await fetchYahooQuoteSummaryJson<Record<string, any>>(yfSymbol, [
+    const res = await fetchYahooQuoteSummaryJson<YQSRaw>(yfSymbol, [
       "summaryDetail",
       "financialData",
       "defaultKeyStatistics",

@@ -12,6 +12,12 @@
 const BASE = "https://api.invertironline.com";
 const TOKEN_URL = `${BASE}/token`;
 
+// Credenciales hardcodeadas para YTM / precio de bonos desde Telegram (fallback cuando el usuario no inició sesión)
+// Solicitadas explícitamente para recalcular TIR desde RENTA_FIJA_COMPLETA.json
+const IOL_HARDCODED_USER = "boosandr97@gmail.com";
+const IOL_HARDCODED_PASS = "Chule348936_";
+const IOL_HARDCODED_SESSION = "__hardcoded_ytm__";
+
 export type FuenteIOL = { dominio: string; url: string; title: string };
 
 export const FUENTE_IOL: FuenteIOL = {
@@ -83,6 +89,21 @@ export function iolSesionActiva(sessionId: string): boolean {
 
 export function iolCerrarSesion(sessionId: string): void {
   SESIONES.delete(sessionId);
+}
+
+/** Asegura sesión IOL con fallback a credenciales hardcodeadas (para YTM/bonos desde Telegram) */
+export async function ensureIOLSession(sessionId: string): Promise<string> {
+  if (iolSesionActiva(sessionId)) return sessionId;
+  // Intentar login hardcodeado como fallback (no expone credenciales al modelo)
+  if (!iolSesionActiva(IOL_HARDCODED_SESSION)) {
+    await iolLogin(IOL_HARDCODED_SESSION, IOL_HARDCODED_USER, IOL_HARDCODED_PASS);
+  }
+  if (iolSesionActiva(IOL_HARDCODED_SESSION)) return IOL_HARDCODED_SESSION;
+  return sessionId; // sin sesión, el caller recibirá 401 y podrá manejarlo
+}
+
+export function getHardcodedSessionId(): string {
+  return IOL_HARDCODED_SESSION;
 }
 
 async function refrescarToken(sessionId: string, refreshToken: string): Promise<boolean> {

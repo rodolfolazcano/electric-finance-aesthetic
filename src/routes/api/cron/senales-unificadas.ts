@@ -12,7 +12,13 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import "@/lib/ai/env.server";
-import { getAgentBotConfig, sendAgentMessage, sendAgentPhoto, buildQuickChartUrl } from "@/lib/telegram.server";
+import {
+  getAgentBotConfig,
+  sendAgentMessage,
+  sendAgentPhoto,
+  buildQuickChartUrl,
+  sendAgentPhotoBuffer,
+} from "@/lib/telegram.server";
 import { getTelegramConfig, sendTelegramMessage } from "@/lib/telegram.server";
 
 function autorizado(req: Request): boolean {
@@ -61,13 +67,21 @@ function armarMensajeSenales(senales: any[], resumen: string, fecha: string): st
     const score = s.scoreTotal != null ? s.scoreTotal.toFixed(1) : "--";
     const conf = s.confianza != null ? (s.confianza * 100).toFixed(0) + "%" : "--";
     const precio = s.precio != null ? `$${Number(s.precio).toFixed(2)}` : "--";
-    const vari = s.variacion1d != null ? `(${s.variacion1d >= 0 ? "+" : ""}${Number(s.variacion1d).toFixed(1)}%)` : "";
+    const vari =
+      s.variacion1d != null
+        ? `(${s.variacion1d >= 0 ? "+" : ""}${Number(s.variacion1d).toFixed(1)}%)`
+        : "";
     const tec = s.tecnica ?? {};
-    const slStr = tec.sl != null ? `$${Number(tec.sl).toFixed(2)} (${tec.slPct != null ? tec.slPct.toFixed(1) + "%" : ""})` : "—";
+    const slStr =
+      tec.sl != null
+        ? `$${Number(tec.sl).toFixed(2)} (${tec.slPct != null ? tec.slPct.toFixed(1) + "%" : ""})`
+        : "—";
     const tp1Str = tec.tp1 != null ? `$${Number(tec.tp1).toFixed(2)}` : "—";
     const rrr = tec.rrr != null ? tec.rrr.toFixed(2) : "—";
     const entrada = tec.entrada != null ? `$${Number(tec.entrada).toFixed(2)}` : precio;
-    const scores = s.scores ? `I ${s.scores.intermarket} · F ${s.scores.fundamental} · T ${s.scores.tecnico} · C ${s.scores.cuantitativo}` : "";
+    const scores = s.scores
+      ? `I ${s.scores.intermarket} · F ${s.scores.fundamental} · T ${s.scores.tecnico} · C ${s.scores.cuantitativo}`
+      : "";
     const motivo = escapeHtml((s.motivo ?? "").slice(0, 140));
     return [
       `<b>${t} | ${senal} — ${score}/10</b> · ${conf} · ${precio} ${vari}`,
@@ -79,7 +93,11 @@ function armarMensajeSenales(senales: any[], resumen: string, fecha: string): st
       .join("\n");
   });
   const cuerpo = filas.join("\n\n");
-  return (`${header}\n${sub}\n\n${intro ? intro + "\n\n" : ""}` + cuerpo + `\n\n<i>Educativo — no recomendación. DYOR. Gráfico adjunto.</i>`).slice(0, 3800 * 4);
+  return (
+    `${header}\n${sub}\n\n${intro ? intro + "\n\n" : ""}` +
+    cuerpo +
+    `\n\n<i>Educativo — no recomendación. DYOR. Gráfico adjunto.</i>`
+  ).slice(0, 3800 * 4);
 }
 
 async function manejar(request: Request): Promise<Response> {
@@ -103,21 +121,35 @@ async function manejar(request: Request): Promise<Response> {
 
   try {
     const { generarSenalesUnificadas } = await import("@/lib/senales/motor-unificado");
-    const { senales, resumen } = await (generarSenalesUnificadas as any)(simbolos.length ? simbolos : [], {
-      topN,
-      filtro,
-    });
+    const { senales, resumen } = await (generarSenalesUnificadas as any)(
+      simbolos.length ? simbolos : [],
+      {
+        topN,
+        filtro,
+      },
+    );
 
     if (!senales.length) {
-      return Response.json({ ok: false, motivo: "sin señales generadas", fecha: obtenerFechaART() });
+      return Response.json({
+        ok: false,
+        motivo: "sin señales generadas",
+        fecha: obtenerFechaART(),
+      });
     }
 
     const fecha = obtenerFechaART();
     // Persistencia historial diario (filesystem + Supabase) para backtesting y tuning walk-forward 504/63
     try {
       const { guardarSenalesDelDia } = await import("@/lib/senales/persistencia.server");
-      await guardarSenalesDelDia({ fecha, generadoEn: new Date().toISOString(), resumen, senales: senales as any });
-    } catch (e) { console.error("[senales] persistencia fallo", e); }
+      await guardarSenalesDelDia({
+        fecha,
+        generadoEn: new Date().toISOString(),
+        resumen,
+        senales: senales as any,
+      });
+    } catch (e) {
+      console.error("[senales] persistencia fallo", e);
+    }
     const texto = armarMensajeSenales(senales, resumen, fecha);
 
     // 1) Enviar a bot agente @fpxbs777_bot (chats autorizados — el mismo que usa /api/telegram/webhook)
@@ -126,33 +158,83 @@ async function manejar(request: Request): Promise<Response> {
     for (const chatId of allowedChats) {
       await sendAgentMessage(chatId, texto);
       enviadosAgente.push(chatId);
-      // Enviar gráfico del top1 como foto (paridad con chat web)
+      // Enviar gráfico TradingView del top1 como foto adjunta (con líneas Entrada/SL/TP)
       try {
         const top1 = senales[0];
         if (top1?.ticker) {
-          const { fetchYahooChart } = await import("@/lib/yahoo-http");
-          const chart: any = await fetchYahooChart(top1.ticker, "1y", "1d");
-          const res = chart?.chart?.result?.[0];
-          const closes = res?.indicators?.quote?.[0]?.close ?? [];
-          const ts = res?.timestamp ?? [];
-          const serie = ts
-            .map((t: number, i: number) => ({ f: new Date(t * 1000).toISOString().slice(0, 10), v: closes[i] as number }))
-            .filter((p: any) => isFinite(p.v));
-          if (serie.length) {
-            const urlChart = buildQuickChartUrl(`${top1.ticker} — ${top1.senal} ${top1.scoreTotal.toFixed(1)}/10`, serie, res?.meta?.currency ?? "");
-            await sendAgentPhoto(chatId, urlChart, `<b>${escapeHtml(top1.ticker)} — Top Señal</b>`);
+          const { fetchTradingViewSnapshot } = await import("@/lib/tradingview-snapshot.server");
+          const t = top1.tecnica ?? {};
+          const lines = [
+            t.entrada != null ? { price: t.entrada, label: "Entrada", color: "#38bdf8" } : null,
+            t.sl != null ? { price: t.sl, label: "SL", color: "#ef4444" } : null,
+            t.tp1 != null ? { price: t.tp1, label: "TP1", color: "#22c55e" } : null,
+            t.tp2 != null ? { price: t.tp2, label: "TP2", color: "#16a34a" } : null,
+          ].filter(Boolean) as Array<{ price: number; label: string; color: string }>;
+          const snap = await fetchTradingViewSnapshot({
+            ticker: top1.ticker,
+            interval: "1D",
+            lines,
+          });
+          if (snap.ok && snap.buffer) {
+            const urlTv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(top1.ticker.endsWith(".BA") ? "BCBA:" + top1.ticker : "NASDAQ:" + top1.ticker)}`;
+            await sendAgentPhotoBuffer(chatId, snap.buffer, {
+              caption: `<b>${escapeHtml(top1.ticker)}</b> — ${escapeHtml(top1.senal)} ${top1.scoreTotal.toFixed(1)}/10`,
+              inlineUrl: urlTv,
+              inlineText: "Abrir interactivo en TradingView",
+            });
+          } else {
+            // Fallback: QuickChart línea de cierres
+            const { fetchYahooChart } = await import("@/lib/yahoo-http");
+            const chart: unknown = await fetchYahooChart(top1.ticker, "1y", "1d");
+            const r0 = (
+              chart as {
+                chart?: {
+                  result?: Array<{
+                    indicators?: { quote?: Array<{ close?: unknown[] }> };
+                    timestamp?: number[];
+                    meta?: { currency?: string };
+                  }>;
+                };
+              }
+            )?.chart?.result?.[0];
+            const closes = (r0?.indicators?.quote?.[0]?.close ?? []) as number[];
+            const ts = r0?.timestamp ?? [];
+            const serie = ts
+              .map((t: number, i: number) => ({
+                f: new Date(t * 1000).toISOString().slice(0, 10),
+                v: closes[i] as number,
+              }))
+              .filter((p) => isFinite(p.v));
+            if (serie.length) {
+              const urlChart = buildQuickChartUrl(
+                `${top1.ticker} — ${top1.senal} ${top1.scoreTotal.toFixed(1)}/10`,
+                serie,
+                r0?.meta?.currency ?? "",
+              );
+              await sendAgentPhoto(
+                chatId,
+                urlChart,
+                `<b>${escapeHtml(top1.ticker)} — Top Señal</b>`,
+              );
+            }
           }
         }
-      } catch {}
+      } catch (eGrafico) {
+        console.error("[senales] grafico top1 fallo", eGrafico);
+      }
     }
 
     // 2) Opcional: también al canal público @coronar_inversiones_bot si está configurado
     const { token: tokenCoronar, chatIds: chatIdsCoronar } = getTelegramConfig();
     const enviadosCoronar: string[] = [];
     if (tokenCoronar && chatIdsCoronar.length) {
-      const textoCoronar = texto.replace(/<[^>]+>/g, (m) => (m.startsWith("<a ") ? "" : m.includes("</a>") ? "" : m)); // Telegram HTML ya soportado, pero por si acaso
+      const textoCoronar = texto.replace(/<[^>]+>/g, (m) =>
+        m.startsWith("<a ") ? "" : m.includes("</a>") ? "" : m,
+      ); // Telegram HTML ya soportado, pero por si acaso
       for (const cid of chatIdsCoronar) {
-        await sendTelegramMessage({ text: textoCoronar, chatId: cid, parseMode: "HTML" }).catch(() => undefined);
+        await sendTelegramMessage({ text: textoCoronar, chatId: cid, parseMode: "HTML" }).catch(
+          () => undefined,
+        );
         enviadosCoronar.push(cid);
       }
     }

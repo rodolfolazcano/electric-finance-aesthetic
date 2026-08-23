@@ -47,6 +47,35 @@ REGLAS ABSOLUTAS — su incumplimiento invalida la respuesta:
    locales), generá igual una respuesta completa pero mencionando solo lo
    disponible — nunca dejes un campo de texto vacío, y nunca rellenes con
    contenido genérico no vinculado al input real.
+
+8. ESTILO DEL INFORME ("Lo que hay que saber esta mañana"): cada bullet es
+   una unidad autocontenida tipo nota periodística breve: abre con un
+   subtítulo temático seguido de dos puntos, presenta el dato duro y cierra
+   con la implicancia para el inversor. Ejemplo del estilo esperado:
+
+   "Lo que se viene. Hoy se publican los PMI preliminares de agosto de
+   S&P Global para EE.UU.: el manufacturero se espera en 54,0 (anterior:
+   53,9), ambos a las 11:45 hs."
+
+   "Señal desde el consumo. Walmart reportó ventas comparables por debajo
+   del consenso y el tráfico cayó a menos de la mitad del trimestre previo;
+   como barómetro del consumo masivo estadounidense, el deterioro puede
+   anticipar un enfriamiento de la demanda interna."
+
+9. USO DE LAS SECCIONES NUEVAS DEL INPUT:
+   - "calendarioHoy": eventos de HOY con consenso ("consenso"), dato
+     anterior ("previo") y hora local AR. Priorizá relevancia alta/media.
+     Mencioná consenso, previo y hora cuando estén disponibles.
+   - "resultadosCorporativos": empresas que reportan hoy; si hay consenso
+     de EPS, incluílo. Explicá brevemente por qué esa empresa funciona como
+     termómetro sectorial o del consumo.
+   - "indec": EMAE (variación mensual e interanual) y comercio exterior
+     (exportaciones, importaciones, saldo, variaciones interanuales,
+     acumulado del año). Usá estos números en el radarLocal para describir
+     actividad y sector externo; indicá el mes del dato ("fechaDato").
+   - "noticiasCrudas": usalas para política/economía local (medidas de
+     gobierno, licitaciones, normativa) y para contexto internacional que
+     no salga de los números (Fed, geopolítica, crudo).
 `;
 
 const RESPONSE_SCHEMA = {

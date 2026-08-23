@@ -1,7 +1,11 @@
 import type { SemaforoResult } from "../finance.functions";
 import { InformeMatutinoIASchema } from "./schema";
 import type { InformeMatutinoIA } from "./schema";
+import type { EventoCalendario } from "./calendario-economico.functions";
+import type { ResultadoCorporativo } from "./earnings.functions";
+import type { IndecDatos } from "./indec.functions";
 export type { InformeMatutinoIA };
+export type { EventoCalendario, ResultadoCorporativo, IndecDatos };
 
 // ─── Snapshot de datos (Fase 1 — backend, sin IA) ────────────────────────────
 
@@ -77,6 +81,9 @@ export interface MarketContextSnapshot {
   };
 
   agendaDelDia: AgendaEvento[];
+  calendarioHoy: EventoCalendario[];
+  resultadosCorporativos: ResultadoCorporativo[];
+  indec: IndecDatos;
   screeners: import("../daily-opportunities.functions").MarketScreenersResult;
   macroContextoAR: import("../daily-opportunities.functions").MacroContextAR;
   noticiasCrudas: NoticiaCruda[];

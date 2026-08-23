@@ -136,22 +136,37 @@ export type SenalInstitucionalArgs = {
   variacion1d: number | null;
   scoreTotal: number;
   scores: { intermarket: number; fundamental: number; tecnico: number; cuantitativo: number };
-  tecnica: { entrada: number | null; sl: number | null; tp1: number | null; tp2: number | null; slPct: number | null; tp1Pct: number | null; rrr: number | null };
+  tecnica: {
+    entrada: number | null;
+    sl: number | null;
+    tp1: number | null;
+    tp2: number | null;
+    slPct: number | null;
+    tp1Pct: number | null;
+    rrr: number | null;
+  };
   motivo?: string;
   confianza?: number;
 };
 
 export function formatSenalInstitucional(s: SenalInstitucionalArgs): string {
   const t = s.ticker.toUpperCase();
-  const varStr = s.variacion1d != null ? ` (${s.variacion1d >= 0 ? "+" : ""}${s.variacion1d.toFixed(2)}%)` : "";
+  const varStr =
+    s.variacion1d != null ? ` (${s.variacion1d >= 0 ? "+" : ""}${s.variacion1d.toFixed(2)}%)` : "";
   const precioStr = s.precio != null ? `$${s.precio.toFixed(2)}` : "s/d";
-  const slStr = s.tecnica.sl != null ? `$${s.tecnica.sl.toFixed(2)} (${s.tecnica.slPct != null ? s.tecnica.slPct.toFixed(2) + "%" : ""})` : "—";
-  const tp1Str = s.tecnica.tp1 != null ? `$${s.tecnica.tp1.toFixed(2)} (${s.tecnica.tp1Pct != null ? "+" + s.tecnica.tp1Pct.toFixed(2) + "%" : ""})` : "—";
+  const slStr =
+    s.tecnica.sl != null
+      ? `$${s.tecnica.sl.toFixed(2)} (${s.tecnica.slPct != null ? s.tecnica.slPct.toFixed(2) + "%" : ""})`
+      : "—";
+  const tp1Str =
+    s.tecnica.tp1 != null
+      ? `$${s.tecnica.tp1.toFixed(2)} (${s.tecnica.tp1Pct != null ? "+" + s.tecnica.tp1Pct.toFixed(2) + "%" : ""})`
+      : "—";
   const rrrStr = s.tecnica.rrr != null ? s.tecnica.rrr.toFixed(2) : "—";
   const entradaStr = s.tecnica.entrada != null ? `$${s.tecnica.entrada.toFixed(2)}` : precioStr;
   return [
     `<b>CORONAR — ${escapeHtml(t)} | ${escapeHtml(s.senal)} — ${s.scoreTotal.toFixed(1)}/10</b>`,
-    `Precio ${precioStr}${varStr} · Confianza ${(s.confianza ?? 0.6 * 100).toFixed ? ((s.confianza ?? 0.6) * 100).toFixed(0) + "%" : ""}`,
+    `Precio ${precioStr}${varStr} · Confianza ${((s.confianza ?? 0.6) * 100).toFixed(0)}%`,
     `Entrada ${entradaStr} · SL ${slStr} · TP1 ${tp1Str} · R/R ${rrrStr}`,
     `I ${s.scores.intermarket.toFixed(1)} · F ${s.scores.fundamental.toFixed(1)} · T ${s.scores.tecnico.toFixed(1)} · C ${s.scores.cuantitativo.toFixed(1)}`,
     s.motivo ? escapeHtml(s.motivo).slice(0, 220) : "",
@@ -166,7 +181,9 @@ export async function sendTelegramSignal(args: TelegramSignalArgs): Promise<stri
   return sendTelegramMessage({ text, chatId: args.chatId, parseMode: "HTML" });
 }
 
-export async function sendSenalInstitucional(args: SenalInstitucionalArgs & { chatId?: string }): Promise<string> {
+export async function sendSenalInstitucional(
+  args: SenalInstitucionalArgs & { chatId?: string },
+): Promise<string> {
   const text = formatSenalInstitucional(args);
   return sendTelegramMessage({ text, chatId: args.chatId, parseMode: "HTML" });
 }
@@ -328,7 +345,7 @@ export async function sendAgentPhoto(
   photoUrl: string,
   caption?: string,
 ): Promise<void> {
-  let res = await agentApi("sendPhoto", {
+  const res = await agentApi("sendPhoto", {
     chat_id: chatId,
     photo: photoUrl,
     ...(caption ? { caption, parse_mode: "HTML" } : {}),
@@ -338,6 +355,130 @@ export async function sendAgentPhoto(
     console.error("[AGENTE TG] sendPhoto fallo:", res.description, "-> fallback link");
     await sendAgentMessage(chatId, `${caption ?? "Gráfico"}\n${photoUrl}`);
   }
+}
+
+type PhotoBufferOpts = { caption?: string; inlineUrl?: string; inlineText?: string };
+
+/** Envía un PNG como archivo adjunto (multipart sendPhoto) con caption HTML y botón inline opcional. */
+async function sendPhotoBufferWithToken(
+  token: string,
+  chatId: string | number,
+  buffer: Buffer,
+  opts: PhotoBufferOpts = {},
+): Promise<boolean> {
+  if (!token || !buffer?.length) return false;
+  const fd = new FormData();
+  fd.append("chat_id", String(chatId));
+  const caption = (opts.caption ?? "").trim();
+  if (caption) {
+    fd.append("caption", caption.slice(0, 1024));
+    fd.append("parse_mode", "HTML");
+  }
+  if (opts.inlineUrl) {
+    fd.append(
+      "reply_markup",
+      JSON.stringify({
+        inline_keyboard: [
+          [{ text: opts.inlineText ?? "Abrir gráfico interactivo", url: opts.inlineUrl }],
+        ],
+      }),
+    );
+  }
+  fd.append("photo", new Blob([new Uint8Array(buffer)], { type: "image/png" }), "tradingview.png");
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+      method: "POST",
+      body: fd,
+      signal: AbortSignal.timeout(25000),
+    });
+    const data = (await res.json().catch(() => ({}))) as { ok?: boolean; description?: string };
+    if (!res.ok || data.ok === false) {
+      console.error("[TELEGRAM] sendPhoto(buffer) fallo:", res.status, data.description);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error("[TELEGRAM] sendPhoto(buffer) error:", e instanceof Error ? e.message : e);
+    return false;
+  }
+}
+
+/** Foto adjunta por el bot de señales (@Coronarinversiones777_bot). */
+export async function sendSignalsPhotoBuffer(
+  chatId: string | number,
+  buffer: Buffer,
+  opts: PhotoBufferOpts = {},
+): Promise<boolean> {
+  return sendPhotoBufferWithToken(getTelegramConfig().token, chatId, buffer, opts);
+}
+
+/** Foto adjunta por el bot agente (@fpxbs777_bot). */
+export async function sendAgentPhotoBuffer(
+  chatId: string | number,
+  buffer: Buffer,
+  opts: PhotoBufferOpts = {},
+): Promise<boolean> {
+  return sendPhotoBufferWithToken(getAgentBotConfig().token, chatId, buffer, opts);
+}
+
+/**
+ * Envía la señal institucional limpia CON el gráfico TradingView descargado como adjunto.
+ * Si falla la imagen, cae al mensaje de texto solo. Devuelve resumen del resultado.
+ */
+export async function sendSenalInstitucionalConGrafico(
+  args: SenalInstitucionalArgs & {
+    chatId?: string;
+    intervaloTv?: string;
+  },
+): Promise<string> {
+  const text = formatSenalInstitucional(args);
+  const { token, chatIds, enabled } = getTelegramConfig();
+  if (!enabled || !token) return "[TELEGRAM] Deshabilitado";
+  const targets = args.chatId ? [args.chatId] : chatIds;
+  if (!targets.length) return "[TELEGRAM ERROR] Sin chat destino";
+  const resultados: string[] = [];
+  for (const chatId of targets) {
+    let enviadoFoto = false;
+    try {
+      const { fetchTradingViewSnapshot } = await import("@/lib/tradingview-snapshot.server");
+      const t = args.tecnica;
+      const lines = [
+        t.entrada != null ? { price: t.entrada, label: "Entrada", color: "#38bdf8" } : null,
+        t.sl != null ? { price: t.sl, label: "SL", color: "#ef4444" } : null,
+        t.tp1 != null ? { price: t.tp1, label: "TP1", color: "#22c55e" } : null,
+        t.tp2 != null ? { price: t.tp2, label: "TP2", color: "#16a34a" } : null,
+      ].filter(Boolean) as Array<{ price: number; label: string; color: string }>;
+      const snap = await fetchTradingViewSnapshot({
+        ticker: args.ticker,
+        interval: args.intervaloTv ?? "1D",
+        lines,
+      });
+      if (snap.ok && snap.buffer) {
+        const urlTv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(normalizarSimboloTvLocal(args.ticker))}`;
+        enviadoFoto = await sendPhotoBufferWithToken(token, chatId, snap.buffer, {
+          caption: text,
+          inlineUrl: urlTv,
+          inlineText: "Grafico interactivo en TradingView",
+        });
+      }
+    } catch (e) {
+      console.error("[TELEGRAM] snapshot grafico fallo:", e instanceof Error ? e.message : e);
+    }
+    if (!enviadoFoto) {
+      await sendTelegramMessage({ text, chatId, parseMode: "HTML" });
+      resultados.push(`[OK texto chat ${chatId}]`);
+    } else {
+      resultados.push(`[OK foto+texto chat ${chatId}]`);
+    }
+  }
+  return resultados.join("\n");
+}
+
+function normalizarSimboloTvLocal(tickerRaw: string): string {
+  const t = (tickerRaw || "").trim().toUpperCase();
+  if (/^[A-Z0-9.]+:[A-Z0-9.]+$/.test(t)) return t;
+  if (t.endsWith(".BA")) return `BCBA:${t}`;
+  return `NASDAQ:${t}`;
 }
 
 /** Construye URL de QuickChart para serie de linea (usado por webhook para graficos). */
@@ -356,7 +497,9 @@ export function buildQuickChartUrl(
     type: "line",
     data: {
       labels: cl,
-      datasets: [{ label: titulo, data: cd, borderColor: "rgb(14,165,233)", fill: false, pointRadius: 0 }],
+      datasets: [
+        { label: titulo, data: cd, borderColor: "rgb(14,165,233)", fill: false, pointRadius: 0 },
+      ],
     },
     options: {
       title: { display: true, text: titulo + (unidad ? ` (${unidad})` : "") },
@@ -417,7 +560,9 @@ export async function getAgentFilePath(fileId: string): Promise<string | null> {
   return r.file_path ?? null;
 }
 
-export async function downloadAgentFileAsBase64(fileId: string): Promise<{ base64: string; mime: string; filePath: string } | null> {
+export async function downloadAgentFileAsBase64(
+  fileId: string,
+): Promise<{ base64: string; mime: string; filePath: string } | null> {
   const filePath = await getAgentFilePath(fileId);
   if (!filePath) return null;
   const { token } = getAgentBotConfig();
@@ -427,16 +572,29 @@ export async function downloadAgentFileAsBase64(fileId: string): Promise<{ base6
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
     const base64 = buf.toString("base64");
-    const mime = filePath.endsWith(".ogg") ? "audio/ogg" : filePath.endsWith(".mp3") ? "audio/mpeg" : filePath.endsWith(".mp4") ? "video/mp4" : filePath.endsWith(".wav") ? "audio/wav" : "image/jpeg";
+    const mime = filePath.endsWith(".ogg")
+      ? "audio/ogg"
+      : filePath.endsWith(".mp3")
+        ? "audio/mpeg"
+        : filePath.endsWith(".mp4")
+          ? "video/mp4"
+          : filePath.endsWith(".wav")
+            ? "audio/wav"
+            : "image/jpeg";
     return { base64, mime, filePath };
   } catch {
     return null;
   }
 }
 
-export async function describirImagenBase64(base64: string, mime: string, promptExtra?: string): Promise<string> {
+export async function describirImagenBase64(
+  base64: string,
+  mime: string,
+  promptExtra?: string,
+): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? "";
-  if (!apiKey) return "[Imagen recibida — sin GEMINI_API_KEY configurada, no puedo describirla. Configurá GEMINI_API_KEY para visión.]";
+  if (!apiKey)
+    return "[Imagen recibida — sin GEMINI_API_KEY configurada, no puedo describirla. Configurá GEMINI_API_KEY para visión.]";
   try {
     const { GoogleGenAI } = await import("@google/genai");
     const client = new GoogleGenAI({ apiKey });
@@ -450,7 +608,12 @@ export async function describirImagenBase64(base64: string, mime: string, prompt
           role: "user",
           parts: [
             { text: prompt },
-            { inlineData: { mimeType: mime.startsWith("image/") ? mime : "image/jpeg", data: base64 } },
+            {
+              inlineData: {
+                mimeType: mime.startsWith("image/") ? mime : "image/jpeg",
+                data: base64,
+              },
+            },
           ],
         },
       ],
@@ -464,7 +627,8 @@ export async function describirImagenBase64(base64: string, mime: string, prompt
 
 export async function transcribirAudioBase64(base64: string, mime: string): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? "";
-  if (!apiKey) return "[Audio recibido — sin GEMINI_API_KEY, no puedo transcribir. Configurá GEMINI_API_KEY.]";
+  if (!apiKey)
+    return "[Audio recibido — sin GEMINI_API_KEY, no puedo transcribir. Configurá GEMINI_API_KEY.]";
   try {
     const { GoogleGenAI } = await import("@google/genai");
     const client = new GoogleGenAI({ apiKey });
@@ -474,7 +638,9 @@ export async function transcribirAudioBase64(base64: string, mime: string): Prom
         {
           role: "user",
           parts: [
-            { text: "Transcribí este audio/voz en español rioplatense, literal y con puntuación. Si es consulta financiera, transcribí tal cual." },
+            {
+              text: "Transcribí este audio/voz en español rioplatense, literal y con puntuación. Si es consulta financiera, transcribí tal cual.",
+            },
             { inlineData: { mimeType: mime, data: base64 } },
           ],
         },

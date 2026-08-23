@@ -30,8 +30,9 @@ export type ConfiguracionOrquestacion = {
 /**
  * Si el usuario selecciona un modelo de razonamiento, ese mismo modelo actúa
  * como planner y como salida (es capaz de ambas cosas). Si selecciona uno de
- * rapidez, el modelo seleccionado redacta y el planner por defecto (ultra)
- * investiga y ejecuta las herramientas por él.
+ * rapidez, el modelo seleccionado redacta y el planner FREE por defecto
+ * (gpt-oss-20b, sin GPU) investiga y ejecuta las herramientas por él.
+ * Ultra/Super quedan como opción explícita: si el usuario los elige, se usan tal cual.
  */
 export function orquestarModelos(
   modeloSeleccionadoId: string | undefined,

@@ -19,9 +19,16 @@ import { Route as PlanificacionRouteImport } from './routes/planificacion'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as ApiBotUnificadoRouteImport } from './routes/api/bot-unificado'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as ApiPrediccionRouteImport } from './routes/api/prediccion'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as ApiSugerenciasRouteImport } from './routes/api/sugerencias'
 import { Route as ApiTelegramRouteImport } from './routes/api/telegram'
+import { Route as ApiCronContextoTelegramRouteImport } from './routes/api/cron/contexto-telegram'
+import { Route as ApiCronSenalesUnificadasRouteImport } from './routes/api/cron/senales-unificadas'
+import { Route as ApiCronTuningSenalesRouteImport } from './routes/api/cron/tuning-senales'
+import { Route as ApiIolStatusRouteImport } from './routes/api/iol.status'
+import { Route as ApiOpcionesCadenaRouteImport } from './routes/api/opciones.cadena'
+import { Route as ApiOpcionesPrecioRouteImport } from './routes/api/opciones.precio'
 import { Route as ApiTelegramWebhookRouteImport } from './routes/api/telegram/webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -74,6 +81,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPrediccionRoute = ApiPrediccionRouteImport.update({
+  id: '/api/prediccion',
+  path: '/api/prediccion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSearchRoute = ApiSearchRouteImport.update({
   id: '/api/search',
   path: '/api/search',
@@ -87,6 +99,37 @@ const ApiSugerenciasRoute = ApiSugerenciasRouteImport.update({
 const ApiTelegramRoute = ApiTelegramRouteImport.update({
   id: '/api/telegram',
   path: '/api/telegram',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronContextoTelegramRoute = ApiCronContextoTelegramRouteImport.update({
+  id: '/api/cron/contexto-telegram',
+  path: '/api/cron/contexto-telegram',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronSenalesUnificadasRoute =
+  ApiCronSenalesUnificadasRouteImport.update({
+    id: '/api/cron/senales-unificadas',
+    path: '/api/cron/senales-unificadas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiCronTuningSenalesRoute = ApiCronTuningSenalesRouteImport.update({
+  id: '/api/cron/tuning-senales',
+  path: '/api/cron/tuning-senales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiIolStatusRoute = ApiIolStatusRouteImport.update({
+  id: '/api/iol/status',
+  path: '/api/iol/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOpcionesCadenaRoute = ApiOpcionesCadenaRouteImport.update({
+  id: '/api/opciones/cadena',
+  path: '/api/opciones/cadena',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOpcionesPrecioRoute = ApiOpcionesPrecioRouteImport.update({
+  id: '/api/opciones/precio',
+  path: '/api/opciones/precio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiTelegramWebhookRoute = ApiTelegramWebhookRouteImport.update({
@@ -106,9 +149,16 @@ export interface FileRoutesByFullPath {
   '/studio': typeof StudioRoute
   '/api/bot-unificado': typeof ApiBotUnificadoRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/prediccion': typeof ApiPrediccionRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
   '/api/telegram': typeof ApiTelegramRouteWithChildren
+  '/api/cron/contexto-telegram': typeof ApiCronContextoTelegramRoute
+  '/api/cron/senales-unificadas': typeof ApiCronSenalesUnificadasRoute
+  '/api/cron/tuning-senales': typeof ApiCronTuningSenalesRoute
+  '/api/iol/status': typeof ApiIolStatusRoute
+  '/api/opciones/cadena': typeof ApiOpcionesCadenaRoute
+  '/api/opciones/precio': typeof ApiOpcionesPrecioRoute
   '/api/telegram/webhook': typeof ApiTelegramWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -122,9 +172,16 @@ export interface FileRoutesByTo {
   '/studio': typeof StudioRoute
   '/api/bot-unificado': typeof ApiBotUnificadoRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/prediccion': typeof ApiPrediccionRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
   '/api/telegram': typeof ApiTelegramRouteWithChildren
+  '/api/cron/contexto-telegram': typeof ApiCronContextoTelegramRoute
+  '/api/cron/senales-unificadas': typeof ApiCronSenalesUnificadasRoute
+  '/api/cron/tuning-senales': typeof ApiCronTuningSenalesRoute
+  '/api/iol/status': typeof ApiIolStatusRoute
+  '/api/opciones/cadena': typeof ApiOpcionesCadenaRoute
+  '/api/opciones/precio': typeof ApiOpcionesPrecioRoute
   '/api/telegram/webhook': typeof ApiTelegramWebhookRoute
 }
 export interface FileRoutesById {
@@ -139,9 +196,16 @@ export interface FileRoutesById {
   '/studio': typeof StudioRoute
   '/api/bot-unificado': typeof ApiBotUnificadoRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/prediccion': typeof ApiPrediccionRoute
   '/api/search': typeof ApiSearchRoute
   '/api/sugerencias': typeof ApiSugerenciasRoute
   '/api/telegram': typeof ApiTelegramRouteWithChildren
+  '/api/cron/contexto-telegram': typeof ApiCronContextoTelegramRoute
+  '/api/cron/senales-unificadas': typeof ApiCronSenalesUnificadasRoute
+  '/api/cron/tuning-senales': typeof ApiCronTuningSenalesRoute
+  '/api/iol/status': typeof ApiIolStatusRoute
+  '/api/opciones/cadena': typeof ApiOpcionesCadenaRoute
+  '/api/opciones/precio': typeof ApiOpcionesPrecioRoute
   '/api/telegram/webhook': typeof ApiTelegramWebhookRoute
 }
 export interface FileRouteTypes {
@@ -157,9 +221,16 @@ export interface FileRouteTypes {
     | '/studio'
     | '/api/bot-unificado'
     | '/api/chat'
+    | '/api/prediccion'
     | '/api/search'
     | '/api/sugerencias'
     | '/api/telegram'
+    | '/api/cron/contexto-telegram'
+    | '/api/cron/senales-unificadas'
+    | '/api/cron/tuning-senales'
+    | '/api/iol/status'
+    | '/api/opciones/cadena'
+    | '/api/opciones/precio'
     | '/api/telegram/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -173,9 +244,16 @@ export interface FileRouteTypes {
     | '/studio'
     | '/api/bot-unificado'
     | '/api/chat'
+    | '/api/prediccion'
     | '/api/search'
     | '/api/sugerencias'
     | '/api/telegram'
+    | '/api/cron/contexto-telegram'
+    | '/api/cron/senales-unificadas'
+    | '/api/cron/tuning-senales'
+    | '/api/iol/status'
+    | '/api/opciones/cadena'
+    | '/api/opciones/precio'
     | '/api/telegram/webhook'
   id:
     | '__root__'
@@ -189,9 +267,16 @@ export interface FileRouteTypes {
     | '/studio'
     | '/api/bot-unificado'
     | '/api/chat'
+    | '/api/prediccion'
     | '/api/search'
     | '/api/sugerencias'
     | '/api/telegram'
+    | '/api/cron/contexto-telegram'
+    | '/api/cron/senales-unificadas'
+    | '/api/cron/tuning-senales'
+    | '/api/iol/status'
+    | '/api/opciones/cadena'
+    | '/api/opciones/precio'
     | '/api/telegram/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -206,9 +291,16 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRoute
   ApiBotUnificadoRoute: typeof ApiBotUnificadoRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiPrediccionRoute: typeof ApiPrediccionRoute
   ApiSearchRoute: typeof ApiSearchRoute
   ApiSugerenciasRoute: typeof ApiSugerenciasRoute
   ApiTelegramRoute: typeof ApiTelegramRouteWithChildren
+  ApiCronContextoTelegramRoute: typeof ApiCronContextoTelegramRoute
+  ApiCronSenalesUnificadasRoute: typeof ApiCronSenalesUnificadasRoute
+  ApiCronTuningSenalesRoute: typeof ApiCronTuningSenalesRoute
+  ApiIolStatusRoute: typeof ApiIolStatusRoute
+  ApiOpcionesCadenaRoute: typeof ApiOpcionesCadenaRoute
+  ApiOpcionesPrecioRoute: typeof ApiOpcionesPrecioRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -283,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/prediccion': {
+      id: '/api/prediccion'
+      path: '/api/prediccion'
+      fullPath: '/api/prediccion'
+      preLoaderRoute: typeof ApiPrediccionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/search': {
       id: '/api/search'
       path: '/api/search'
@@ -302,6 +401,48 @@ declare module '@tanstack/react-router' {
       path: '/api/telegram'
       fullPath: '/api/telegram'
       preLoaderRoute: typeof ApiTelegramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/contexto-telegram': {
+      id: '/api/cron/contexto-telegram'
+      path: '/api/cron/contexto-telegram'
+      fullPath: '/api/cron/contexto-telegram'
+      preLoaderRoute: typeof ApiCronContextoTelegramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/senales-unificadas': {
+      id: '/api/cron/senales-unificadas'
+      path: '/api/cron/senales-unificadas'
+      fullPath: '/api/cron/senales-unificadas'
+      preLoaderRoute: typeof ApiCronSenalesUnificadasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/tuning-senales': {
+      id: '/api/cron/tuning-senales'
+      path: '/api/cron/tuning-senales'
+      fullPath: '/api/cron/tuning-senales'
+      preLoaderRoute: typeof ApiCronTuningSenalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/iol/status': {
+      id: '/api/iol/status'
+      path: '/api/iol/status'
+      fullPath: '/api/iol/status'
+      preLoaderRoute: typeof ApiIolStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/opciones/cadena': {
+      id: '/api/opciones/cadena'
+      path: '/api/opciones/cadena'
+      fullPath: '/api/opciones/cadena'
+      preLoaderRoute: typeof ApiOpcionesCadenaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/opciones/precio': {
+      id: '/api/opciones/precio'
+      path: '/api/opciones/precio'
+      fullPath: '/api/opciones/precio'
+      preLoaderRoute: typeof ApiOpcionesPrecioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/telegram/webhook': {
@@ -337,9 +478,16 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRoute,
   ApiBotUnificadoRoute: ApiBotUnificadoRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiPrediccionRoute: ApiPrediccionRoute,
   ApiSearchRoute: ApiSearchRoute,
   ApiSugerenciasRoute: ApiSugerenciasRoute,
   ApiTelegramRoute: ApiTelegramRouteWithChildren,
+  ApiCronContextoTelegramRoute: ApiCronContextoTelegramRoute,
+  ApiCronSenalesUnificadasRoute: ApiCronSenalesUnificadasRoute,
+  ApiCronTuningSenalesRoute: ApiCronTuningSenalesRoute,
+  ApiIolStatusRoute: ApiIolStatusRoute,
+  ApiOpcionesCadenaRoute: ApiOpcionesCadenaRoute,
+  ApiOpcionesPrecioRoute: ApiOpcionesPrecioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

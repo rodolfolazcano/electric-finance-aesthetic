@@ -26,7 +26,7 @@ const GRID_RR2 = [2.4, 2.8, 3.2];
 
 // Reusa indicadores del backtest (duplicado ligero server-side para evitar import circular)
 function sma(arr:number[], p:number){ const r:(number|null)[]=[]; let s=0; for(let i=0;i<arr.length;i++){ s+=arr[i]; if(i>=p) s-=arr[i-p]; r.push(i>=p-1? s/p : null);} return r; }
-function ema(arr:number[], p:number){ const k=2/(p+1); const r:(number|null)[]=[]; let e:number|null=null; for(let i=0;i<arr.length;i++){ if(i===p-1){ let s=0; for(let j=i-p+1;j<=i;j++) s+=arr[j]; e=s/p; r.push(e);} else if(i>=p){ e= arr[i]*k + (e as number)*(1-k); r.push(e);} else r.push(null);} return r; }
+function ema(arr:number[], p:number){ const k=2/(p+1); const r:(number|null)[]=[]; let e:number|null=null; for(let i=0;i<arr.length;i++){ if(i===p-1){ let s=0; for(let j=i-p+1;j<=i;j++) s+=arr[j]; e=s/p; r.push(e);} else if(i>=p){ e= arr[i]*k + Number(e)*(1-k); r.push(e);} else r.push(null);} return r; }
 function rsi(arr:number[], p=14){
   const r:(number|null)[]=[]; let gains=0, losses=0;
   for(let i=1;i<arr.length;i++){
@@ -39,7 +39,16 @@ function rsi(arr:number[], p=14){
 }
 function scoreTec(closes:number[], idx:number){
   const price=closes[idx]; const r=rsi(closes,14)[idx]; const ma20=sma(closes,20)[idx], ma50=sma(closes,50)[idx], ma200=sma(closes,200)[idx];
-  const e12=ema(closes,12)[idx], e26=ema(closes,26)[idx]; const macdHist = e12!=null&&e26!=null ? (e12-e26) - (ema(closes.map((_,i)=> (ema(closes,12)[i]!=null&&ema(closes,26)[i]!=null? (ema(closes,12)[i] as number)-(ema(closes,26)[i] as number):0),9)[idx] ?? 0) : null;
+  const e12=ema(closes,12)[idx], e26=ema(closes,26)[idx];
+  const ema12Arr = ema(closes,12);
+  const ema26Arr = ema(closes,26);
+  const diffArr = closes.map((_,i)=> {
+    const a = ema12Arr[i];
+    const b = ema26Arr[i];
+    return a!=null&&b!=null ? Number(a)-Number(b) : 0;
+  });
+  const ema9Diff = ema(diffArr,9)[idx] ?? 0;
+  const macdHist = e12!=null&&e26!=null ? (e12-e26) - ema9Diff : null;
   let s=5;
   if(r!=null){ if(r>70) s-=1.5; else if(r<30) s-=2; else if(r>=55&&r<=68) s+=1; }
   if(price!=null&&ma20!=null&&ma50!=null&&ma200!=null){ if(price>ma20&&ma20>ma50&&ma50>ma200) s+=2; else if(price<ma50&&ma50<ma200) s-=2; else if(price>ma50) s+=0.8; else s-=0.8; }

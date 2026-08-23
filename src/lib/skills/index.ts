@@ -539,10 +539,41 @@ const SKILLS: Skill[] = [
   · DV01 = P·Dmod·0.0001: cambio en precio por 1bp. Usar para arbitraje y hedging.
   · Bootstrapping: construir curva spot desde bonos cupón cero; forwards implícitos desde spots.
   · IPD (Implicit Probability of Default): [S(1+r)]/[S(1+r)+(1+r-R)] con R≈20.8% para Argentina.
-  · GS-ESS spread de equilibrio: Spread eq = -691.3·GROWTH + 165·DEFAULT + 500. Comparar spread actual vs equilibrio.
+  · GS-ESS COMPLETO (Goldman Sachs): S = -439,3 -691,3*GROWTH +162,1*TAMRES +7,5*TXDY -34,2*NBB -2,57*XGD +210,4*MISAL +45,3*LIBOR +165,0*DEFAULT (en bps; GROWTH fraccion, DEFAULT dummy 0/1). Requiere las OCHO variables; si falta alguna, declarar no calculable en vez de aproximar.
   · Curva argentina: TIR = a + b·ln(Duration) (regresión log-lin). R² > 0.8 indica buen ajuste.
-  · Covenants: EBITDA/Deuda ≥ 6.5×, Cobertura ≥ 1.75×, Liquidez ≥ 1×. Alerta si 1+ en rojo.
+  · Covenants Elbaum: Deuda financiera consolidada/EBITDA maximo 5,5-6,5x; Cobertura = EBITDA/(intereses + dividendos preferentes) minimo 1,75-2,0x; Ratio corriente minimo 1,25-1,50x; Acido minimo 1,00x. VIOLAR incurrence impide nueva deuda; violar mantenimiento es EVENTO DE DEFAULT.
 - Reportá TIR/TEA/TNA, duration, convexidad, DV01, IPD, comparación spread vs equilibrio, covenants y recomendación. Educativo, no recomendación de inversión.`,
+  },
+  {
+    id: "ml-prediccion-labadie",
+    nombre: "Prediccion ML del Subyacente - Labadie ML 2018",
+    descripcion:
+      "Pipeline de prediccion direccional con regresion logistica L2, split temporal sin leakage, umbral F1 optimo y validacion walk-forward obligatoria.",
+    instrucciones: `[SKILL - Prediccion ML Labadie]
+- TRIGGER: "sube o baja X?", "probabilidad de subida", "prediccion del subyacente", "senal ML".
+- HERRAMIENTA: predecir_direccion {simbolo, horizonte}. Ejecutar SIEMPRE antes de responder; nunca estimar probabilidades mentalmente.
+- METODOLOGIA (Labadie ML Secc 3-4): split temporal 60/20/20 PROHIBIDO shuffle (leakage); StandardScaler ajustado SOLO con train; umbral F1 optimo en CV con fallback Acc+F1 si degenera; REGLA DE ORO features <= n_train/10, reportarla si se viola.
+- GUARDRAILS ANTI-ALUCINACION CUANTITATIVA:
+  - walk-forward acc < 55% => decir explicitamente "el modelo no muestra ventaja predictiva verificable" y presentar como exploratorio.
+  - Reportar SIEMPRE las tres metricas (CV, test, walk-forward), no solo la mas favorable.
+  - La probabilidad es condicional al horizonte; aclararlo.
+  - Nunca convertir probabilidad en certeza ni en recomendacion directa de compra/venta.`,
+  },
+  {
+    id: "opciones-bcba",
+    nombre: "Opciones BCBA - IV, Griegas y Sesgo",
+    descripcion:
+      "Cadena de opciones BCBA con IV por biseccion, griegas Black-Scholes, VaR delta-gamma e interpretacion del skew OTM como termometro de sentimiento.",
+    instrucciones: `[SKILL - Opciones BCBA]
+- TRIGGER: "opciones de X", "volatilidad implicita", "IV", "griegas", "skew de opciones".
+- HERRAMIENTA: cadena_opciones_bcba {simbolo}. Ejecutar primero; si IOL falla, informarlo sin inventar cadenas.
+- METODOLOGIA (Dunbar BS + prototipo Labadie):
+  - T en dias habiles XBUE / 252 (no dias corridos).
+  - IV dentro de limites teoricos Call [max(S-K*e^-rT,0), S]; fuera => sin IV, usar EWMA.
+  - VaR delta-gamma 95% 1 dia: -(Delta*dS + 0.5*Gamma*dS^2)*S con piso -Delta*dS*S.
+  - SKEW OTM: % entre vol media puts OTM vs calls OTM. >+10% alcista (cobertura contra suba); <-10% bajista; resto neutral.
+- INTERPRETACION OBLIGATORIA dato->implicancia: reportar skew con lectura de sentimiento y vencimiento mas liquido.
+- Educativo; no recomendacion de inversion.`,
   },
 ];
 

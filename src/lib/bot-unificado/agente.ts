@@ -9,7 +9,7 @@
  */
 
 import { NVIDIA_API_KEY } from "@/lib/agents/nvidia-key";
-import { ejecutarTool, llamarModelo } from "@/lib/agents/orquestador";
+import { ejecutarTool, llamarModelo, type ApiMsg } from "@/lib/agents/orquestador";
 import { MODELO_PLANNER_POR_DEFECTO } from "@/lib/model-registry";
 import { construirPromptSkills } from "@/lib/skills";
 import type { CandidatoSenal, SenalFinal } from "./tipos";
@@ -20,6 +20,7 @@ const HERRAMIENTAS_BOT = [
   "consultar_base_conocimiento",
   "estadisticas_retornos",
   "datos_financieros",
+  "pairs_trading_labadie",
 ];
 
 const SKILLS_BOT = [
@@ -27,6 +28,8 @@ const SKILLS_BOT = [
   "metodo-pascale-valuacion",
   "carteras-elbaum",
   "macro-latam-ciclo",
+  "statarb-labadie",
+  "analisis-tecnico-senal",
 ];
 
 const MAX_ITERACIONES_TOOLS = 4;
@@ -75,7 +78,7 @@ function MAX_ITERACIONES_TOOL_S(): string {
   return String(MAX_ITERACIONES_TOOLS);
 }
 
-function extraerJson(texto: string): { senales?: any[]; resumen?: string } | null {
+function extraerJson(texto: string): { senales?: Array<Record<string, unknown>>; resumen?: string } | null {
   if (!texto) return null;
   const limpio = texto.replace(/```json/gi, "").replace(/```/g, "").trim();
   const inicio = limpio.indexOf("{");
@@ -110,7 +113,7 @@ export type ResultadoAgente = { senales: SenalFinal[]; resumen: string | null; u
 export async function validarYRedactar(candidatos: CandidatoSenal[]): Promise<ResultadoAgente> {
   if (!NVIDIA_API_KEY) return { senales: senalesDeterministicas(candidatos), resumen: null, usoAgente: false };
   const modelo = process.env.BOT_UNIFICADO_MODELO?.trim() || MODELO_PLANNER_POR_DEFECTO.id;
-  const mensajes: any[] = [
+  const mensajes: ApiMsg[] = [
     { role: "system", content: promptSistema() },
     {
       role: "user",
@@ -131,11 +134,15 @@ export async function validarYRedactar(candidatos: CandidatoSenal[]): Promise<Re
         reasoningBudget: Math.min(12288, MODELO_PLANNER_POR_DEFECTO.reasoningBudget ?? 8192),
       });
       if (!res.ok) break;
-      const data = (await res.json()) as { choices?: Array<{ message?: any }> };
+      const data = (await res.json()) as {
+        choices?: Array<{
+          message?: { content?: string; tool_calls?: Array<{ id: string; function: { name: string; arguments?: string } }> };
+        }>;
+      };
       const msg = data.choices?.[0]?.message;
       if (!msg) break;
 
-      const toolCalls: Array<{ id: string; function: { name: string; arguments: string } }> = msg.tool_calls ?? [];
+      const toolCalls = msg.tool_calls ?? [];
       if (toolCalls.length && i < MAX_ITERACIONES_TOOLS) {
         mensajes.push({ role: "assistant", content: msg.content ?? "", tool_calls: toolCalls });
         for (const tc of toolCalls.slice(0, 4)) {

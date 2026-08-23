@@ -42,29 +42,27 @@ function MacroCard() {
     refetchOnWindowFocus: false,
   });
 
-  if (q.isPending) return <Skeleton className="h-72 w-full" />;
+  if (q.isPending) return <Skeleton className="h-72 w-full rounded-2xl" />;
   if (q.isError || !q.data)
     return (
-      <Card>
-        <CardContent className="p-6 text-[15px] text-muted-foreground">
-          No se pudo cargar el contexto macro. Intentá de nuevo.
-        </CardContent>
-      </Card>
+      <div className="glass rounded-2xl p-6 text-[15px] text-muted-foreground">
+        No se pudo cargar el contexto macro. Intentá de nuevo.
+      </div>
     );
 
   const d = q.data;
   return (
-    <Card className="overflow-hidden w-full">
-      <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/20">
-        <CardTitle className="flex items-center gap-2 text-[16px]">
+    <div className="glass overflow-hidden rounded-2xl w-full">
+      <div className="flex flex-row items-center justify-between pb-3 border-b border-border/20 px-6 pt-6">
+        <h3 className="flex items-center gap-2 text-[16px] font-semibold">
           <Globe2 className="h-5 w-5 text-primary" />
           Contexto macro argentino
-        </CardTitle>
+        </h3>
         <Badge variant="outline" className={cn("font-mono text-[15px] px-2.5 py-1", regimenColor(d.regimen_macro))}>
           {d.regimen_macro}
         </Badge>
-      </CardHeader>
-      <CardContent className="grid w-full grid-cols-2 gap-4 md:grid-cols-3 p-6 w-full">
+      </div>
+      <div className="grid w-full grid-cols-2 gap-4 md:grid-cols-3 p-6 w-full">
         <Dato etiqueta="Riesgo país" valor={d.riesgo_pais != null ? `${d.riesgo_pais.toFixed(0)} bps` : "s/d"} />
         <Dato etiqueta="Inflación mensual" valor={d.inflacion_mensual != null ? `${d.inflacion_mensual.toFixed(1)}%` : "s/d"} />
         <Dato etiqueta="Tasa pasiva BCRA" valor={d.tasa_pasiva != null ? `${d.tasa_pasiva.toFixed(1)}% TEM` : "s/d"} />
@@ -74,9 +72,9 @@ function MacroCard() {
         <Dato etiqueta="Dólar MEP" valor={dolar(d.dolar_mep)} />
         <Dato etiqueta="Dólar CCL" valor={dolar(d.dolar_ccl)} />
         <Dato etiqueta="Tasa libre de riesgo local" valor={d.tasa_libre_riesgo_local != null ? `${d.tasa_libre_riesgo_local.toFixed(2)}%` : "s/d"} />
-      </CardContent>
+      </div>
       {d.senal_regimen.length > 0 && (
-        <CardContent className="border-t border-border/20 bg-muted/20 pt-3">
+        <div className="border-t border-border/20 bg-muted/20 pt-3 px-6">
           <ul className="space-y-1.5 text-[15px] text-muted-foreground">
             {d.senal_regimen.map((s, i) => (
               <li key={i} className="flex items-start gap-2">
@@ -85,21 +83,21 @@ function MacroCard() {
               </li>
             ))}
           </ul>
-        </CardContent>
+        </div>
       )}
       <div className="border-t border-border/20 bg-muted/10 px-4 py-2.5 flex flex-wrap gap-5 text-[15px] text-muted-foreground">
         <span>Fuentes: <span className="text-foreground">BCRA</span> · <span className="text-foreground">IOL</span> · <span className="text-foreground">ArgentinaDatos</span></span>
         <span className="ml-auto">Actualizado: {new Date().toLocaleString("es-AR")} · Delay 15’</span>
       </div>
-    </Card>
+    </div>
   );
 }
 
 function Dato({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
-    <div className="rounded-xl border border-border/30 bg-muted/10 p-5 w-full">
-      <div className="text-[13px] font-medium uppercase tracking-wide text-muted-foreground">{etiqueta}</div>
-      <div className="font-mono text-[16px] font-semibold mt-1">{valor}</div>
+    <div className="surface-card rounded-xl p-5 w-full">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{etiqueta}</div>
+      <div className="font-mono text-[16px] font-semibold mt-1 tabular-nums">{valor}</div>
     </div>
   );
 }
@@ -115,29 +113,27 @@ function CicloBanner() {
     refetchOnWindowFocus: false,
   });
 
-  if (q.isPending) return <Skeleton className="h-44 w-full" />;
+  if (q.isPending) return <Skeleton className="h-44 w-full rounded-2xl" />;
   if (q.isError || !q.data)
     return (
-      <Card>
-        <CardContent className="p-6 text-[15px] text-muted-foreground">
-          Ciclo económico no disponible en este momento.
-        </CardContent>
-      </Card>
+      <div className="glass rounded-2xl p-6 text-[15px] text-muted-foreground">
+        Ciclo económico no disponible en este momento.
+      </div>
     );
 
   const d = q.data;
   return (
-    <Card className="overflow-hidden w-full">
-      <CardHeader className="pb-3 border-b border-border/20">
-        <CardTitle className="flex items-center gap-2 text-[16px]">
+    <div className="glass overflow-hidden rounded-2xl w-full">
+      <div className="pb-3 border-b border-border/20 px-6 pt-6">
+        <h3 className="flex items-center gap-2 text-[16px] font-semibold">
           <Compass className="h-5 w-5 text-primary" />
           Ciclo económico intermarket
           <span className="font-mono text-[14px] font-normal text-muted-foreground">
             Pring / Stovall · 6 etapas
           </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6 p-6">
+        </h3>
+      </div>
+      <div className="space-y-6 p-6">
         <div className="flex items-baseline gap-5">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-[15px] font-bold text-primary">{d.stage}</span>
           <div>
@@ -152,18 +148,18 @@ function CicloBanner() {
           <Lista titulo="Sectores favorecidos" items={d.sectoresFavorecidos} />
           <Lista titulo="Riesgos" items={d.riesgos} />
         </div>
-      </CardContent>
+      </div>
       <div className="border-t border-border/20 bg-muted/10 px-4 py-2.5 text-[15px] text-muted-foreground">
         Fuente: <span className="text-foreground">Intermarket · Pring</span> · Metodología Stovall
       </div>
-    </Card>
+    </div>
   );
 }
 
 function Lista({ titulo, items }: { titulo: string; items: string[] }) {
   return (
-    <div className="rounded-xl border border-border/40 bg-card p-5 w-full">
-      <div className="mb-2 text-[13px] font-semibold tracking-wide text-muted-foreground uppercase">
+    <div className="surface-card rounded-xl p-5 w-full">
+      <div className="mb-2 eyebrow !text-muted-foreground !tracking-[0.14em]">
         {titulo}
       </div>
       <ul className="space-y-1 text-[15px] leading-relaxed">
@@ -185,29 +181,27 @@ function PerformanceSectorial() {
     refetchOnWindowFocus: false,
   });
 
-  if (q.isPending) return <Skeleton className="h-64 w-full" />;
+  if (q.isPending) return <Skeleton className="h-64 w-full rounded-2xl" />;
   if (q.isError || !q.data)
     return (
-      <Card>
-        <CardContent className="p-6 text-[15px] text-muted-foreground">
-          Performance sectorial no disponible.
-        </CardContent>
-      </Card>
+      <div className="glass rounded-2xl p-6 text-[15px] text-muted-foreground">
+        Performance sectorial no disponible.
+      </div>
     );
 
   const max = Math.max(...q.data.items.map((i) => Math.abs(i.changePercent ?? 0)), 0.01);
   return (
-    <Card className="overflow-hidden w-full">
-      <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/20">
-        <CardTitle className="flex items-center gap-2 text-[16px]">
+    <div className="glass overflow-hidden rounded-2xl w-full">
+      <div className="flex flex-row items-center justify-between pb-3 border-b border-border/20 px-6 pt-6">
+        <h3 className="flex items-center gap-2 text-[16px] font-semibold">
           <Activity className="h-5 w-5 text-primary" />
           Performance sectorial EE.UU. (5 días)
-        </CardTitle>
+        </h3>
         <Button variant="ghost" size="icon" onClick={() => void q.refetch()} aria-label="Refrescar">
           <RefreshCw className={cn("h-4 w-4", q.isFetching && "animate-spin")} />
         </Button>
-      </CardHeader>
-      <CardContent className="space-y-2.5 p-6 w-full">
+      </div>
+      <div className="space-y-2.5 p-6 w-full">
         {q.data.items.map((it) => {
           const v = it.changePercent ?? 0;
           const positivo = v >= 0;
@@ -231,19 +225,19 @@ function PerformanceSectorial() {
             </div>
           );
         })}
-      </CardContent>
+      </div>
       <div className="border-t border-border/20 bg-muted/10 px-4 py-2.5 text-[15px] text-muted-foreground">
         Fuente: <span className="text-foreground">Yahoo Finance</span> · ETFs SPDR XLB/XLE/XLF/XLI/XLK/XLP/XLU · 5 días
       </div>
-    </Card>
+    </div>
   );
 }
 
 function DivisasTasasPanel() {
   const fn = useServerFn(contextoMacroFn);
   const q = useQuery({ queryKey: ["clara-macro-divisas"], queryFn: () => fn(), staleTime: 15 * 60_000 });
-  if (q.isPending) return <Skeleton className="h-64 w-full" />;
-  if (q.isError || !q.data) return <Card><CardContent className="p-6 text-[15px] text-muted-foreground">Divisas no disponibles.</CardContent></Card>;
+  if (q.isPending) return <Skeleton className="h-64 w-full rounded-2xl" />;
+  if (q.isError || !q.data) return <div className="glass rounded-2xl p-6 text-[15px] text-muted-foreground">Divisas no disponibles.</div>;
   const d = q.data;
   const items = [
     { label: "Dólar Oficial", value: dolar(d.dolar_oficial), sub: "BCRA · BYMA" },
@@ -258,14 +252,14 @@ function DivisasTasasPanel() {
   return (
     <div className="grid w-full gap-4 md:grid-cols-2 lg:grid-cols-4 w-full">
       {items.map((it) => (
-        <Card key={it.label} className="overflow-hidden w-full flex flex-col">
-          <CardContent className="p-6 flex-1">
-            <div className="text-[13px] font-medium uppercase tracking-wide text-muted-foreground flex items-center gap-1.5"><DollarSign className="h-4 w-4 text-primary" />{it.label}</div>
-            <div className="font-mono text-[17px] font-semibold mt-2">{it.value}</div>
+        <div key={it.label} className="glass overflow-hidden rounded-2xl w-full flex flex-col">
+          <div className="p-6 flex-1">
+            <div className="eyebrow !tracking-[0.14em] !text-muted-foreground flex items-center gap-1.5"><DollarSign className="h-4 w-4 text-primary" />{it.label}</div>
+            <div className="font-mono text-[17px] font-semibold mt-2 tabular-nums">{it.value}</div>
             <div className="text-[13px] text-muted-foreground mt-1">{it.sub}</div>
-          </CardContent>
+          </div>
           <div className="border-t border-border/20 bg-muted/10 px-4 py-1.5 text-[13px] text-muted-foreground">Fuente: {it.sub}</div>
-        </Card>
+        </div>
       ))}
     </div>
   );
@@ -273,21 +267,22 @@ function DivisasTasasPanel() {
 
 export function ContextoTab() {
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-8 w-full">
       <div>
-        <h2 className="font-display text-[clamp(1.6rem,2.5vw,2rem)] font-semibold tracking-tight">Contexto de mercado</h2>
-        <p className="text-[15px] leading-relaxed text-muted-foreground mt-1">
+        <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-tight tracking-tight">Contexto de mercado</h2>
+        <p className="text-[17px] leading-relaxed text-muted-foreground mt-1 lg:text-[19px]">
           Régimen macro argentino, ciclo intermarket y rotación sectorial — <span className="text-foreground">Fuentes: BCRA · IOL · Yahoo Finance · ArgentinaDatos · CriptoYa · Delay 15-20’</span>
         </p>
+        <div aria-hidden className="electric-line mt-6 max-w-3xl" />
       </div>
 
       <Tabs defaultValue="mercado" className="w-full">
-        <TabsList className="flex-wrap h-auto gap-1 p-1 bg-muted/20 w-full justify-start">
-          <TabsTrigger value="mercado" className="text-[14px] px-4 py-2"><Globe2 className="h-4 w-4 mr-1.5" />Mercado Hoy</TabsTrigger>
-          <TabsTrigger value="divisas" className="text-[14px] px-4 py-2"><DollarSign className="h-4 w-4 mr-1.5" />Divisas y Tasas</TabsTrigger>
-          <TabsTrigger value="tendencias" className="text-[14px] px-4 py-2"><TrendingUp className="h-4 w-4 mr-1.5" />Tendencias</TabsTrigger>
-          <TabsTrigger value="performance" className="text-[14px] px-4 py-2"><BarChart3 className="h-4 w-4 mr-1.5" />Sectores</TabsTrigger>
-          <TabsTrigger value="noticias" className="text-[14px] px-4 py-2">Noticias</TabsTrigger>
+        <TabsList className="flex flex-wrap h-auto gap-1 p-1 bg-muted/20 rounded-lg w-full justify-start">
+          <TabsTrigger value="mercado" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"><Globe2 className="h-4 w-4 mr-1.5" />Mercado Hoy</TabsTrigger>
+          <TabsTrigger value="divisas" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"><DollarSign className="h-4 w-4 mr-1.5" />Divisas y Tasas</TabsTrigger>
+          <TabsTrigger value="tendencias" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"><TrendingUp className="h-4 w-4 mr-1.5" />Tendencias</TabsTrigger>
+          <TabsTrigger value="performance" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"><BarChart3 className="h-4 w-4 mr-1.5" />Sectores</TabsTrigger>
+          <TabsTrigger value="noticias" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Noticias</TabsTrigger>
         </TabsList>
 
         <TabsContent value="mercado" className="mt-4 space-y-6 w-full">
@@ -315,11 +310,9 @@ export function ContextoTab() {
         </TabsContent>
       </Tabs>
 
-      <Card className="border-dashed bg-muted/5 w-full">
-        <CardContent className="p-6 text-[15px] leading-relaxed text-muted-foreground">
-          <span className="font-medium text-foreground">Fuentes y metodología:</span> BCRA (tasa pasiva, FX oficial), IOL (MEP/CCL, caución), Yahoo Finance (ETFs SPDR, performance 5d), ArgentinaDatos/CriptoYa (blue, riesgo país). Delay 15-20’. No constituye recomendación de inversión. <span className="text-foreground">Verificar en cada fuente.</span>
-        </CardContent>
-      </Card>
+      <div className="glass rounded-2xl border border-dashed p-6 text-[15px] leading-relaxed text-muted-foreground">
+        <span className="font-medium text-foreground">Fuentes y metodología:</span> BCRA (tasa pasiva, FX oficial), IOL (MEP/CCL, caución), Yahoo Finance (ETFs SPDR, performance 5d), ArgentinaDatos/CriptoYa (blue, riesgo país). Delay 15-20’. No constituye recomendación de inversión. <span className="text-foreground">Verificar en cada fuente.</span>
+      </div>
     </div>
   );
 }

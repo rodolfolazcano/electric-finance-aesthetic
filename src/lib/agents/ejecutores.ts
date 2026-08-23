@@ -8,6 +8,18 @@
 
 import { buscar, dominio, extraerTexto } from "@/lib/search.server";
 import { consultarMercado, type FuenteMercado } from "@/lib/mercado.server";
+import {
+  autenticar,
+  obtenerCadenaOpciones,
+  obtenerTasaCaucion,
+} from "@/lib/opciones-bcba/iol";
+import {
+  ewmaVol,
+  volHistorica,
+} from "@/lib/opciones-bcba/black-scholes.functions";
+import { procesarCadena, sesgoVolatilidad } from "@/lib/opciones-bcba/cadena.functions";
+import { obtenerVelas, retornosLog } from "@/lib/opciones-bcba/datos.functions";
+import { ejecutarPrediccion } from "@/lib/opciones-bcba/prediccion.functions";
 import { consultarNoticias } from "@/lib/noticias.server";
 import { buscarEnBase } from "@/lib/knowledge-base";
 import { buscarAcademico } from "@/lib/kb-academic";
@@ -3643,55 +3655,6 @@ export async function ejecutarYTM(argsRaw: string, sessionId: string): Promise<{
 }
 
 // ---------------------------------------------------------------------------
-// Predicción ML Labadie (server/prediccion_service.py)
-// ---------------------------------------------------------------------------
-
-export async function ejecutarPrediccionSubyacente(argsRaw: string): Promise<ResultadoTool> {
-  let simbolo = "";
-  try {
-    const args = JSON.parse(argsRaw) as { simbolo?: string };
-    simbolo = String(args.simbolo ?? "").trim().toUpperCase();
-  } catch {}
-  if (!simbolo) {
-    return {
-      texto: "SIN RESULTADOS: no recibí el símbolo. Reinvocá con el parámetro simbolo (ej. 'GGAL.BA', 'YPF', 'PAMP.BA').",
-      fuentes: [],
-    };
-  }
-  try {
-    const res = await fetch("http://localhost:5000/api/prediccion", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ ticker: simbolo }),
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      return { texto: `SIN RESULTADOS: /api/prediccion respondió ${res.status} ${txt.slice(0,200)} — ¿está corriendo python server/server.py?`, fuentes: [] };
-    }
-    const j: any = await res.json();
-    // Guardrails anti-alucinación cuantitativa
-    const wfAcc = j.walk_forward?.accuracy ?? j.wf_acc ?? 0;
-    const reglaOro = j.regla_oro_ok ?? j.reglaOroOk ?? true;
-    if (wfAcc < 0.55 || reglaOro === false) {
-      return {
-        texto: `Modelo sin ventaja predictiva verificada para ${simbolo}: wf_acc=${(wfAcc*100).toFixed(1)}% regla_oro_ok=${reglaOro} — No se genera señal direccional. Métricas: CV=${(j.cv_accuracy*100 ?? 0).toFixed(1)}% test=${(j.test_accuracy*100 ?? 0).toFixed(1)}%`,
-        fuentes: [],
-      };
-    }
-    const L: string[] = [];
-    L.push(`Predicción ML Labadie — ${simbolo}`);
-    L.push(`Prob. dirección alcista: ${(j.probabilidad*100 ?? 0).toFixed(1)}% · Umbral óptimo: ${(j.umbral_optimo*100 ?? 50).toFixed(1)}%`);
-    L.push(`CV accuracy: ${(j.cv_accuracy*100 ?? 0).toFixed(1)}% · Test: ${(j.test_accuracy*100 ?? 0).toFixed(1)}% · Walk-forward: ${(wfAcc*100).toFixed(1)}%`);
-    if (j.feature_importance) L.push(`Feature importance: ${Object.entries(j.feature_importance).slice(0,5).map(([k,v])=>`${k}:${(v as number).toFixed(2)}`).join(" | ")}`);
-    if (j.decision) L.push(`Decisión: ${j.decision} ${j.strike_sugerido ? `Strike sugerido ${j.strike_sugerido}` : ""} ${j.confianza ? `Confianza ${(j.confianza*100).toFixed(0)}%` : ""}`);
-    return { texto: L.join("\n"), fuentes: [] };
-  } catch (e) {
-    return { texto: `Error predicción ${simbolo}: ${e instanceof Error ? e.message : String(e)} — ¿server.py corriendo en :5000?`, fuentes: [] };
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Cadena de Opciones BCBA (server/opciones_service.py)
 // ---------------------------------------------------------------------------
 
@@ -3730,4 +3693,169 @@ export async function ejecutarCadenaOpciones(argsRaw: string): Promise<Resultado
   } catch (e) {
     return { texto: `Error cadena opciones ${simbolo}: ${e instanceof Error ? e.message : String(e)}`, fuentes: [] };
   }
+}
+
+
+// ─── Opciones BCBA + Predicción ML (port TS nativo Vercel) ──────────────────
+
+export async function ejecutarPrediccionSubyacente(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  let simbolo = "";
+  let horizonte = 5;
+  try {
+    const args = JSON.parse(argsRaw) as { simbolo?: string; horizonte?: number };
+    simbolo = String(args.simbolo ?? "").trim().toUpperCase();
+    if (typeof args.horizonte === "number" && args.horizonte >= 1 && args.horizonte <= 60) {
+      horizonte = Math.round(args.horizonte);
+    }
+  } catch {
+    /* sin args */
+  }
+  if (!simbolo) {
+    return {
+      texto:
+        "Sin datos: necesito el parámetro 'simbolo' (ej. GGAL, PAMP, YPFD). No inventes probabilidades.",
+      fuentes: [],
+      ok: false,
+    };
+  }
+
+  const subyacente = await obtenerVelas(simbolo.endsWith(".BA") ? simbolo : `${simbolo}.BA`, "2y");
+  if (!subyacente.ok || subyacente.velas.length < 120) {
+    return {
+      texto: `No hay historial suficiente para ${simbolo} (${subyacente.velas.length} velas). Informalo con honestidad y no estimés nada.`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+
+  const r = ejecutarPrediccion(subyacente.velas, simbolo, horizonte);
+  if (r.error || r.probActual == null || !r.decision) {
+    return { texto: `Predicción no disponible para ${simbolo}: ${r.error ?? "datos insuficientes"}`, fuentes: [], ok: false };
+  }
+
+  const pct = (v: number | null) => (v != null ? `${(v * 100).toFixed(1)}%` : "n/d");
+  const sinVentaja =
+    r.wfAcc != null && r.wfAcc < 0.55 && !r.reglaOroOk
+      ? " ⚠️ El modelo NO muestra ventaja predictiva verificable (walk-forward <55% y regla de oro violada): presentá el resultado como exploratorio."
+      : r.wfAcc != null && r.wfAcc < 0.55
+        ? " ⚠️ Walk-forward por debajo de 55%: sin ventaja estadística clara, comunicar con cautela."
+        : "";
+
+  const texto = `**Predicción direccional ML — ${simbolo}** (horizonte ${horizonte} días hábiles)
+
+- Precio spot: $${subyacente.spot?.toFixed(2)}
+- Probabilidad de subida actual: **${(r.probActual * 100).toFixed(1)}%** (umbral óptimo ${(r.logThreshold * 100).toFixed(0)}%)
+- Señal: **${r.decision.direccion}** — confianza ${(r.decision.confianza * 100).toFixed(0)}%
+- Estrategia sugerida: ${r.decision.estrategia}
+
+Validación del modelo:
+- CV accuracy/F1: ${pct(r.logisticCv.acc)} / ${r.logisticCv.f1.toFixed(2)}
+- Test accuracy/F1: ${pct(r.testAcc)} / ${r.testF1?.toFixed(2) ?? "n/d"}
+- Walk-forward (${r.wfVentanas} ventanas): acc ${pct(r.wfAcc)} / F1 ${r.wfF1?.toFixed(2) ?? "n/d"}${sinVentaja}
+- Regla de oro features ≤ n/10: ${r.reglaOroOk ? "OK" : "violada"}
+- Features más influyentes: ${r.featuresImportancia.slice(0, 3).map(([k, v]) => `${k} (${v > 0 ? "+" : ""}${v})`).join(", ")}
+
+Fuente de precios: Yahoo Finance (${subyacente.velas.length} velas diarias). Modelo logístico L2 entrenado con split temporal 60/20/20 sin mezcla de información. Esto es una estimación estadística, no recomendación de inversión.`;
+
+  return {
+    texto,
+    fuentes: [
+      { dominio: "finance.yahoo.com", url: `https://finance.yahoo.com/quote/${simbolo}.BA`, title: `Historial ${simbolo}.BA` },
+    ],
+    ok: true,
+  };
+}
+
+export async function ejecutarCadenaOpcionesBCBA(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  let simbolo = "";
+  try {
+    const args = JSON.parse(argsRaw) as { simbolo?: string };
+    simbolo = String(args.simbolo ?? "").trim().toUpperCase();
+  } catch {
+    /* sin args */
+  }
+  if (!simbolo) {
+    return {
+      texto: "Necesito el parámetro 'simbolo' del subyacente BCBA con opciones listadas (GGAL, PAMP, YPFD, COME, BMA).",
+      fuentes: [],
+      ok: false,
+    };
+  }
+
+  const token = await autenticar();
+  if (!token) {
+    return {
+      texto: "No pude autenticarme en la API de IOL en este momento. Reintentá más tarde.",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  const subyacente = await obtenerVelas(`${simbolo}.BA`, "1y");
+  if (!subyacente.ok || !subyacente.spot) {
+    return { texto: `Sin datos de mercado para ${simbolo}.BA.`, fuentes: [], ok: false };
+  }
+  const spot = subyacente.spot;
+  const rets = retornosLog(subyacente.velas.map((v) => v.close));
+  const vd = ewmaVol(rets) ?? volHistorica(rets) ?? 0.35;
+
+  const [tasaRiesgo, cruda] = await Promise.all([obtenerTasaCaucion(token), obtenerCadenaOpciones(token, simbolo)]);
+  if (cruda.length === 0) {
+    return { texto: `${simbolo} no tiene opciones con datos en IOL hoy.`, fuentes: [], ok: false };
+  }
+  const cadena = await procesarCadena(cruda, spot, { tasaRiesgo, volHistorica: vd });
+  if (cadena.length === 0) {
+    return { texto: `La cadena de ${simbolo} no tiene strikes procesables (sin precio o vencimiento).`, fuentes: [], ok: false };
+  }
+
+  const sesgo = sesgoVolatilidad(
+    cadena.map((o) => ({ tipo: o.tipoOpcion, strike: o.strike, iv: o.iv })),
+    spot,
+  );
+  const vencimientos = [...new Set(cadena.map((o) => o.fechaVencimiento))].slice(0, 3);
+  const resumenVenc = vencimientos
+    .map((venc) => {
+      const filas = cadena.filter((o) => o.fechaVencimiento === venc);
+      const callsItm = filas.filter((o) => o.tipoOpcion === "Call" && o.moneyness === "ITM").length;
+      const putsItm = filas.filter((o) => o.tipoOpcion === "Put" && o.moneyness === "ITM").length;
+      const ivMedia = filas.filter((o) => o.iv != null);
+      const ivProm = ivMedia.length ? (ivMedia.reduce((s, o) => s + (o.iv as number), 0) / ivMedia.length) * 100 : NaN;
+      return `- ${venc}: ${filas.length} opciones | IV promedio ${Number.isNaN(ivProm) ? "n/d" : `${ivProm.toFixed(1)}%`} | calls ITM ${callsItm}, puts ITM ${putsItm}`;
+    })
+    .join("\n");
+
+  const lecturaSesgo =
+    sesgo == null
+      ? "no calculable (faltan OTM de un lado)"
+      : sesgo > 10
+        ? `+${sesgo.toFixed(1)}% → sesgo ALCISTA (puts OTM más caras: mercado comprando cobertura contra suba)`
+        : sesgo < -10
+          ? `${sesgo.toFixed(1)}% → sesgo BAJISTA (calls OTM más caras)`
+          : `${sesgo.toFixed(1)}% → neutral`;
+
+  const texto = `**Cadena de opciones BCBA — ${simbolo}**
+
+- Spot: $${spot.toFixed(2)} | Vol EWMA anual: ${(vd * 100).toFixed(1)}% | Tasa caución 7d: ${(tasaRiesgo * 100).toFixed(2)}%
+- Opciones procesadas: ${cadena.length}
+- Skew/sesgo de volatilidad OTM: ${lecturaSesgo}
+
+Vencimientos principales:
+${resumenVenc}
+
+Interpretación metodológica (Elbaum Cap 10 + prototipo Labadie): la T de cada opción usa días hábiles XBUE/252; la IV se resuelve por bisección dentro de límites teóricos; las griegas salen de Black-Scholes con la IV de mercado cuando existe. Datos: API InvertirOnline. No es recomendación de inversión.`;
+
+  return {
+    texto,
+    fuentes: [
+      { dominio: "invertironline.com", url: "https://api.invertironline.com", title: "API IOL — cadena de opciones" },
+    ],
+    ok: true,
+  };
 }

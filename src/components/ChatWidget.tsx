@@ -196,8 +196,29 @@ function GraficoLinea({
           <LineChart className="h-3.5 w-3.5 flex-none text-primary" />
           {titulo}
         </span>
-        <span className={subio ? "text-emerald-400" : "text-red-400"}>
-          {fmtNum(ultimo.v)} {unidad}
+        <span className="flex items-center gap-2">
+          <span className={subio ? "text-emerald-400" : "text-red-400"}>
+            {fmtNum(ultimo.v)} {unidad}
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              const csv = `fecha,valor\n${pts.map((p) => `${p.f},${p.v}`).join("\n")}`;
+              const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `${titulo.replace(/[^a-zA-Z0-9]/g, "_")}.csv`;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              URL.revokeObjectURL(url);
+            }}
+            title="Descargar CSV"
+            className="rounded p-1 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+          >
+            <Download className="h-3 w-3" />
+          </button>
         </span>
       </figcaption>
       <svg
@@ -404,6 +425,7 @@ export function ChatWidget() {
   const [conectandoIol, setConectandoIol] = useState(false);
   const [printIdx, setPrintIdx] = useState<number | null>(null);
   const [agentesActivos, setAgentesActivos] = useState<string[]>([]);
+  const [adaptiveHint, setAdaptiveHint] = useState<{ toolParallelism: string; maxParallel: number; reason: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const queueRef = useRef<string[]>([]);
@@ -723,6 +745,12 @@ export function ChatWidget() {
         } else if (evt.t === "informe") {
           const inf = evt.v as InformeData | undefined;
           if (inf?.titulo) updateLast({ informe: inf });
+        } else if (evt.t === "adaptive") {
+          const h = evt.v as { toolParallelism: string; maxParallel: number; reason: string } | null;
+          if (h) setAdaptiveHint(h);
+        } else if (evt.t === "observability") {
+          // snapshot relay para debug — no bloquea UI
+          console.debug("[relay observability]", evt.v);
         } else if (evt.t === "text") {
           setSearching(null);
           setConsultando(false);
@@ -1256,8 +1284,12 @@ export function ChatWidget() {
                   <span className="flex h-4 w-4 items-center justify-center">
                     <span className="h-1.5 w-1.5 animate-ping rounded-full bg-gold" />
                   </span>
-                  {agentesActivos.length} agentes trabajando en paralelo…
+                  {agentesActivos.length} agentes trabajando en paralelo
+                  {adaptiveHint ? ` · ${adaptiveHint.toolParallelism}×${adaptiveHint.maxParallel}` : ""}…
                 </p>
+              )}
+              {adaptiveHint && agentesActivos.length <= 1 && loading && (
+                <p className="text-[10.5px] text-muted-foreground">Relay · {adaptiveHint.toolParallelism} · {adaptiveHint.reason}</p>
               )}
               {messages.length === 1 && (
                 <div className="flex flex-wrap gap-1.5 pt-2">
@@ -1304,7 +1336,7 @@ export function ChatWidget() {
                   </button>
                 </div>
               )}
-              <div className="mb-2 flex items-center gap-2">
+              <div className="mb-2 flex min-w-0 items-start gap-2">
                 <Select
                   value={model}
                   onValueChange={(v) => {
@@ -1314,11 +1346,22 @@ export function ChatWidget() {
                 >
                   <SelectTrigger
                     aria-label="Modelo del asistente"
-                    className="h-8 w-auto flex-none rounded-lg border-border/70 px-2.5 text-[11px] shadow-none focus:ring-primary/50"
+                    className="h-8 w-auto max-w-[52%] shrink-0 rounded-lg border-border/70 px-2.5 text-[11px] shadow-none focus:ring-primary/50 sm:max-w-none"
                   >
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="max-w-[300px]">
+                  <SelectContent
+                    align="start"
+                    side="top"
+                    sideOffset={8}
+                    className="max-h-[min(60dvh,520px)] max-w-none"
+                    style={{
+                      width: isDesktop
+                        ? `${Math.min((size?.w ?? 460) - 24, typeof window !== "undefined" ? window.innerWidth - 24 : 460)}px`
+                        : "calc(100vw - 24px)",
+                      maxWidth: "calc(100vw - 16px)",
+                    }}
+                  >
                     <SelectGroup>
                       <SelectLabel className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
                         {CATEGORIA_RAPIDEZ_LABEL}
@@ -1327,12 +1370,12 @@ export function ChatWidget() {
                         <SelectItem
                           key={m.id}
                           value={m.id}
-                          className="text-[12px] leading-tight"
+                          className="whitespace-normal break-words py-2 text-[12px] leading-tight"
                           title={m.descripcion}
                         >
-                          {m.nombre}
-                          <span className="block truncate text-[10.5px] text-muted-foreground">
-                            {m.editor} · {m.descripcion.slice(0, 60)}
+                          <span className="block pr-1 font-medium">{m.nombre}</span>
+                          <span className="block whitespace-normal break-words pr-1 text-[10.5px] font-normal leading-snug text-muted-foreground">
+                            {m.editor} · {m.descripcion}
                           </span>
                         </SelectItem>
                       ))}
@@ -1345,19 +1388,19 @@ export function ChatWidget() {
                         <SelectItem
                           key={m.id}
                           value={m.id}
-                          className="text-[12px] leading-tight"
+                          className="whitespace-normal break-words py-2 text-[12px] leading-tight"
                           title={m.descripcion}
                         >
-                          {m.nombre}
-                          <span className="block truncate text-[10.5px] text-muted-foreground">
-                            {m.editor} · {m.descripcion.slice(0, 60)}
+                          <span className="block pr-1 font-medium">{m.nombre}</span>
+                          <span className="block whitespace-normal break-words pr-1 text-[10.5px] font-normal leading-snug text-muted-foreground">
+                            {m.editor} · {m.descripcion}
                           </span>
                         </SelectItem>
                       ))}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                <p className="min-w-0 flex-1 truncate text-[10.5px] leading-snug text-muted-foreground">
+                <p className="min-w-0 flex-1 whitespace-normal break-words pt-1.5 text-[10.5px] leading-snug text-muted-foreground">
                   <span className="font-medium text-foreground/70">{modelInfo.nombre}</span>
                   {" · "}
                   {modelInfo.descripcion}
