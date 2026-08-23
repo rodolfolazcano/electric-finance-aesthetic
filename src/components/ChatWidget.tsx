@@ -1401,76 +1401,79 @@ export function ChatWidget() {
                 </label>
                 <Switch id="modo-automatico" checked={modoAutomatico} onCheckedChange={setModoAutomatico} aria-label="Modo automático" />
               </div>
-              <div className="mb-2 flex min-w-0 items-start gap-2">
-                <Select
-                  value={model}
-                  onValueChange={(v) => {
-                    setModel(v);
-                    setModelInfo(obtenerModelo(v));
-                  }}
-                >
-                  <SelectTrigger
-                    aria-label="Modelo del asistente"
-                    className="h-8 w-auto max-w-[52%] shrink-0 rounded-lg border-border/70 px-2.5 text-[11px] shadow-none focus:ring-primary/50 sm:max-w-none"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent
-                    align="start"
-                    side="top"
-                    sideOffset={8}
-                    className="max-h-[min(60dvh,520px)] max-w-none"
-                    style={{
-                      width: isDesktop
-                        ? `${Math.min((size?.w ?? 460) - 24, typeof window !== "undefined" ? window.innerWidth - 24 : 460)}px`
-                        : "calc(100vw - 24px)",
-                      maxWidth: "calc(100vw - 16px)",
+              {!modoAutomatico && (
+                <div className="mb-2 flex min-w-0 items-center gap-2">
+                  <Select
+                    value={model}
+                    onValueChange={(v) => {
+                      setModel(v);
+                      setModelInfo(obtenerModelo(v));
                     }}
                   >
-                    <SelectGroup>
-                      <SelectLabel className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
-                        {CATEGORIA_RAPIDEZ_LABEL}
-                      </SelectLabel>
-                      {MODELOS_RAPIDEZ.map((m) => (
-                        <SelectItem
-                          key={m.id}
-                          value={m.id}
-                          className="whitespace-normal break-words py-2 text-[12px] leading-tight"
-                          title={m.descripcion}
-                        >
-                          <span className="block pr-1 font-medium">{m.nombre}</span>
-                          <span className="block whitespace-normal break-words pr-1 text-[10.5px] font-normal leading-snug text-muted-foreground">
-                            {m.editor} · {m.descripcion}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                    <SelectGroup>
-                      <SelectLabel className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
-                        {CATEGORIA_RAZONAMIENTO_LABEL}
-                      </SelectLabel>
-                      {MODELOS_RAZONAMIENTO.map((m) => (
-                        <SelectItem
-                          key={m.id}
-                          value={m.id}
-                          className="whitespace-normal break-words py-2 text-[12px] leading-tight"
-                          title={m.descripcion}
-                        >
-                          <span className="block pr-1 font-medium">{m.nombre}</span>
-                          <span className="block whitespace-normal break-words pr-1 text-[10.5px] font-normal leading-snug text-muted-foreground">
-                            {m.editor} · {m.descripcion}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <p className="min-w-0 flex-1 whitespace-normal break-words pt-1.5 text-[10.5px] leading-snug text-muted-foreground">
-                  <span className="font-medium text-foreground/70">{modelInfo.nombre}</span>
-                  {" · "}
-                  {modelInfo.descripcion}
-                </p>
-              </div>
+                    <SelectTrigger
+                      aria-label="Modelo del asistente"
+                      className="h-8 w-auto max-w-[55%] shrink rounded-lg border-border/70 px-2.5 text-[11px] shadow-none focus:ring-primary/50 sm:max-w-none sm:shrink-0"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent
+                      align="start"
+                      side="top"
+                      sideOffset={8}
+                      className="max-h-[min(60dvh,520px)] max-w-none"
+                      style={{
+                        width: isDesktop
+                          ? `${Math.min((size?.w ?? 460) - 24, typeof window !== "undefined" ? window.innerWidth - 24 : 460)}px`
+                          : "calc(100vw - 24px)",
+                        maxWidth: "calc(100vw - 16px)",
+                      }}
+                    >
+                      <SelectGroup>
+                        <SelectLabel className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
+                          {CATEGORIA_RAPIDEZ_LABEL}
+                        </SelectLabel>
+                        {MODELOS_RAPIDEZ.map((m) => (
+                          <SelectItem
+                            key={m.id}
+                            value={m.id}
+                            className="whitespace-normal break-words py-2 text-[12px] leading-tight"
+                            title={m.descripcion}
+                          >
+                            <span className="block pr-1 font-medium">{m.nombre}</span>
+                            <span className="block whitespace-normal break-words pr-1 text-[10.5px] font-normal leading-snug text-muted-foreground">
+                              {m.editor} · {m.descripcion}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
+                          {CATEGORIA_RAZONAMIENTO_LABEL}
+                        </SelectLabel>
+                        {MODELOS_RAZONAMIENTO.map((m) => (
+                          <SelectItem
+                            key={m.id}
+                            value={m.id}
+                            className="whitespace-normal break-words py-2 text-[12px] leading-tight"
+                            title={m.descripcion}
+                          >
+                            <span className="block pr-1 font-medium">{m.nombre}</span>
+                            <span className="block whitespace-normal break-words pr-1 text-[10.5px] font-normal leading-snug text-muted-foreground">
+                              {m.editor} · {m.descripcion}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <p
+                    title={`${modelInfo.nombre} · ${modelInfo.descripcion}`}
+                    className="min-w-0 flex-1 truncate pt-0.5 text-[10.5px] leading-tight text-muted-foreground"
+                  >
+                    {modelInfo.nombre} · {modelInfo.descripcion}
+                  </p>
+                </div>
+              )}
               <div className="flex items-end gap-2 rounded-xl border border-border bg-background px-3 py-2 focus-within:border-primary/60">
                 <textarea
                   ref={inputRef}
