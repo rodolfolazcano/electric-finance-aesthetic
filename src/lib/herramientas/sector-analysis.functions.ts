@@ -6,6 +6,62 @@ import rawSectores from "./sectores.json";
 import { getHistory } from "./history-cache.server";
 import { getOrFetch } from "./cache/api-cache.server";
 import { TTL_POR_TIPO } from "./cache/types";
+import { SECTOR_ETF_BY_SECTOR_KEY, SECTOR_KEY_BY_ESPANOL } from "../benchmarks-master";
+import { getFlatTickerList } from "../universos";
+import { hedgeCandidatesFallback, type HedgeCandidate as HedgeCandidateContract, type CohorteKey as CohorteKeyContract } from "../labadie/contracts";
+
+// ── Cohortes homogéneas — lógica pura testeable (movida desde SectoresTab) ──
+export type CohorteKey = CohorteKeyContract;
+export const COHORTES: Record<CohorteKey, { label: string; corto: string }> = {
+  BCBA_ARS: { label: "Acciones BCBA · ARS", corto: "BCBA ARS" },
+  CEDear_ARS: { label: "CEDEARs BCBA · ARS", corto: "CEDEAR ARS" },
+  CEDear_USD: { label: "CEDEARs BCBA · USD", corto: "CEDEAR USD" },
+  US_USD: { label: "Acciones EE.UU. · USD", corto: "EE.UU. USD" },
+};
+export const ORDEN_COHORTES: CohorteKey[] = ["BCBA_ARS", "CEDear_ARS", "CEDear_USD", "US_USD"];
+
+const META_TICKER_SA = new Map<string, { tipo?: string; moneda?: string; mercado?: string }>(
+  getFlatTickerList().map((t) => [
+    t.ticker.toUpperCase(),
+    { tipo: (t as any).tipo, moneda: (t as any).moneda, mercado: (t as any).mercado },
+  ]),
+);
+
+export function clasificarCohorte(ticker: string): CohorteKey {
+  const tk = ticker.toUpperCase();
+  const meta = META_TICKER_SA.get(tk);
+  if (meta?.mercado === "BCBA") {
+    if (meta.tipo === "cedear") return meta.moneda === "USD" ? "CEDear_USD" : "CEDear_ARS";
+    return "BCBA_ARS";
+  }
+  if (meta?.mercado === "NYSE/NASDAQ") return "US_USD";
+  if (tk.endsWith(".BA")) return "BCBA_ARS";
+  if (/^[A-Z0-9]{1,6}D$/.test(tk)) return "CEDear_USD";
+  return "US_USD";
+}
+
+function normSectorSA(s: string): string {
+  return s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+export function resolverSectorKey(input: string): string | null {
+  const q = normSectorSA(input);
+  if (!q) return null;
+  if ((SECTOR_ETF_BY_SECTOR_KEY as Record<string, string>)[q]) return q;
+  const esp = (SECTOR_KEY_BY_ESPANOL as Record<string, string>)[q];
+  if (esp) return esp;
+  for (const k of Object.keys(SECTOR_ETF_BY_SECTOR_KEY)) if (k.includes(q) || q.includes(k)) return k;
+  for (const [espLabel, engKey] of Object.entries(SECTOR_KEY_BY_ESPANOL as Record<string, string>))
+    if (espLabel.includes(q) || q.includes(espLabel)) return engKey;
+  if (q.includes("financ")) return "financial-services";
+  if (q.includes("tecnolog") || q === "tech") return "technology";
+  if (q.includes("salud") || q.includes("health")) return "healthcare";
+  if (q.includes("energia") || q.includes("energy")) return "energy";
+  return null;
+}
+export function etfDeSector(input: string): string | null {
+  const k = resolverSectorKey(input);
+  return k ? (SECTOR_ETF_BY_SECTOR_KEY as Record<string, string>)[k] ?? null : null;
+}
 
 const SECTORES = rawSectores as Record<
   string,
@@ -951,3 +1007,122 @@ export const getSectorEtfFit = createServerFn({ method: "POST" })
       );
     },
   );
+
+// ── A1 — Hedge provider (no recalcula CAPM, importa de cuantitativo) ─────
+// TODO Bustamante 5 pasos (ingresos→estructura→regulador→disrupción→múltiplo)
+// Ver: metodologías/pt "La televisión económica" — pipeline pendiente FichaValuacion → múltiplo sectorial.
+// Usa SECTOR_ETF_BY_SECTOR_KEY + getMatrizCAPM (capm.functions) + getBenchmarksMatrix (benchmarks-matrix)
+// para exponer beta/alpha/r² vs ETF sectorial. Mantiene cohortes BCBA_ARS/CEDEAR_* intactas.
+// TODO Bustamante 5 pasos: modelo ingresos → estructura competitiva → regulador → disrupción → múltiplo ajustado
+export type HedgeCandidate = HedgeCandidateContract;
+// CohorteKey ya exportado arriba desde contracts
+
+function resolverLabelEspanol(sectorKeyInput: string): string | null {
+  const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const q = norm(sectorKeyInput);
+  const eng = resolverSectorKey(q);
+  // Invertir SECTOR_KEY_BY_ESPANOL para buscar label español
+  if (eng) {
+    for (const [espLabel, engKey] of Object.entries(SECTOR_KEY_BY_ESPANOL as Record<string, string>)) {
+      if (engKey === eng) {
+        // buscar clave exacta en sectores.json (puede tener mayúsculas/acentos distintos)
+        const found = Object.keys(SECTORES).find((k) => norm(k) === norm(espLabel));
+        if (found) return found;
+        return espLabel;
+      }
+    }
+  }
+  // fallback fuzzy sobre claves de sectores.json
+  for (const k of Object.keys(SECTORES)) {
+    const nk = norm(k);
+    if (nk.includes(q) || q.includes(nk)) return k;
+    if (q.includes("financ") && nk.includes("financ")) return k;
+    if (q.includes("tecnolog") && nk.includes("tecnolog")) return k;
+  }
+  return null;
+}
+
+function stdAnualizado(returns: number[]): number {
+  if (returns.length < 2) return 0;
+  const m = returns.reduce((s, v) => s + v, 0) / returns.length;
+  const v = returns.reduce((s, x) => s + (x - m) ** 2, 0) / returns.length;
+  return Math.sqrt(v) * Math.sqrt(252);
+}
+
+export const getHedgeCandidates = createServerFn({ method: "POST" })
+  .inputValidator((input: { sectorKey: string; max?: number }) =>
+    z.object({ sectorKey: z.string().min(1), max: z.number().int().min(1).max(50).optional() }).parse(input),
+  )
+  .handler(async ({ data }): Promise<HedgeCandidate[]> => {
+    try {
+      const max = data.max ?? 12;
+      const etf = etfDeSector(data.sectorKey);
+      if (!etf) return hedgeCandidatesFallback(data.sectorKey);
+      const labelEsp = resolverLabelEspanol(data.sectorKey);
+      if (!labelEsp || !SECTORES[labelEsp]) return hedgeCandidatesFallback(data.sectorKey);
+    const industriaMap = SECTORES[labelEsp] as Record<string, { ticker: string; nombre: string }[]>;
+    const flat: string[] = [];
+    const seen = new Set<string>();
+    for (const arr of Object.values(industriaMap)) {
+      for (const it of arr) {
+        const tk = it.ticker.toUpperCase();
+        if (!seen.has(tk)) {
+          seen.add(tk);
+          flat.push(tk);
+        }
+      }
+    }
+    if (flat.length === 0) return [];
+    // Mantener cohortes: no filtrar, solo etiquetar; limitar para matriz (Yahoo rate)
+    const tickersForMatriz = [etf, ...flat.slice(0, Math.min(flat.length, Math.max(2, max)))];
+    // Import dinámico para no recalcular CAPM — lee de cuantitativo
+    const { getMatrizCAPM } = await import("./capm.functions");
+    let matriz: { tickers: string[]; beta: number[][]; alpha: number[][]; rSquared: number[][]; correlation: number[][] };
+      try {
+        matriz = (await (getMatrizCAPM as any)({ data: { tickers: tickersForMatriz } })) as any;
+      } catch {
+        return hedgeCandidatesFallback(data.sectorKey);
+      }
+      const idxEtf = matriz.tickers.findIndex((t) => t.toUpperCase() === etf.toUpperCase());
+      if (idxEtf < 0) return hedgeCandidatesFallback(data.sectorKey);
+    // Fetch vol por ticker (batch)
+    const volMap = new Map<string, number>();
+    const toFetch = matriz.tickers.filter((t) => t.toUpperCase() !== etf.toUpperCase()).slice(0, max);
+    const BATCH = 4;
+    for (let i = 0; i < toFetch.length; i += BATCH) {
+      const slice = toFetch.slice(i, i + BATCH);
+      const results = await Promise.allSettled(
+        slice.map(async (tk) => {
+          const hist = await fetchHistory(tk, 365).catch(() => [] as { close: number }[]);
+          const closes = (hist as any[]).map((h: any) => h.close).filter((c: number) => c > 0);
+          if (closes.length < 30) return { tk, vol: 0 };
+          const rets: number[] = [];
+          for (let j = 1; j < closes.length; j++) rets.push((closes[j] - closes[j - 1]) / closes[j - 1]);
+          return { tk, vol: stdAnualizado(rets) };
+        }),
+      );
+      for (const r of results) if (r.status === "fulfilled") volMap.set(r.value.tk.toUpperCase(), r.value.vol);
+    }
+    const out: HedgeCandidate[] = [];
+    for (let i = 0; i < matriz.tickers.length; i++) {
+      const t = matriz.tickers[i];
+      if (t.toUpperCase() === etf.toUpperCase()) continue;
+      const beta = matriz.beta?.[i]?.[idxEtf] ?? matriz.beta?.[idxEtf]?.[i] ?? 0;
+      const alpha = matriz.alpha?.[i]?.[idxEtf] ?? matriz.alpha?.[idxEtf]?.[i] ?? 0;
+      const r2 = matriz.rSquared?.[i]?.[idxEtf] ?? matriz.rSquared?.[idxEtf]?.[i] ?? 0;
+      out.push({
+        ticker: t,
+        cohorte: clasificarCohorte(t),
+        beta: Math.round(beta * 10000) / 10000,
+        alpha: Math.round(alpha * 100000) / 100000,
+        r2: Math.round(r2 * 10000) / 10000,
+        vol: Math.round((volMap.get(t.toUpperCase()) ?? 0) * 10000) / 10000,
+      });
+      }
+      out.sort((a, b) => b.r2 - a.r2 || Math.abs(b.beta) - Math.abs(a.beta));
+      const res = out.slice(0, max);
+      return res.length > 0 ? res : hedgeCandidatesFallback(data.sectorKey);
+    } catch {
+      return hedgeCandidatesFallback(data.sectorKey);
+    }
+  });

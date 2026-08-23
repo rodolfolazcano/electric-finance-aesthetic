@@ -421,7 +421,7 @@ export function CalculadoraFinancieraTab() {
                 <span className="text-[13px] text-muted-foreground">Base</span>
                 <select
                   value={simpleBase}
-                  onChange={(e) => setSimpleBase(e.target.value as 360 | 365)}
+                  onChange={(e) => setSimpleBase(e.target.value as unknown as 360 | 365)}
                   className="w-full rounded-md border border-border/40 bg-background/20 px-3 py-2 text-[14px] text-foreground outline-none focus:border-emerald-500/50"
                 >
                   <option value={365}>365 días</option>

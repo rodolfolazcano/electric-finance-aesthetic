@@ -2,21 +2,56 @@
  * Labadié — Validación 5 Stages (Statistical Arbitrage §148-217)
  * Walk-forward 60/20 + Monte Carlo synth OU+fBm Stage1
  */
-import { runBacktest, analyzePair } from "../statarb.math";
+import { runBacktest, analyzePair, simulateSyntheticSpread, simulateTrading, computeRollingStats } from "../statarb.math";
 import type { BacktestConfig, BacktestGridResult } from "../statarb.types";
 import { mean } from "../math/stats";
 
-// Stage1: Monte Carlo synth spread OU con Hurst H (self-similar)
 export function monteCarloStage1(
   hurst: number,
-  syntheticTrades: (seed: number) => number, // placeholder: retorna PnL sintético
+  syntheticTrades?: (seed: number) => number,
   sims = 5000,
 ): { meanPnl: number; winRate: number; sharpeSynth: number } {
-  void hurst;
+  // Sin generador custom: Stage 1 canónico con sintéticos OU+fBm reales (no placeholder)
+  if (!syntheticTrades) return monteCarloOU(hurst);
   const pnls: number[] = [];
   for (let i = 0; i < sims; i++) pnls.push(syntheticTrades(i));
   const m = mean(pnls);
   const wins = pnls.filter((p) => p > 0).length / Math.max(1, pnls.length);
+  const st = Math.sqrt(pnls.reduce((s, v) => s + (v - m) ** 2, 0) / Math.max(1, pnls.length - 1)) || 1;
+  return { meanPnl: m, winRate: wins * 100, sharpeSynth: m / st };
+}
+
+// Monte Carlo OU+fBm canónico (usar cuando no se pasa syntheticTrades custom)
+export function monteCarloOU(
+  hurst: number,
+  mu = 0,
+  theta = 0.1,
+  sigma = 0.02,
+  days = 252,
+  sims = 2000,
+  window = 20,
+  entryA = 1.5,
+  stopB = 2.5,
+  beta = 1,
+  txCost = 0.1,
+): { meanPnl: number; winRate: number; sharpeSynth: number } {
+  const H = Math.min(0.91, Math.max(0.25, hurst));
+  const pnls: number[] = [];
+  for (let s = 0; s < sims; s++) {
+    const synth = simulateSyntheticSpread(theta, mu, sigma, days, 1 / 252, H);
+    const spread = synth.map(p => p.value);
+    // precios sintéticos: p1 = spread + beta*p2 ; p2 vol alrededor mu
+    const p2 = synth.map((_, i) => 100 + Math.sin(i * 0.05) * 2);
+    const p1 = spread.map((v, i) => v + beta * p2[i]);
+    const dates = synth.map(p => p.date);
+    const rolled = computeRollingStats(spread, window);
+    const sim = simulateTrading(spread, dates, p1, p2, rolled.mean, rolled.std, entryA, stopB, beta, txCost);
+    const trades = sim.trades;
+    const total = trades.length ? trades[trades.length - 1].pnlCum : 0;
+    pnls.push(total);
+  }
+  const m = mean(pnls);
+  const wins = pnls.filter(p => p > 0).length / Math.max(1, pnls.length);
   const st = Math.sqrt(pnls.reduce((s, v) => s + (v - m) ** 2, 0) / Math.max(1, pnls.length - 1)) || 1;
   return { meanPnl: m, winRate: wins * 100, sharpeSynth: m / st };
 }

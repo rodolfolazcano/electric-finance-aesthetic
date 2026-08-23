@@ -53,11 +53,13 @@ export function hedgeCandidatesFallback(sectorKey: string): HedgeCandidate[] {
 export interface QuantSignals {
   hurst: number | null;
   betaP: number | null;
+  vol: number | null;
   pValue: number | null;
 }
 export function quantSignalsFallback(): QuantSignals {
-  return { hurst: null, betaP: null, pValue: null };
+  return { hurst: null, betaP: null, vol: null, pValue: null };
 }
+export const QUANT_FALLBACK: QuantSignals = { hurst: null, betaP: null, vol: null, pValue: null };
 
 // ── Contexto snapshots (null-safe) ──
 export interface IntermarketRegime {

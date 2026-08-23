@@ -50,6 +50,45 @@ import {
 } from "./bonos-data";
 import { fetchBonosCashFlows } from "./docta-api";
 import { getCached, setCache } from "./cache";
+import { riskFreeFallback } from "../labadie/contracts";
+
+// ── ETTI única fuente (A3) — caución 7d vía IOL, cache 15m ────────────────
+export const rfTPsTirMap = new Map<string, number>();
+
+export async function getRiskFreeRateETTI(): Promise<number> {
+  const CACHE_KEY = "rf-etti-caucion-7d";
+  const cached = getCached<number>(CACHE_KEY);
+  if (cached != null && isFinite(cached)) return cached;
+  // Sin token → fallback (riskFreeFallback de contracts)
+  const token =
+    (typeof process !== "undefined" ? (process.env as any)?.IOL_TOKEN ?? (process.env as any)?.IOL_API_TOKEN : null) ??
+    null;
+  if (!token) {
+    setCache(CACHE_KEY, riskFreeFallback, 15 * 60);
+    return riskFreeFallback;
+  }
+  try {
+    const res = await fetch("https://api.invertironline.com/api/v2/Cotizaciones/Cauciones/Todas/Argentina", {
+      headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
+      cache: "no-store" as any,
+    });
+    if (!res.ok) throw new Error(`IOL caucion ${res.status}`);
+    const data: any = await res.json();
+    const titulos: any[] = data?.titulos ?? data ?? [];
+    if (!Array.isArray(titulos) || !titulos.length) throw new Error("sin titulos");
+    // Buscar plazo 7, fallback al primero ordenado por plazo
+    const sorted = [...titulos].sort((a, b) => (a.plazo ?? 999) - (b.plazo ?? 999));
+    const t7 = sorted.find((t) => t.plazo === 7);
+    const tasaRaw = t7?.tasaPromedio ?? sorted[0]?.tasaPromedio;
+    const tasa = typeof tasaRaw === "number" && isFinite(tasaRaw) ? tasaRaw / 100 : riskFreeFallback;
+    const out = isFinite(tasa) && tasa > 0 && tasa < 5 ? tasa : riskFreeFallback;
+    setCache(CACHE_KEY, out, 15 * 60);
+    return out;
+  } catch {
+    setCache(CACHE_KEY, riskFreeFallback, 15 * 60);
+    return riskFreeFallback;
+  }
+}
 
 // ============================================================================
 // CONSTANTES DE ESCALA DE PRECIOS IOL
@@ -1230,6 +1269,8 @@ export const calcularRendimientosBono = createServerFn({ method: "POST" })
         const tea = Math.pow(1 + tem, 12) - 1;
         const tna = tem * 12;
         const precioTec = pagoUnico;
+        // Poblar rfTPsTirMap (A3) — título público → TIR (LECAP)
+        if (tea != null && isFinite(tea)) rfTPsTirMap.set(data.ticker.toUpperCase(), tea);
 
         return {
           ticker: data.ticker,
@@ -1324,6 +1365,8 @@ export const calcularRendimientosBono = createServerFn({ method: "POST" })
 
     // Calcular TIR con convención correcta
     const tirCalc = xirrConvencion(flujosXIRR, freq, yieldConv);
+    // Poblar rfTPsTirMap (A3) — título público → TIR (curva/lecap/ON único)
+    if (tirCalc != null && isFinite(tirCalc)) rfTPsTirMap.set(data.ticker.toUpperCase(), tirCalc);
 
     // TEA y TNA desde TIR calculada
     let tea: number | null = null;

@@ -1,7 +1,7 @@
-import { computeHurst, impliedPFromReturns } from "@/lib/math/stats";
+import { computeHurst, impliedPFromReturns } from "@/lib/labadie";
 
 export function HurstPanel({ serie, returns }: { serie: number[]; returns?: number[] }) {
-  const H = serie.length >= 30 ? computeHurst(serie) : 0.5;
+  const H = serie.length >= 100 ? computeHurst(serie) : 0.5;
   const p = H > 0 ? 1 / H : 2;
   const p2 = returns && returns.length >= 100 ? impliedPFromReturns(returns) : null;
   const regime = H < 0.45 ? "mean-reverting" : H > 0.55 ? "trending" : "random";
@@ -18,8 +18,8 @@ export function HurstPanel({ serie, returns }: { serie: number[]; returns?: numb
         <div><div className="text-[11px] text-muted-foreground">p = 1/H</div><div className="text-lg font-semibold">{p.toFixed(2)}</div></div>
         <div><div className="text-[11px] text-muted-foreground">p (multi-escala)</div><div className="text-lg font-semibold">{p2 != null ? p2.toFixed(2) : "—"}</div></div>
       </div>
-      {warn && <p className="text-xs text-amber-500">Serie &lt;100 obs: estimador R/S sesgado. Usar solo como referencia.</p>}
-      <p className="text-xs text-muted-foreground">1205.3482v6 §3.2 — H&lt;0.5 mean-reverting favorece pairs, H&gt;0.5 trending penaliza contra-tendencia. Clamp H∈[0.05,0.95] evita p explosivo.</p>
+      {warn && <p className="text-xs text-amber-500">Serie &lt;100 obs: R/S no fiable (paper §3.2, DFA recomendado). H neutral 0.5.</p>}
+      <p className="text-xs text-muted-foreground">1205.3482v6 §3.2 + §4.3 — H&lt;0.5 mean-reverting favorece pairs, H&gt;0.5 trending penaliza. Clamp canónico H∈[0.25,0.91] (p∈[1.1,4]) unificado con execution-curve.ts. p&gt;2 agresivo tardío, p&lt;2 conservador temprano.</p>
     </div>
   );
 }

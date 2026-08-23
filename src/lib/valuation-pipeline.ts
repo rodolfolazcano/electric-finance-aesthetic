@@ -13,6 +13,7 @@ import {
   type Fundamentales,
 } from "./market-data";
 import { calcularDCF, calcularWACC, type ResultadoValuacion } from "./dcf-engine";
+import { quantSignalsFallback, type QuantSignals } from "./labadie/contracts";
 
 export interface FuenteAnalisis {
   tipo: "paper" | "mercado" | "estimacion";
@@ -48,6 +49,7 @@ export interface AnalisisCompleto {
   detalle: ResultadoValuacion | null;
   consensoAnalistas: number | null;
   upsideAnalistasPct: number | null;
+  quantSignals: QuantSignals | null;
 }
 
 const nf0 = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 0 });
@@ -72,10 +74,14 @@ function limiteSupuesto(v: string | number | null | undefined): string {
   return typeof v === "number" ? nf2.format(v) : String(v ?? "s/d");
 }
 
-/** Ejecuta el análisis completo para un símbolo y una metodología del paper. */
+/** Ejecuta el análisis completo para un símbolo y una metodología del paper.
+ *  F0→F10 único caller: F0 macro BCRA (rf) → F1 Fowler gate≥5.0 + M1-M15 → F2 Dumrauf VAN/YTM → F3 Pascale WACC+DCF+múltiplos+APV → MOS.
+ *  Importa ÚNICAMENTE dcf-engine (prohibido reimplementar DCF). Quant inyectado opcional con fallback "--".
+ */
 export async function analisisValorIntrinseco(
   simbolo: string,
   temaPaper = "DCF Flujo de Caja Descontado",
+  signals?: QuantSignals | null,
 ): Promise<AnalisisCompleto> {
   const traza: string[] = [];
   const fuentes: FuenteAnalisis[] = [];
@@ -119,6 +125,7 @@ export async function analisisValorIntrinseco(
     detalle: null,
     consensoAnalistas: null,
     upsideAnalistasPct: null,
+    quantSignals: signals ?? quantSignalsFallback(),
   };
 
   if (!simboloConsulta) {
@@ -358,6 +365,23 @@ export async function analisisValorIntrinseco(
     },
   ];
 
+  // ── Quant inyección opcional (Session B) — fallback "--" si no hay datos ──
+  const qs: QuantSignals = signals ?? quantSignalsFallback();
+  supuestosUsados.push(
+    {
+      variable: "Hurst (Labadié)",
+      valor: qs.hurst != null && isFinite(qs.hurst) ? nf2.format(qs.hurst) : "--",
+      fuente: qs.hurst != null ? "cuantitativo/labadié (real)" : "s/d — cuantitativo aún no disponible (fallback)",
+      descripcion: "Exponente de Hurst — persistencia del activo",
+    },
+    {
+      variable: "Beta_p (p-varianza)",
+      valor: qs.betaP != null && isFinite(qs.betaP) ? nf2.format(qs.betaP) : "--",
+      fuente: qs.betaP != null ? "cuantitativo/capm-hedge (real)" : "s/d — cuantitativo aún no disponible (fallback)",
+    },
+  );
+  traza.push(`[quant] Hurst=${qs.hurst ?? "--"} betaP=${qs.betaP ?? "--"} vol=${qs.vol ?? "--"} ${qs.hurst == null && qs.betaP == null ? "(fallback)" : "(real)"}`);
+
   // Supuestos del paper que no estén ya cubiertos.
   for (const s of paper.supuestos) {
     if (supuestosUsados.some((u) => u.variable === s.variable)) continue;
@@ -397,6 +421,7 @@ export async function analisisValorIntrinseco(
     detalle: resultado,
     consensoAnalistas: consenso,
     upsideAnalistasPct: upsideAnalistas,
+    quantSignals: qs,
   };
 }
 

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { mean, std, pearsonR, linregress, computeHurst, computePVariance, impliedPFromReturns } from "./math/stats";
 import { getRiskFreeRateSync } from "./risk-free-rate";
+import { clampP } from "./labadie/contracts";
 import type {
   PairAnalysisResult,
   PairConfig,
@@ -175,7 +176,7 @@ export function simulateTrading(
   // Market impact: I(v) = sign(v) × σ × |v/V|^γ × τ^(1/p)  (Labadie §2.1)
   const miGamma = marketImpactGamma ?? 0;
   const partRate = participationRate ?? 0;
-  const p = pValue ?? 2;
+  const p = clampP(pValue ?? 2); // Labadié §4.3 p∈[1.1,4] vía contracts.ts
   const spreadSigma = rollingStd.length > 0 ? rollingStd.reduce((a, b) => a + b, 0) / rollingStd.length : 0;
   // τ: paso temporal = 1 día para datos diarios
   const tau = 1 / 252;
@@ -312,7 +313,7 @@ export function computePerformance(trades: Trade[], annFactor = 252, pVal?: numb
   //  Labadie §3.2: p-variance Sharpe sobre retornos diarios reales (no PnL de trades) 
   let pSharpe: number | undefined;
   let pVariance: number | undefined;
-  const p = pVal ?? 2;
+  const p = clampP(pVal ?? 2); // Labadié §4.3
   // Usar daily returns del activo para p-variance (métrica de riesgo del precio)
   const returnsForPVar = dailyReturnsArr && dailyReturnsArr.length >= 20 ? dailyReturnsArr : returns;
   if (returnsForPVar.length >= MIN_TRADES_FOR_SHARPE) {
@@ -554,7 +555,7 @@ export function analyzePair(
   // p = 1/H identidad del paper
   const spreadForHurst = c1.map((v, i) => v - beta * (c2[i] ?? 0));
   const hurst = computeHurst(spreadForHurst);
-  const impliedP = hurst > 0 ? Math.min(10, Math.max(1.1, 1 / hurst)) : 2;
+  const impliedP = hurst > 0 ? clampP(1 / hurst) : 2;
   const impliedPFromReturnsVal = r1.length >= 100 ? impliedPFromReturns(r1) : undefined;
 
   //  Labadie §4 (eq. 21) — EXPERIMENTAL: Regresión heurística no-paper 
@@ -567,9 +568,9 @@ export function analyzePair(
   const avgMarketImpact = spreadForHurst.length > 0
     ? spreadForHurst.reduce((s, v) => s + Math.abs(v), 0) / spreadForHurst.length / avgPrice
     : 0.05;
-  const impliedP_regression = Math.min(10, Math.max(1.1,
+  const impliedP_regression = clampP(
     2.35 + 0.14 * avgMarketImpact * 100 - 1.79 * priceVolatility
-  ));
+  );
 
   //  Labadie §3.2: p-variance 
   const pUsed = config.pValue ?? 2;

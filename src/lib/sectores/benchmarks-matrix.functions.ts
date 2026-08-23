@@ -1,6 +1,82 @@
 // @ts-nocheck
 import { createServerFn } from "@tanstack/react-start";
 import { computePearsonCorrelation } from "../intermarket-complete";
+import { SECTOR_ETF_BY_SECTOR_KEY, SECTOR_KEY_BY_ESPANOL } from "../benchmarks-master";
+import { getFlatTickerList } from "../universos";
+
+// ── Cohortes homogéneas — lógica pura testeable (movida desde SectoresTab) ──
+// Fowler Newton: moneda homogénea. Pascale: comparables homogéneos.
+// Un CEDEAR replica al subyacente: NO comparable con acción local ni US original.
+export type CohorteKey = "BCBA_ARS" | "CEDear_ARS" | "CEDear_USD" | "US_USD";
+export const COHORTES: Record<CohorteKey, { label: string; corto: string }> = {
+  BCBA_ARS: { label: "Acciones BCBA · ARS", corto: "BCBA ARS" },
+  CEDear_ARS: { label: "CEDEARs BCBA · ARS", corto: "CEDEAR ARS" },
+  CEDear_USD: { label: "CEDEARs BCBA · USD", corto: "CEDEAR USD" },
+  US_USD: { label: "Acciones EE.UU. · USD", corto: "EE.UU. USD" },
+};
+export const ORDEN_COHORTES: CohorteKey[] = ["BCBA_ARS", "CEDear_ARS", "CEDear_USD", "US_USD"];
+
+const META_TICKER_BM = new Map<string, { tipo?: string; moneda?: string; mercado?: string }>(
+  getFlatTickerList().map((t) => [
+    t.ticker.toUpperCase(),
+    { tipo: (t as any).tipo, moneda: (t as any).moneda, mercado: (t as any).mercado },
+  ]),
+);
+
+export function clasificarCohorte(ticker: string): CohorteKey {
+  const tk = ticker.toUpperCase();
+  const meta = META_TICKER_BM.get(tk);
+  if (meta?.mercado === "BCBA") {
+    if (meta.tipo === "cedear") return meta.moneda === "USD" ? "CEDear_USD" : "CEDear_ARS";
+    return "BCBA_ARS";
+  }
+  if (meta?.mercado === "NYSE/NASDAQ") return "US_USD";
+  if (tk.endsWith(".BA")) return "BCBA_ARS";
+  if (/^[A-Z0-9]{1,6}D$/.test(tk)) return "CEDear_USD";
+  return "US_USD";
+}
+
+// ── Resolución de sector → ETF (tolerante a alias español/inglés) ──
+function normSector(s: string): string {
+  return s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+export function resolverSectorKey(input: string): string | null {
+  const q = normSector(input);
+  if (!q) return null;
+  if ((SECTOR_ETF_BY_SECTOR_KEY as Record<string, string>)[q]) return q;
+  const esp = (SECTOR_KEY_BY_ESPANOL as Record<string, string>)[q];
+  if (esp) return esp;
+  // fuzzy: token contiene clave o viceversa
+  for (const k of Object.keys(SECTOR_ETF_BY_SECTOR_KEY)) {
+    if (k.includes(q) || q.includes(k)) return k;
+  }
+  for (const [espLabel, engKey] of Object.entries(SECTOR_KEY_BY_ESPANOL)) {
+    if (espLabel.includes(q) || q.includes(espLabel)) return engKey;
+  }
+  // alias cortos frecuentes en UI
+  if (q.includes("financ")) return "financial-services";
+  if (q.includes("tecnolog") || q === "tech") return "technology";
+  if (q.includes("salud") || q.includes("health")) return "healthcare";
+  if (q.includes("energia") || q.includes("energy")) return "energy";
+  return null;
+}
+export function etfDeSector(input: string): string | null {
+  const k = resolverSectorKey(input);
+  return k ? (SECTOR_ETF_BY_SECTOR_KEY as Record<string, string>)[k] ?? null : null;
+}
+
+// TODO Bustamante 5 pasos — pipeline valuación sectorial pendiente (ingresos→estructura→regulador→disrupción→múltiplo).
+// Fase A2 conectará F0→F10 (prima riesgo BCRA → DCF) vía dcf-engine + hurst/beta_p de cuantitativo (contracts.ts fallback).
+// Ver: metodologias/pt "La televisión económica. Financiación, estrategias y mercados" + sector-analysis §FichaValuacion.
+
+export interface HedgeCandidate {
+  ticker: string;
+  cohorte: CohorteKey;
+  beta: number;
+  alpha: number;
+  r2: number;
+  vol: number;
+}
 
 //  MASTER FACTOR LIST (macro, sectores, smart-beta, países) 
 

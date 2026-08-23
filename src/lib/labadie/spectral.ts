@@ -4,7 +4,7 @@
  * Aplicado a Markowitz: filtrado espectral de Σ = PDPᵀ, clipping eigenvalues ruido
  */
 
-// Jacobi para simétrica N≤20 (suficiente para matriz sectores/portafolio)
+// Jacobi para simétrica N≤30 (suficiente para 11 ETFs sectores + portafolio, O(N³) limitado)
 function jacobiEigen(A: number[][], maxIter = 200, eps = 1e-10): { values: number[]; vectors: number[][] } {
   const n = A.length;
   const V: number[][] = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 1 : 0)));
@@ -43,13 +43,18 @@ export function eigenDecomposition(cov: number[][]): { values: number[]; vectors
 }
 
 // Filtra eigenvalues por Marchenko-Pastur λ+ = σ²(1+√(N/T))²
-// T = observaciones, N = activos
-export function clipCovariance(cov: number[][], T: number): { filtered: number[][]; values: number[]; clippedValues: number[] } {
+// T = observaciones, N = activos. Paper spectral_theory-1: T=Σ λ P_λ, λ ruidosos < λ+ se clippean.
+// Límite Jacobi N≤30 con fallback warning (portafolio 11 ETFs OK).
+export function clipCovariance(cov: number[][], T: number): { filtered: number[][]; values: number[]; clippedValues: number[]; sigma2Used: number; lambdaPlus: number } {
   const n = cov.length;
+  if (n > 30) console.warn(`clipCovariance: N=${n} >30 Jacobi limitado, resultados aproximados`);
   const { values, vectors } = eigenDecomposition(cov);
   const q = n / Math.max(1, T);
-  // estimar sigma² como mediana de values inferiores
-  const sigma2 = values.length > 2 ? values[Math.floor(values.length / 2)] : values[0] ?? 1;
+  // estimar σ² como media de eigenvalues inferiores (mitad inferior) — más estable que mediana puntual (paper sugiere mediana de bulk)
+  const sortedAsc = [...values].sort((a,b)=>a-b);
+  const lowerHalf = sortedAsc.slice(0, Math.max(1, Math.floor(n/2)));
+  const rawSigma2 = lowerHalf.reduce((s,v)=>s+v,0)/lowerHalf.length;
+  const sigma2 = (rawSigma2 || values[0] || 1) as number;
   const lambdaPlus = sigma2 * Math.pow(1 + Math.sqrt(q), 2);
   const clipped = values.map((v) => (v < lambdaPlus ? lambdaPlus : v));
   // reconstruir Σ_filt = V · diag(clipped) · Vᵀ
@@ -59,7 +64,7 @@ export function clipCovariance(cov: number[][], T: number): { filtered: number[]
     for (let k = 0; k < n; k++) s += vectors[k][i] * clipped[k] * vectors[k][j];
     filtered[i][j] = s;
   }
-  return { filtered, values, clippedValues: clipped };
+  return { filtered, values, clippedValues: clipped, sigma2Used: sigma2, lambdaPlus };
 }
 
 // Eigen-portfolios: peso ∝ eigenvector / volatilidad

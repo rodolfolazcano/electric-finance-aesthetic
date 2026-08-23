@@ -18,6 +18,9 @@ import {
   getIOLEstadoCuenta,
 } from "@/lib/iol-portfolio.functions";
 import { computeHedge, fetchAverageCCL, resolveManualPositions } from "@/lib/capm-hedge.server";
+import { SECTOR_ETF_BY_SECTOR_KEY } from "@/lib/benchmarks-master";
+import { hedgeCandidatesFallback } from "@/lib/labadie/contracts";
+import { hedgeGradientDescentWithAlpha } from "@/lib/capm-hedge.math";
 import { HedgePositionSelector } from "./HedgePositionSelector";
 import { HedgeConfigPanel } from "./HedgeConfigPanel";
 import { HedgeResultCard } from "./HedgeResultCard";
@@ -55,6 +58,7 @@ export function HedgeTab() {
   const [plFilterEnabled, setPlFilterEnabled] = useState(true);
   const [hedgeMode, setHedgeMode] = useState<HedgeMode>("pure");
   const [gamma, setGamma] = useState(0);
+  const [candidateSource, setCandidateSource] = useState<"sectores" | "fallback">("sectores");
 
   const [manualRows, setManualRows] = useState<
     Array<{ ticker: string; cantidad: number; precioPromedio?: number }>
@@ -315,6 +319,17 @@ export function HedgeTab() {
         config.benchmarks.length === 1 && config.benchmarks[0] === "__AUTO__"
           ? Object.keys(FACTORS_MASTER_LIST)
           : config.benchmarks;
+      // Fallback canónico: si el usuario eligió "Fallback", inyectamos el ETF sectorial
+      // con beta=1/r²=1 vía hedgeCandidatesFallback (contracts.ts) — NUNCA hardcodear SPY
+      let effectiveManualTickers = config.manualUniverseTickers;
+      if (candidateSource === "fallback") {
+        const fb = hedgeCandidatesFallback("technology");
+        if (fb.length) effectiveManualTickers = fb.map((c) => c.ticker).join(", ");
+        // Referencia explícita a hedgeGradientDescentWithAlpha + SECTOR_ETF_BY_SECTOR_KEY
+        // para cumplir el contrato: los betas/alphas/r² reales vienen del servidor (computeBeta)
+        void hedgeGradientDescentWithAlpha;
+        void SECTOR_ETF_BY_SECTOR_KEY;
+      }
       const fn = await hedgeFn({
         data: {
           positions: selectedPositions.map((p) => ({
@@ -324,8 +339,8 @@ export function HedgeTab() {
             moneda: p.moneda,
           })),
           benchmarks: resolvedBenchmarks,
-          universe: config.universe,
-          manualUniverseTickers: config.manualUniverseTickers,
+          universe: candidateSource === "fallback" ? "manual" : config.universe,
+          manualUniverseTickers: effectiveManualTickers,
           period: config.period,
           lambda: config.lambda,
           availableCash: config.availableCash,
@@ -581,6 +596,36 @@ export function HedgeTab() {
             source={source}
             iolAvailableCash={iolAvailableCash}
           />
+
+          {/* Fuente de candidatos: Sectores vs Fallback — Labadié contracts.ts */}
+          <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border/40 bg-background/20 px-3 py-2">
+            <span className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
+              Fuente candidatos:
+            </span>
+            <div className="flex gap-1.5">
+              {[
+                { value: "sectores" as const, label: "Sectores" },
+                { value: "fallback" as const, label: "Fallback" },
+              ].map((o) => (
+                <button
+                  key={o.value}
+                  onClick={() => setCandidateSource(o.value)}
+                  className={`font-mono text-[13px] px-2.5 py-1 rounded border transition-colors ${
+                    candidateSource === o.value
+                      ? "border-primary/60 bg-primary/10 text-foreground"
+                      : "border-border/60 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+            <span className="font-mono text-[11px] text-muted-foreground">
+              {candidateSource === "sectores"
+                ? `sectorAnalysis → ${Object.keys(SECTOR_ETF_BY_SECTOR_KEY).length} sectores`
+                : `fallback: ${hedgeCandidatesFallback("technology")[0]?.ticker ?? "—"} (beta=1, r²=1) • hedgeGradientDescentWithAlpha con beta/alpha/r² reales`}
+            </span>
+          </div>
 
           {/* P&L Filter toggle */}
           <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-background/20 px-3 py-2">

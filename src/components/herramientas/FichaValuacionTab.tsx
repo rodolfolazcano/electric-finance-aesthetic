@@ -29,6 +29,7 @@ import {
 import type { ResultadoFicha } from "@/lib/clarity-analysis";
 import { cn } from "@/lib/utils";
 import { getFlatTickerList, type TickerInfo } from "@/lib/universos";
+import { quantSignalsFallback } from "@/lib/labadie/contracts";
 
 const EJEMPLOS = ["AAPL", "MSFT", "GGAL.BA", "YPFD.SA", "KO"].map((t) =>
   t === "YPFD.SA" ? "YPFD.BA" : t,
@@ -280,6 +281,19 @@ function SeccionFundamental({ ticker }: { ticker: string }) {
                 {metricasCuant.map(([k, v]) => (
                   <Fila key={k} k={k} v={v} />
                 ))}
+                {/* Quant inyección opcional — fallback "--" si B aún no mergeó */}
+                {(() => {
+                  const qs = quantSignalsFallback();
+                  return (
+                    <div className="pt-2 border-t border-border/20 space-y-1">
+                      <div className="text-[10px] tracking-widest text-muted-foreground uppercase">
+                        Quant (Labadié) — {qs.hurst == null && qs.betaP == null ? 'fallback "--"' : "real"}
+                      </div>
+                      <Fila k="Hurst" v={qs.hurst != null ? qs.hurst.toFixed(2) : "--"} />
+                      <Fila k="Beta_p" v={qs.betaP != null ? qs.betaP.toFixed(2) : "--"} />
+                    </div>
+                  );
+                })()}
                 {rojas.length > 0 && (
                   <ul className="space-y-1 pt-1 text-xs text-red-400">
                     {rojas.map((a, i) => (

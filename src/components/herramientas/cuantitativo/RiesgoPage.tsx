@@ -123,18 +123,21 @@ function RiesgoResultPanel({
     return results.find((r) => r.ticker === selectedTicker) ?? results[0];
   }, [results, selectedTicker]);
 
+  const [pMode, setPMode] = useState<"classic" | "implied">("classic");
+
   const chartData = useMemo(() => {
     if (!results) return null;
     return results.map((r) => ({
       ticker: r.ticker,
       "Retorno anual": r.meanAnnual,
       Volatilidad: r.volatilityAnnual,
-      Sharpe: r.sharpeRatio,
+      // Labadié §3.2 p-variance: toggle clásico (p=2) vs p=implied (1/H, ya computado en riesgo.functions: ~342)
+      Sharpe: pMode === "implied" && r.pSharpe != null ? r.pSharpe : r.sharpeRatio,
       "VaR 95%": r.var95,
       Skewness: r.skewness,
       Kurtosis: r.kurtosis,
     }));
-  }, [results]);
+  }, [results, pMode]);
 
   return (
     <div className="min-w-0 w-full space-y-4">
@@ -919,8 +922,35 @@ function RiesgoResultPanel({
           {/* â”€â”€ ComparaciÃ³n de mÃ©tricas â”€â”€ */}
           {chartData && (
             <div className="glass p-5 w-full">
-              <div className="mono mb-3 text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
-                ComparaciÃ³n de mÃ©tricas
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="mono text-[14px] uppercase tracking-[0.18em] text-muted-foreground">
+                  Comparación de métricas
+                </div>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setPMode("classic")}
+                    className={`font-mono text-[11px] px-2 py-1 rounded border transition-colors ${
+                      pMode === "classic"
+                        ? "border-primary/60 bg-primary/10 text-foreground"
+                        : "border-border/60 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    p=2 clásico
+                  </button>
+                  <button
+                    onClick={() => setPMode("implied")}
+                    className={`font-mono text-[11px] px-2 py-1 rounded border transition-colors ${
+                      pMode === "implied"
+                        ? "border-primary/60 bg-primary/10 text-foreground"
+                        : "border-border/60 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    p=implied (1/H)
+                  </button>
+                </div>
+              </div>
+              <div className="mono mb-2 text-[11px] text-muted-foreground">
+                {pMode === "classic" ? "Sharpe clásico (p=2, varianza)" : "Sharpe_p (Labadie §3.2, p=1/H, computePVariance en riesgo.functions)"}
               </div>
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">

@@ -1,6 +1,7 @@
 // @ts-nocheck
 // src/lib/math/stats.ts
-// Funciones estadísticas puras sin dependencias externas
+// Funciones estadísticas puras sin dependencias externas — clamp vía contracts (dueño A)
+import { clampH, clampP } from "@/lib/labadie/contracts";
 
 const SQRT2PI = Math.sqrt(2 * Math.PI);
 const GAMMA_COEF = [
@@ -218,7 +219,9 @@ export function computeHurst(serie: number[]): number {
   let lag = 4;
   while (lag <= maxLag) {
     lags.push(lag);
-    lag = Math.min(Math.floor(lag * 1.5), maxLag);
+    const next = Math.min(Math.floor(lag * 1.5), maxLag);
+    if (next <= lag) break; // maxLag alcanzado — sin esto: bucle infinito (RangeError) — fix B0 coordinación con A0
+    lag = next;
   }
   if (lags.length < 3) return 0.5;
 
@@ -258,8 +261,7 @@ export function computeHurst(serie: number[]): number {
 
   // Regresión lineal: log(R/S) = log(c) + H * log(n)
   const result = linregress(logLags, logRS);
-  // Clamp Labadié: H∈[0.05,0.95] evita p=1/H explosivo; UI debe mostrar warning si n<100 o R²<0.6
-  return Math.min(0.95, Math.max(0.05, result.slope));
+  return clampH(result.slope);
 }
 
 // ============================================================================
@@ -305,8 +307,8 @@ export function impliedPFromReturns(
   }
   if (logTau.length < 4) return 2;
   const reg = linregress(logTau, logMq); // slope = H
-  const H = Math.min(0.99, Math.max(0.01, reg.slope));
-  return Math.min(maxP, Math.max(minP, 1 / H));
+  const H = clampH(reg.slope);
+  return clampP(1 / H);
 }
 
 // ============================================================================
@@ -475,4 +477,39 @@ export function linregress(
   const t = stdErr > 0 ? Math.abs(slope) / stdErr : 0;
   const pValue = n > 2 ? 2 * (1 - tCDF(t, n - 2)) : 1;
   return { slope, intercept, r2, pValue, stdErr };
+}
+
+// ── A0: CI95 μ±1.96σ (pt/01_rv_sim) ─────────────────────────────────────
+export function ci95(arr: number[]): [number, number] {
+  if (arr.length === 0) return [0, 0];
+  const m = mean(arr);
+  const s = std(arr);
+  const d = 1.96 * s;
+  return [m - d, m + d];
+}
+
+// Demo pt/01_rv_sim.py — 6 distribuciones con randomNormal() existente
+export function runRvSim(n = 10000): {
+  normal: number[];
+  studentT: number[];
+  chi2: number[];
+  uniform: number[];
+  lognormal: number[];
+  expo: number[];
+} {
+  const df = 5;
+  const normal: number[] = Array.from({ length: n }, () => randomNormal());
+  const uniform: number[] = Array.from({ length: n }, () => Math.random());
+  const expo: number[] = uniform.map((u) => -Math.log(Math.max(1e-12, u)));
+  const lognormal: number[] = normal.map((z) => Math.exp(z));
+  const chi2: number[] = Array.from({ length: n }, () => {
+    let acc = 0;
+    for (let k = 0; k < df; k++) {
+      const z = randomNormal();
+      acc += z * z;
+    }
+    return acc;
+  });
+  const studentT: number[] = normal.map((z, i) => z / Math.sqrt(chi2[i]! / df));
+  return { normal, studentT, chi2, uniform, lognormal, expo };
 }

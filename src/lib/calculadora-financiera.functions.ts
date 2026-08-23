@@ -1,7 +1,9 @@
 /**
  * Calculadora Financiera - Funciones basadas en manuales AFC 2022
  * Referencia: Calculadora Financiera Conceptos Básicos, VAN y TIR HP10
+ * DEDUP A0: wrappers delegan en math/stats.ts (única fuente).
  */
+import { mean, std, pearsonR } from "./math/stats";
 
 // ============================================================================
 // 1. CÁLCULO DE PORCENTAJES
@@ -346,9 +348,7 @@ export interface MediaResult {
 }
 
 export function calcularMediaAritmetica(valores: number[]): MediaResult {
-  const suma = valores.reduce((a, b) => a + b, 0);
-  const media = suma / valores.length;
-  
+  const media = mean(valores);
   return {
     media,
     formula: `Media = (${valores.join(" + ")}) / ${valores.length} = ${media.toFixed(2)}`,
@@ -380,13 +380,11 @@ export interface VarianzaResult {
 }
 
 export function calcularVarianzaDesviacion(valores: number[], poblacional: boolean = true): VarianzaResult {
-  const media = valores.reduce((a, b) => a + b, 0) / valores.length;
+  const media = mean(valores);
   const divisor = poblacional ? valores.length : valores.length - 1;
-  const varianza = valores.reduce((acc, val) => acc + Math.pow(val - media, 2), 0) / divisor;
-  const desviacion = Math.sqrt(varianza);
-  
+  const desviacion = std(valores, !poblacional);
+  const varianza = desviacion * desviacion;
   const tipo = poblacional ? "poblacional" : "muestral";
-  
   return {
     varianza,
     desviacion,
@@ -406,17 +404,10 @@ export function calcularCovarianzaCorrelacion(x: number[], y: number[]): Covaria
   if (x.length !== y.length) {
     throw new Error("Los arrays X e Y deben tener la misma longitud");
   }
-  
-  const mediaX = x.reduce((a, b) => a + b, 0) / x.length;
-  const mediaY = y.reduce((a, b) => a + b, 0) / y.length;
-  
+  const mediaX = mean(x);
+  const mediaY = mean(y);
   const covarianza = x.reduce((acc, xi, i) => acc + (xi - mediaX) * (y[i] - mediaY), 0) / x.length;
-  
-  const varX = x.reduce((acc, xi) => acc + Math.pow(xi - mediaX, 2), 0) / x.length;
-  const varY = y.reduce((acc, yi) => acc + Math.pow(yi - mediaY, 2), 0) / y.length;
-  
-  const correlacion = covarianza / (Math.sqrt(varX) * Math.sqrt(varY));
-  
+  const correlacion = pearsonR(x, y);
   return {
     covarianza,
     correlacion,

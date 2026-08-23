@@ -27,11 +27,11 @@ describe("Hurst clamp", () => {
   it("serie corta retorna 0.5 neutral", () => {
     expect(computeHurst([1, 2, 3])).toBe(0.5);
   });
-  it("H ∈[0.05,0.95]", () => {
+  it("H ∈[0.25,0.91]", () => {
     const serie = Array.from({ length: 300 }, (_, i) => Math.sin(i * 0.1) + Math.random() * 0.1);
     const H = computeHurst(serie);
-    expect(H).toBeGreaterThanOrEqual(0.05);
-    expect(H).toBeLessThanOrEqual(0.95);
+    expect(H).toBeGreaterThanOrEqual(0.25);
+    expect(H).toBeLessThanOrEqual(0.91);
   });
   it("impliedP =1/H ∈[1.1,4] por clamp", () => {
     const rets = Array.from({ length: 200 }, () => (Math.random() - 0.5) * 0.02);
@@ -54,8 +54,9 @@ describe("Execution curve Labadié", () => {
   it("hurst afecta sigma2tau", () => {
     const h1 = calcularCurvaOptima({ algo: "tc", T: 20, sigma: 0.3, hurst: 0.3, gamma: 0.5, participationRate: 0.1 });
     const h2 = calcularCurvaOptima({ algo: "tc", T: 20, sigma: 0.3, hurst: 0.7, gamma: 0.5, participationRate: 0.1 });
-    // curvas deben diferir
-    expect(h1.curve[0].volume).not.toBeCloseTo(h2.curve[0].volume, 2);
+    // H cambia tau^H e I' — la curva debe diferir en algún slice (no necesariamente 0, que puede capearse a 0.1)
+    const diff = h1.curve.reduce((s, c, i) => s + Math.abs(c.volume - h2.curve[i]!.volume), 0);
+    expect(diff).toBeGreaterThan(1e-6);
   });
 });
 

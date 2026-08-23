@@ -1,4 +1,5 @@
 import { linregress, pearsonR, mean, std, computeHurst, computePVariance } from "./math/stats";
+import { clampP } from "./labadie/contracts";
 
 export interface BetaResult {
   beta: number;
@@ -46,15 +47,16 @@ export function computeBetaPVariance(
   benchReturns: number[],
   p: number = 2,
 ): { betaP: number; alphaP: number; pVarianceAsset: number; pVarianceBench: number } {
+  const pClamped = clampP(p); // Labadié §4.3 p∈[1.1,4] vía contracts.ts
   const n = Math.min(posReturns.length, benchReturns.length);
   if (n < 5) return { betaP: 0, alphaP: 0, pVarianceAsset: 0, pVarianceBench: 0 };
 
   const x = benchReturns.slice(0, n);
   const y = posReturns.slice(0, n);
 
-  // p-variance del benchmark y del activo
-  const varPx = computePVariance(x, p);
-  const varPy = computePVariance(y, p);
+  // p-variance del benchmark y del activo (p clamp canónico)
+  const varPx = computePVariance(x, pClamped);
+  const varPy = computePVariance(y, pClamped);
 
   // p-covarianza: E[sign(x-μx) × |x-μx|^(p-1) × (y-μy)]  (forma simplificada)
   const mx = mean(x);
@@ -64,7 +66,7 @@ export function computeBetaPVariance(
     const dx = x[i] - mx;
     const dy = y[i] - my;
     const signX = dx >= 0 ? 1 : -1;
-    covP += signX * Math.pow(Math.abs(dx), p - 1) * dy;
+    covP += signX * Math.pow(Math.abs(dx), pClamped - 1) * dy;
   }
   covP /= n;
 

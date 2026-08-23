@@ -55,42 +55,21 @@ import { cn } from "@/lib/utils";
 import { getFlatTickerList } from "@/lib/universos";
 import { CHAT_OPEN_EVENT_NAME } from "@/lib/chat-open";
 
-// ── Cohortes homogéneas (nunca comparar tipo/moneda/mercado distintos) ────────
-// Guía: unificado_completo.json (tipo: accion|cedear · moneda: ARS|USD ·
-// mercado: BCBA|NYSE/NASDAQ). Fowler Newton: moneda homogénea. Pascale:
-// comparables homogéneos. Un CEDEAR replica al subyacente: NO es comparable
-// con la acción local ni con la acción US original.
-type CohorteKey = "BCBA_ARS" | "CEDear_ARS" | "CEDear_USD" | "US_USD";
-const COHORTES: Record<CohorteKey, { label: string; corto: string }> = {
-  BCBA_ARS: { label: "Acciones BCBA · ARS", corto: "BCBA ARS" },
-  CEDear_ARS: { label: "CEDEARs BCBA · ARS", corto: "CEDEAR ARS" },
-  CEDear_USD: { label: "CEDEARs BCBA · USD", corto: "CEDEAR USD" },
-  US_USD: { label: "Acciones EE.UU. · USD", corto: "EE.UU. USD" },
-};
-
-// Meta por ticker desde unificado_completo.json (una sola vez)
-const META_TICKER = new Map<string, { tipo?: string; moneda?: string; mercado?: string }>(
-  getFlatTickerList().map((t) => [
-    t.ticker.toUpperCase(),
-    { tipo: t.tipo, moneda: t.moneda, mercado: t.mercado },
-  ]),
-);
-
+// ── Cohortes homogéneas — fuente única en lib (testeable) ─────────────────
+// Fowler Newton: moneda homogénea. Pascale: comparables homogéneos.
+// CEDEAR replica subyacente: NO comparable con acción local ni US original.
+// Lógica pura movida a src/lib/herramientas/sector-analysis.functions.ts para test.
+import {
+  COHORTES,
+  ORDEN_COHORTES,
+  clasificarCohorte as clasificarCohorteLib,
+  type CohorteKey,
+} from "@/lib/herramientas/sector-analysis.functions";
+export type { CohorteKey } from "@/lib/herramientas/sector-analysis.functions";
+export { COHORTES, ORDEN_COHORTES } from "@/lib/herramientas/sector-analysis.functions";
 export function clasificarCohorte(ticker: string): CohorteKey {
-  const tk = ticker.toUpperCase();
-  const meta = META_TICKER.get(tk);
-  if (meta?.mercado === "BCBA") {
-    if (meta.tipo === "cedear") return meta.moneda === "USD" ? "CEDear_USD" : "CEDear_ARS";
-    return "BCBA_ARS";
-  }
-  if (meta?.mercado === "NYSE/NASDAQ") return "US_USD";
-  // Fallback determinístico si no está en el mapa
-  if (tk.endsWith(".BA")) return "BCBA_ARS";
-  if (/^[A-Z0-9]{1,6}D$/.test(tk)) return "CEDear_USD"; // sufijo D = dólar CED
-  return "US_USD";
+  return clasificarCohorteLib(ticker);
 }
-
-const ORDEN_COHORTES: CohorteKey[] = ["BCBA_ARS", "CEDear_ARS", "CEDear_USD", "US_USD"];
 // Sector components (Clarity parity)
 import { SectorPerformanceBars } from "@/components/sectores/SectorPerformanceBars";
 import { SectorRelStrengthPanel } from "@/components/sectores/SectorRelStrengthPanel";
