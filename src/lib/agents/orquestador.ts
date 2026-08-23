@@ -261,7 +261,21 @@ export function detectarViaRapida(pregunta: string): ConsultaDirecta | null {
   const mBono = lp.match(/\b(al|gd|ae|tx)\s?(\d{2})\b/);
   if (mBono && /\b(tir|ytm|tasa\s+interna|rendimiento|rentabilidad|precio|cotiza|cu[aá]nto)/.test(lp)) {
     const ticker = `${mBono[1]!.toUpperCase()}${mBono[2]}`;
-    return { herramienta: "calcular_ytm_bono", argumentos: { ticker } };
+    // Precio manual opcional: "con precio 76250", "al precio de 76.250,5", "precio: 62.5"
+    let precio: number | undefined;
+    const mPrecio = p.match(/precio\s*(?:de|del\s+bono)?\s*[:=]?\s*([\d][\d.,]*)/i);
+    if (mPrecio?.[1]) {
+      let crudo = mPrecio[1].trim();
+      if (crudo.includes(".") && crudo.includes(",")) crudo = crudo.replace(/\./g, "").replace(",", ".");
+      else if (/,\d{1,2}$/.test(crudo)) crudo = crudo.replace(",", ".");
+      else crudo = crudo.replace(/,/g, "");
+      const v = parseFloat(crudo);
+      if (isFinite(v) && v > 0) precio = v;
+    }
+    return {
+      herramienta: "calcular_ytm_bono",
+      argumentos: precio != null ? { ticker, precio } : { ticker },
+    };
   }
 
   // 2) Dato de mercado puntual (dólar, riesgo país, UVA, tasas...) → consultar_mercado.
