@@ -762,6 +762,28 @@ export function computeRollingCorrelation(
   return result;
 }
 
+/** Euler–Maruyama para SDE GBM / OU (Labadie procesos estocásticos): dS = μ S dt + σ S dW */
+export function simularEulerSDE(
+  s0: number,
+  mu: number,
+  sigma: number,
+  T: number,
+  pasos: number,
+  tipo: "gbm" | "ou" = "gbm",
+  muLong: number = s0,
+): number[] {
+  const dt = T / Math.max(1, pasos);
+  const out: number[] = [s0];
+  let s = s0;
+  for (let i = 0; i < pasos; i++) {
+    const dW = Math.sqrt(dt) * randomNormal();
+    if (tipo === "gbm") s = s + mu * s * dt + sigma * s * dW;
+    else s = s + mu * (muLong - s) * dt + sigma * dW; // OU
+    out.push(s);
+  }
+  return out;
+}
+
 export function computeNeighborRobustness(
   grid: Array<{ a: number; b: number; sharpe: number; pnl: number; winRate: number; maxDD: number; trades: number }>,
   optimalA: number,

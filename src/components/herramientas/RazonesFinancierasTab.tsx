@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { fetchFundamentalAF, fetchHistoricoDetallado } from "@/lib/fundamental-af.functions";
-import { calcularRazonesFinancieras } from "@/lib/razones-financieras.functions";
-import type { RazonesFinancierasResult, RazonesPeriodo } from "@/lib/razones-financieras.functions";
+import { calcularRazonesFinancieras, calcularRazonesReales } from "@/lib/razones-financieras.functions";
+import type { RazonesFinancierasResult, RazonesPeriodo, IndiceInflacion } from "@/lib/razones-financieras.functions";
 
 // Formatters
 function f(v: number | null, dec = 2): string {
@@ -122,15 +122,46 @@ export function RazonesFinancierasTab({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<RazonesFinancierasResult | null>(null);
+  const [dataReal, setDataReal] = useState<RazonesFinancierasResult | null>(null);
+  const [factorReal, setFactorReal] = useState<number | null>(null);
+  const [verReal, setVerReal] = useState(false);
+  const [serieIPC, setSerieIPC] = useState<IndiceInflacion[] | null>(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
 
   const histFn = useServerFn(fetchHistoricoDetallado);
+
+  // Cargar serie IPC una vez (ArgentinaDatos) para ajuste a moneda constante — Fowler Newton
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      try {
+        const r = await fetch("https://api.argentinadatos.com/v1/finanzas/indices/inflacion");
+        if (!r.ok) return;
+        const j = (await r.json()) as Array<{ fecha?: string; valor?: number }>;
+        if (!Array.isArray(j) || !j.length) return;
+        // Construir índice acumulado (base 100) desde valor mensual %
+        let idx = 100;
+        const serie: IndiceInflacion[] = [];
+        for (const row of j) {
+          const v = row.valor;
+          const f = row.fecha;
+          if (typeof v !== "number" || !f) continue;
+          idx = idx * (1 + v / 100);
+          serie.push({ fecha: String(f).slice(0, 10), indice: idx });
+        }
+        if (!cancel) setSerieIPC(serie);
+      } catch {}
+    })();
+    return () => { cancel = true; };
+  }, []);
 
   const run = useCallback(
     async (symbol: string) => {
       setLoading(true);
       setError(null);
       setData(null);
+      setDataReal(null);
+      setFactorReal(null);
       try {
         const res = await fetchFundamentalAF({ data: { symbol } });
         if (res.error) {
@@ -138,7 +169,13 @@ export function RazonesFinancierasTab({
           return;
         }
         const hist = await histFn({ data: { symbol, granularidad: "anual" } });
-        setData(calcularRazonesFinancieras(res, hist.periods));
+        const nominal = calcularRazonesFinancieras(res, hist.periods);
+        setData(nominal);
+        // Si hay serie IPC y el activo es ARS (.BA) o el usuario activa moneda constante, pre-calcular real
+        if (serieIPC && serieIPC.length && hist.periods.length) {
+          const { real, factorUsado } = calcularRazonesReales(res, hist.periods, serieIPC);
+          if (real) { setDataReal(real); setFactorReal(factorUsado); }
+        }
         setSelectedIdx(0);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Error al consultar Yahoo Finance");
@@ -146,7 +183,7 @@ export function RazonesFinancierasTab({
         setLoading(false);
       }
     },
-    [histFn],
+    [histFn, serieIPC],
   );
 
   useEffect(() => {
@@ -161,16 +198,27 @@ export function RazonesFinancierasTab({
     run(sym);
   };
 
+  const activo = verReal && dataReal ? dataReal : data;
   const selected =
-    data && selectedIdx >= 0 && data.periods[selectedIdx] ? data.periods[selectedIdx] : null;
+    activo && selectedIdx >= 0 && activo.periods[selectedIdx] ? activo.periods[selectedIdx] : null;
 
   return (
     <div className="space-y-4">
       <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
         <p className="text-[13px] text-muted-foreground mb-2">
           Razones financieras según Weston &amp; Brigham (5 categorías) + descomposición DuPont a
-          partir de los estados financieros anuales de Yahoo Finance.
+          partir de los estados financieros anuales de Yahoo Finance (22 módulos quoteSummary normalizados).{" "}
+          <span className="text-emerald-400/60">Fowler Newton/Biondi: se ofrece vista en moneda constante (ajuste IPC ArgentinaDatos) para comparar períodos en términos reales.</span>
         </p>
+        {serieIPC && dataReal && factorReal && (
+          <div className="flex items-center gap-2 mb-2">
+            <label className="flex items-center gap-2 text-[13px] text-muted-foreground">
+              <input type="checkbox" checked={verReal} onChange={(e) => setVerReal(e.target.checked)} className="rounded" />
+              Ver en moneda constante (ajuste inflación)
+            </label>
+            <span className="text-[11px] text-muted-foreground/60">factor {factorReal.toFixed(3)}x · IPC acumulado desde el período más reciente</span>
+          </div>
+        )}
         <div className="flex gap-2">
           <input
             type="text"
@@ -203,19 +251,19 @@ export function RazonesFinancierasTab({
         </div>
       )}
 
-      {data && !loading && (
+      {activo && !loading && (
         <div className="space-y-4">
-          {data.periods.length > 1 && (
+          {activo.periods.length > 1 && (
             <div className="rounded-md border border-border/40 bg-background/40/60 p-3">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
-                Período
+                Período {verReal ? "(moneda constante)" : "(nominal)"}
               </p>
               <select
                 value={selectedIdx}
                 onChange={(e) => setSelectedIdx(Number(e.target.value))}
                 className="w-full rounded-md border border-border/40 bg-background/20 px-2 py-1.5 text-[14px] font-mono text-foreground outline-none focus:border-emerald-500/50"
               >
-                {data.periods.map((p, i) => (
+                {activo.periods.map((p, i) => (
                   <option key={p.label + i} value={i}>
                     {p.label} — {p.endDate}
                   </option>
@@ -236,35 +284,38 @@ export function RazonesFinancierasTab({
           <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-4">
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
-                Liquidez · interpretación
+                Liquidez · interpretación {verReal ? "(real)" : ""}
               </p>
-              <InterpList items={data.interpretaciones.liquidez} />
+              <InterpList items={activo.interpretaciones.liquidez} />
             </div>
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Actividad · interpretación
               </p>
-              <InterpList items={data.interpretaciones.actividad} />
+              <InterpList items={activo.interpretaciones.actividad} />
             </div>
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Endeudamiento · interpretación
               </p>
-              <InterpList items={data.interpretaciones.endeudamiento} />
+              <InterpList items={activo.interpretaciones.endeudamiento} />
             </div>
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Rentabilidad + DuPont · interpretación
               </p>
-              <InterpList items={data.interpretaciones.rentabilidad} />
+              <InterpList items={activo.interpretaciones.rentabilidad} />
             </div>
             <div className="rounded-md border border-border/40 bg-background/40/60 p-4">
               <p className="text-[13px] uppercase tracking-widest text-muted-foreground mb-2">
                 Valor de mercado · interpretación
               </p>
-              <InterpList items={data.interpretaciones.mercado} />
+              <InterpList items={activo.interpretaciones.mercado} />
             </div>
           </div>
+          {verReal && (
+            <p className="text-[11px] text-muted-foreground/60">Ajuste Fowler Newton: valores monetarios reexpresados a moneda homogénea (IPC). Ratios no se reexpresan (adimensionales).</p>
+          )}
         </div>
       )}
     </div>

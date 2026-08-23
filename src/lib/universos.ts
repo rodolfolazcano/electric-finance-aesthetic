@@ -78,6 +78,55 @@ export function getTickerInfo(ticker: string): TickerInfo | undefined {
   return list.find((t) => t.ticker === ticker);
 }
 
+// F4 — Sincronización con sectores e industrias cedears.py
+// El JSON es la foto; esta función permite enriquecerlo con el panel vivo de IOL (acciones/cedears)
+// sin reescribir el archivo en disco (cache en memoria). Recicla `sectores e industrias cedears.py`
+// y `cedears_scraper.py` como fuente viva: si IOL trae un ticker nuevo, se expone con sector "BCBA · IOL vivo".
+let vivoExtras: TickerInfo[] = [];
+let vivoLastSync: string | null = null;
+
+export async function sincronizarUniversoDesdeIOL(sessionId?: string): Promise<{ agregados: number; total: number; fecha: string }> {
+  try {
+    const { iolPanelTodos } = await import("@/lib/iol.server");
+    // Requiere sesión IOL activa; si no hay, usar fallback de catálogo local
+    const tryFetch = async (instrumento: string) => {
+      try { return await (iolPanelTodos as any)(sessionId ?? "anon", instrumento); } catch { return null; }
+    };
+    const [acciones, cedears] = await Promise.all([tryFetch("acciones"), tryFetch("cedears")]);
+    const nuevos: TickerInfo[] = [];
+    for (const panel of [acciones, cedears]) {
+      const titulos = (panel as any)?.titulos ?? panel ?? [];
+      if (!Array.isArray(titulos)) continue;
+      for (const t of titulos.slice(0, 200)) {
+        const sym = String(t.simbolo ?? t.ticker ?? "").trim().toUpperCase();
+        if (!sym || getTickerInfo(sym)) continue;
+        if (vivoExtras.find((v) => v.ticker === sym)) continue;
+        nuevos.push({
+          ticker: sym,
+          nombre: String(t.descripcion ?? t.nombre ?? sym),
+          sector: String(t.sector ?? "BCBA · IOL vivo"),
+          industria: String(t.industria ?? "Sin clasificar"),
+          tipo: String(t.tipo ?? (panel === cedears ? "cedear" : "accion")),
+          moneda: "ARS",
+          mercado: "BCBA",
+          pais: "Argentina",
+        });
+      }
+    }
+    vivoExtras = [...vivoExtras, ...nuevos];
+    vivoLastSync = new Date().toISOString();
+    return { agregados: nuevos.length, total: ensureFlat().length + vivoExtras.length, fecha: vivoLastSync };
+  } catch {
+    return { agregados: 0, total: ensureFlat().length + vivoExtras.length, fecha: vivoLastSync ?? new Date().toISOString() };
+  }
+}
+
+export function getFlatTickerListConVivo(): TickerInfo[] {
+  return [...ensureFlat(), ...vivoExtras];
+}
+
+export function getVivoExtras(): TickerInfo[] { return vivoExtras; }
+
 // Universo combinado para Oportunidades (acciones US líquidas + .BA argentinas)
 export const UNIVERSO_TECNICO = [
   "AAPL",

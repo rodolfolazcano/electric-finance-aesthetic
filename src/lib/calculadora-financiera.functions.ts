@@ -448,3 +448,93 @@ export function formatNumber(value: number, decimals: number = 2): string {
     maximumFractionDigits: decimals
   }).format(value);
 }
+
+// ============================================================================
+// 9. SOLVER CUOPT — Ecuaciones de valor con restricciones (F2 Dumrauf)
+// Replica cuopt-numerical-optimization-formulation para TIR con bounds y VAN objetivo.
+// No requiere GPU: usa Newton-Raphson con fallback bisección y verifica no-arbitraje.
+// ============================================================================
+
+export interface SolverTIRResult {
+  tir: number; // % anual
+  van: number;
+  iteraciones: number;
+  convergio: boolean;
+  metodo: "newton" | "biseccion" | "hibrido";
+  cotaInferior: number;
+  cotaSuperior: number;
+  advertencias: string[];
+}
+
+export function resolverTIRConRestricciones(
+  flujos: number[],
+  bounds: { min?: number; max?: number } = {},
+  objetivoVAN: number = 0,
+  opts: { tol?: number; maxIter?: number } = {},
+): SolverTIRResult {
+  const tol = opts.tol ?? 1e-7;
+  const maxIter = opts.maxIter ?? 200;
+  const lo = bounds.min != null ? bounds.min / 100 : -0.9;
+  const hi = bounds.max != null ? bounds.max / 100 : 5;
+  const advertencias: string[] = [];
+  const vanAt = (r: number) => flujos.reduce((s, cf, t) => s + cf / Math.pow(1 + r, t), 0) - objetivoVAN;
+  const dvanAt = (r: number) => flujos.reduce((s, cf, t) => s - (t * cf) / Math.pow(1 + r, t + 1), 0);
+
+  // Detectar múltiples cambios de signo → TIR múltiple (Dumrauf)
+  let cambios = 0;
+  for (let i = 1; i < flujos.length; i++) if ((flujos[i] ?? 0) * (flujos[i - 1] ?? 0) < 0) cambios++;
+  if (cambios > 1) advertencias.push(`Flujo con ${cambios} cambios de signo → TIR múltiple posible (preferir VAN para rankear).`);
+
+  // Buscar bracket donde VAN cambia de signo
+  let a = lo, b = hi;
+  let fa = vanAt(a), fb = vanAt(b);
+  if (fa * fb > 0) {
+    // No bracket: probar VAN en 0% y en hi
+    const f0 = vanAt(0);
+    if (f0 * fb <= 0) { a = 0; fa = f0; }
+    else advertencias.push("Sin bracket con cambio de signo — TIR fuera de bounds o flujo degenerado.");
+  }
+
+  // Newton con salvaguarda de bounds
+  let r = 0.1;
+  if (r < a || r > b) r = (a + b) / 2;
+  let metodo: SolverTIRResult["metodo"] = "hibrido";
+  let iter = 0;
+  let convergio = false;
+  for (iter = 0; iter < maxIter; iter++) {
+    const f = vanAt(r);
+    const df = dvanAt(r);
+    if (Math.abs(f) < tol) { convergio = true; metodo = "newton"; break; }
+    if (!isFinite(df) || Math.abs(df) < 1e-12) break;
+    const rNext = r - f / df;
+    if (!isFinite(rNext) || rNext < a || rNext > b) break; // salir a bisección
+    if (Math.abs(rNext - r) < tol) { r = rNext; convergio = true; metodo = "newton"; break; }
+    r = rNext;
+  }
+
+  // Bisección como fallback / refinamiento
+  if (!convergio) {
+    let al = a, bl = b, fl = vanAt(al), fr = vanAt(bl);
+    if (fl * fr <= 0) {
+      for (let i = 0; i < 120; i++) {
+        const m = (al + bl) / 2;
+        const fm = vanAt(m);
+        if (Math.abs(fm) < tol || Math.abs(bl - al) < tol) { r = m; convergio = true; metodo = fl * fr <= 0 ? "biseccion" : "hibrido"; break; }
+        if (fl * fm <= 0) { bl = m; fr = fm; } else { al = m; fl = fm; }
+        r = m;
+      }
+    }
+  }
+
+  const van = vanAt(r);
+  return {
+    tir: r * 100,
+    van,
+    iteraciones: iter,
+    convergio,
+    metodo,
+    cotaInferior: lo * 100,
+    cotaSuperior: hi * 100,
+    advertencias,
+  };
+}

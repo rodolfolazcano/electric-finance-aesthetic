@@ -48,6 +48,8 @@ const HERRAMIENTAS_POR_ROL: Record<RolAgente, string[]> = {
   noticias: ["buscar_noticias", "buscar_web", "consultar_mercado"],
   conocimiento: ["consultar_base_conocimiento", "buscar_web", "buscar_noticias", "consultar_mercado"],
   valoracion: [
+    "analisis_completo",
+    "validar_analisis",
     "ficha_de_decision",
     "valor_por_metodos",
     "calcular_wacc",
@@ -55,12 +57,20 @@ const HERRAMIENTAS_POR_ROL: Record<RolAgente, string[]> = {
     "valor_intrinseco_real",
     "calcular_dcf",
     "score_sectorial",
+    "contexto_macro",
+    "ciclo_economico",
+    "analizar_semaforo",
+    "analizar_riesgo",
+    "analizar_capm",
     "buscar_noticias",
     "buscar_web",
     "consultar_mercado",
+    "datos_financieros",
   ],
-  semaforo: ["analizar_semaforo", "analisis_tecnico", "score_sectorial", "buscar_noticias", "buscar_web"],
+  semaforo: ["analisis_completo", "analizar_semaforo", "analisis_tecnico", "score_sectorial", "analizar_riesgo", "validar_analisis", "buscar_noticias", "buscar_web"],
   cuantitativo: [
+    "analisis_completo",
+    "validar_analisis",
     "analizar_capm",
     "matriz_capm",
     "calcular_wacc",
@@ -84,6 +94,7 @@ const HERRAMIENTAS_POR_ROL: Record<RolAgente, string[]> = {
     "analisis_industria",
     "ranking_valuacion_sectores",
     "buscar_web",
+    "datos_financieros",
   ],
   redactor: BASE_COMUN,
 };
@@ -141,7 +152,8 @@ export const AGENTES: Record<RolAgente, AgenteDef> = {
     categoria: "razonamiento",
     status: "valoracion",
     sistema: `Sos el Agente de Valoración de IA, asistente del mercado de capitales argentino.
-- Para "cuánto vale X", "valor real de X", "analizá el valor de X", "DCF de X" o "ficha de decisión de X": usá SIEMPRE ficha_de_decision(simbolo) — ejecuta contexto macro + cualitativo + cuantitativo + WACC + triangulación (DCF, múltiplos, valor libro/APV) y devuelve la decisión final con margen de seguridad, todo con datos en vivo de Yahoo Finance. No pidas supuestos al usuario.
+- Para "haceme el análisis completo de X / análisis integral / ficha coronar / pipeline maestro F0→F10": usá SIEMPRE analisis_completo(simbolo) — pipeline jerárquico coronar bases/pt en orden F0 macro ampliado (BCRA v4: Badlar, reservas, base, circulante, TC serie 90d + CriptoYa + ArgentinaDatos) → F1 cualitativo 6D gate 5.0 → F1 cuantitativo 15 ratios → F2 cálculo (YTM/TIR) → F3 valuación triangulada DCF+múltiplos+APV con WACC CAPM+riesgo país+size → F4 sectores score+benchmarks → F5/F6 CAPM/factores/riesgo → F7 renta fija ETTI → F8 derivados → F9 quant → F10 ficha con MOS calibrado → T validación determinística. Luego validar_analisis(simbolo) como gate final. Es el flujo completo; no pidas supuestos.
+- Para "cuánto vale X", "valor real de X", "DCF de X" o "ficha de decisión de X": usá SIEMPRE ficha_de_decision(simbolo) — ejecuta contexto macro + cualitativo + cuantitativo + WACC + triangulación (DCF, múltiplos, valor libro/APV) y devuelve la decisión final con margen de seguridad, todo con datos en vivo de Yahoo Finance. No pidas supuestos al usuario.
 - Si el usuario pide explícitamente un método puntual: valor_por_metodos(simbolo) para la triangulación DCF+múltiplos+valor libro, calcular_wacc(simbolo) para el costo de capital, analizar_fundamental(simbolo) para cualitativo+cuantitativo.
 - Usá valor_intrinseco_real(simbolo) o calcular_dcf(simbolo) SOLO como alternativa/verificación cruzada o cuando el usuario aporte supuestos propios para probar un escenario puntual.
 - Tenés acceso a todas las herramientas del sistema (mercado, noticias, base de conocimiento y búsqueda web) para complementar el análisis con el dato actual y las noticias de sustento.

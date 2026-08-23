@@ -26,6 +26,9 @@ import {
   Download,
   KeyRound,
   Copy,
+  Sparkles,
+  Bot,
+  Zap,
 } from "lucide-react";
 import { CHAT_OPEN_EVENT_NAME } from "@/lib/chat-open";
 import {
@@ -45,10 +48,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 const WHATSAPP = "https://wa.me/541162355944";
 
 const SESSION_STORAGE_KEY = "norte-session-id";
+const AUTO_MODE_STORAGE_KEY = "norte-auto-mode";
 
 function obtenerSessionId(): string {
   try {
@@ -438,10 +443,28 @@ export function ChatWidget() {
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const [paused, setPaused] = useState(false);
+  const [modoAutomatico, setModoAutomatico] = useState(() => {
+    try {
+      const v = window.localStorage.getItem(AUTO_MODE_STORAGE_KEY);
+      // Por defecto ACTIVO: orquestación autónoma siempre (null => true)
+      return v == null ? true : v === "1";
+    } catch {
+      return true; // por defecto ACTIVO: orquestación autónoma siempre
+    }
+  });
+  const [autonomoActivo, setAutonomoActivo] = useState(false);
 
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(AUTO_MODE_STORAGE_KEY, modoAutomatico ? "1" : "0");
+    } catch {
+      /* sin storage */
+    }
+  }, [modoAutomatico]);
 
   // Impresión / guardado como PDF de un mensaje: se marca el objetivo y se
   // abre el diálogo de impresión (el CSS de impresión oculta el resto).
@@ -606,7 +629,7 @@ export function ChatWidget() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history, model, sessionId: obtenerSessionId() }),
+        body: JSON.stringify({ messages: history, model, sessionId: obtenerSessionId(), modoAutomatico }),
         signal: controller.signal,
       });
       if (!res.ok || !res.body) {
@@ -719,6 +742,15 @@ export function ChatWidget() {
             setValorando(false);
             setAnalizandoSemaforo(false);
             setConectandoIol(false);
+          } else if (evt.v === "autonomo") {
+            setAutonomoActivo(true);
+            setSearching(evt.q ? String(evt.q) : "Orquestación autónoma · razonando en lenguaje natural…");
+            setConsultando(false);
+            setBuscandoNoticias(false);
+            setLeyendo(false);
+            setValorando(false);
+            setAnalizandoSemaforo(false);
+            setConectandoIol(false);
           } else if (evt.v === "capm" || evt.v === "portafolio" || evt.v === "riesgo") {
             setSearching(evt.q ?? "");
             setConsultando(false);
@@ -727,6 +759,7 @@ export function ChatWidget() {
             setValorando(false);
             setAnalizandoSemaforo(false);
             setConectandoIol(false);
+            setAutonomoActivo(false);
           } else {
             setSearching(null);
             setConsultando(false);
@@ -806,6 +839,8 @@ export function ChatWidget() {
     setLeyendo(false);
     setValorando(false);
     setConectandoIol(false);
+    setAutonomoActivo(false);
+    setAnalizandoSemaforo(false);
     setAgentesActivos([]);
     busyRef.current = false;
     setLoading(false);
@@ -983,6 +1018,18 @@ export function ChatWidget() {
               <span className="text-muted-foreground">
                 Asistente del mercado de capitales argentino
               </span>
+            </p>
+            <p className="flex items-center gap-1.5 truncate text-[10.5px] leading-none">
+              {modoAutomatico ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 font-semibold uppercase tracking-wide text-emerald-400">
+                  <Sparkles className="h-3 w-3" /> Auto · orquestación autónoma
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/20 px-1.5 py-0.5 font-semibold uppercase tracking-wide text-muted-foreground">
+                  <Bot className="h-3 w-3" /> Manual
+                </span>
+              )}
+              {autonomoActivo && <span className="animate-pulse text-primary">● razonando</span>}
             </p>
           </div>
           <button
@@ -1279,6 +1326,12 @@ export function ChatWidget() {
                   Conectando con InvertirOnline…
                 </p>
               )}
+              {autonomoActivo && (
+                <p className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1.5 text-[12px] font-medium text-emerald-400">
+                  <Sparkles className="h-3.5 w-3.5 animate-pulse" />
+                  Modo Automático · orquestación autónoma razonando y ejecutando funciones…
+                </p>
+              )}
               {agentesActivos.length > 1 && (
                 <p className="flex items-center gap-1.5 text-[12px] text-gold">
                   <span className="flex h-4 w-4 items-center justify-center">
@@ -1336,6 +1389,18 @@ export function ChatWidget() {
                   </button>
                 </div>
               )}
+              <div className="mb-2 flex items-center justify-between gap-2 rounded-lg border border-primary/20 bg-primary/[0.04] px-2.5 py-2">
+                <label htmlFor="modo-automatico" className="flex min-w-0 flex-1 cursor-pointer items-center gap-2">
+                  <span className={`flex h-6 w-6 items-center justify-center rounded-full border text-[12px] ${modoAutomatico ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-400" : "border-border bg-muted text-muted-foreground"}`}>
+                    {modoAutomatico ? <Sparkles className="h-3.5 w-3.5" /> : <Zap className="h-3.5 w-3.5" />}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className={`block text-[12px] font-semibold leading-none ${modoAutomatico ? "text-emerald-400" : "text-foreground"}`}>{modoAutomatico ? "Modo Automático activo" : "Modo Automático desactivado"}</span>
+                    <span className="block truncate text-[10.5px] leading-tight text-muted-foreground">Orquesta funciones y propone instrucciones solo</span>
+                  </span>
+                </label>
+                <Switch id="modo-automatico" checked={modoAutomatico} onCheckedChange={setModoAutomatico} aria-label="Modo automático" />
+              </div>
               <div className="mb-2 flex min-w-0 items-start gap-2">
                 <Select
                   value={model}
@@ -1418,7 +1483,7 @@ export function ChatWidget() {
                       void send(input);
                     }
                   }}
-                  placeholder="Escribí tu consulta…"
+                  placeholder={modoAutomatico ? "Modo Auto: escribí en lenguaje natural, ej: análisis completo de GGAL..." : "Escribí tu consulta…"}
                   className="max-h-28 flex-1 resize-none bg-transparent text-[13px] outline-none placeholder:text-muted-foreground"
                 />
                 <button

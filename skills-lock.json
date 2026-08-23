@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "skills": {
+    "dynamo-router-starter": {
+      "source": "nvidia/skills",
+      "sourceType": "github",
+      "skillPath": "skills/dynamo-router-starter/SKILL.md",
+      "computedHash": "e2b2e2d9e7150d7bfee8d9efc03a17b31fcb8580fe2dec1720e9539e32c1d1f5"
+    },
+    "nemo-relay-get-started": {
+      "source": "nvidia/skills",
+      "sourceType": "github",
+      "skillPath": "skills/nemo-relay-get-started/SKILL.md",
+      "computedHash": "9343a2548c90476ad4daf52b96e025e7a0a6a824f0bf8ac75d84bdd275d77b2a"
+    },
+    "nemo-relay-instrument-calls": {
+      "source": "nvidia/skills",
+      "sourceType": "github",
+      "skillPath": "skills/nemo-relay-instrument-calls/SKILL.md",
+      "computedHash": "eaa9a7e2d0e1bee996fb2992795fd7c7a90de7ae33497a9e5c672a0a960c01b4"
+    },
+    "nemo-relay-plugin-adaptive-tuning": {
+      "source": "nvidia/skills",
+      "sourceType": "github",
+      "skillPath": "skills/nemo-relay-plugin-adaptive-tuning/SKILL.md",
+      "computedHash": "a9a3209dba565fbeada13592499cdea24f3c4b8a389480b403f6dc511fefd22a"
+    },
+    "nemo-relay-plugin-observability": {
+      "source": "nvidia/skills",
+      "sourceType": "github",
+      "skillPath": "skills/nemo-relay-plugin-observability/SKILL.md",
+      "computedHash": "b0a59b4362a666e2453de4e226b1be249297e6abd6a926d609ea844328cd7049"
+    },
+    "nemo-retriever": {
+      "source": "nvidia/skills",
+      "sourceType": "github",
+      "skillPath": "skills/nemo-retriever/SKILL.md",
+      "computedHash": "ebe51c445968d86f28cfae062051c8baaf37561c5e982c79b40343b77fabb500"
+    },
+    "portfolio-optimization": {
+      "source": "nvidia/skills",
+      "sourceType": "github",
+      "skillPath": "skills/portfolio-optimization/SKILL.md",
+      "computedHash": "f662cd6cdc05a66901d0a27ab3800da5f16774035cd9e5290dca85b33e8e826f"
+    },
+    "rag-blueprint": {
+      "source": "nvidia/skills",
+      "sourceType": "github",
+      "skillPath": "skills/rag-blueprint/SKILL.md",
+      "computedHash": "4621085caf70c1ab91cf321dcd97ed432e44150565c30f9b2d87bbb4a2b62dfe"
+    }
+  }
+}

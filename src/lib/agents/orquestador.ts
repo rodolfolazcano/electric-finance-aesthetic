@@ -39,6 +39,8 @@ import {
   ejecutarWacc,
   ejecutarValorMetodos,
   ejecutarFichaDecision,
+  ejecutarAnalisisCompleto,
+  ejecutarValidarAnalisis,
   ejecutarContextoMacro,
   ejecutarCicloEconomico,
   ejecutarPerformanceSectorial,
@@ -266,6 +268,20 @@ export function enrutar(pregunta: string): Set<RolAgente> {
   if (esPreguntaCuantitativa(pregunta)) {
     activos.add("cuantitativo");
   }
+  // Parte 1 — Pipeline maestro F0→F10 (prima sobre todo): necesita TODOS los agentes + validación T
+  if (
+    /analisis\s+completo|an[áa]lisis\s+integral|ficha\s+coronar|coronar\s+bases|hace?me\s+el\s+analisis\s+completo|valuaci[óo]n\s+integral|analiz[aá]\s+.*completa|analiz[aá]\s+.*integral/i.test(
+      p,
+    )
+  ) {
+    activos.add("valoracion");
+    activos.add("semaforo");
+    activos.add("cuantitativo");
+    activos.add("mercado");
+    activos.add("conocimiento");
+    activos.add("noticias");
+    return activos;
+  }
   // Motor unificado: señal 4 capas necesita TODOS los agentes especializados
   if (
     /se[ñn]al\s+unificada|se[ñn]ales\s+unificadas|motor\s+unificado|qu[eé]\s+compro\s+hoy|qu[eé]\s+comprar|top\s+se[ñn]ales|generar.*se[ñn]al|analiz[aá]\s+(?:complet[ao]|unificad)/i.test(
@@ -432,6 +448,19 @@ function detectarIntencionSkill(pregunta: string): string[] {
   ) {
     skills.push("elbaum-renta-fija");
   }
+  if (
+    /analisis\s+completo|an[áa]lisis\s+integral|ficha\s+coronar|coronar\s+bases|valuaci[óo]n\s+integral|jerarqu[íi]a\s+metodol[óo]gica|f0.*f10|pipeline\s+maestro/i.test(p)
+  ) {
+    skills.push("razonamiento-profundo");
+    skills.push("analisis-fundamental-6d");
+    skills.push("analisis-tecnico-senal");
+    skills.push("razonamiento-autonomo-financiero");
+    skills.push("metodo-pascale-valuacion");
+    skills.push("analisis-estados-contables");
+    skills.push("calculo-financiero-dumrauf");
+    skills.push("carteras-elbaum");
+    skills.push("macro-latam-ciclo");
+  }
 
   return skills;
 }
@@ -455,6 +484,25 @@ const HERRAMIENTAS_BASE = new Set([
 ]);
 
 const GRUPOS_HERRAMIENTAS: Record<string, string[]> = {
+  analisisCompleto: [
+    "analisis_completo",
+    "validar_analisis",
+    "ficha_de_decision",
+    "valor_por_metodos",
+    "calcular_wacc",
+    "analizar_fundamental",
+    "score_sectorial",
+    "contexto_macro",
+    "ciclo_economico",
+    "analizar_semaforo",
+    "analizar_capm",
+    "analizar_factores",
+    "analizar_riesgo",
+    "estadisticas_retornos",
+    "performance_sectorial",
+    "valuacion_sectorial",
+    "datos_financieros",
+  ],
   valoracion: [
     "calcular_dcf",
     "valor_intrinseco_real",
@@ -506,7 +554,7 @@ const GRUPOS_HERRAMIENTAS: Record<string, string[]> = {
     "consultar_agenda_economica",
     "generar_senales_cedear",
   ],
-  senalUnificada: ["generar_senal_unificada", "generar_senales_unificadas"],
+  senalUnificada: ["generar_senal_unificada", "generar_senales_unificadas", "telegram_enviar_senal", "telegram_enviar_mensaje"],
   rentaFija: ["calcular_ytm_bono", "consultar_curva_etti", "calcular_yield_call", "calcular_total_return", "calcular_stripped_yield", "consultar_semaforo_riesgo_bono", "calcular_tir_portafolio"],
   opciones: ["analizar_opciones_completo"],
 };
@@ -603,6 +651,12 @@ export function filtrarToolsParaPregunta(pregunta: string, roles: RolAgente[]): 
   }
   if (/ytm|tir\b|tasa\s+interna|bono\s+[a-z0-9]{2,6}|al30|gd30|al35|gd35|ae38|gd38|tx26|tx28|etti|curva\s+spot|curva\s+soberana|forward\s+impl[ií]cito|forma\s+de\s+la\s+curva|stripped|yield\s+to\s+call|ytc|ytw|yield\s+to\s+worst|total\s+return|reinversi[oó]n\s+de\s+cupones|semaforo.*riesgo|riesgo.*bono|tir.*portafolio|tir.*cartera/i.test(p)) {
     agregarGrupoHerramientas(nombres, "rentaFija");
+  }
+  if (/analisis\s+completo|an[áa]lisis\s+integral|ficha\s+coronar|coronar\s+bases|valuaci[óo]n\s+integral|pipeline\s+maestro|jerarqu[íi]a.*metodol|f0.*f10/i.test(p)) {
+    agregarGrupoHerramientas(nombres, "analisisCompleto");
+    agregarGrupoHerramientas(nombres, "rentaFija");
+    agregarGrupoHerramientas(nombres, "opciones");
+    agregarGrupoHerramientas(nombres, "labadie");
   }
 
   for (const skill of detectarIntencionSkill(pregunta ?? "")) {
@@ -980,6 +1034,45 @@ export async function ejecutarTool(
         const res = await ejecutarSenalesUnificadas(argsRaw);
         return { texto: res.texto, fuentes: res.fuentes, ok: res.ok, eventos: (res as any).eventos };
       }
+      case "telegram_enviar_senal": {
+        let a: { ticker?: string; senal?: string; precio?: number; variacion1d?: number; motivo?: string; chatId?: string } = {};
+        try {
+          a = JSON.parse(argsRaw || "{}");
+        } catch {}
+        if (!a.ticker)
+          return { texto: "[ERROR] telegram_enviar_senal requiere ticker", fuentes: [], ok: false };
+        // Sin señal explícita: genera la unificada 4 capas y publica con gráfico TradingView adjunto.
+        if (!a.senal) {
+          const { toolGenerarSenalUnificada } = await import("@/lib/ai/agent-tools.server");
+          const out = await toolGenerarSenalUnificada({
+            ticker: a.ticker,
+            enviarTelegram: true,
+            chatId: a.chatId,
+          });
+          return { texto: out, fuentes: [], ok: !out.startsWith("[ERROR") };
+        }
+        const { sendTelegramSignal } = await import("@/lib/telegram.server");
+        const out = await sendTelegramSignal({
+          ticker: a.ticker,
+          senal: a.senal,
+          precio: a.precio,
+          variacion1d: a.variacion1d,
+          motivo: a.motivo,
+          chatId: a.chatId,
+        });
+        return { texto: out, fuentes: [], ok: !out.includes("[FAIL") && !out.includes("[ERROR") };
+      }
+      case "telegram_enviar_mensaje": {
+        let a: { text?: string; chatId?: string } = {};
+        try {
+          a = JSON.parse(argsRaw || "{}");
+        } catch {}
+        if (!a.text)
+          return { texto: "[ERROR] telegram_enviar_mensaje requiere text", fuentes: [], ok: false };
+        const { sendTelegramMessage } = await import("@/lib/telegram.server");
+        const out = await sendTelegramMessage({ text: a.text, chatId: a.chatId, parseMode: "HTML" });
+        return { texto: out, fuentes: [], ok: !out.includes("[FAIL") && !out.includes("[ERROR") };
+      }
       case "calcular_ytm_bono": {
         const { ejecutarYTM } = await import("@/lib/agents/ejecutores");
         const res = await ejecutarYTM(argsRaw, sessionId);
@@ -1086,6 +1179,14 @@ export async function ejecutarTool(
         } catch (e) {
           return { texto: `SIN RESULTADOS: TIR portafolio falló (${e instanceof Error ? e.message : String(e)})`, fuentes: [], ok: false };
         }
+      }
+      case "analisis_completo": {
+        const res = await ejecutarAnalisisCompleto(argsRaw, sessionId);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok, eventos: (res as any).eventos };
+      }
+      case "validar_analisis": {
+        const res = await ejecutarValidarAnalisis(argsRaw);
+        return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
       }
       case "predecir_direccion": {
         const { ejecutarPrediccionSubyacente } = await import("@/lib/agents/ejecutores");

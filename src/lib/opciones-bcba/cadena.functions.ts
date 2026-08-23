@@ -194,3 +194,47 @@ function vencString(fecha: string): string {
 }
 
 export { sesgoVolatilidad };
+
+// Superficie de volatilidad: IV por strike y vencimiento (smile + term structure)
+export interface VolSurfacePoint { strike: number; vencimiento: string; T: number; iv: number; delta: number | null }
+export function construirSuperficieVol(opciones: OpcionProcesada[]): {
+  smile: VolSurfacePoint[];
+  termStructure: Array<{ vencimiento: string; T: number; atmIv: number | null }>;
+  skew: number | null;
+} {
+  const smile: VolSurfacePoint[] = opciones
+    .filter((o) => o.iv != null)
+    .map((o) => ({ strike: o.strike, vencimiento: o.fechaVencimiento, T: o.T, iv: o.iv!, delta: o.greeks?.delta ?? null }))
+    .sort((a, b) => a.T - b.T || a.strike - b.strike);
+  const byExp = new Map<string, typeof smile>();
+  for (const p of smile) {
+    const arr = byExp.get(p.vencimiento) ?? [];
+    arr.push(p);
+    byExp.set(p.vencimiento, arr);
+  }
+  const termStructure = Array.from(byExp.entries())
+    .map(([venc, pts]) => {
+      const atm = pts.reduce((best, cur) => {
+        if (!best) return cur;
+        // más cercano a delta 0.5 ≈ ATM
+        const dBest = Math.abs((best.delta ?? 0.5) - 0.5);
+        const dCur = Math.abs((cur.delta ?? 0.5) - 0.5);
+        return dCur < dBest ? cur : best;
+      }, null as any);
+      return { vencimiento: venc, T: atm?.T ?? pts[0].T, atmIv: atm?.iv ?? null };
+    })
+    .sort((a, b) => a.T - b.T);
+  // skew: (IV puts OTM - IV calls OTM)/ATM
+  let skew: number | null = null;
+  if (smile.length >= 4 && termStructure.length) {
+    const front = byExp.get(termStructure[0].vencimiento) ?? [];
+    const puts = front.filter((p) => (p.delta ?? 0) < 0.3 && p.delta! > 0);
+    const calls = front.filter((p) => (p.delta ?? 1) > 0.7);
+    if (puts.length && calls.length && termStructure[0].atmIv) {
+      const avgPut = puts.reduce((s, p) => s + p.iv, 0) / puts.length;
+      const avgCall = calls.reduce((s, p) => s + p.iv, 0) / calls.length;
+      skew = ((avgPut - avgCall) / termStructure[0].atmIv) * 100;
+    }
+  }
+  return { smile, termStructure, skew };
+}

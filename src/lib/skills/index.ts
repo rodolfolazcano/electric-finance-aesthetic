@@ -575,6 +575,28 @@ const SKILLS: Skill[] = [
 - INTERPRETACION OBLIGATORIA dato->implicancia: reportar skew con lectura de sentimiento y vencimiento mas liquido.
 - Educativo; no recomendacion de inversion.`,
   },
+  {
+    id: "analisis-completo-f0-f10",
+    nombre: "Pipeline Maestro F0→F10 — Jerarquía Coronar Bases",
+    descripcion: "Orquestación top-down completa F0 macro → F10 perfil + validación T transversal, reutilizando todos los motores existentes sin duplicar archivos.",
+    instrucciones: `[SKILL · Pipeline Maestro F0→F10 — Jerarquía Coronar Bases/pt + Labadie]
+- TRIGGER: "análisis completo", "análisis integral", "ficha coronar", "pipeline maestro", "F0→F10", "coronar bases", petición de valuación integral con contexto macro.
+- JERARQUÍA OBLIGATORIA (top-down, no paralelizar sin orden):
+  F0 Macro (INICIO): contexto_macro ampliado (BCRA v4: Badlar/reservas/base/circulante/TC 90d + ArgentinaDatos inflación/riesgo/UVA/letras + CriptoYa dólares + Yahoo SPY/DXY/TNX → tasas reales Fisher, spread, régimen FAVORABLE/NEUTRO/ADVERSO) + ciclo_economico (Pring/Stovall 6 etapas). ¿En qué régimen estamos?
+  F1 Contabilidad: analizar_fundamental → Fowler Newton (caps 1,2,5,6,10,12,13) + Biondi (4-7) → 6D con gate ≥5.0 + 15 ratios M1-M15 con alertas. ¿Cómo leer balance/ER/flujo?
+  F2 Cálculo financiero: Dumrauf MATF U2-4 + Instrumentos_37 → VAN/TIR/ETTI. Para bonos: calcular_ytm_bono + consultar_curva_etti (spot/forward); para acciones: el VAN se vehiculiza en DCF. ¿VAN/TIR/temporalidad?
+  F3 Valuación: Pascale DFN U1-7 + Alonso U1/U3 → WACC CAPM (β 1y, Rf ^TNX, prima 6% ARG/5.5% US, riesgo país, size) + DCF 5y + múltiplos sector + APV → triangulación con pesos por perfil (crecimiento/madura/distress). ¿Cuánto vale?
+  F4 Sectores: score_sectorial + analisis_industria + matriz_benchmarks + performance_sectorial (11 ETFs) vs universo BCBA (unificado_completo). ¿Dónde está el valor relativo?
+  F5 Cartera: optimizar_portafolio / optimizar_cartera_avanzada (Markowitz/Mean-CVaR SOCP) + backtest walk-forward. ¿Cómo combinar?
+  F6 Riesgo/CAPM: analizar_riesgo (σ, VaR95/99, CVaR, drawdown) + analizar_capm (β, R², p-valor, Hurst, p-variance) + analizar_factores (140+ maestros) + geometry.txt (p-varianza). ¿Cuánto riesgo compensa?
+  F7 Renta fija: consultar_curva_etti + calcular_stripped_yield + consultar_semaforo_riesgo_bono + calcular_tir_portafolio (RENTA_FIJA_COMPLETA.json). ¿TIR/duration?
+  F8 Derivados: cadena_opciones_bcba + analizar_opciones_completo (Dunbar BS+CRR, griegas, IV brentq/Newton, VaR delta-gamma, smile). ¿Pricing?
+  F9 Quant: pairs_trading_labadie (cointegración, z-score μ±aσ) + curva_ejecucion_labadie (Almgren-Chriss, p-varianza, PVol). Señales + ejecución.
+  F10 Ejecución + Perfil (CIERRE): ficha_de_decision con MOS calibrado por score (20%/35%/50%) + iol_operar (confirmar:true) + perfil inversor. Orden + reporte al cliente.
+  T Transversal: validar_analisis (recicla validar.py): total vs serie, MOS vs score, Deuda/EBITDA>4, PN<0, margen<0, CT<0, beta null, triangulación sin rango, semáforo vs valuación contradictoria. Todo resultado se re-verifica antes de publicar. Descartar TV económica (Bustamante) salvo panel noticias.
+- REGLA DE EJECUCIÓN: tool analisis_completo(simbolo) ejecuta F0→F10 en orden y validar_analisis como gate final. Usar validar.py checks determinísticos; si hay 🔴 bloquear publicación. Citar fuente por número.
+- REUTILIZACIÓN: no crear archivos nuevos; extender funciones existentes (clarity-analysis, ejecutores, mercado.server).`,
+  },
 ];
 
 const POR_ID = new Map(SKILLS.map((s) => [s.id, s]));

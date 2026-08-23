@@ -1571,6 +1571,48 @@ export const TOOLS: ToolSpec[] = [
   {
     type: "function",
     function: {
+      name: "telegram_enviar_senal",
+      description:
+        "PUBLICA una señal en el canal de inversores vía @Coronarinversiones777_bot (bot de salida). Con solo el ticker genera la señal unificada 4 capas y la publica sola con formato institucional + gráfico TradingView como adjunto (líneas Entrada/SL/TP1/TP2 anotadas). Si pasás señal explícita, publica ese texto directo. Usar para 'enviá la señal de GGAL', 'publicá esta señal en Telegram', 'mandala al canal'. Ejecuta sin pedir confirmación ni chat_id.",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: { type: "string", description: "Ticker (ej. 'GGAL.BA', 'YPF', 'AAPL')." },
+          senal: {
+            type: "string",
+            description:
+              "Opcional: COMPRA | COMPRA CON CAUTELA | MANTENER | REDUCIR | VENTA. Si se omite, se genera con el motor unificado 4 capas antes de publicar.",
+          },
+          precio: { type: "number", description: "Precio actual opcional (solo con señal explícita)." },
+          variacion1d: { type: "number", description: "Variación % diaria opcional." },
+          motivo: { type: "string", description: "Motivo breve opcional (score, RSI, cataliza)." },
+          chatId: { type: "string", description: "Chat destino opcional; default canal de señales configurado." },
+        },
+        required: ["ticker"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "telegram_enviar_mensaje",
+      description:
+        "PUBLICA texto libre en el canal de inversores vía @Coronarinversiones777_bot (bot de salida, formato HTML, máx 4000 chars). Usar para 'publicá el resumen en el canal', 'avisale a los inversores que...'. Ejecuta sin pedir confirmación ni chat_id.",
+      parameters: {
+        type: "object",
+        properties: {
+          text: { type: "string", description: "Texto HTML (<b>, <i>, <code>) a publicar." },
+          chatId: { type: "string", description: "Chat destino opcional; default canal de señales." },
+        },
+        required: ["text"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "calcular_ytm_bono",
       description:
         "Calcula YTM/TIR real de un bono argentino usando RENTA_FIJA_COMPLETA.json (flujo_fondos, fechas, cupones) + precio de cotización EN VIVO de IOL (usa sesión del usuario o fallback hardcodeado boosandr97@gmail.com). Método Newton-Raphson ACT/365. Devuelve TIR anual, TEM, TNA, precio usado, flujos futuros y diagnóstico. Para 'YTM de AL30', 'TIR de GD30', 'rendimiento de AL35', 'bono soberano'.",
@@ -1740,6 +1782,56 @@ export const TOOLS: ToolSpec[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "analisis_completo",
+      description:
+        "PIPELINE MAESTRO F0→F10 — Análisis financiero COMPLETO de un ticker siguiendo la jerarquía metodológica coronar bases/pt (Blanchard/Dornbusch → Fowler/Biondi → Dumrauf → Pascale/Alonso → Sectores → Elbaum/CAPM → Renta Fija → Dunbar/Black-Scholes → Labadie Quant → Ejecución+Perfil). Ejecuta EN ORDEN: (F0) contexto macro ampliado (BCRA v4: Badlar, reservas, base monetaria, circulante, TC oficial histórico + ArgentinaDatos + CriptoYa + SPY/DXY/TNX) + ciclo intermarket 6 etapas, (F1) fundamental cualitativo 6D con gate >=5.0 + 15 ratios M1-M15 con alertas, (F2) cálculo financiero (VAN/TIR/YTM), (F3) valuación triangulada DCF+múltiplos+APV con WACC CAPM+riesgo país+size, (F4) sectorial score+benchmarks+industria, (F5+F6) CAPM/factores/riesgo/distribución + cobertura, (F7) renta fija ETTI si es bono, (F8) opciones BCBA si tiene cadena, (F9) quant pairs/stat-arb si aplica, (F10) ficha de decisión con MOS calibrado y notas de consistencia + (T) validación transversal determinística anti-alucinación. Para 'haceme el análisis completo de GGAL', 'analizá YPF completa', 'ficha coronar de AAPL', 'valuación integral de MELI'. Acepta ticker o nombre; si es .BA calibra a ARS con Fisher.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description: "Ticker o nombre del activo (ej. 'GGAL.BA','YPF','AAPL','MELI','AL30').",
+          },
+          incluirOpciones: {
+            type: "boolean",
+            description: "Si true incluye F8 cadena de opciones BCBA (default true si subyacente BCBA).",
+          },
+          incluirQuant: {
+            type: "boolean",
+            description: "Si true incluye F9 señales quant adicionales (default true).",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "validar_analisis",
+      description:
+        "VALIDACIÓN TRANSVERSAL T — Suite determinística pre-publicación (recicla validar.py): verifica coherencia del análisis completo antes de reportar al cliente. Checks: total declarado vs suma serie, mos coherente con score cualitativo, Deuda/EBITDA>4, PN<0, margen<0, capital trabajo<0, beta/WACC faltante, VIX/DXY desalineado, triangulación sin rango, semáforo técnico vs fundamental contradictorio sin advertencia. Para usar como gate final del pipeline F0-F10.",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description: "Ticker validado (ej. 'GGAL.BA').",
+          },
+          payload: {
+            type: "string",
+            description: "JSON string del resultado de analisis_completo a validar (opcional).",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
 ];
 
 export type EstadoHerramienta =
@@ -1856,6 +1948,10 @@ export function estadoDeHerramienta(name: string): EstadoHerramienta {
     case "predecir_direccion":
       return "portafolio";
     case "analizar_opciones":
+      return "valoracion";
+    case "analisis_completo":
+      return "valoracion";
+    case "validar_analisis":
       return "valoracion";
     default:
       return "searching";

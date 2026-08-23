@@ -413,6 +413,48 @@ async function bcraV4Ultimo(idVariable: number): Promise<number | null> {
   return null;
 }
 
+/** Token BCRA para estadisticasbcra.com y api.bcra.gob.ar v4 (reusa caucion.server.ts). */
+const BCRA_TOKEN_EST =
+  (typeof process !== "undefined" && (process.env["BCRA_TOKEN"] ?? process.env["BCRA_API_TOKEN"])) ||
+  "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE4MTg2NjM1OTYsInR5cGUiOiJleHRlcm5hbCIsInVzZXIiOiJib29zYW5kcjk3QGdtYWlsLmNvbSJ9.9K-OA06ViqIJdvLwUU_eBuuUBf-NQGy3BVkSSZNqikMoKKNkVnXkMsqDCmetVE3KrakLUiKTm6koOnEmdILdyA";
+
+async function estadisticasBcraUltimo(endpoint: string): Promise<number | null> {
+  try {
+    const res = await fetch(`https://api.estadisticasbcra.com/${endpoint}`, {
+      headers: { Authorization: `BEARER ${BCRA_TOKEN_EST}`, Accept: "application/json" },
+      signal: AbortSignal.timeout(7000),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as Array<{ d?: string; v?: number }>;
+    if (!Array.isArray(data) || !data.length) return null;
+    for (let i = data.length - 1; i >= 0; i--) {
+      const v = data[i]?.v;
+      if (typeof v === "number" && isFinite(v)) return v;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function estadisticasBcraSerie(endpoint: string, limit = 30): Promise<Array<{ fecha: string; valor: number }> | null> {
+  try {
+    const res = await fetch(`https://api.estadisticasbcra.com/${endpoint}`, {
+      headers: { Authorization: `BEARER ${BCRA_TOKEN_EST}`, Accept: "application/json" },
+      signal: AbortSignal.timeout(7000),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as Array<{ d?: string; v?: number }>;
+    if (!Array.isArray(data)) return null;
+    const slice = data.slice(-limit);
+    return slice
+      .filter((x) => typeof x.v === "number" && typeof x.d === "string")
+      .map((x) => ({ fecha: String(x.d), valor: x.v as number }));
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Panel MEP/CCL de CriptoYa: estructura anidada por ticker
  * ({ al30: { "24hs": { price } }, ... }) — se elige el ticker preferido
@@ -1376,6 +1418,16 @@ export interface ResultadoMacro {
   dolar_blue: { compra: number | null; venta: number | null } | null;
   dolar_mep: { compra: number | null; venta: number | null } | null;
   dolar_ccl: { compra: number | null; venta: number | null } | null;
+  // BCRA v4 ampliado — Parte 1 F0
+  base_monetaria: number | null;
+  reservas_internacionales: number | null;
+  circulacion_monetaria: number | null;
+  depositos_totales: number | null;
+  tasa_badlar: number | null;
+  tasa_tm20: number | null;
+  tasa_pases_1d: number | null;
+  m2_privado_variacion: number | null;
+  serie_tc_oficial: Array<{ fecha: string; valor: number }> | null;
   tasa_real_mensual_fisher: number | null;
   tasa_real_anual_fisher: number | null;
   spread_soberano: number | null;
@@ -1399,9 +1451,26 @@ export async function claContextoMacro(): Promise<ResultadoMacro> {
   };
 
   // BCRA v4 (la v3 fue deprecada): 27 = IPC mensual, 5 = TC mayorista, 12 = tasa pasiva.
-  macro.inflacion_mensual = await bcraV4Ultimo(27);
-  macro.tipo_cambio_oficial = await bcraV4Ultimo(5);
-  macro.tasa_pasiva = await bcraV4Ultimo(12);
+  const [ipcV4, tcV4, pasivaV4] = await Promise.all([bcraV4Ultimo(27), bcraV4Ultimo(5), bcraV4Ultimo(12)]);
+  macro.inflacion_mensual = ipcV4;
+  macro.tipo_cambio_oficial = tcV4;
+  macro.tasa_pasiva = pasivaV4;
+  // F0 ampliado — estadisticasbcra.com (reservas, base, circulante, TC oficial serie histórica)
+  const [baseMono, reservas, circulante, m2Var, badlarEst, tm20Est, pasesEst, usdOfSerie, usdOfLast] =
+    await Promise.all([
+      estadisticasBcraUltimo("base"),
+      estadisticasBcraUltimo("reservas"),
+      estadisticasBcraUltimo("circulacion_monetaria"),
+      estadisticasBcraUltimo("m2_privado_variacion_mensual"),
+      estadisticasBcraUltimo("tasa_badlar"),
+      estadisticasBcraUltimo("tasa_tm20"),
+      estadisticasBcraUltimo("tasa_pase_activas_1_dia"),
+      estadisticasBcraSerie("usd_of", 90),
+      estadisticasBcraUltimo("usd_of"),
+    ]);
+  const serieTcOficial = usdOfSerie;
+  // Si BCRA v4 TC falló, fallback a estadisticasbcra usd_of
+  if (macro.tipo_cambio_oficial == null && usdOfLast != null) macro.tipo_cambio_oficial = usdOfLast;
 
   const rpData = (await fetchJson(
     "https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais/ultimo",
@@ -1508,6 +1577,15 @@ export async function claContextoMacro(): Promise<ResultadoMacro> {
     dolar_blue: macro.dolar_blue,
     dolar_mep: macro.dolar_mep,
     dolar_ccl: macro.dolar_ccl,
+    base_monetaria: baseMono,
+    reservas_internacionales: reservas,
+    circulacion_monetaria: circulante,
+    depositos_totales: null,
+    tasa_badlar: badlarEst,
+    tasa_tm20: tm20Est,
+    tasa_pases_1d: pasesEst,
+    m2_privado_variacion: m2Var,
+    serie_tc_oficial: serieTcOficial,
     tasa_real_mensual_fisher: red(tasaRealMensual != null ? tasaRealMensual : null, 4),
     tasa_real_anual_fisher: red(tasaRealAnual != null ? tasaRealAnual : null, 4),
     spread_soberano: red(spreadSoberano != null ? spreadSoberano : null, 2),
@@ -2334,26 +2412,42 @@ export function textoFicha(r: ResultadoFicha): string {
 
 export function textoMacro(r: ResultadoMacro): string {
   const L: string[] = [];
-  L.push(`Contexto macro (${new Date(r.timestamp).toLocaleString("es-AR")}):`);
+  L.push(`Contexto macro F0 (${new Date(r.timestamp).toLocaleString("es-AR")}) — metodología Blanchard/Pérez-Enrri + Dornbusch + BCRA v4:`);
   L.push(`- Régimen: ${r.regimen_macro} (score ${r.score_macro})`);
   L.push(
     `- Inflación mensual: ${r.inflacion_mensual != null ? r.inflacion_mensual.toFixed(2) + "%" : "s/d"} · Riesgo país: ${r.riesgo_pais != null ? r.riesgo_pais.toFixed(0) + "bps" : "s/d"}`,
   );
   L.push(
-    `- Tasa pasiva BCRA: ${r.tasa_pasiva != null ? r.tasa_pasiva.toFixed(2) + "%" : "s/d"} · Tasa real Fisher (mensual): ${r.tasa_real_mensual_fisher != null ? r.tasa_real_mensual_fisher.toFixed(2) + "%" : "s/d"}`,
+    `- Tasa pasiva BCRA: ${r.tasa_pasiva != null ? r.tasa_pasiva.toFixed(2) + "%" : "s/d"} · Tasa real Fisher (mensual): ${r.tasa_real_mensual_fisher != null ? r.tasa_real_mensual_fisher.toFixed(2) + "%" : "s/d"} · Tasa real anual: ${r.tasa_real_anual_fisher != null ? r.tasa_real_anual_fisher.toFixed(2) + "%" : "s/d"}`,
   );
+  L.push(
+    `- Base monetaria: ${r.base_monetaria != null ? nf0.format(r.base_monetaria) + " MM ARS" : "s/d"} · Reservas: ${r.reservas_internacionales != null ? nf0.format(r.reservas_internacionales) + " MM USD" : "s/d"} · Circulación: ${r.circulacion_monetaria != null ? nf0.format(r.circulacion_monetaria) + " MM ARS" : "s/d"}`,
+  );
+  L.push(
+    `- M2 privado var.mensual: ${r.m2_privado_variacion != null ? r.m2_privado_variacion.toFixed(2) + "%" : "s/d"} · TC oficial BCRA: ${r.tipo_cambio_oficial != null ? "$" + r.tipo_cambio_oficial.toFixed(2) : "s/d"}`,
+  );
+  L.push(
+    `- BADLAR: ${r.tasa_badlar != null ? r.tasa_badlar.toFixed(2) + "%" : "s/d"} · TM20: ${r.tasa_tm20 != null ? r.tasa_tm20.toFixed(2) + "%" : "s/d"} · Pases 1d: ${r.tasa_pases_1d != null ? r.tasa_pases_1d.toFixed(2) + "%" : "s/d"}`,
+  );
+  if (r.serie_tc_oficial?.length) {
+    const ult = r.serie_tc_oficial[r.serie_tc_oficial.length - 1]!;
+    const ant = r.serie_tc_oficial[r.serie_tc_oficial.length - 2];
+    L.push(
+      `- Serie TC oficial (90d, estadisticasbcra.com): último ${ult.valor.toFixed(2)} al ${ult.fecha}${ant ? ` · var ${(((ult.valor / ant.valor) - 1) * 100).toFixed(2)}%` : ""}`,
+    );
+  }
   const dol = (label: string, v: { compra: number | null; venta: number | null } | null) =>
     `  - ${label}: ${v?.compra != null ? "$" + v.compra.toFixed(2) : "s/d"} / ${v?.venta != null ? "$" + v.venta.toFixed(2) : "s/d"}`;
-  L.push(`Dólares (compra/venta):`);
+  L.push(`Dólares (compra/venta, CriptoYa + ArgentinaDatos):`);
   L.push(dol("Oficial", r.dolar_oficial));
   L.push(dol("Blue", r.dolar_blue));
   L.push(dol("MEP", r.dolar_mep));
   L.push(dol("CCL", r.dolar_ccl));
   L.push(
-    `- Spread soberano implícito: ${r.spread_soberano != null ? r.spread_soberano.toFixed(2) : "s/d"} · Tasa libre local: ${r.tasa_libre_riesgo_local != null ? r.tasa_libre_riesgo_local.toFixed(2) + "%" : "s/d"}`,
+    `- Spread soberano implícito (TNX+RP): ${r.spread_soberano != null ? r.spread_soberano.toFixed(2) + "%" : "s/d"} · Tasa libre local: ${r.tasa_libre_riesgo_local != null ? r.tasa_libre_riesgo_local.toFixed(2) + "%" : "s/d"}`,
   );
   if (r.senal_regimen.length)
-    L.push(`\nSeñales de régimen:\n${r.senal_regimen.map((s) => `- ${s}`).join("\n")}`);
+    L.push(`\nSeñales de régimen F0:\n${r.senal_regimen.map((s) => `- ${s}`).join("\n")}`);
   return L.join("\n");
 }
 

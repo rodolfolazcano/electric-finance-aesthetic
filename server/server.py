@@ -260,6 +260,8 @@ def optimize_portfolio(ptype, mean_vec, vol_vec, mtx_cov, tickers):
 # ─── Contexto Macroeconómico (Capa 1) ─────────────────────────────────────────
 
 BCRA_HEADERS = {"Accept": "application/json", "User-Agent": "Mozilla/5.0"}
+BCRA_EST_TOKEN = os.getenv("BCRA_TOKEN") or "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE4MTg2NjM1OTYsInR5cGUiOiJleHRlcm5hbCIsInVzZXIiOiJib29zYW5kcjk3QGdtYWlsLmNvbSJ9.9K-OA06ViqIJdvLwUU_eBuuUBf-NQGy3BVkSSZNqikMoKKNkVnXkMsqDCmetVE3KrakLUiKTm6koOnEmdILdyA"
+BCRA_EST_HEADERS = {"Accept": "application/json", "User-Agent": "Mozilla/5.0", "Authorization": f"BEARER {BCRA_EST_TOKEN}"}
 
 def _bcra_ultimo_valor(url):
     try:
@@ -285,16 +287,57 @@ def _bcra_serie(url, dias=90):
         pass
     return []
 
+def _est_bcra_ultimo(endpoint):
+    try:
+        r = requests.get(f"https://api.estadisticasbcra.com/{endpoint}", headers=BCRA_EST_HEADERS, timeout=10)
+        if r.ok:
+            data = r.json()
+            if isinstance(data, list) and data:
+                # buscar último con v numérico
+                for item in reversed(data):
+                    v = item.get("v")
+                    if isinstance(v, (int, float)):
+                        return float(v)
+    except:
+        pass
+    return None
+
+def _est_bcra_serie(endpoint, dias=90):
+    try:
+        r = requests.get(f"https://api.estadisticasbcra.com/{endpoint}", headers=BCRA_EST_HEADERS, timeout=10)
+        if r.ok:
+            data = r.json()
+            if isinstance(data, list) and data:
+                slice_data = data[-dias:]
+                return [{"fecha": item.get("d"), "valor": float(item.get("v"))} for item in slice_data if isinstance(item.get("v"), (int, float))]
+    except:
+        pass
+    return []
+
 def get_macro_context():
     ctx = {"timestamp": datetime.now().isoformat()}
 
-    # ── BCRA / ArgentinaDatos ─────────────────────────────────────────────
+    # ── BCRA / ArgentinaDatos — F0 ampliado (BCRA v4 + estadisticasbcra.com) ──
     ctx["inflacion_mensual"] = _bcra_ultimo_valor(
         "https://api.bcra.gob.ar/estadisticas/v3.0/monetarias/variacionIPC")
     ctx["tipo_cambio_oficial"] = _bcra_ultimo_valor(
         "https://api.bcra.gob.ar/estadisticas/v3.0/monetarias/tipoCambioReferencia")
     ctx["tasa_pasiva"] = _bcra_ultimo_valor(
         "https://api.bcra.gob.ar/estadisticas/v3.0/monetarias/tasaPasivaBancaria")
+    # F0 faltantes — estadisticasbcra.com (sin límite diario BCRA v4)
+    ctx["base_monetaria"] = _est_bcra_ultimo("base")
+    ctx["reservas_internacionales"] = _est_bcra_ultimo("reservas")
+    ctx["circulacion_monetaria"] = _est_bcra_ultimo("circulacion_monetaria")
+    ctx["m2_privado_variacion"] = _est_bcra_ultimo("m2_privado_variacion_mensual")
+    ctx["tasa_badlar"] = _est_bcra_ultimo("tasa_badlar")
+    ctx["tasa_tm20"] = _est_bcra_ultimo("tasa_tm20")
+    ctx["tasa_pases_1d"] = _est_bcra_ultimo("tasa_pase_activas_1_dia")
+    ctx["serie_tc_oficial"] = _est_bcra_serie("usd_of", 90)
+    # Fallback TC oficial si BCRA v3 falló
+    if ctx["tipo_cambio_oficial"] is None:
+        fallback_tc = _est_bcra_ultimo("usd_of")
+        if fallback_tc is not None:
+            ctx["tipo_cambio_oficial"] = fallback_tc
     # Riesgo país vía ArgentinaDatos
     try:
         rp = requests.get("https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais/ultimo",

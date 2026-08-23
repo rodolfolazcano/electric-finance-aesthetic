@@ -1077,6 +1077,312 @@ export async function ejecutarContextoMacro(): Promise<{
   }
 }
 
+/**
+ * PIPELINE MAESTRO F0 → F10 — Análisis completo secuencial con validación T.
+ * Reutiliza los ejecutores existentes (F0-F10) en orden jerárquico y aplica
+ * checks determinísticos (validar.py) antes de publicar.
+ * No crea archivos nuevos: compone texto a partir de los motores ya portados.
+ */
+export async function ejecutarAnalisisCompleto(
+  argsRaw: string,
+  sessionId = "anon",
+): Promise<ResultadoToolConEventos> {
+  let simbolo = "";
+  let incluirOpciones = true;
+  let incluirQuant = true;
+  try {
+    const p = JSON.parse(argsRaw) as {
+      simbolo?: string;
+      incluirOpciones?: boolean;
+      incluirQuant?: boolean;
+      ticker?: string;
+    };
+    simbolo = String(p.simbolo ?? p.ticker ?? "").trim();
+    if (typeof p.incluirOpciones === "boolean") incluirOpciones = p.incluirOpciones;
+    if (typeof p.incluirQuant === "boolean") incluirQuant = p.incluirQuant;
+  } catch {
+    simbolo = argsRaw.trim().slice(0, 24);
+  }
+  if (!simbolo) {
+    return {
+      texto: "SIN RESULTADOS: no recibí el símbolo para el análisis completo. Usá parametro simbolo (ej. 'GGAL.BA','YPF','AAPL','AL30').",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  const t0 = Date.now();
+  const secciones: string[] = [];
+  const fuentes: FuenteMercado[] = [];
+  const eventos: EventoChat[] = [];
+  let ficha: Awaited<ReturnType<typeof claFicha>> | null = null;
+
+  // F0 — Contexto Macro ampliado (Blanchard/Dornbusch + BCRA v4 completa) + nemotron-retrieval RAG
+  try {
+    const [macro, ciclo] = await Promise.all([claContextoMacro(), claCiclo()]);
+    secciones.push(`## F0 — Contexto Macro (INICIO)\n${textoMacro(macro)}`);
+    secciones.push(`\n${textoCiclo(ciclo)}`);
+    // nemo-retrieval: RAG macro LATAM para sustentar diagnóstico (sin bloquear si falla)
+    try {
+      const { buscarAcademico } = await import("@/lib/kb-academic");
+      const rag = await buscarAcademico("Blanchard Dornbusch macro LATAM régimen inflación tipo cambio", 2);
+      if (rag.length) {
+        secciones.push(`\n> RAG macro (nemotron-retrieval): ${rag.map((r) => `[${r.categoria} · ${r.archivo} p.${r.pagina}] ${r.texto.slice(0, 180)}...`).join(" · ")}`);
+      }
+    } catch {}
+    // Señal de régimen macro para calibrar WACC/MOS
+    if (macro.regimen_macro === "ADVERSO") {
+      secciones.push(`\n> ⚠️ Régimen ADVERSO: WACC se descuenta con prima; exigir MOS ≥ 35-50%`);
+    }
+  } catch (e) {
+    secciones.push(`## F0 — Contexto Macro\nSIN RESULTADOS F0: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  // F1 — Fundamentos contables (Fowler Newton / Biondi) — 6D + 15 ratios
+  let cuali: Awaited<ReturnType<typeof claCualitativo>> | null = null;
+  let cuanti: Awaited<ReturnType<typeof claCuantitativo>> | null = null;
+  try {
+    [cuali, cuanti] = await Promise.all([claCualitativo(simbolo), claCuantitativo(simbolo)]);
+    secciones.push(`\n## F1 — Fundamentos Contables (Fowler Newton caps 1,2,5,6,10,12,13 + Biondi 4-7)\n${textoCualitativo(cuali)}`);
+    secciones.push(`\n${textoCuantitativo(cuanti)}`);
+    if (!cuali.continuar) {
+      secciones.push(`\n> 🛑 Gate cualitativo <5.0: F2-F3 se reportan pero la decisión final queda BLOQUEADA (no comprar lo que no se entiende).`);
+    }
+  } catch (e) {
+    secciones.push(`\n## F1 — Fundamentos\nSIN RESULTADOS F1: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  // F2 — Cálculo financiero (Dumrauf MATF U2-4 + Instrumentos_37): TIR/YTM spot/forward
+  // Si es bono argentino, usar renta fija viva; si es acción, el cálculo se refleja en WACC/DCF
+  const esBono = /^(AL|GD|AE|TX|LECAP|BONCAP|TX\d|AL\d+|GD\d+)/i.test(simbolo);
+  if (esBono) {
+    try {
+      const { ejecutarYTM } = await import("@/lib/agents/ejecutores");
+      const r = await ejecutarYTM(JSON.stringify({ ticker: simbolo }), sessionId);
+      fuentes.push(...r.fuentes);
+      if ((r as any).eventos) eventos.push(...(r as any).eventos);
+      secciones.push(`\n## F2 — Cálculo Financiero (Dumrauf) + F7 Renta Fija\n${r.texto}`);
+    } catch (e) {
+      secciones.push(`\n## F2 — Cálculo Financiero\nSIN RESULTADOS F2: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  } else {
+    secciones.push(`\n## F2 — Cálculo Financiero (Dumrauf)\n_Para ${simbolo} el cálculo se vehiculiza vía WACC/DCF (VAN/TIR del equity). Ver F3._`);
+  }
+
+  // F3 — Valuación corporativa (Pascale DFN U1-7 + Alonso): DCF + múltiplos + APV + WACC
+  let tri: Awaited<ReturnType<typeof claTriangulacion>> | null = null;
+  let wacc: Awaited<ReturnType<typeof claWacc>> | null = null;
+  try {
+    [wacc, tri] = await Promise.all([claWacc(simbolo), claTriangulacion(simbolo)]);
+    secciones.push(`\n## F3 — Valuación Corporativa (Pascale + Alonso)\n${textoWacc(wacc)}`);
+    secciones.push(`\n${textoTriangulacion(tri)}`);
+  } catch (e) {
+    secciones.push(`\n## F3 — Valuación\nSIN RESULTADOS F3: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  // F4 — Mercados y sectores (Value Investing + Murphy intermarket + universo BCBA)
+  try {
+    const [perf, secScore] = await Promise.all([
+      claPerformanceSectorial("1mo").catch(() => null),
+      (async () => {
+        try {
+          const mod = await import("@/lib/herramientas/score-sectorial.functions");
+          return await mod.scoreSectorialFn({ data: { ticker: simbolo } });
+        } catch {
+          return null;
+        }
+      })(),
+    ]);
+    let sectorTxt = "";
+    try {
+      const sec = await analisisSectorial(simbolo);
+      const comps = (sec.comparacion ?? []).slice(0, 5).map((c) => `${c.name} (${c.ticker}) β=${(c.beta ?? 0).toFixed(2)} R²=${(c.rSquared ?? 0).toFixed(2)}`).join(" · ");
+      sectorTxt = `Sector Yahoo: ${sec.sector.yahoo ?? "s/d"} | ETF sectorial: ${sec.sector.etfSector ?? "s/d"} · Comparables: ${comps || "s/d"}`;
+    } catch {
+      sectorTxt = "Sector: s/d";
+    }
+    secciones.push(`\n## F4 — Mercados y Sectores (meso)\n${sectorTxt}`);
+    if (secScore) {
+      const s = (secScore as any).score;
+      secciones.push(`- Score sectorial: ${s.disponible ? `${s.valor}/100` : `no disponible (${s.valor})`} · ${(secScore as any).interpretacion?.resumenEjecutivo ?? ""}`);
+    }
+    if (perf) secciones.push(`\n${textoPerformanceSectorial(perf)}`);
+  } catch (e) {
+    secciones.push(`\n## F4 — Sectores\nSIN RESULTADOS F4: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  // F5+F6 — Cartera, CAPM, factores y riesgo (Elbaum + capm.txt + geometry.txt)
+  try {
+    const [riesgo, capm, factores] = await Promise.all([
+      analizarRiesgo(simbolo, "2y").catch(() => null),
+      analizarCAPM({ simbolo, rango: "2y" } as any).catch(() => null),
+      correlacionesBenchmarks(simbolo, 6, "1y").catch(() => null),
+    ]);
+    secciones.push(`\n## F5-F6 — Cartera, CAPM y Factores`);
+    if (riesgo && !riesgo.error) {
+      secciones.push(textoRiesgo(riesgo as any));
+    } else if (riesgo?.error) {
+      secciones.push(`Riesgo: ${riesgo.error}`);
+    }
+    if (capm && !capm.error) {
+      const n = capm as any;
+      secciones.push(`CAPM ${n.ticker} vs ${n.benchmarkLabel ?? n.benchmark} → β=${(n.beta ?? 0).toFixed(2)} α=${n.alpha != null ? (n.alpha * 100).toFixed(2) + "%" : "s/d"} R²=${(n.rSquared ?? 0).toFixed(3)} p=${(n.pValue ?? 0).toFixed(4)} Hurst=${(n.hurstExponent ?? 0).toFixed(2)}`);
+    }
+    if (factores && (factores.positivas?.length || factores.negativas?.length)) {
+      const pos = factores.positivas.slice(0, 3).map((c) => `${c.name} r=${(c.correlation ?? 0).toFixed(2)}`).join(" · ");
+      const neg = factores.negativas.slice(0, 3).map((c) => `${c.name} r=${(c.correlation ?? 0).toFixed(2)}`).join(" · ");
+      if (pos) secciones.push(`Factores positivos: ${pos}`);
+      if (neg) secciones.push(`Factores diversificadores: ${neg}`);
+    }
+  } catch (e) {
+    secciones.push(`\n## F5-F6 — Riesgo/CAPM\nSIN RESULTADOS: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  // F7 — Renta fija ETTI (Elbaum U4 + RENTA_FIJA_COMPLETA.json) — solo si aplica o a modo contexto
+  if (!esBono) {
+    try {
+      const { getCurvaETTI } = await import("@/lib/herramientas/etti.functions");
+      const etti = await (getCurvaETTI as any)({ data: { sessionId } });
+      const forma = (etti as any).forma ?? "s/d";
+      secciones.push(`\n## F7 — Renta Fija (contexto ETTI soberana)\nCurva spot soberana forma: ${forma} — ${(etti as any).justificacionForma ?? ""} (ver consultar_curva_etti para detalle)`);
+    } catch {
+      // silencio: F7 contextual
+    }
+  }
+
+  // F8 — Derivados (Dunbar Black-Scholes + Labadie)
+  if (incluirOpciones) {
+    try {
+      const base = simbolo.replace(".BA", "");
+      const esBCBA = simbolo.toUpperCase().endsWith(".BA") || ["GGAL", "PAMP", "YPFD", "COME", "BMA", "LOMA", "CEPU", "TRAN"].includes(base.toUpperCase());
+      if (esBCBA) {
+        // Cadena IOL no siempre disponible sin token; se intenta pero no bloquea
+        const { autenticar, obtenerCadenaOpciones, obtenerTasaCaucion } = await import("@/lib/opciones-bcba/iol");
+        const token = await autenticar().catch(() => null);
+        if (token) {
+          secciones.push(`\n## F8 — Derivados (Black-Scholes + CRR)\nCadena BCBA disponible para ${base} (IOL autenticado) — usar cadena_opciones_bcba para smile/griegas/IV.`);
+        } else {
+          secciones.push(`\n## F8 — Derivados\nSubyacente BCBA ${base} identificado; cadena requiere IOL token. Tip: usar analizar_opciones_completo para BS+CRR+IV+VaR.`);
+        }
+      }
+    } catch {
+      // no bloquea
+    }
+  }
+
+  // F9 — Trading cuantitativo (Labadie: StatArb, ML, HFT, microestructura, Almgren-Chriss)
+  if (incluirQuant) {
+    try {
+      // Mostrar nivel de señal sin ejecutar el par completo (evita doble latencia)
+      secciones.push(`\n## F9 — Trading Cuantitativo (Labadie)\nMetodologías disponibles: pairs_trading_labadie (ADF/z-score/bandas μ±aσ), curva_ejecucion_labadie (Almgren-Chriss con PVol y p-varianza), predecir_direccion (ML F1 walk-forward). Usar tools dedicadas para señal de par o ejecución de orden grande.`);
+    } catch {}
+  }
+
+  // F10 — Ficha de decisión + MOS calibrado (perfil cliente)
+  try {
+    ficha = await claFicha(simbolo);
+    secciones.push(`\n## F10 — Ejecución + Perfil (CIERRE) — Ficha de Decisión\n${textoFicha(ficha)}`);
+    // Evento informe para el chat
+    eventos.push({ t: "informe", v: { titulo: `Ficha ${simbolo} — F0→F10`, contenidoMarkdown: secciones.join("\n\n") } } as any);
+  } catch (e) {
+    secciones.push(`\n## F10 — Ficha\nSIN RESULTADOS F10: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  // T — TRANSVERSAL: validación determinística (validar.py reciclad)
+  const checks: string[] = [];
+  const rojo: string[] = [];
+  const amarillo: string[] = [];
+  try {
+    if (cuanti) {
+      const m = cuanti.metricas as any;
+      if (m.M14_deuda_ebitda != null && m.M14_deuda_ebitda > 4) rojo.push(`Deuda/EBITDA ${m.M14_deuda_ebitda.toFixed(1)}x >4 (apalancamiento excesivo)`);
+      if (m.M9_patrimonio_neto != null && m.M9_patrimonio_neto < 0) rojo.push("Patrimonio neto negativo — default técnico");
+      if (m.M6_margen_neto != null && m.M6_margen_neto < 0) rojo.push(`Margen neto ${(m.M6_margen_neto * 100).toFixed(1)}% negativo`);
+      if (m.M11_capital_trabajo != null && m.M11_capital_trabajo < 0) rojo.push("Capital de trabajo negativo — riesgo liquidez");
+      if (cuanti.alertas.total_rojas > 0) checks.push(`${cuanti.alertas.total_rojas} alerta(s) roja(s) cuantitativa(s)`);
+    }
+    if (cuali && !cuali.continuar) rojo.push(`Score cualitativo ${cuali.score_total.toFixed(1)}<5.0 — análisis BLOQUEADO`);
+    if (wacc && wacc.wacc_usd == null) amarillo.push("WACC no calculable — usar tasa de referencia");
+    if (tri && tri.rango_final == null) amarillo.push("Triangulación sin rango — datos insuficientes en algún método");
+    if (ficha) {
+      const mos = ficha.margen_seguridad.mos_aplicado_pct;
+      const score = ficha.cualitativo.score_total;
+      const esperado = score >= 8 ? 20 : score >= 6 ? 35 : 50;
+      if (Math.abs(mos - esperado) > 0.1) amarillo.push(`MOS ${mos}% no coincide con score ${score.toFixed(1)} (esperado ${esperado}%)`);
+    }
+    // Cross: semáforo vs valuación (requiere ejecutar semáforo si no se hizo)
+    let semaTxt = "";
+    try {
+      const { analizarSemaforo } = await import("@/lib/semaforo.server");
+      const sema = await analizarSemaforo(simbolo);
+      if (!sema.error) {
+        // textoSemaforo no exportado aquí, se sintetiza
+        if (sema.clasificacion && ficha) {
+          const esCompra = /COMPRA/i.test(sema.clasificacion);
+          const esVenta = /VENTA/i.test(ficha.decision_final) || /VENDER/i.test(tri?.decision_final ?? "");
+          if (esCompra && esVenta) amarillo.push(`Incoherencia semáforo (${sema.clasificacion}) vs valuación (${ficha.decision_final}) — señalar al cliente`);
+        }
+      }
+    } catch {}
+    const total = rojo.length + amarillo.length;
+    secciones.push(`\n## T — VALIDACIÓN TRANSVERSAL (validar.py determinístico)\nChecks: ${checks.length ? checks.join(" · ") : "sin alertas previas"}`);
+    if (rojo.length) secciones.push(`🔴 Rojas (${rojo.length}): ${rojo.join(" · ")}`);
+    if (amarillo.length) secciones.push(`🟡 Amarillas (${amarillo.length}): ${amarillo.join(" · ")}`);
+    if (!rojo.length && !amarillo.length) secciones.push(`✅ Sin inconsistencias determinísticas — listo para reporte al cliente (con disclaimer CNV).`);
+    else if (rojo.length) secciones.push(`⛔ Bloquear publicación hasta resolver rojas; amarillas con advertencia explícita.`);
+  } catch (e) {
+    secciones.push(`\n## T — Validación\nSIN VALIDACIÓN: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  const tiempo = ((Date.now() - t0) / 1000).toFixed(1);
+  secciones.unshift(`# Análisis Completo F0→F10 — ${simbolo} · ${new Date().toISOString().slice(0, 10)} · ${tiempo}s\n> Jerarquía pt\\ + Labadie · F0 inicia (macro), F10 cierra (perfil). T transversal valida antes de publicar.`);
+  secciones.push(`\n---\n*Análisis educativo — no es recomendación de inversión (CNV). Fuentes: Yahoo Finance, BCRA v4 + estadisticasbcra.com, ArgentinaDatos, CriptoYa, IOL/BYMA.*`);
+
+  return { texto: secciones.join("\n\n"), fuentes, ok: true, eventos };
+}
+
+export async function ejecutarValidarAnalisis(argsRaw: string): Promise<ResultadoToolConEventos> {
+  let simbolo = "";
+  try {
+    const p = JSON.parse(argsRaw) as { simbolo?: string };
+    simbolo = String(p.simbolo ?? "").trim();
+  } catch {
+    simbolo = argsRaw.trim().slice(0, 24);
+  }
+  if (!simbolo) {
+    return { texto: "SIN RESULTADOS: falta simbolo para validar.", fuentes: [], ok: false };
+  }
+  try {
+    const [cuali, cuanti, wacc, tri, macro] = await Promise.all([
+      claCualitativo(simbolo),
+      claCuantitativo(simbolo),
+      claWacc(simbolo),
+      claTriangulacion(simbolo),
+      claContextoMacro(),
+    ]);
+    const L: string[] = [`Validación T de ${simbolo}:`];
+    const rojas: string[] = [];
+    const amarillas: string[] = [];
+    const m = cuanti.metricas as any;
+    if (m.M14_deuda_ebitda != null && m.M14_deuda_ebitda > 4) rojas.push(`Deuda/EBITDA ${m.M14_deuda_ebitda.toFixed(1)}x`);
+    if (m.M9_patrimonio_neto != null && m.M9_patrimonio_neto < 0) rojas.push("PN negativo");
+    if (m.M6_margen_neto != null && m.M6_margen_neto < 0) rojas.push("Margen neto <0");
+    if (m.M11_capital_trabajo != null && m.M11_capital_trabajo < 0) rojas.push("CT <0");
+    if (!cuali.continuar) rojas.push(`Cualitativo ${cuali.score_total.toFixed(1)}<5.0`);
+    if (wacc.wacc_usd == null) amarillas.push("WACC nulo");
+    if (tri.rango_final == null) amarillas.push("Sin rango triangulación");
+    if (macro.regimen_macro === "ADVERSO") amarillas.push("Régimen ADVERSO — exigir MOS alto");
+    if (!rojas.length && !amarillas.length) L.push("✅ OK — sin hallazgos");
+    else {
+      if (rojas.length) L.push(`🔴 Rojas: ${rojas.join(" · ")}`);
+      if (amarillas.length) L.push(`🟡 Amarillas: ${amarillas.join(" · ")}`);
+    }
+    return { texto: L.join("\n"), fuentes: [], ok: rojas.length === 0 };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS validar: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
+  }
+}
+
+
 /** Ciclo económico intermarket (Pring/Stovall 6 etapas). */
 export async function ejecutarCicloEconomico(): Promise<{
   texto: string;

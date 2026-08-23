@@ -329,6 +329,58 @@ function interpretarDuPont(r: RazonesPeriodo): string[] {
   ];
 }
 
+//  Ajuste por inflación (Fowler Newton / Biondi — moneda homogénea)
+// Convierte valores corrientes a moneda constante usando factor IPC.
+// factor = IPC_hoy / IPC_periodo  (>1 si hubo inflación). Para ARS, usar inflación oficial de ArgentinaDatos;
+// para USD, factor 1. Se aplica solo a magnitudes monetarias, no a ratios.
+export interface IndiceInflacion { fecha: string; indice: number }
+
+export function factorInflacionario(fechaPeriodo: string, serieIPC: IndiceInflacion[], fechaHoy?: string): number | null {
+  if (!serieIPC.length) return null;
+  const dPeriodo = new Date(fechaPeriodo).toISOString().slice(0, 10);
+  const dHoy = fechaHoy ? new Date(fechaHoy).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+  const ipcPeriodo = serieIPC.find((x) => x.fecha.slice(0, 10) === dPeriodo)?.indice
+    ?? serieIPC.filter((x) => x.fecha <= dPeriodo).slice(-1)[0]?.indice;
+  const ipcHoy = serieIPC.find((x) => x.fecha.slice(0, 10) === dHoy)?.indice
+    ?? serieIPC.slice(-1)[0]?.indice;
+  if (ipcPeriodo == null || ipcHoy == null || ipcPeriodo <= 0) return null;
+  return ipcHoy / ipcPeriodo;
+}
+
+export function ajustarPeriodoPorInflacion(
+  p: PeriodoHistoricoRow,
+  factor: number,
+): PeriodoHistoricoRow {
+  if (!isFinite(factor) || factor <= 0) return p;
+  const moneyFields: Array<keyof PeriodoHistoricoRow> = [
+    "revenue","netIncome","totalAssets","totalLiabilities","totalEquity","currentAssets","currentLiabilities","inventory","netReceivables","netFixedAssets","cash","totalDebt","cashFromOps","capex","fcf",
+  ];
+  const q: PeriodoHistoricoRow = { ...p };
+  for (const k of moneyFields) {
+    const v = (p as any)[k];
+    if (typeof v === "number" && isFinite(v)) (q as any)[k] = v * factor;
+  }
+  return q;
+}
+
+export function calcularRazonesReales(
+  result: FundamentalAFResult,
+  historico: PeriodoHistoricoRow[],
+  serieIPC: IndiceInflacion[],
+): { nominal: RazonesFinancierasResult; real: RazonesFinancierasResult | null; factorUsado: number | null } {
+  const nominal = calcularRazonesFinancieras(result, historico);
+  if (!serieIPC.length || !historico.length) return { nominal, real: null, factorUsado: null };
+  const ultimoFecha = historico[0]?.endDate ?? new Date().toISOString().slice(0,10);
+  const f = factorInflacionario(ultimoFecha, serieIPC);
+  if (f == null || Math.abs(f - 1) < 0.001) return { nominal, real: null, factorUsado: f };
+  const historicoReal = historico.map((p) => {
+    const fp = factorInflacionario(p.endDate, serieIPC);
+    return fp != null ? ajustarPeriodoPorInflacion(p, fp) : p;
+  });
+  const real = calcularRazonesFinancieras(result, historicoReal);
+  return { nominal, real, factorUsado: f };
+}
+
 //  Resultado completo 
 
 export function calcularRazonesFinancieras(

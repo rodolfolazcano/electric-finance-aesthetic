@@ -420,6 +420,7 @@ function tipoFci(raw: string): { tipo: string; etiqueta: string; resto: string }
     { tipo: "rentaVariable", etiqueta: "renta variable", pat: /renta variable|rv|fci de accion/ },
     { tipo: "rentaFija", etiqueta: "renta fija", pat: /renta fija|rf|fci de bono/ },
     { tipo: "rentaMixta", etiqueta: "renta mixta", pat: /renta mixta|mixta/ },
+    { tipo: "otros", etiqueta: "otros / infraestructura / pymes", pat: /otros|infraestructura|pyme|pymes/ },
     {
       tipo: "mercadoDinero",
       etiqueta: "money market / mercado de dinero",
@@ -431,6 +432,10 @@ function tipoFci(raw: string): { tipo: string; etiqueta: string; resto: string }
       const resto = raw.replace(s.pat, "").trim();
       return { tipo: s.tipo, etiqueta: s.etiqueta, resto };
     }
+  }
+  // heurística FCI×5: si pide "todos" o "comparador", devolver mercadoDinero como default pero dejar etiqueta genérica
+  if (/todos|comparador|fci.*todos|fondos.*todos/.test(raw)) {
+    return { tipo: "mercadoDinero", etiqueta: "money market (comparador FCI×5: mercadoDinero/rentaFija/rentaMixta/rentaVariable/otros)", resto: "" };
   }
   return { tipo: "mercadoDinero", etiqueta: "money market / mercado de dinero", resto: raw };
 }
@@ -563,10 +568,32 @@ export async function consultarMercado(
     return consultarTasasBcra(raw);
   }
   if (
-    /(fondo|fci|money market|mercado de dinero|renta variable|renta fija|renta mixta)/.test(raw)
+    /(fondo|fci|money market|mercado de dinero|renta variable|renta fija|renta mixta|otros)/.test(raw)
   ) {
+    // Si pide comparador/comparación, traer los 5 tipos en paralelo (ArgentinaDatos FCI×5)
+    if (/comparador|todos|fci.*todos|comparar.*fci/.test(raw)) {
+      const tipos = ["mercadoDinero","rentaFija","rentaMixta","rentaVariable","otros"] as const;
+      const resultados = await Promise.all(tipos.map((t) => fci(t)));
+      const textos = resultados.map((r) => r.texto).filter(Boolean);
+      const fuentes = resultados.flatMap((r) => r.fuentes);
+      // deduplicar fuentes
+      const uniq = Array.from(new Map(fuentes.map((f) => [f.url, f])).values());
+      return { texto: textos.join("\n\n"), fuentes: uniq };
+    }
     return fci(raw);
   }
   if (/(euro|eur|real|brl|libra|gbp|yen|jpy|yuan|cny)/.test(raw)) return moneda(raw);
+  if (/(cpd|cheque.*pago.*diferido|subasta.*cpd)/.test(raw)) {
+    return {
+      texto: `Operatoria CPD (Cheques de Pago Diferido) — requiere sesión IOL activa. Usá iol_operar con accion "cpd_subastas" para listado, "cpd_comisiones" para simular y "cpd_operar" (con confirmar:true) para ejecutar. Filtros: estado/segmento. Fuente: IOL API v2.`,
+      fuentes: [{ dominio: "api.invertironline.com", url: "https://api.invertironline.com", title: "IOL API" }],
+    };
+  }
+  if (/(suscripci[óo]n.*fci|rescate.*fci|fci.*suscri|fci.*rescat)/.test(raw)) {
+    return {
+      texto: `Operatoria FCI — requiere sesión IOL activa. Usá iol_operar con accion "suscripcion_fci" o "rescate_fci" (soloValidar=true para simular, confirmar:true para ejecutar). Fuente: IOL API.`,
+      fuentes: [{ dominio: "api.invertironline.com", url: "https://api.invertironline.com", title: "IOL API" }],
+    };
+  }
   return { texto: "", fuentes: [] };
 }

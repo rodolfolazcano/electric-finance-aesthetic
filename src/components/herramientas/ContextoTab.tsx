@@ -276,26 +276,12 @@ export function ContextoTab() {
         <div aria-hidden className="electric-line mt-6 max-w-3xl" />
       </div>
 
-      <Tabs defaultValue="mercado" className="w-full">
+      <Tabs defaultValue="tendencias" className="w-full">
         <TabsList className="flex flex-wrap h-auto gap-1 p-1 bg-muted/20 rounded-lg w-full justify-start">
-          <TabsTrigger value="mercado" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"><Globe2 className="h-4 w-4 mr-1.5" />Mercado Hoy</TabsTrigger>
-          <TabsTrigger value="divisas" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"><DollarSign className="h-4 w-4 mr-1.5" />Divisas y Tasas</TabsTrigger>
           <TabsTrigger value="tendencias" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"><TrendingUp className="h-4 w-4 mr-1.5" />Tendencias</TabsTrigger>
           <TabsTrigger value="performance" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary"><BarChart3 className="h-4 w-4 mr-1.5" />Sectores</TabsTrigger>
           <TabsTrigger value="noticias" className="text-[14px] px-4 py-2 rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Noticias</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="mercado" className="mt-4 space-y-6 w-full">
-          <div className="grid w-full gap-6 lg:grid-cols-2 w-full">
-            <MacroCard />
-            <CicloBanner />
-          </div>
-          <PerformanceSectorial />
-        </TabsContent>
-
-        <TabsContent value="divisas" className="mt-4 w-full">
-          <DivisasTasasPanel />
-        </TabsContent>
 
         <TabsContent value="tendencias" className="mt-4 w-full">
           <TendenciasMacroPanel />

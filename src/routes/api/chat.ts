@@ -8,6 +8,7 @@ import {
   type Msg,
   type ApiMsg,
 } from "@/lib/agents/orquestador";
+import { esTareaAutonoma, orquestarTurnoAutonomo } from "@/lib/agents/autonomo";
 import { MemoriaDeSesion } from "@/lib/agents/memory";
 import { esAcademico, type ResultadoConocimiento } from "@/lib/agents/ejecutores";
 import { NVIDIA_API_KEY } from "@/lib/agents/nvidia-key";
@@ -162,6 +163,15 @@ Tenés acceso directo a estas fuentes y capacidades; sugerilas al usuario cuando
  - **MOTOR UNIFICADO CORONAR (señales 4 capas)**: generar_senal_unificada(simbolo) y generar_senales_unificadas(simbolos[], topN) — orquestación estricta Intermarket (Pring 6 etapas + macro, corpus pt Blanchard/Pascale) → Fundamental (gate cualitativo 5.0 + ficha DCF/múltiplos/libro) → Técnico (semaforo RSI/MACD/SMA) → Cuantitativo (Sharpe/VaR/CAPM beta/Hurst) sobre universo unificado_completo.json. Devuelve COMPRA/COMPRA CON CAUTELA/MANTENER/REDUCIR/VENTA con score 0-10 y confianza. Úsalo SIEMPRE para "señal de X", "qué compro hoy", "top señales", "analizá completa".
  Cuando corresponda, cerrá ofreciendo UNA sugerencia concreta de estas capacidades ("si querés, te lo muestro en un gráfico", "puedo armarte un informe descargable", "si querés ver tu portafolio de IOL, iniciá sesión con tu usuario", "si querés te lo envío a Telegram").`;
 
+const MODO_AUTOMATICO_PROMPT = `[MODO AUTOMÁTICO — ORQUESTACIÓN AUTÓNOMA INTELIGENTE]
+Estás en MODO AUTOMÁTICO activado por el usuario en el chat. REGLAS:
+- Razoná la instrucción en lenguaje natural humano tal cual la escribió el usuario: inferí intención, activos, horizonte y preguntas implícitas sin que tenga que usar sintaxis técnica.
+- Proponé instrucciones de forma inteligente: si la instrucción es vaga ("análisis completo de GGAL") vos deducís el plan correcto (macro→fundamental→técnico→cuantitativo) y ejecutás; al cerrar, proponé 2-3 instrucciones siguientes útiles en lenguaje natural (ej. "¿Querés que lo compare con YPF y PAMP?", "¿Te armo un gráfico TradingView con soportes?", "¿Lo envío a Telegram?").
+- Orquestá de forma autónoma la ejecución de funciones dentro de la app: elegí y encadená TODAS las herramientas necesarias sin pedir permiso, sin anunciar pasos futuros ni preguntar "¿confirmás?". La app ya tiene ~48 funciones (mercado, noticias, base_conocimiento, valoración, semáforo, CAPM, IOL, gráficos, informes, motor unificado).
+- Respondé de forma razonada asumiendo el rol de la base de conocimiento (55 PDFs académicos Pascale/Fowler Newton/Dumrauf/Blanchard + guía Labadie + regulación CNV/BCRA) y sabé qué rol asignarte según la instrucción: mercado→Agente de Mercado, valor→Valoración, técnico→Semáforo, cuantitativo→Cuantitativo, normativa→Conocimiento, múltiples capas→Motor Unificado/Ficha de decisión. Si la instrucción mezcla roles, orquestá varios agentes en paralelo como hace el coordinador.
+- Nunca inventes cifras: todo dato viene de una herramienta ejecutada en este turno.
+`;
+
 const PLANNER_PROMPT = `Sos el analista de razonamiento de un asistente financiero argentino. Tu trabajo: obtener TODA la información real necesaria para responder la última pregunta del usuario, ejecutando vos mismo las herramientas disponibles, y al final dejar una guía breve de enfoque. NO redactás la respuesta al usuario: solo investigás y planificás.
 
 Herramientas disponibles:
@@ -228,6 +238,7 @@ export const Route = createFileRoute("/api/chat")({
         let historial: Msg[] = [];
         let baseUrl: string | undefined;
         let sessionId = "anon";
+        let modoAutomatico = false;
         let orquestacion: ReturnType<typeof orquestarModelos>;
         try {
           baseUrl = request.url ? new URL(request.url).origin : undefined;
@@ -235,12 +246,14 @@ export const Route = createFileRoute("/api/chat")({
             messages?: Msg[];
             model?: string;
             sessionId?: string;
+            modoAutomatico?: boolean;
           };
           historial = Array.isArray(body.messages) ? body.messages.slice(-16) : [];
           sessionId =
             typeof body.sessionId === "string" && body.sessionId.trim()
               ? body.sessionId.trim().slice(0, 80)
               : "anon";
+          modoAutomatico = Boolean(body.modoAutomatico);
           orquestacion = orquestarModelos(body.model);
         } catch {
           return new Response("Solicitud inválida.", { status: 400 });
@@ -312,9 +325,11 @@ export const Route = createFileRoute("/api/chat")({
 
             let resultado: Awaited<ReturnType<typeof orquestarTurno>>;
             try {
-              recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "start", payload: { pregunta: pregunta.slice(0, 80), hint } });
+              recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "start", payload: { pregunta: pregunta.slice(0, 80), hint, modoAutomatico } });
               const t0 = Date.now();
-              resultado = await orquestarTurno({
+              const effectiveSystemPrompt = modoAutomatico ? `${SYSTEM_PROMPT}\n\n${MODO_AUTOMATICO_PROMPT}` : SYSTEM_PROMPT;
+              const effectivePlannerPrompt = modoAutomatico ? `${MODO_AUTOMATICO_PROMPT}\n\n${PLANNER_PROMPT}` : PLANNER_PROMPT;
+              const optsTurno = {
                 pregunta,
                 historial,
                 memoria,
@@ -322,12 +337,20 @@ export const Route = createFileRoute("/api/chat")({
                 apiKey: NVIDIA_API_KEY,
                 baseUrl,
                 enviar: send,
-                systemPrompt: SYSTEM_PROMPT,
-                plannerPrompt: PLANNER_PROMPT,
+                systemPrompt: effectiveSystemPrompt,
+                plannerPrompt: effectivePlannerPrompt,
                 siteContext: SITE_CONTEXT,
                 sessionId,
                 ...(ragMsg ? { ragMsg } : {}),
-              });
+              };
+              // Modo Automático del chat: cuando el toggle está activo, SIEMPRE usa orquestación autónoma
+              // (razona la instrucción natural, propone instrucciones, asigna rol y orquesta funciones).
+              // Si está desactivado, solo activa autónomo para tareas que lo piden explícitamente ("análisis completo").
+              const usarAutonomo = modoAutomatico || esTareaAutonoma(pregunta);
+              if (usarAutonomo) send({ t: "status", v: "autonomo", q: modoAutomatico ? "Modo Automático: orquestación autónoma activa" : "Análisis completo detectado" });
+              resultado = usarAutonomo
+                ? await orquestarTurnoAutonomo(optsTurno)
+                : await orquestarTurno(optsTurno);
               recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "success", durationMs: Date.now() - t0 });
             } catch (err) {
               console.error("chat error", err);

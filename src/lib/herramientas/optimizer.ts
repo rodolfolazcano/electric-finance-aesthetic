@@ -222,7 +222,9 @@ export type Strategy =
   | "inverse-vol"
   | "markowitz"
   | "min-pvar"
-  | "max-psharpe";
+  | "max-psharpe"
+  | "mean-cvar"
+  | "min-cvar";
 
 // Factor de anualización y tasa libre de riesgo
 const FACTOR = 252;
@@ -352,6 +354,48 @@ export function optimize(strategy: Strategy, inp: Inputs): OptimizationResult {
         },
         n,
         { iters: 1000, lr: 0.5 },
+      );
+    }
+  } else if (strategy === "mean-cvar" || strategy === "min-cvar") {
+    // portfolio-optimization: Mean-CVaR (Rockafellar & Uryasev) vía PGD sobre histórico
+    // SOCP en cuOpt; acá aproximación GPU-free con histórico (cudf para ETL masivo en producción)
+    const alpha = 0.95;
+    const rets = inp.returnsRows;
+    const target = inp.targetReturn ?? mean(inp.meanDaily);
+    if (!rets || rets.length < 30) {
+      w = new Array(n).fill(1 / n);
+    } else {
+      const T = rets.length;
+      const k = Math.max(1, Math.floor(T * (1 - alpha)));
+      w = pgd(
+        (x) => {
+          const port = rets.map((row) => dot(x, row));
+          const sorted = [...port].sort((a, b) => a - b);
+          const varIdx = k;
+          const varThresh = sorted[varIdx] ?? sorted[0];
+          // CVaR = - mean de los k peores (pérdidas)
+          // grad ≈ - mean de grads de los k peores
+          const worstIdx = port
+            .map((v, i) => ({ v, i }))
+            .sort((a, b) => a.v - b.v)
+            .slice(0, k)
+            .map((o) => o.i);
+          const grad = new Array(n).fill(0);
+          for (const idx of worstIdx) {
+            for (let i = 0; i < n; i++) grad[i] += rets[idx][i] / k;
+          }
+          // Para mean-cvar: minimizar CVaR - lambda*ret ; para min-cvar: solo CVaR
+          const lambdaRet = strategy === "mean-cvar" ? 2 : 0;
+          const gap = dot(inp.meanDaily, x) - target;
+          // grad de -CVaR es -gradCVaR ; añadir penalización de target
+          const gCVaR = grad.map((g) => -g);
+          if (strategy === "mean-cvar") {
+            return gCVaR.map((g, i) => g - lambdaRet * inp.meanDaily[i] + 2 * 500 * gap * inp.meanDaily[i]);
+          }
+          return gCVaR;
+        },
+        n,
+        { iters: 1500, lr: 0.08 },
       );
     }
   } else {
