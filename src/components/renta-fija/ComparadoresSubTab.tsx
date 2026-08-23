@@ -28,6 +28,7 @@ import {
   comparadorE,
   comparadorF,
   comparadorG,
+  comparadorH,
   buscarCERIOL,
 } from "@/lib/renta-fija/comparadores.functions";
 
@@ -119,6 +120,7 @@ export function ComparadoresSubTab({ sessionId }: ComparadoresSubTabProps) {
   const fnE = useServerFn(comparadorE);
   const fnF = useServerFn(comparadorF);
   const fnG = useServerFn(comparadorG);
+  const fnH = useServerFn(comparadorH);
   const fnCER = useServerFn(buscarCERIOL);
 
   const loadComparador = useCallback(
@@ -180,6 +182,11 @@ export function ComparadoresSubTab({ sessionId }: ComparadoresSubTabProps) {
           case "G": {
             const d = await fnG({ data: {} });
             res = { id: "G", data: d };
+            break;
+          }
+          case "H": {
+            const d = await fnH({ data: {} });
+            res = { id: "H", data: d };
             break;
           }
         }
@@ -265,7 +272,80 @@ function ComparadorRenderer({
       return <ComparadorFView data={resultado.data} />;
     case "G":
       return <ComparadorGView data={resultado.data} />;
+    case "H":
+      return <ComparadorHView data={resultado.data} />;
   }
+}
+
+//
+// COMPARADOR H — Brecha de Ley AL vs GD (Elbaum 10.7)
+//
+
+function ComparadorHView({ data }: { data: ComparadorResultado["data"] }) {
+  const hd = data as any;
+  if (hd.error) return <ErrorState error={hd.error} />;
+  return (
+    <div className="space-y-4">
+      <div>
+        <div className="text-sm font-medium">Brecha de Ley · Bonares (AR) vs Globales (NY)</div>
+        <div className="text-[10px] text-muted-foreground">
+          Riesgo jurisdiccional: TIR Bonar − TIR Global del mismo vencimiento. Brecha positiva =
+          premio por ley argentina; negativa = riesgo de reestructuración local. Elbaum 10.7.
+        </div>
+        <TimestampBadge ts={hd.timestamp} />
+      </div>
+      {hd.pares?.length ? (
+        <table className="mono w-full text-xs">
+          <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
+            <tr className="border-b border-border/60">
+              <th className="px-2 py-2 text-left">Par</th>
+              <th className="px-2 py-2 text-right">Venc</th>
+              <th className="px-2 py-2 text-right">TIR Bonar</th>
+              <th className="px-2 py-2 text-right">TIR Global</th>
+              <th className="px-2 py-2 text-right">Brecha</th>
+              <th className="px-2 py-2 text-left">Interpretación</th>
+            </tr>
+          </thead>
+          <tbody>
+            {hd.pares.map((p: any) => (
+              <tr key={p.par} className="border-b border-border/30">
+                <td className="px-2 py-2 font-medium">{p.par}</td>
+                <td className="px-2 py-2 text-right text-muted-foreground">{p.vencimiento}</td>
+                <td className="px-2 py-2 text-right">
+                  {p.bonarTir != null ? fmtPct(p.bonarTir, 2) : "—"}
+                </td>
+                <td className="px-2 py-2 text-right">
+                  {p.globalTir != null ? fmtPct(p.globalTir, 2) : "—"}
+                </td>
+                <td
+                  className={`px-2 py-2 text-right font-medium ${
+                    p.brechaBps == null
+                      ? ""
+                      : p.brechaBps > 0
+                        ? "text-green-400"
+                        : "text-red-400"
+                  }`}
+                >
+                  {fmtBps(p.brechaBps)}
+                </td>
+                <td className="px-2 py-2 text-[10px] text-muted-foreground">
+                  {p.brechaBps == null
+                    ? "s/d"
+                    : p.brechaBps > 100
+                      ? "Premio ley AR alto"
+                      : p.brechaBps > 0
+                        ? "Premio moderado"
+                        : "Ley NY paga más"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <EmptyState text="Sin pares disponibles." />
+      )}
+    </div>
+  );
 }
 
 // 

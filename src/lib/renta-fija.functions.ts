@@ -190,6 +190,7 @@ export interface PosicionPortafolio {
   tir: number | null;
   tea: number | null;
   durationMacaulay: number | null;
+  convexity?: number | null;
   paridad: number | null;
   sinFlujos: boolean;
   error?: string;
@@ -212,6 +213,8 @@ export interface ResultadoPortafolio {
     totalUSD: number | null;
     tirPonderadaUSD: number | null;
     durationPonderada: number | null;
+    convexityPonderada?: number | null;
+    dv01Real?: number | null;
     pctConTir: number;
     pctSinFlujos: number;
     advertencias: string[];
@@ -2101,6 +2104,7 @@ export const calcularPortafolioRentaFija = createServerFn({ method: "POST" })
 
       let tirVal: number | null = null;
       let durationMacaulayVal: number | null = null;
+      let convexityVal: number | null = null;
       let paridadCalc: number | null = null;
 
       const bono = BONOS_DB[p.ticker.toUpperCase()];
@@ -2119,6 +2123,14 @@ export const calcularPortafolioRentaFija = createServerFn({ method: "POST" })
           tirVal = xirr(flujosXIRR);
           if (tirVal !== null) {
             const dm = tirVal;
+            // Elbaum 10.12-10.14: convexidad REAL sobre flujos descontados
+            // C = Σ CF_i × t(t+1)/(1+y)^{t+2} / Precio  (convención TRUE anual)
+            let sumC = 0;
+            for (const f of flujosXIRR.slice(1)) {
+              const t = f.dias / 365;
+              sumC += f.monto * t * (t + 1) / Math.pow(1 + dm, t + 2);
+            }
+            convexityVal = p.precio > 0 ? sumC / p.precio : null;
             const flujosPV = flujosXIRR.slice(1).map((f) => ({
               dias: f.dias,
               monto: f.monto,
@@ -2156,6 +2168,7 @@ export const calcularPortafolioRentaFija = createServerFn({ method: "POST" })
         tir: tirVal,
         tea: tirVal,
         durationMacaulay: durationMacaulayVal,
+        convexity: convexityVal,
         paridad: paridadCalc,
         sinFlujos: !bono,
       };
@@ -2189,6 +2202,21 @@ export const calcularPortafolioRentaFija = createServerFn({ method: "POST" })
       (s, p) => s + (p.peso ?? 0) * (p.durationMacaulay ?? 0),
       0,
     );
+    // Elbaum 10.13: convexidad ponderada por valor de mercado con convexidad REAL por posición
+    const convexityPonderada = merged.reduce(
+      (s, p) => s + (p.peso ?? 0) * ((p as any).convexity ?? 0),
+      0,
+    );
+    // Elbaum 10.14: DV01 REAL por re-precio −1bp: DV01 ≈ ModDur × Precio × 1bp (por posición, ponderado)
+    // ModDur = MacDur/(1+y); DV01_usd = Σ peso × ModDur × ValorMercadoUSD × 0.0001
+    const dv01Real =
+      totalGeneral > 0
+        ? merged.reduce((s, p) => {
+            const y = p.tir ?? 0;
+            const modDur = (p.durationMacaulay ?? 0) / (1 + y);
+            return s + modDur * (p.valorMercadoUSD ?? Math.abs(p.valorMercado)) * 0.0001;
+          }, 0)
+        : null;
 
     // Composición
     const porTipo = Array.from(new Set(merged.map((p) => p.tipoInterno))).map((tipo) => ({
@@ -2224,6 +2252,8 @@ export const calcularPortafolioRentaFija = createServerFn({ method: "POST" })
         totalUSD,
         tirPonderadaUSD,
         durationPonderada,
+        convexityPonderada,
+        dv01Real,
         pctConTir: merged.length > 0 ? pctConTir / merged.length : 0,
         pctSinFlujos: merged.filter((p) => p.sinFlujos).length / merged.length,
         advertencias,

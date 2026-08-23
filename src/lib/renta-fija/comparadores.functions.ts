@@ -807,8 +807,7 @@ export const fetchEvolucionCambiaria = createServerFn({ method: "GET" }).handler
   serie: PuntoEvolucion[];
   timestamp: string;
   error?: string;
-}> => {
-  try {
+}> => {  try {
     const [oficialRaw, blueRaw, mepRaw, inflacionRaw, inflacionIaRaw] = await Promise.all([
       fetchConCache<Array<{ fecha: string; venta: number }>>(`${AD}/v1/cotizaciones/dolares/oficial`, "tc_oficial_evo", 600_000),
       fetchConCache<Array<{ fecha: string; venta: number }>>(`${AD}/v1/cotizaciones/dolares/blue`, "tc_blue_evo", 600_000),
@@ -851,3 +850,59 @@ export const fetchEvolucionCambiaria = createServerFn({ method: "GET" }).handler
     return { serie: [], timestamp: new Date().toISOString(), error: `Error: ${e instanceof Error ? e.message : "desconocido"}` };
   }
 });
+
+//
+// COMPARADOR H � Brecha de Ley: Bonares (ley AR) vs Globales (ley NY)
+// Elbaum 10.7 / pr�ctica local AR: AL30-GD30, GD35-AL35, etc.
+// Riesgo jurisdiccional = TIR Bonar - TIR Global del mismo vencimiento.
+
+
+//
+// COMPARADOR H — Brecha de Ley: Bonares (ley AR) vs Globales (ley NY)
+// Elbaum 10.7 / practica local AR: AL30-GD30, GD35-AL35, etc.
+// Riesgo jurisdiccional = TIR Bonar - TIR Global del mismo vencimiento.
+// TIR > 0 (Bonar paga mas) = premio por ley argentina; brecha negativa = riesgo de reestructuracion local.
+//
+
+export const comparadorH = createServerFn({ method: "POST" })
+  .validator(z.object({}))
+  .handler(async (): Promise<any> => {
+    try {
+      // Pares ley AR vs ley NY del mismo vencimiento (RENTA_FIJA_COMPLETA.json)
+      const PARES: Array<{ bonar: string; global: string; label: string }> = [
+        { bonar: "AL29", global: "GD29", label: "2029" },
+        { bonar: "AL30", global: "GD30", label: "2030" },
+        { bonar: "AL35", global: "GD35", label: "2035" },
+        { bonar: "AL41", global: "GD41", label: "2041" },
+      ];
+      const pares: any[] = [];
+      for (const p of PARES) {
+        try {
+          const [rB, rG] = await Promise.allSettled([
+            calcularRendimientosBono({ data: { ticker: p.bonar, precioPorCada100VN: 100 } }),
+            calcularRendimientosBono({ data: { ticker: p.global, precioPorCada100VN: 100 } }),
+          ]);
+          const bonarTir = rB.status === "fulfilled" && !(rB.value as any).error ? (rB.value as any).tir : null;
+          const globalTir = rG.status === "fulfilled" && !(rG.value as any).error ? (rG.value as any).tir : null;
+          const brechaBps =
+            bonarTir != null && globalTir != null ? Math.round((bonarTir - globalTir) * 10000) : null;
+          pares.push({
+            par: p.bonar + " vs " + p.global,
+            vencimiento: p.label,
+            bonarTir,
+            globalTir,
+            brechaBps,
+          });
+        } catch {
+          /* skip par */
+        }
+      }
+      return { pares, timestamp: new Date().toISOString() };
+    } catch (e) {
+      return {
+        pares: [],
+        timestamp: new Date().toISOString(),
+        error: "Error: " + (e instanceof Error ? e.message : "desconocido"),
+      };
+    }
+  });

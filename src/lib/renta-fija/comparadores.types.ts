@@ -1,4 +1,4 @@
-export type ComparadorId = "A" | "B" | "C" | "D" | "E" | "F" | "G";
+export type ComparadorId = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H";
 
 export interface ComparadorInfo {
   id: ComparadorId;
@@ -14,7 +14,20 @@ export const COMPARADORES: ComparadorInfo[] = [
   { id: "E", label: "Dollar-Linked vs Hard vs CER", descripcion: "Cobertura cambiaria: retorno USD en 3 escenarios" },
   { id: "F", label: "FCI vs Instrumento Directo", descripcion: "Comparación FCI vs equivalente directo (costo implícito)" },
   { id: "G", label: "BADLAR/TAMAR vs Tasa Fija", descripcion: "Breakeven de tasa flotante vs fija" },
+  { id: "H", label: "Brecha de Ley AL vs GD", descripcion: "Riesgo jurisdiccional: TIR Bonares (ley AR) vs Globales (ley NY) por tramo — Elbaum 10.7" },
 ];
+
+export interface ComparadorHData {
+  pares: Array<{
+    par: string; // "AL30 vs GD30"
+    bonarTir: number | null;
+    globalTir: number | null;
+    brechaBps: number | null;
+  }>;
+  serieBrecha?: Array<{ fecha: string; brechaBps: number }>; // histórica del primer par disponible
+  timestamp: string;
+  error?: string;
+}
 
 export interface HardDollarAsset {
   ticker: string;

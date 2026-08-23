@@ -910,11 +910,13 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
     }> = [];
 
     for (const b of data.bonos) {
+      // Dumrauf: TEM = (1+TIR)^(1/12) - 1 (metadata.motor_calculo.tem de RENTA_FIJA_COMPLETA.json)
+      const temReal = b.tir != null ? Math.pow(1 + b.tir, 1 / 12) - 1 : null;
       rows.push({
         ticker: b.ticker,
         categoria: b.tipo,
         tir: b.tir,
-        tem: b.tir,
+        tem: temReal,
         paridad: b.paridad,
         precio: b.precio,
         duration: b.durationMacaulay,
@@ -1033,7 +1035,7 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
       </div>
 
       {/* Scatter chart con tooltip mejorado */}
-      <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
+      <div className="rounded-lg border border-border/40 bg-background/40 p-3">
         <h3 className="mb-2 font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
           Curva de Rendimiento (TIR / TEA) por categoría
           <span className="ml-2 font-normal text-[13px] text-muted-foreground">
@@ -1106,7 +1108,7 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
 
       {/* Noticias de mayor y menor TIR */}
       {news.length > 0 && (
-        <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
+        <div className="rounded-lg border border-border/40 bg-background/40 p-3">
           <h3 className="mb-2 font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
             Noticias destacadas
           </h3>
@@ -1334,19 +1336,23 @@ function ContextoMacroSubTab({ data }: { data: MonitorResult | null }) {
         </div>
         <div className="rounded-lg border border-border/40 bg-muted/5 p-3">
           <span className="font-mono text-[13px] uppercase tracking-wider text-muted-foreground">
-            Tasa Real
+            Tasa Real (Fisher exacta)
           </span>
           <p className="font-mono text-lg text-foreground mt-0.5">
             {badlar != null && inflacionMM != null
-              ? (badlar - inflacionMM * 12).toFixed(2) + "%"
+              ? (((1 + badlar / 100) / (1 + (inflacionMM * 12) / 100)) * 100 - 100).toFixed(2) + "%"
               : "\u2014"}
           </p>
+          <TooltipHeader
+            label=""
+            tooltip="Dumrauf: Fisher exacta (1+ia)/(1+π)-1. La resta simple ia−π subestima la pérdida de poder adquisitivo con inflación alta."
+          />
           <p className="text-[13px] text-muted-foreground mt-1">
             {badlar != null && inflacionMM != null
               ? badlar > inflacionMM * 12
                 ? "Tasa real positiva (+) preserva capital"
                 : "Tasa real negativa (-) pierde poder adq."
-              : "Diferencia BADLAR - inflación"}
+              : "(1+BADLAR)/(1+π aa)-1 · no resta simple"}
           </p>
         </div>
       </div>
@@ -2079,7 +2085,7 @@ function DetalleSubTab({
           {historicoLoading && <EmptyState text="Cargando histórico…" />}
 
           {historicoData && historicoData.serie.length > 0 && (
-            <div className="rounded-lg border border-border/40 bg-background/40/40 p-3">
+            <div className="rounded-lg border border-border/40 bg-background/40 p-3">
               <ResponsiveContainer width="100%" height={280}>
                 <ComposedChart data={(() => {
                   const sorted = [...historicoData.serie].sort((a, b) => a.fecha.localeCompare(b.fecha));
@@ -2577,22 +2583,20 @@ function PortafolioSubTab({
               </div>
               <div className="rounded-md border border-border/40 bg-muted/20 p-2.5">
                 <div className="text-[13px] text-muted-foreground">Convexity</div>
+                <TooltipHeader label="" tooltip="Elbaum 10.13: convexidad REAL ponderada por valor de mercado sobre flujos descontados (no aproximación D²×1.5)" />
                 <div className="mono mt-0.5 text-base font-medium">
-                  {resultado.metricas.durationPonderada != null
-                    ? fmtNum(Math.pow(resultado.metricas.durationPonderada, 2) * 1.5, 2)
+                  {resultado.metricas.convexityPonderada != null && resultado.metricas.convexityPonderada > 0
+                    ? fmtNum(resultado.metricas.convexityPonderada, 1)
                     : "\u2014"}
                 </div>
               </div>
               <div className="rounded-md border border-border/40 bg-muted/20 p-2.5">
                 <div className="text-[13px] text-muted-foreground">DV01</div>
+                <TooltipHeader label="" tooltip="Elbaum 10.14: DV01 real por posición = ModDur × ValorMercado × 1bp, sumado sobre cartera" />
                 <div className="mono mt-0.5 text-base font-medium">
                   USD{" "}
-                  {resultado.metricas.durationPonderada != null &&
-                  resultado.metricas.totalUSD != null
-                    ? fmtNum(
-                        resultado.metricas.durationPonderada * resultado.metricas.totalUSD * 0.0001,
-                        2,
-                      )
+                  {resultado.metricas.dv01Real != null
+                    ? fmtNum(resultado.metricas.dv01Real, 2)
                     : "\u2014"}
                 </div>
               </div>
