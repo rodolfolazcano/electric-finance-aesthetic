@@ -92,6 +92,20 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
                 <Badge variant="outline">Riesgo país: {fase1?.macro?.riesgo_pais ?? "?"}</Badge>
               </div>
               <p className="text-[11px] text-muted-foreground">Ratios: {fase1?.ratios?.slice(0, 300) ?? "s/d"}</p>
+              {/* Orden de ejecución del scoring — jerarquía pt */}
+              {data?.pipeline && (
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px] font-mono">
+                  <span className="uppercase tracking-widest text-muted-foreground mr-1">Scoring:</span>
+                  {data.pipeline.map((p: any, i: number) => (
+                    <span key={i} className={"rounded border px-1.5 py-0.5 " + (p.ok ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-red-500/30 bg-red-500/10 text-red-400")}>
+                      {p.ok ? "OK" : "X"} {p.fase}
+                    </span>
+                  ))}
+                  {data.regimenMacro === "ADVERSO" && (
+                    <span className="rounded border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-amber-400">Gate macro ADVERSO −0.5</span>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 

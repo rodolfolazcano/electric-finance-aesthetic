@@ -161,6 +161,28 @@ export const getOportunidadesOrquestadas = createServerFn({ method: "POST" })
         }));
       } catch {}
 
+      // ── ORDEN DE EJECUCIÓN DEL SCORING (jerarquía pt) ──────────────────────
+      // 1 Intermarket (fase1: ratios Murphy + ciclo Pring) → 2 Macro (régimen
+      // BCRA/riesgo/Fisher, gate de exigencia) → 3 Cuantitativo (fase4 R²/beta)
+      // → 4 Fundamental (fase5 gate Pascale 5.0 + MOS) → 5 Técnico (score ≥4.5).
+      // Gate macro: régimen ADVERSO penaliza el score final (−0.5) y lo reporta.
+      const regimenMacro = base.fase1?.macro?.regimen_macro ?? "NEUTRO";
+      if (regimenMacro === "ADVERSO") {
+        senalesOrdenadas = senalesOrdenadas.map((s: any) => ({
+          ...s,
+          scoreTotal: Math.round(((s.scoreTotal ?? 0) - 0.5) * 10) / 10,
+          gateMacro: "ADVERSO (−0.5)",
+        }));
+        senalesOrdenadas.sort((a: any, b: any) => b.scoreTotal - a.scoreTotal);
+      }
+      const pipeline = [
+        { fase: "1 · Intermarket", fuente: "Murphy ratios + ciclo Pring/Stovall", ok: !!base.fase1?.ciclo },
+        { fase: "2 · Macro", fuente: `BCRA/CriptoYa/Fisher — régimen ${regimenMacro}`, ok: !!base.fase1?.macro },
+        { fase: "3 · Cuantitativo", fuente: "β/R² vs factor mayor ajuste", ok: tickerBestBenchmarks.length > 0 },
+        { fase: "4 · Fundamental", fuente: "Pascale 6D gate 5.0 + MOS Value", ok: base.fase5.senales.length > 0 },
+        { fase: "5 · Técnico", fuente: "RSI/MACD/SMA score ≥4.5 + R/R ≥1.2", ok: true },
+      ];
+
       return {
         ...base,
         fase4: fase4ext,
@@ -170,6 +192,8 @@ export const getOportunidadesOrquestadas = createServerFn({ method: "POST" })
         cohorte: data.cohorte ?? null,
         topN,
         maxTickers,
+        regimenMacro,
+        pipeline,
       };
     });
   });
