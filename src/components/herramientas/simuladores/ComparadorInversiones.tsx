@@ -10,6 +10,7 @@ import { buildEvolucion, fisherReal, type InstrConfig } from "@/lib/simuladores.
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { registerComparadorActions } from "./chat/registry";
 
 type Vista = "evolucion" | "comparativa" | "tabla";
 type Moneda = "ARS" | "USD";
@@ -79,6 +80,8 @@ export function ComparadorInversiones() {
     }).catch(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, []);
+
+
 
   // Auto-seleccionar entidad más cercana al plazo cuando cambia el slider
   const autoSelectCercana = useCallback((id: string, newDias: number) => {
@@ -216,6 +219,24 @@ export function ComparadorInversiones() {
   function updateSel(id: string, patch: Partial<FuenteSel & { enabled: boolean }>) {
     setSel((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } as any }));
   }
+
+  useEffect(() => {
+    registerComparadorActions({
+      setCapital,
+      setDias,
+      setInflacion: setInflMensual,
+      setModoReal,
+      setVista,
+      setInstrumentoEnabled: (id: string, enabled: boolean) => updateSel(id, { enabled } as any),
+      setInstrumentoModo: (id: string, modo: string, entidadId?: string, manualVal?: number) => updateSel(id, { modo: modo as any, entidadId, manualVal } as any),
+      getSnapshot: () => ({
+        capital, dias, meses, inflacionMensual: inflMensual, inflacionOficial: fuentes?.inflacion?.mensual ?? null,
+        ganador: ranking[0] ? { label: ranking[0].label, fuenteLabel: ranking[0].fuenteLabel, vfNominal: ranking[0].vfNominal } : null,
+        vista, modoReal,
+      }),
+    });
+    return () => registerComparadorActions(null);
+  }, [capital, dias, inflMensual, fuentes, ranking, meses, vista, modoReal]);
 
   return (
     <div className="space-y-5">

@@ -648,8 +648,16 @@ function Studio() {
                 const dt = new DataTransfer();
                 dt.items.add(file);
                 await handleUpload(dt.files, "data");
-                setInput(`Analizá la imagen ${file.name} del contexto: qué muestra, cifras visibles y lectura financiera.`);
-                setTimeout(submit, 100);
+                // Wait for React to flush the patch, then check if extraction succeeded
+                await new Promise((r) => setTimeout(r, 500));
+                const session = sessionsRef.current.find((s) => s.id === activeId);
+                const fileEntry = session?.files.find((f) => f.name === file.name && f.segment === "data");
+                if (fileEntry?.status === "ready" && fileEntry.text) {
+                  setInput(`Analizá la imagen ${file.name} del contexto: qué muestra, cifras visibles y lectura financiera.`);
+                  setTimeout(submit, 100);
+                } else {
+                  toast.error(`No pude procesar ${file.name}: ${fileEntry?.error ?? "error desconocido"}. Adjuntalo de nuevo o probá otro formato.`);
+                }
               }}
             />
           </div>

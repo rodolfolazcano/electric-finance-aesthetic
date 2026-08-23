@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { ArrowLeftRight, Calculator, PiggyBank, TrendingUp } from "lucide-react";
 import { ComparadorInversiones } from "./simuladores/ComparadorInversiones";
 import { PlanificadorFinanciero } from "./simuladores/PlanificadorFinanciero";
+import { SimuladorChat } from "./simuladores/chat/SimuladorChat";
+import { Drawer, DrawerContent, DrawerTrigger, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { MessageCircle } from "lucide-react";
 
 export type SubTabCalculadora = "catalog" | "comparador" | "planificador";
 
@@ -51,6 +54,15 @@ export function CalculadoraFinancieraTab({ initialSubTab }: { initialSubTab?: st
   useEffect(() => {
     if (initialSubTab) setSubTab(normalizeSubTab(initialSubTab));
   }, [initialSubTab]);
+
+  useEffect(() => {
+    const h = (e: Event) => {
+      const d = (e as CustomEvent<{ subTab: string }>).detail;
+      if (d?.subTab && VALID_SUBTABS.includes(d.subTab as any)) setSubTab(d.subTab as SubTabCalculadora);
+    };
+    window.addEventListener("simulador:changeSubTab", h as any);
+    return () => window.removeEventListener("simulador:changeSubTab", h as any);
+  }, []);
 
   if (subTab === "catalog") {
     return (
@@ -115,8 +127,28 @@ export function CalculadoraFinancieraTab({ initialSubTab }: { initialSubTab?: st
         </div>
       </div>
 
-      {subTab === "comparador" && <ComparadorInversiones />}
-      {subTab === "planificador" && <PlanificadorFinanciero />}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px] items-start">
+        <div className="min-w-0">
+          {subTab === "comparador" && <ComparadorInversiones />}
+          {subTab === "planificador" && <PlanificadorFinanciero />}
+        </div>
+        <div className="hidden xl:block">
+          <SimuladorChat subTab={subTab} />
+        </div>
+      </div>
+      <div className="xl:hidden">
+        <Drawer>
+          <DrawerTrigger asChild>
+            <button className="fixed bottom-5 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">
+              <MessageCircle className="h-5 w-5" />
+            </button>
+          </DrawerTrigger>
+          <DrawerContent className="max-h-[78vh]">
+            <DrawerHeader className="pb-2"><DrawerTitle className="text-xs uppercase tracking-widest">Asistente · Simuladores</DrawerTitle></DrawerHeader>
+            <div className="px-4 pb-6 overflow-auto"><SimuladorChat subTab={subTab} /></div>
+          </DrawerContent>
+        </Drawer>
+      </div>
     </div>
   );
 }

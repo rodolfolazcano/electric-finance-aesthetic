@@ -19,6 +19,7 @@ import {
   downloadAgentFileAsBase64,
   describirImagenBase64,
   transcribirAudioBase64,
+  detectMimeFromBytes,
 } from "@/lib/telegram.server";
 
 export type Msg = { role: "user" | "assistant"; content: string };
@@ -236,15 +237,45 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
     } else if (
       msg.document?.file_id &&
       (msg.document.mime_type?.startsWith("image/") ||
-        msg.document.file_name?.match(/\.(jpg|jpeg|png|webp|heic)$/i))
+        msg.document.file_name?.match(/\.(jpg|jpeg|png|webp|heic|gif|bmp)$/i))
     ) {
       const fileId = msg.document.file_id;
       await sendAgentChatAction(chatId);
       const file = await downloadAgentFileAsBase64(fileId);
       if (file) {
-        const mime = msg.document.mime_type ?? "image/jpeg";
-        const desc = await describirImagenBase64(file.base64, mime, text);
-        multimodalContext = `[IMAGEN (documento) — visión IA]:\n${desc}`;
+        const buf = Buffer.from(file.base64, "base64");
+        const realMime = detectMimeFromBytes(buf);
+        if (realMime.startsWith("image/")) {
+          const desc = await describirImagenBase64(file.base64, realMime, text || "Analiza esta imagen financiera");
+          multimodalContext = `[IMAGEN (documento) — visión IA]:\n${desc}`;
+        } else {
+          multimodalContext = `[DOCUMENTO adjunto detectado como ${realMime} — ${msg.document.file_name ?? "sin nombre"}]`;
+          if (!text) text = `Recibí un documento tipo ${realMime}. Analizalo y decime qué contiene.`;
+        }
+      }
+    } else if (
+      msg.document?.file_id
+    ) {
+      const fileId = msg.document.file_id;
+      await sendAgentChatAction(chatId);
+      const file = await downloadAgentFileAsBase64(fileId);
+      if (file) {
+        const buf = Buffer.from(file.base64, "base64");
+        const realMime = detectMimeFromBytes(buf);
+        if (realMime.startsWith("image/")) {
+          const desc = await describirImagenBase64(file.base64, realMime, text || "Analiza esta imagen financiera");
+          multimodalContext = `[IMAGEN (adjunto auto-detectado) — visión IA]:\n${desc}`;
+        } else if (realMime === "application/pdf") {
+          multimodalContext = `[PDF adjunto: ${msg.document.file_name ?? "documento"} — ${Math.round(buf.length / 1024)}KB]`;
+          if (!text) text = `Recibí un PDF "${msg.document.file_name ?? "documento"}". Analizalo y decime qué contiene.`;
+        } else if (realMime.startsWith("audio/")) {
+          const tr = await transcribirAudioBase64(file.base64, realMime);
+          multimodalContext = `[AUDIO (adjunto auto-detectado) — transcripción IA]:\n${tr}`;
+          if (!text) text = tr;
+        } else {
+          multimodalContext = `[ARCHIVO adjunto: ${realMime}, ${msg.document.file_name ?? "sin nombre"}, ${Math.round(buf.length / 1024)}KB — tipo no soportado para procesamiento automático. Indicale al usuario qué podés hacer con él.]`;
+          if (!text) text = `Recibí un archivo tipo ${realMime} ("${msg.document.file_name ?? "sin nombre"}"). No puedo procesarlo automáticamente, pero describí qué necesitás y te ayudo.`;
+        }
       }
     } else if (msg.voice?.file_id) {
       const fileId = msg.voice.file_id;

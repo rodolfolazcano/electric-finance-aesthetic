@@ -1,6 +1,7 @@
 // Capa resiliente multi-proveedor con rotación de API keys.
 // Solo corre en el servidor: las keys nunca salen de acá.
 import { envReady } from "./env.server";
+import { NVIDIA_API_KEY as NVIDIA_KEY_FALLBACK } from "@/lib/agents/nvidia-key";
 import {
   FAST_CHAIN,
   IMAGE_TIMEOUT_MS,
@@ -119,6 +120,7 @@ function keysFor(provider: ProviderId): string[] {
           envVal("NVIDIA_API_KEY_4"),
           envVal("NVIDIA_API_KEY_5"),
           envVal("NVIDIA_API_KEY_6"),
+          NVIDIA_KEY_FALLBACK,
         ]
       : provider === "together"
         ? [envVal("TOGETHER_API_KEY")]

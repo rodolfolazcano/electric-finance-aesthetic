@@ -560,6 +560,19 @@ export async function getAgentFilePath(fileId: string): Promise<string | null> {
   return r.file_path ?? null;
 }
 
+export function detectMimeFromBytes(buf: Buffer): string {
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47) return "image/png";
+  if (buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) return "image/jpeg";
+  if (buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46) return "image/webp";
+  if (buf[0] === 0x25 && buf[1] === 0x50 && buf[2] === 0x44 && buf[3] === 0x46) return "application/pdf";
+  if (buf[0] === 0x4F && buf[1] === 0x67 && buf[2] === 0x67 && buf[3] === 0x53) return "audio/ogg";
+  if (buf[0] === 0xFF && buf[1] === 0xFB) return "audio/mpeg";
+  if (buf[0] === 0x49 && buf[1] === 0x44 && buf[2] === 0x33) return "audio/mpeg";
+  if (buf[0] === 0x1A && buf[1] === 0x45 && buf[2] === 0xDF && buf[3] === 0xA3) return "video/mp4";
+  if (buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46) return "audio/wav";
+  return "application/octet-stream";
+}
+
 export async function downloadAgentFileAsBase64(
   fileId: string,
 ): Promise<{ base64: string; mime: string; filePath: string } | null> {
@@ -572,21 +585,7 @@ export async function downloadAgentFileAsBase64(
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
     const base64 = buf.toString("base64");
-    const mime = filePath.endsWith(".ogg")
-      ? "audio/ogg"
-      : filePath.endsWith(".mp3")
-        ? "audio/mpeg"
-        : filePath.endsWith(".mp4")
-          ? "video/mp4"
-          : filePath.endsWith(".wav")
-            ? "audio/wav"
-            : filePath.endsWith(".png")
-              ? "image/png"
-              : filePath.endsWith(".webp")
-                ? "image/webp"
-                : filePath.endsWith(".heic") || filePath.endsWith(".heif")
-                  ? "image/heic"
-                  : "image/jpeg";
+    const mime = detectMimeFromBytes(buf);
     return { base64, mime, filePath };
   } catch {
     return null;
@@ -605,9 +604,13 @@ export async function describirImagenBase64(
       ? `Analiza esta imagen. Contexto del usuario: "${promptExtra}". Describe en español rioplatense todo lo visible: texto, números, gráficos, tickers, valores. Si es un gráfico de trading, extrae ticker, precio, tendencia, soportes/resistencias. Si es captura de portfolio, lista posiciones y valorizado. Sé preciso y cita cifras visibles.`
       : "Describe esta imagen en español rioplatense con máximo detalle: todo texto visible, números, gráficos, tickers, tablas. Si es gráfico financiero, extrae ticker, valores, tendencia. Si es portfolio, lista activos y montos. No inventes lo que no ves.";
     const result = await resilientVision(VISION_CHAIN, base64, mime, prompt);
-    return result.text.trim() || "[Imagen recibida pero no se devolvió descripción]";
+    if (!result.ok || !result.text.trim()) {
+      const reason = result.ok ? "respuesta vacía" : (result.error ?? "error desconocido");
+      return `[IMAGEN PRESENTE pero la visión no pudo procesarla: ${reason}. Adjuntá la imagen de nuevo o describí manualmente lo que necesitás.]`;
+    }
+    return result.text.trim();
   } catch (e) {
-    return `[Error describiendo imagen: ${e instanceof Error ? e.message : String(e)}]`;
+    return `[IMAGEN PRESENTE pero la visión falló: ${e instanceof Error ? e.message : String(e)}. Adjuntá la imagen de nuevo o describí manualmente lo que necesitás.]`;
   }
 }
 

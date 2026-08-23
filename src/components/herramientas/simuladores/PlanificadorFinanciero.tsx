@@ -15,6 +15,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { registerPlanificadorActions } from "./chat/registry";
 
 type PlanVista = "proyeccion" | "flujo" | "analisis";
 type Moneda = "ARS" | "USD";
@@ -146,6 +147,14 @@ export function PlanificadorFinanciero() {
   const vanVal = useMemo(() => (modo === "flujos" ? van(flujos, tasaDescuento) : null), [modo, flujos, tasaDescuento]);
   const tirVal = useMemo(() => (modo === "flujos" ? tirBiseccion(flujos) : null), [modo, flujos]);
   const perfil = useMemo(() => (modo === "flujos" ? perfilVan(flujos, Math.max(-10, (tirVal ?? tasaDescuento) - 20), (tirVal ?? tasaDescuento) + 20, 48) : []), [modo, flujos, tirVal, tasaDescuento]);
+
+  useEffect(() => {
+    registerPlanificadorActions({
+      setAporteInicial, setAporteMensual, setTna, setInflacion: setInflMensual, setConCuotas, setAnticipada, setModo, setVista, setModoMeta, setVfObjetivo, setMesesMeta, setEdadActual, setEdadRetiro, setEsperanzaVida, setFlujos, setTasaDescuento, setExtras,
+      getSnapshot: () => ({ aporteInicial, aporteMensual, tna, inflacionMensual: inflMensual, conCuotas, anticipada, modo, vista, modoMeta, vfObjetivo, mesesMeta, edadActual, edadRetiro, esperanzaVida, flujos, tasaDescuento, vanVal, tirVal }),
+    });
+    return () => registerPlanificadorActions(null);
+  }, [aporteInicial, aporteMensual, tna, inflMensual, conCuotas, anticipada, modo, vista, modoMeta, vfObjetivo, mesesMeta, edadActual, edadRetiro, esperanzaVida, flujos, tasaDescuento, vanVal, tirVal]);
 
   return (
     <div className="space-y-5">
