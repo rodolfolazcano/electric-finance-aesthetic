@@ -249,7 +249,9 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
             const tr = await transcribirAudioBase64(file.base64, file.mime);
             if (tr && !tr.includes("Error"))
               multimodalContext += `\n[Transcripción de audio del video]: ${tr}`;
-          } catch {}
+          } catch {
+            /* sin transcripción de audio disponible */
+          }
         }
       } else {
         multimodalContext = `[Video adjunto recibido]`;

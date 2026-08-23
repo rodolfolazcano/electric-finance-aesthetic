@@ -5,8 +5,12 @@ import { renderErrorPage } from "./lib/error-page";
 // Bot unificado de señales: loop interno siempre encendido (idempotente,
 // desactivable con BOT_UNIFICADO_AUTO=false). En serverless lo cubre el cron externo.
 import { arrancarBotUnificado } from "./lib/bot-unificado/scheduler";
+// Agente Telegram en desarrollo local: getUpdates long polling (idempotente,
+// desactivable con TELEGRAM_POLLING=false). En serverless lo cubre el webhook.
+import { arrancarPollingTelegram } from "./lib/telegram-polling.server";
 
 arrancarBotUnificado();
+arrancarPollingTelegram();
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
