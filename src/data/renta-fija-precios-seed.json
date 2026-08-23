@@ -1,0 +1,6 @@
+{
+  "fecha": "",
+  "generado": "",
+  "nota": "Cierres de referencia de renta fija commiteados para que el motor de TIR tenga un precio datado en producción (.data no persiste en serverless). Regenerar con: node scripts/genera-seed-renta-fija.mjs",
+  "precios": {}
+}

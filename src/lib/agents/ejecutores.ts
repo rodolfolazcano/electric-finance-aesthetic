@@ -3933,14 +3933,16 @@ export async function ejecutarSenalesUnificadas(argsRaw: string): Promise<{
 
 export async function ejecutarYTM(argsRaw: string, sessionId: string): Promise<{ texto: string; fuentes: FuenteMercado[]; ok: boolean }> {
   let ticker = "";
+  let precioManual: number | undefined;
   try {
     const p: any = JSON.parse(argsRaw);
     ticker = String(p.ticker ?? p.simbolo ?? "").trim().toUpperCase();
+    if (p.precio != null && isFinite(Number(p.precio)) && Number(p.precio) > 0) precioManual = Number(p.precio);
   } catch {}
   if (!ticker) return { texto: "Falta ticker del bono (ej. AL30, GD30, AL35)", fuentes: [], ok: false };
   try {
     const { calcularYTM } = await import("@/lib/renta-fija/ytm-calculator");
-    const r = await calcularYTM(ticker, sessionId);
+    const r = await calcularYTM(ticker, sessionId, precioManual);
     const L: string[] = [];
     const esPrecioDeHoy = r.fechaPrecio === new Date().toISOString().slice(0, 10);
     L.push(`=== YTM / TIR — ${r.ticker} — ${r.nombre} ===`);

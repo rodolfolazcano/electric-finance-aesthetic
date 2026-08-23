@@ -1615,13 +1615,17 @@ export const TOOLS: ToolSpec[] = [
     function: {
       name: "calcular_ytm_bono",
       description:
-        "Calcula YTM/TIR real de un bono argentino usando RENTA_FIJA_COMPLETA.json (flujo_fondos, fechas, cupones) + precio de cotización EN VIVO de IOL (usa sesión del usuario o fallback hardcodeado boosandr97@gmail.com). Método Newton-Raphson ACT/365. Devuelve TIR anual, TEM, TNA, precio usado, flujos futuros y diagnóstico. Para 'YTM de AL30', 'TIR de GD30', 'rendimiento de AL35', 'bono soberano'.",
+        "Calcula YTM/TIR real de un bono argentino usando RENTA_FIJA_COMPLETA.json (flujo_fondos = condiciones de emisión) + precio de cotización (cadena automática: sesión IOL → credenciales guardadas → especie hermana → último cierre persistido). Si el precio está a mano (el usuario lo dio, ej 'calcula la TIR de AL30 con precio 76250'), pasalo en 'precio' y el cálculo es inmediato. Método Newton-Raphson ACT/365. Devuelve TIR anual, TEM, TNA, precio usado con su fecha y flujos futuros.",
       parameters: {
         type: "object",
         properties: {
           ticker: {
             type: "string",
             description: "Ticker del bono (ej. AL30, GD30, AL35, AE38, GD29, TX26, etc. — sin sufijo D/C si es especie Pesos)",
+          },
+          precio: {
+            type: "number",
+            description: "Precio OPCIONAL por cada 100 VN en la moneda de cotización del ticker (AL30 en ARS ej 76250; AL30D en USD ej 62.5). Usarlo si el usuario lo indicó o si la fuente automática no está disponible; el resultado aclara que se calculó con ese precio.",
           },
         },
         required: ["ticker"],

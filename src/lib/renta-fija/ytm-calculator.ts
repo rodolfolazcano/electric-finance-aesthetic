@@ -260,7 +260,7 @@ export type ResultadoYTM = {
   fuente: string;
 };
 
-export async function calcularYTM(tickerRaw: string, sessionId: string): Promise<ResultadoYTM> {
+export async function calcularYTM(tickerRaw: string, sessionId: string, precioManual?: number): Promise<ResultadoYTM> {
   const ticker = tickerRaw.trim().toUpperCase();
   const bono = findBono(ticker);
   if (!bono) {
@@ -273,11 +273,23 @@ export async function calcularYTM(tickerRaw: string, sessionId: string): Promise
   const hoy = new Date();
   hoy.setHours(12, 0, 0, 0);
 
-  // Precio con cadena completa: IOL vivo → especie hermana → último cierre persistido.
-  const resPrecio = await resolverPrecio(bono, sessionId);
+  // Precio: manual (el usuario lo dio en el chat) > IOL vivo > especie hermana > caché/seed.
+  let resPrecio: PrecioResuelto | null = null;
+  if (precioManual != null && isFinite(precioManual) && precioManual > 0) {
+    resPrecio = {
+      precioCrudo: precioManual,
+      precioMoneda: bono.especie === "Pesos" ? "ARS" : "USD",
+      detalle: null,
+      especieEfectiva: bono.especie,
+      fechaPrecio: hoyIso(),
+      fuentePrecio: "precio indicado por el usuario en este turno",
+    };
+  } else {
+    resPrecio = await resolverPrecio(bono, sessionId);
+  }
   if (!resPrecio) {
     throw new Error(
-      `Sin precio para ${ticker}: IOL sin cotización (sesión caída o mercado cerrado) y sin cierre previo en caché. El cron diario /api/cron/actualiza-renta-fija lo rellena; reintentá en unos minutos.`,
+      `Sin precio para ${ticker}: IOL rechazó las credenciales o no hay cotización, y no hay cierre previo persistido. Pedile al usuario el precio actual del bono ("calcula la TIR de AL30 con precio X") y calculá con ese dato; también puede regenerarse el seed con scripts/genera-seed-renta-fija.mjs cuando IOL vuelva a aceptar el login.`,
     );
   }
   const { precioCrudo, precioMoneda, detalle: precioDetalle, fechaPrecio, fuentePrecio } = resPrecio;
