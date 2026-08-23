@@ -270,6 +270,36 @@ async function fetchLecaps(sessionId?: string, badlarRate?: number | null): Prom
   return lecaps;
 }
 
+export interface PlazoFijoItem { entidad: string; tnaClientes: number | null; tnaNoClientes: number | null; logo: string | null; link?: string | null }
+export interface PlazoFijoUvaItem { id: string; entidad: string; logo: string; nombre: string; plazoMinDias: number; plazoMaxDias: number; tna: number; tea: number }
+export const fetchPlazoFijoTasas = createServerFn({ method: "GET" }).handler(async (): Promise<PlazoFijoItem[]> => {
+  const cached = getCached<PlazoFijoItem[]>("plazoFijoTasas");
+  if (cached) return cached;
+  try {
+    const r = await fetch(`${AD}/v1/finanzas/tasas/plazoFijo`, { cache: "no-store" });
+    if (!r.ok) return [];
+    const arr: any[] = await r.json();
+    const out: PlazoFijoItem[] = arr.map((x) => ({ entidad: x.entidad ?? "", tnaClientes: x.tnaClientes ?? null, tnaNoClientes: x.tnaNoClientes ?? null, logo: x.logo ?? null, link: x.link ?? null }));
+    setCache("plazoFijoTasas", out, 15 * 60 * 1000);
+    return out;
+  } catch { return []; }
+});
+export const fetchPlazoFijoUva = createServerFn({ method: "GET" }).handler(async (): Promise<PlazoFijoUvaItem[]> => {
+  const cached = getCached<PlazoFijoUvaItem[]>("plazoFijoUva");
+  if (cached) return cached;
+  try {
+    const r = await fetch(`${AD}/v1/finanzas/tasas/plazoFijoUvaPagoPeriodico`, { cache: "no-store" });
+    if (!r.ok) return [];
+    const arr: any[] = await r.json();
+    const out: PlazoFijoUvaItem[] = [];
+    for (const prov of arr) {
+      for (const t of prov.tasas ?? []) out.push({ id: prov.id ?? "", entidad: prov.entidad ?? "", logo: prov.logo ?? "", nombre: t.nombre ?? "", plazoMinDias: t.plazoMinDias ?? 0, plazoMaxDias: t.plazoMaxDias ?? 0, tna: t.tna ?? 0, tea: t.tea ?? 0 });
+    }
+    setCache("plazoFijoUva", out, 15 * 60 * 1000);
+    return out;
+  } catch { return []; }
+});
+
 export const fetchFciPricesIOL = createServerFn({ method: "POST" })
   .validator(z.object({ token: z.string().min(1), refreshToken: z.string().nullable() }))
   .handler(async ({ data }) => {

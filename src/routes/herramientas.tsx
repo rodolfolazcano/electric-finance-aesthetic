@@ -310,7 +310,7 @@ function HerramientasContenido() {
           <main className="min-w-0 flex-1 w-full">
             {activo === "analisis" && <AnalisisTab tickerInicial={ticker} />}
             {activo === "sectores" && <SectoresTab initialTab={subTab} />}
-            {activo === "cuantitativo" && <CuantitativoTab initialSubTab={subTab} />}
+            {activo === "cuantitativo" && <CuantitativoTab initialSubTab={subTab} onSubTabChange={setSubTab} />}
             {activo === "portafolio" && <PortfolioComposition />}
             {activo === "renta-fija" && (
               <RentaFijaPanel
@@ -322,8 +322,8 @@ function HerramientasContenido() {
             {activo === "opciones" && <OptionsPanel />}
             {activo === "arbitrador" && <ArbitrajeP2PPanel />}
             {activo === "cripto" && <CriptoTab />}
-            {activo === "calculadora" && <CalculadoraFinancieraTab />}
-            {activo === "planificacion" && <PlanificacionPersonalTab initialSubTab={subTab} />}
+            {activo === "calculadora" && <CalculadoraFinancieraTab initialSubTab={subTab} />}
+            {activo === "planificacion" && <PlanificacionPersonalTab initialSubTab={subTab} onSubTabChange={setSubTab} />}
             {activo === "contexto" && <ContextoTab />}
             <CNVDisclaimer className="mt-8" />
           </main>

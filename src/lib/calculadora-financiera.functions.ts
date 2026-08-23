@@ -529,3 +529,136 @@ export function resolverTIRConRestricciones(
     advertencias,
   };
 }
+
+// ============================================================================
+// 10. TVM SOLVER — resolver cualquiera de n,i,PV,PMT,FV (HP12C 5 vars)
+// ============================================================================
+export interface TVMInput {
+  n?: number | null; // número de períodos
+  i?: number | null; // tasa por período % (no anual)
+  pv?: number | null;
+  pmt?: number | null;
+  fv?: number | null;
+  tipo?: "end" | "begin"; // vencida/anticipada
+}
+export interface TVMResult { variable: string; valor: number; iteraciones: number; convergio: boolean }
+function tvmEcuacion(p: Required<TVMInput> & { n: number; i: number; pv: number; pmt: number; fv: number }): number {
+  const { n, i, pv, pmt, fv, tipo } = p as any;
+  const r = i / 100;
+  if (Math.abs(r) < 1e-12) return pv + pmt * n + fv;
+  const ax = tipo === "begin" ? 1 + r : 1;
+  return pv * Math.pow(1 + r, n) + pmt * ax * (Math.pow(1 + r, n) - 1) / r + fv;
+}
+export function resolverTVM(inp: TVMInput): TVMResult {
+  const keys = ["n", "i", "pv", "pmt", "fv"] as const;
+  const faltantes = keys.filter((k) => inp[k] == null);
+  if (faltantes.length !== 1) throw new Error("TVM: debe faltar exactamente 1 variable de n,i,pv,pmt,fv");
+  const variable = faltantes[0] as string;
+  const tipo = inp.tipo ?? "end";
+  // caso directo para i no: usamos Newton sobre i o n
+  if (variable === "n") {
+    // si i,pv,pmt,fv conocen, despejar n analíticamente cuando posible
+    let n = 100;
+    for (let it = 0; it < 120; it++) {
+      const cur = inp as any;
+      const f = tvmEcuacion({ ...cur, n, i: cur.i ?? 0, pv: cur.pv ?? 0, pmt: cur.pmt ?? 0, fv: cur.fv ?? 0, tipo } as any);
+      const f2 = tvmEcuacion({ ...cur, n: n + 1e-6, i: cur.i ?? 0, pv: cur.pv ?? 0, pmt: cur.pmt ?? 0, fv: cur.fv ?? 0, tipo } as any);
+      const df = (f2 - f) / 1e-6;
+      if (Math.abs(f) < 1e-9) return { variable, valor: n, iteraciones: it, convergio: true };
+      if (!isFinite(df) || Math.abs(df) < 1e-12) break;
+      const nn = n - f / df;
+      if (!isFinite(nn)) break;
+      if (Math.abs(nn - n) < 1e-9) return { variable, valor: nn, iteraciones: it + 1, convergio: true };
+      n = Math.max(0.01, nn);
+    }
+    return { variable, valor: n, iteraciones: 120, convergio: false };
+  }
+  if (variable !== "i") {
+    // para pv,pmt,fv es lineal → despeje directo
+    const r = (inp.i ?? 0) / 100;
+    const n = inp.n ?? 0;
+    const ax = tipo === "begin" ? 1 + r : 1;
+    const pow = Math.pow(1 + r, n);
+    if (variable === "pv") {
+      const pv = (-(inp.pmt ?? 0) * ax * (pow - 1) / (r || 1) - (inp.fv ?? 0)) / pow;
+      return { variable, valor: pv, iteraciones: 0, convergio: true };
+    }
+    if (variable === "pmt") {
+      const pmt = (-(inp.pv ?? 0) * pow - (inp.fv ?? 0)) / (ax * (pow - 1) / (r || 1));
+      return { variable, valor: pmt, iteraciones: 0, convergio: true };
+    }
+    if (variable === "fv") {
+      const fv = -(inp.pv ?? 0) * pow - (inp.pmt ?? 0) * ax * (pow - 1) / (r || 1);
+      return { variable, valor: fv, iteraciones: 0, convergio: true };
+    }
+  }
+  // variable === "i" → Newton sobre tasa periódica
+  let i = 0.5; // 0.5% por período como semilla
+  for (let it = 0; it < 200; it++) {
+    const cur = inp as any;
+    const f = tvmEcuacion({ ...cur, i, tipo } as any);
+    const f2 = tvmEcuacion({ ...cur, i: i + 1e-7, tipo } as any);
+    const df = (f2 - f) / 1e-7;
+    if (Math.abs(f) < 1e-9) return { variable, valor: i, iteraciones: it, convergio: true };
+    if (!isFinite(df) || Math.abs(df) < 1e-12) break;
+    const ni = i - f / df;
+    if (!isFinite(ni)) break;
+    if (Math.abs(ni - i) < 1e-10) return { variable, valor: ni, iteraciones: it + 1, convergio: true };
+    i = Math.max(-90, Math.min(90, ni));
+  }
+  return { variable, valor: i, iteraciones: 200, convergio: false };
+}
+
+// ============================================================================
+// 11. FECHAS — DAYS y vencimiento (Manual p.7-8)
+// ============================================================================
+export function diasEntreFechas(d1: Date | string, d2: Date | string, base: 360 | 365 = 365): number {
+  const a = typeof d1 === "string" ? new Date(d1) : d1;
+  const b = typeof d2 === "string" ? new Date(d2) : d2;
+  const diffMs = b.getTime() - a.getTime();
+  const diasReales = Math.round(diffMs / 86400000);
+  if (base === 365) return diasReales;
+  // 30/360 aproximado
+  return Math.round(diasReales * 360 / 365);
+}
+export function fechaVencimiento(inicio: Date | string, dias: number): Date {
+  const d = new Date(typeof inicio === "string" ? inicio : inicio.getTime());
+  d.setDate(d.getDate() + dias);
+  return d;
+}
+
+// ============================================================================
+// 12. TASAS — anticipada↔vencida, Fisher, equivalentes
+// ============================================================================
+export function tasaAnticipadaAVencida(iaPct: number): number {
+  const ia = iaPct / 100;
+  return (ia / (1 - ia)) * 100;
+}
+export function tasaVencidaAAnticipada(ivPct: number): number {
+  const iv = ivPct / 100;
+  return (iv / (1 + iv)) * 100;
+}
+export function fisherReal(nominalPct: number, inflacionPct: number): number {
+  const n = nominalPct / 100; const pi = inflacionPct / 100;
+  return ((1 + n) / (1 + pi) - 1) * 100;
+}
+export function tasaEquivalente(tasaPct: number, mOrigen: number, mDestino: number): number {
+  const i = tasaPct / 100;
+  return (Math.pow(1 + i, mDestino / mOrigen) - 1) * 100 * (mOrigen / mDestino);
+}
+export function temToTea(temPct: number): number { return (Math.pow(1 + temPct / 100, 12) - 1) * 100; }
+export function teaToTem(teaPct: number): number { return (Math.pow(1 + teaPct / 100, 1 / 12) - 1) * 100; }
+export function actualizarPorCER(capital: number, cerInicial: number, cerFinal: number): number {
+  return cerInicial > 0 ? capital * cerFinal / cerInicial : capital;
+}
+export function actualizarPorUVA(capital: number, uvaInicial: number, uvaFinal: number): number {
+  return uvaInicial > 0 ? capital * uvaFinal / uvaInicial : capital;
+}
+// CFT/TAE con comisiones: TIR del flujo neto (mismo que ejemplo transparencias 20k, cuota 600×60 → 32,13%)
+export function calcularCFT(montoNeto: number, cuota: number, n: number): { tem: number; tea: number; cftTea: number } {
+  const flujos = [-montoNeto, ...Array(n).fill(cuota)];
+  const tir = calcularTIR(flujos, 12);
+  const tem = tir.tir / 12;
+  const tea = (Math.pow(1 + tem / 100, 12) - 1) * 100;
+  return { tem, tea, cftTea: tea };
+}
