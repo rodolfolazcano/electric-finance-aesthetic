@@ -27,18 +27,6 @@ export function OportunidadesOrquestadasTab({ sectorFilter }: { sectorFilter?: s
 
   return (
     <div className="space-y-6 w-full">
-      {/* Header metodológico */}
-      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-        <h3 className="font-display text-lg font-semibold">Oportunidades — Panel de análisis financiero orquestado</h3>
-        <p className="text-[13px] text-muted-foreground mt-1">
-          Datos en vivo Yahoo Finance, IOL, BCRA, ArgentinaDatos y CriptoYa. Screener solo sobre subyacentes EE.UU. (NYSE/NASDAQ) con estados contables completos — cada señal muestra su vía operable en BCBA (CEDEAR ARS/USD) o cuenta EE.UU. Máx 50 tickers por corrida, priorizados por liquidez.
-        </p>
-        <p className="text-[12px] text-muted-foreground mt-1">
-          Flujo: <span className="font-mono">Intermarket (Murphy)</span> → <span className="font-mono">Macro</span> → <span className="font-mono">Cuantitativo (R² + Hurst p=1/H)</span> → <span className="font-mono">Fundamental (Pascale 6D gate)</span> → <span className="font-mono">Técnico</span> → <span className="font-mono">Catalizador (Value Investing / Tácticas — upgrade/earnings/margen)</span> → Oportunidades.
-        </p>
-        <p className="text-[11px] text-muted-foreground mt-1">Metodologías: Murphy intermarket + oro/dólar/yield, Pring 6 etapas, Bustamante 5 pasos, Fowler Newton moneda homogénea, Pascale valuación, Elbaum carteras/Markowitz, Labadie p=1/H & spectral + Hurst mean-reversion, Dumrauf Fisher exacta.</p>
-      </div>
-
       {/* Controles — 100% orquestado: Re-ejecutar con nuevo universo */}
       <Card>
         <CardContent className="p-4 flex flex-wrap items-center gap-3">
