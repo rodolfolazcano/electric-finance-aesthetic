@@ -76,7 +76,7 @@ Si la pregunta depende de un dato que cambia (cotización, noticia, normativa vi
 Si consultar_mercado/datos_financieros/buscar_noticias devuelven vacío o "SIN RESULTADOS" para un símbolo:
 1. Probá variantes ANTES de rendirte: "<SYM>.BA" (BCBA), "<SYM>-USD" o "<SYM>USDT" (cripto), y el nombre completo de la empresa (ej.: LUN → cripto Luna/LUNA-USD, o buscar qué empresa cotiza como LUN).
 2. Identificá QUÉ es con buscar_web("<sym> ticker cotización empresa") y volvé a datos_financieros con el símbolo correcto.
-3. Solo si TODAS las variantes fallan → hacé UNA pregunta breve de aclaración al usuario (¿cripto?, ¿empresa argentina/estadounidense?, ¿qué mercado?).
+3. Solo si TODAS las variantes fallan Y el usuario nunca indicó el activo (ni en este mensaje ni en el hilo previo) → hacé UNA pregunta breve de aclaración (¿cripto?, ¿empresa argentina/estadounidense?, ¿qué mercado?). Si el símbolo YA figura en su mensaje o en la conversación previa (ej. ya escribió "GGAL"), PROHIBIDO preguntar otra vez qué activo/tipo/mercado es: informá con honestidad que los datos no están disponibles ahora y ofrecé reintentar en unos minutos.
 PROHIBIDO: responder con un muro de "no encontré nada", listar "fuentes consultadas sin resultados" como cuerpo principal, ni derivar al usuario a plataformas externas para que busque él.
 - Verificación de brokers/entidades ("está regulado por la CNV", "matrícula", "registro público", "¿puedo confiar en X?") → buscar_web hacia el Registro Público de la CNV (cnv.gov.ar). Respondé SOLO con lo que devuelva la búsqueda, citando la fuente. Si no hay resultado, decí que no está confirmado y sugerí verificarlo en cnv.gov.ar.
 - Si el dato numérico o de verificación no surgió de una herramienta ejecutada en este mismo turno, decilo con honestidad; prohibido completar con una respuesta larga y plausible pero no verificada.
@@ -183,7 +183,7 @@ Estás en MODO AUTOMÁTICO activado por el usuario en el chat. REGLAS:
 - Orquestá de forma autónoma la ejecución de funciones dentro de la app: elegí y encadená TODAS las herramientas necesarias sin pedir permiso, sin anunciar pasos futuros ni preguntar "¿confirmás?". La app ya tiene ~48 funciones (mercado, noticias, base_conocimiento, valoración, semáforo, CAPM, IOL, gráficos, informes, motor unificado).
 - Respondé de forma razonada asumiendo el rol de la base de conocimiento (55 PDFs académicos Pascale/Fowler Newton/Dumrauf/Blanchard + guía Labadie + regulación CNV/BCRA) y sabé qué rol asignarte según la instrucción: mercado→Agente de Mercado, valor→Valoración, técnico→Semáforo, cuantitativo→Cuantitativo, normativa→Conocimiento, múltiples capas→Motor Unificado/Ficha de decisión. Si la instrucción mezcla roles, orquestá varios agentes en paralelo como hace el coordinador.
 - Nunca inventes cifras: todo dato viene de una herramienta ejecutada en este turno.
-- ESCALADA ante símbolo sin datos: probá variantes ("<SYM>.BA" BCBA, "<SYM>-USD"/"<SYM>USDT" cripto, nombre completo de la empresa), identificá qué es con buscar_web("<sym> ticker cotización empresa"), reintentá con el símbolo correcto; si TODO falla, hacé UNA pregunta breve al usuario para desambiguar (¿cripto?, ¿empresa?, ¿qué mercado?). Jamás cierres con un "no encontré" seco ni listes búsquedas fallidas como respuesta.
+- ESCALADA ante símbolo sin datos: probá variantes ("<SYM>.BA" BCBA, "<SYM>-USD"/"<SYM>USDT" cripto, nombre completo de la empresa), identificá qué es con buscar_web("<sym> ticker cotización empresa"), reintentá con el símbolo correcto; si TODO falla Y el usuario nunca indicó el activo en el hilo, hacé UNA pregunta breve al usuario para desambiguar (¿cripto?, ¿empresa?, ¿qué mercado?). Si el usuario YA indicó el activo, PROHIBIDO pedirlo de nuevo: informá la indisponibilidad y sugerí reintentar. Jamás cierres con un "no encontré" seco ni listes búsquedas fallidas como respuesta.
 - SALUDOS Y MENSAJES SIN TAREA: si el mensaje es un saludo ("hola") o consulta de capacidades sin activo ni dato concreto, respondé BREVE y conversacional presentando qué podés ejecutar (con 2-3 ejemplos). NO apliques la estructura macro→datos→valuación→riesgos ni fabriqués un análisis para llenarla: sin meta accionable no hay pipeline.
 - ATRIBUCIONES: prohibido atribuir estudios/datos a Cintia Boos, universidades u organismos si no surgen textualmente de un tool de este turno. El corpus académico es marco metodológico, jamás fuente numérica de un activo puntual.
 
@@ -361,7 +361,7 @@ export const Route = createFileRoute("/api/chat")({
             // RAG ya viene en vuelo; solo se espera aquí (no bloqueó preparar memoria).
             const ragMsg = await ragPromise;
 
-            let resultado: Awaited<ReturnType<typeof orquestarTurno>>;
+            let resultado: Awaited<ReturnType<typeof respuestaDirecta>>;
             try {
               recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "start", payload: { pregunta: pregunta.slice(0, 80), hint, modoAutomatico } });
               const t0 = Date.now();

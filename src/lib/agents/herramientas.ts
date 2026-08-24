@@ -184,6 +184,26 @@ export const TOOLS: ToolSpec[] = [
   {
     type: "function",
     function: {
+      name: "estimaciones_earnings",
+      description:
+        "Obtiene las ESTIMACIONES DE EARNINGS reales de una empresa con datos en vivo de Yahoo Finance: fecha del próximo reporte trimestral, EPS estimado por los analistas para ese reporte, historial de los últimos ~8 trimestres (EPS estimado vs real y sorpresa %), tasa de acierto histórica, sorpresa promedio ± desvío, probabilidad bootstrap de sorpresa positiva P(>0), IC90 y Cohen d. Para preguntas como 'qué EPS estiman los analistas para NVDA', 'cuándo reporta Amazon', 'siempre bate las estimaciones?', 'probabilidad de beat de X', 'historial de sorpresas de X', 'earnings de la semana'. Acepta ticker o nombre (ej. NVDA, Nvidia, AAPL, GGAL.BA).",
+      parameters: {
+        type: "object",
+        properties: {
+          simbolo: {
+            type: "string",
+            description:
+              "Ticker o nombre de la empresa (ej. 'NVDA', 'Nvidia', 'AMZN', 'AAPL', 'GGAL.BA').",
+          },
+        },
+        required: ["simbolo"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "analizar_semaforo",
       description:
         "Analiza un activo con un semáforo técnico + fundamental usando datos reales en vivo de Yahoo Finance: indicadores técnicos (RSI14, MACD, SMA20/50/200, soportes y resistencias, anomalía de precio, posición en el rango de 52 semanas) y métricas fundamentales (P/E, crecimiento de ingresos, margen, ROE, upside vs consenso de analistas, deuda/patrimonio). Calcula scores en [-2, 2] con pesos tendencia 40% / momentum 30% / S/R 20% / anomalía 10%, clasifica con umbrales (>1.5 COMPRA, >0.3 COMPRA CON CAUTELA, >-0.3 MANTENER, >-1.5 REDUCIR, VENTA) y valida el resultado con noticias recientes sobre el activo. Para preguntas como 'analizá el semáforo de X', 'análisis técnico de X', 'indicadores técnicos', 'soportes y resistencias de X', 'conviene comprar o vender X', 'RSI/MACD de X'. Acepta ticker o nombre (ej. AAPL, YPF, GGAL.BA, MercadoLibre, Banco Galicia).",

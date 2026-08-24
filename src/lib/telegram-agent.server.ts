@@ -347,6 +347,9 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
         "",
         "Comandos:",
         "/help - ayuda",
+        "/valor IBM - valor justo DCF rápido (datos Yahoo en vivo)",
+        "/ficha IBM - ficha de decisión completa (DCF+múltiplos+APV+MOS)",
+        "/earnings - calendario de earnings de la semana",
         "/reset - empieza conversacion nueva",
         "/auto - activa el modo autónomo pesado (1-3 min) solo para el próximo análisis",
       ].join("\n"),
@@ -369,6 +372,9 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
         "- Tu cuenta IOL: inicia sesion con tus credenciales",
         "",
         "Comandos:",
+        "/valor IBM - valor justo (DCF con datos Yahoo en vivo, sin IA)",
+        "/ficha IBM - ficha de decisión completa (WACC + DCF/múltiplos/APV + MOS)",
+        "/earnings - calendario de earnings de la semana",
         "/reset - borra la memoria de esta conversacion",
         "",
         "Aviso: informacion educativa, no recomendacion de inversion.",
@@ -411,6 +417,63 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
       await sendAgentMessage(
         chatId,
         "Modo autónomo pesado ACTIVADO para este chat (1-3 min por análisis, validación multi-agente).\nMandá tu pedido de análisis completo.\n/auto off para volver a la vía rápida.",
+      );
+    }
+    return;
+  }
+
+  // ─── Comandos directos de valuación (sin LLM: deterministas y rápidos) ───
+  if (low.startsWith("/valor") || low.startsWith("/ficha")) {
+    const esFicha = low.startsWith("/ficha");
+    const ticker = text.replace(/^\/(valor|ficha)\s*/i, "").trim().split(/\s+/)[0] ?? "";
+    if (!ticker) {
+      await sendAgentMessage(
+        chatId,
+        esFicha
+          ? "Usá: /ficha IBM — acepta ticker o nombre (ej. AAPL, GGAL.BA, Microsoft)."
+          : "Usá: /valor IBM — acepta ticker o nombre (ej. AAPL, GGAL.BA, Microsoft).",
+      );
+      return;
+    }
+    try {
+      void sendAgentChatAction(chatId);
+      let respuesta: string;
+      if (esFicha) {
+        const { ejecutarFichaDecision } = await import("@/lib/agents/ejecutores");
+        const r = await ejecutarFichaDecision(JSON.stringify({ simbolo: ticker }));
+        respuesta = r.texto;
+      } else {
+        const { analisisValorIntrinseco, textoAnalisis } = await import(
+          "@/lib/valuation-pipeline"
+        );
+        respuesta = textoAnalisis(await analisisValorIntrinseco(ticker));
+      }
+      await sendAgentMessage(chatId, markdownATelegramHtml(respuesta));
+    } catch (e) {
+      console.error("[AGENTE TG] comando valuacion fallo:", e);
+      await sendAgentMessage(
+        chatId,
+        `No pude completar el análisis de ${escaparHtml(ticker)} (${
+          e instanceof Error ? escaparHtml(e.message) : "error desconocido"
+        }). Reintentá en unos segundos o escribilé "valor intrínseco de ${escaparHtml(ticker)}" para la vía con IA.`,
+      );
+    }
+    return;
+  }
+
+  // ─── Comando directo: calendario de earnings (sin LLM) ───────────────
+  if (low.startsWith("/earnings")) {
+    const modo = /\bdiari/i.test(low) ? "diario" : "semanal";
+    try {
+      void sendAgentChatAction(chatId);
+      const { generarEarnings } = await import("@/lib/earnings-calendario.server");
+      const r = await generarEarnings({ modo });
+      await sendAgentMessage(chatId, r.texto);
+    } catch (e) {
+      console.error("[AGENTE TG] /earnings fallo:", e);
+      await sendAgentMessage(
+        chatId,
+        `No pude generar el calendario de earnings (${e instanceof Error ? escaparHtml(e.message) : "error desconocido"}). Reintentá en unos segundos.`,
       );
     }
     return;

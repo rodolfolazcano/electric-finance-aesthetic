@@ -1,0 +1,2 @@
+- [2026-08-24T17:56:23.292Z] (usuario) cuanto esta el dolar blue?
+- [2026-08-24T17:56:30.687Z] (agente) El dólar blue cotiza a **$1.540,00** para compra y **$1.560,00** para venta, según la actualización más reciente del mercado (24/08 a las 11:55 hs).    **Fuente:** CriptoYa – cotizaciones del dólar en Argentina (sección “Dólar blue”).

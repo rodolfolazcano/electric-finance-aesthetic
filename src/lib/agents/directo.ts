@@ -10,6 +10,57 @@ import type { FuenteMercado } from "@/lib/mercado.server";
 
 const MAX_RONDAS_TOOLS = 6;
 
+/** Detecta un ticker/símbolo ya indicado por el usuario (mensaje actual o hilo
+ *  reciente). Guardia anti-bucle: si el usuario YA dijo el activo, el modelo
+ *  tiene PROHIBIDO volver a preguntar qué activo/tipo/mercado es. */
+function extraerTickerDeTexto(pregunta: string, historial?: ApiMsg[]): string | null {
+  const STOPWORDS = new Set([
+    "QUE", "COMO", "CUAL", "CUALES", "CUANTO", "CUANTA", "PARA", "POR", "CON", "DEL", "LOS",
+    "LAS", "UNA", "UNO", "UNOS", "SOBRE", "ENTRE", "ESTA", "ESTE", "ESO", "ESA", "ESE",
+    "THE", "AND", "FOR", "FROM", "WITH", "HOLA", "GRACIAS", "QUIERO", "PASAME", "DECIME",
+    "DAME", "VALOR", "PRECIO", "GRAFICO", "ANALISIS", "MERCADO", "HOY", "AHORA", "TENER",
+  ]);
+  const textos = [pregunta ?? ""];
+  if (historial?.length) {
+    for (let i = historial.length - 1; i >= 0 && textos.length < 5; i--) {
+      if (historial[i]!.role === "user") textos.push(historial[i]!.content);
+    }
+  }
+  for (const texto of textos) {
+    const t = (texto ?? "").trim();
+    if (!t) continue;
+    // Respuesta monovalente del usuario ("GGAL", "ggal.ba") — máxima confianza.
+    if (/^[a-z0-9][a-z0-9.\-]{1,11}$/i.test(t)) {
+      const up = t.toUpperCase();
+      if (!STOPWORDS.has(up.replace(/\.BA$/, ""))) return up;
+      continue;
+    }
+    const mayus = t.toUpperCase();
+    // Sufijos inequívocos
+    let m = mayus.match(/\b([A-Z0-9]{2,8}\.(?:BA|US)|[A-Z0-9]{2,10}(?:USDT|-USD))\b/);
+    if (m) return m[1]!;
+    // Ticker tras preposición de pedido ("valor intrínseco DE X", "gráfico DE X")
+    m = mayus.match(
+      /\b(?:VALOR|PRECIO|GRAFICO|ANALISIS|SEM[AÁ]FORO|BETA|WACC|EPS|REPORT[EAO]|COTIZACI[ÓO]N)\w*\s+(?:INTR[IÍ]NSECO\s+)?(?:DE|DEL|PARA)\s+([A-Z][A-Z0-9]{1,7}(?:\.BA)?)\b/,
+    );
+    if (m && !STOPWORDS.has(m[1]!)) return m[1]!;
+    // Token MAYÚSCULAS suelto embebido (ej. "analisis completo de GGAL hoy")
+    m = mayus.match(/\b([A-Z]{2,6}(?:\.BA)?)\b/g);
+    if (m) {
+      const valido = m.map((x) => x.replace(/\s/g, "")).find((tok) => !STOPWORDS.has(tok));
+      if (valido && /[A-Z]/.test(valido)) return valido;
+    }
+  }
+  return null;
+}
+
+const RE_PIDE_ACLARACION =
+  /(ind[ií]came|indicame|indic[aá]|decime|dime|decirme)\s+(?:el\s+|la\s+|qué\s+|que\s+)?(nombre|s[ií]mbolo|simbolo|ticker|empresa|activo)|qu[eé]\s+(tipo\s+de\s+)?(activo|empresa|instrumento|cripto)|cu[aá]l\s+(empresa|acci[oó]n|activo)|a\s+qu[eé]\s+(activo|empresa)|en\s+qu[eé]\s+(tipo\s+de\s+)?activo/i;
+
+function mensajeIndisponibilidad(ticker: string): string {
+  return `Los datos en vivo de **${ticker}** no están disponibles en este momento (el proveedor de mercado está saturado o sin respuesta). Ya me indicaste el activo, así que no te voy a preguntar de nuevo: reintentá en unos minutos y lo calculo con datos reales.`;
+}
+
 function esResultadoVacio(texto: string): boolean {
   const t = (texto ?? "").trim();
   if (t.length < 60) return true;
@@ -127,11 +178,30 @@ export async function respuestaDirecta(
     }
 
     if (todaVacia && ronda < MAX_RONDAS_TOOLS - 1) {
+      const tickerYaDado = extraerTickerDeTexto(pregunta, historial);
       mensajes.push({
         role: "system",
-        content:
-          "Los últimos intentos devolvieron vacío o SIN RESULTADOS. Antes de rendirte ESCALÁ: (1) probá variantes del símbolo ('<SYM>.BA' BCBA, '<SYM>-USD'/'<SYM>USDT' cripto, nombre completo de la empresa); (2) usá buscar_web('<sym> ticker cotización empresa') para identificar qué es ese símbolo y reintentá con el correcto; (3) solo si TODO falla, respondé al usuario con UNA pregunta breve de aclaración (¿cripto?, ¿empresa?, ¿qué mercado?). PROHIBIDO entregar un 'no encontré' con la lista de búsquedas fallidas como cuerpo de la respuesta.",
+        content: tickerYaDado
+          ? `Los datos en vivo fallaron y el usuario YA INDICÓ el activo (${tickerYaDado}). PROHIBIDO preguntar qué activo/empresa/mercado es o pedirle que lo repita: respondé con honestidad que los datos de mercado no están disponibles en este momento (proveedor saturado), nombrá ${tickerYaDado} explícitamente y sugerí reintentar en unos minutos. UNA sola vez, sin listas de intentos fallidos.`
+          : "Los últimos intentos devolvieron vacío o SIN RESULTADOS. Antes de rendirte ESCALÁ: (1) probá variantes del símbolo ('<SYM>.BA' BCBA, '<SYM>-USD'/'<SYM>USDT' cripto, nombre completo de la empresa); (2) usá buscar_web('<sym> ticker cotización empresa') para identificar qué es ese símbolo y reintentá con el correcto; (3) SOLO si el usuario nunca indicó el activo ni en este mensaje ni en el hilo previo, respondé con UNA pregunta breve de aclaración (¿cripto?, ¿empresa?, ¿qué mercado?). PROHIBIDO entregar un 'no encontré' con la lista de búsquedas fallidas como cuerpo de la respuesta.",
       });
+    }
+  }
+
+  // Guardia determinística anti-bucle: aunque el modelo ignore las
+  // instrucciones, jamás se le escapa una pregunta de aclaración cuando el
+  // usuario ya dio el activo.
+  const tickerUsuario = extraerTickerDeTexto(pregunta, historial);
+  if (final && RE_PIDE_ACLARACION.test(final)) {
+    if (tickerUsuario) {
+      final = mensajeIndisponibilidad(tickerUsuario);
+    } else {
+      const ultimoUser = [...historial].reverse().find((m) => m.role === "user");
+      if (ultimoUser && RE_PIDE_ACLARACION.test(String(ultimoUser.content ?? ""))) {
+        // El usuario ya respondió a una aclaración previa: no re-interrogar.
+        final =
+          "Sigo sin poder obtener esos datos del proveedor de mercado en este momento. Reintentá en unos minutos y lo resuelvo con cifras reales.";
+      }
     }
   }
 

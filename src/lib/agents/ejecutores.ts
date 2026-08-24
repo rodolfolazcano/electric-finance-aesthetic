@@ -183,6 +183,90 @@ export async function ejecutarValorIntrinseco(argsRaw: string): Promise<{
   return { texto, fuentes: resultado.fuentes, ok, textoUsuario };
 }
 
+/** Estimaciones de earnings con datos reales: próximo reporte, EPS estimado e
+ *  historial de sorpresas con probabilidad bootstrap (estimaciones-earnings.server). */
+export async function ejecutarEstimacionesEarnings(argsRaw: string): Promise<{
+  texto: string;
+  fuentes: FuenteMercado[];
+  ok: boolean;
+}> {
+  let simbolo = "";
+  try {
+    const args = JSON.parse(argsRaw) as { simbolo?: string; ticker?: string };
+    simbolo = String(args.simbolo ?? args.ticker ?? "").trim();
+  } catch {
+    simbolo = String(argsRaw ?? "").trim().slice(0, 24);
+  }
+  if (!simbolo) {
+    return {
+      texto:
+        "SIN RESULTADOS: no recibí el símbolo/empresa. Reinvocá la herramienta con el parámetro simbolo (ej. 'NVDA', 'AAPL', 'GGAL.BA').",
+      fuentes: [],
+      ok: false,
+    };
+  }
+  try {
+    const { resolverSimbolo } = await import("@/lib/market-data");
+    const { analizarEarningsTicker } = await import("@/lib/estimaciones-earnings.server");
+    const resuelto =
+      /^[A-Z0-9.\-^]{1,12}$/i.test(simbolo) ? simbolo.toUpperCase() : (await resolverSimbolo(simbolo)) ?? simbolo.toUpperCase();
+    const r = await analizarEarningsTicker(resuelto);
+    if (r.nTrimestres < 2) {
+      return {
+        texto: `SIN RESULTADOS: sin historial de earnings suficiente para ${simbolo} (${r.companyName}). No inventes estimaciones: respondé con honestidad y ofrecé reintentar.`,
+        fuentes: [],
+        ok: false,
+      };
+    }
+    const fmt = (v: number | null | undefined, d = 2) =>
+      v == null || !isFinite(v) ? "s/d" : `$${v.toFixed(d)}`;
+    const pct = (v: number | null | undefined, d = 2) =>
+      v == null || !isFinite(v) ? "s/d" : `${v >= 0 ? "+" : ""}${v.toFixed(d)}%`;
+    const diasTxt =
+      r.diasHastaProximo != null
+        ? r.diasHastaProximo <= 0
+          ? "HOY o ya publicó"
+          : `en ${r.diasHastaProximo} día(s)`
+        : "";
+    const prob = r.probSPositiva != null ? Math.round(r.probSPositiva * 100) : null;
+    const tendencia = r.probTendencia != null ? Math.round(r.probTendencia * 100) : null;
+    const lectura =
+      prob != null && prob >= 60
+        ? "sesgo estadístico POSITIVO (históricamente bate estimados)"
+        : prob != null && prob <= 40
+          ? "sesgo estadístico NEGATIVO (suele decepcionar vs consenso)"
+          : "sin sesgo claro";
+    const ultimos = r.historial.slice(-6);
+    const lineas = [
+      `RESULTADO DEL TOOL estimaciones_earnings — ${r.companyName} (${r.ticker}):`,
+      ``,
+      `PRÓXIMO REPORTE: ${r.proximoReporte ?? "s/d"} ${diasTxt} — EPS estimado por analistas: ${fmt(r.epsEstimadoProximo)}`,
+      ``,
+      `HISTORIAL (últimos ${ultimos.length} trimestres):`,
+      ...ultimos.map(
+        (h) => `- ${h.fecha} (${h.periodo}): est ${fmt(h.epsEstimado)} → real ${fmt(h.epsReal)} · sorpresa ${pct(h.sorpresaPct)}`,
+      ),
+      ``,
+      `MÉTRICAS: acierto ${Math.round(r.tasaHistorica * 100)}% (${r.hits}/${r.nTrimestres}) · sorpresa promedio ${pct(r.avgSorpresa)} ± ${r.stdSorpresa.toFixed(2)}pp · rango [${pct(r.minSorpresa)}, ${pct(r.maxSorpresa)}]`,
+      prob != null
+        ? `BOOTSTRAP: P(sorpresa>0)=${prob}% · P(tendencia>0)=${tendencia ?? "s/d"}% · IC90 sorpresa [${pct(r.icInf)}, ${pct(r.icSup)}] · Cohen d=${r.cohenD.toFixed(2)}`
+        : `BOOTSTRAP: s/d (muestra insuficiente)`,
+      `LECTURA: ${lectura}.`,
+      ``,
+      `Datos en vivo de Yahoo Finance. Educativo, no recomendación. No inventes cifras que no estén acá.`,
+    ];
+    return { texto: lineas.join("\n"), fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: no se pudieron obtener las estimaciones de earnings de ${simbolo} (${
+        e instanceof Error ? e.message : "desconocido"
+      }). Respondé con honestidad que los datos en vivo no están disponibles ahora y ofrecé reintentar.`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
 /** Semáforo técnico + fundamental con datos reales (Yahoo Finance) + noticias de validación. */
 export async function ejecutarSemaforo(argsRaw: string): Promise<{
   texto: string;

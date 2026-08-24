@@ -484,6 +484,68 @@ export async function fetchYahooQuote(symbol: string): Promise<any> {
   return withConcurrencyLimit(() => yahooQuoteInner(symbol, cacheKey, false));
 }
 
+/** Quote BATCH (multi-símbolo, hasta ~50 por llamada) — usado por el calendario
+ *  de earnings para mapear el universo con pocas llamadas. Devuelve los quotes
+ *  crudos de v7/finance/quote (incluye marketCap y earningsTimestampStart/End).
+ *  Bajo rate limit abandona RÁPIDO (máx 2 intentos totales, sin re-danzar sesión). */
+let ultimo429Batch = 0;
+export async function fetchYahooQuotesBatch(symbols: string[]): Promise<any[]> {
+  if (!symbols.length) return [];
+  const lista = symbols.slice(0, 60).map((s) => s.trim().toUpperCase()).filter(Boolean);
+  const cacheKey = yahooCacheKey("quotebatch", lista.length.toString(), lista.join(","));
+  const cached = getCached<any[]>(cacheKey, YAHOO_CACHE_TTL);
+  if (cached) return cached;
+
+  // Circuit breaker: si el último 429 fue hace <60s, ni intentar (falla en O(1)).
+  if (Date.now() - ultimo429Batch < 60_000) return [];
+
+  let lastError: Error | null = null;
+  let intentos429 = 0;
+  outer: for (const host of ["query1.finance.yahoo.com", "query2.finance.yahoo.com"]) {
+    for (let intento = 0; intento < 2; intento++) {
+      try {
+        const session = await getYahooSession(false); // bajo 429 no re-danzar sesión
+        const params = new URLSearchParams({
+          symbols: lista.join(","),
+          crumb: session?.crumb ?? "",
+          formatted: "false",
+          fields: "earningsTimestamp,earningsTimestampStart,earningsTimestampEnd",
+          corsDomain: "finance.yahoo.com",
+        });
+        const url = `https://${host}/v7/finance/quote?${params}`;
+        const res = await fetch(url, {
+          headers: {
+            "User-Agent": YAHOO_UA,
+            Accept: "application/json",
+            ...(session?.cookie ? { Cookie: session.cookie } : {}),
+          },
+        });
+        if (res.status === 401 && session) {
+          sessionCache = null;
+          continue;
+        }
+        if (res.status === 429 || res.status === 403) {
+          ultimo429Batch = Date.now();
+          intentos429++;
+          lastError = new Error(`Yahoo quote batch ${res.status}`);
+          if (intentos429 >= 2) break outer; // IP bloqueada: no insistir
+          await new Promise((r) => setTimeout(r, 800 + Math.random() * 700));
+          continue;
+        }
+        if (!res.ok) throw new Error(`Yahoo quote batch error: ${res.status}`);
+        const json = (await res.json()) as any;
+        const quotes: any[] = json?.quoteResponse?.result ?? [];
+        setCache(cacheKey, quotes);
+        return quotes;
+      } catch (e) {
+        lastError = e instanceof Error ? e : new Error(String(e));
+      }
+    }
+  }
+  console.error("[yahoo-http] quote batch fallo:", lastError?.message);
+  return [];
+}
+
 // ─── Compat: mercado.ts importaba fetchYahooSearch (alias histórico) ───
 export interface YahooSearchResult {
   quotes?: Array<{

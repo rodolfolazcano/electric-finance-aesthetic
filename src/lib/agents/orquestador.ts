@@ -22,6 +22,7 @@ import {
   ejecutarBaseConocimiento,
   ejecutarDCF,
   ejecutarValorIntrinseco,
+  ejecutarEstimacionesEarnings,
   ejecutarSemaforo,
   ejecutarBusqueda,
   validarDCFEnWeb,
@@ -567,6 +568,7 @@ const GRUPOS_HERRAMIENTAS: Record<string, string[]> = {
   valoracion: [
     "calcular_dcf",
     "valor_intrinseco_real",
+    "estimaciones_earnings",
     "analizar_fundamental",
     "calcular_wacc",
     "valor_por_metodos",
@@ -644,6 +646,13 @@ export function filtrarToolsParaPregunta(pregunta: string, roles: RolAgente[]): 
   if (
     roles.includes("valoracion") ||
     /valor\s+intr[íi]nsec|cu[aá]nto\s+vale|dcf\b|wacc|fundamental\s+(de|del)|valua|valuaci[oó]n|m[uú]ltiplos|ficha\s+de\s+decisi/.test(
+      p,
+    )
+  ) {
+    agregarGrupoHerramientas(nombres, "valoracion");
+  }
+  if (
+    /\beps\b|eps\s+estima|estiman.*analista|cu[aá]ndo\s+reporta|cuando\s+reporta|pr[óo]ximo\s+reporte|\bearings?\b|sorpresa\s+de|probabilidad\s+de\s+beat|hace?\s+beat/i.test(
       p,
     )
   ) {
@@ -879,6 +888,10 @@ export async function ejecutarTool(
       return { ...(await ejecutarDCF(argsRaw)), ok: true };
     case "valor_intrinseco_real": {
       const res = await ejecutarValorIntrinseco(argsRaw);
+      return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
+    }
+    case "estimaciones_earnings": {
+      const res = await ejecutarEstimacionesEarnings(argsRaw);
       return { texto: res.texto, fuentes: res.fuentes, ok: res.ok };
     }
     case "analizar_semaforo": {
