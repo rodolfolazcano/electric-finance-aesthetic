@@ -21,14 +21,6 @@
       "schedule": "0 13 * * 1-5"
     },
     {
-      "path": "/api/cron/earnings-semanal?modo=semanal",
-      "schedule": "0 12 * * 1"
-    },
-    {
-      "path": "/api/cron/earnings-semanal?modo=diario",
-      "schedule": "30 12 * * 1-5"
-    },
-    {
       "path": "/api/cron/alerta-publicaciones?umbral=6&max=2",
       "schedule": "30 15 * * 1-5"
     },

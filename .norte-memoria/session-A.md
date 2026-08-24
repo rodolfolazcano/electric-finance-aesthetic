@@ -34,3 +34,8 @@ Setup: Lovable conectado — sin force-push/amend pusheados. Bitácora exclusiva
 - Estado: DONE-A parcial — A0-A4 + T11 completados, B1-B4 heredados de main (predicción existente, clipCovariance, etc.)
 
 DONE-A — 2026-08-23 — lista commits: f493fd9 A0-B0 merge, A4 T10, T11 reorder
+
+## [2026-08-24] earnings telegram + anti-bucle
+- Archivos: src/lib/earnings-calendario.server.ts (nuevo, escaneo batch v7/quote universo US ~5.5k del catalogo), src/routes/api/cron/earnings-semanal.ts (modo semanal|diario), tool estimaciones_earnings (orquestador+registry+ejecutores), comandos /valor /ficha /earnings en telegram-agent.server.ts, fetchYahooQuotesBatch en yahoo-http.ts con circuit-breaker 429, analizarEarningsTicker exportada
+- Anti-bucle: directo.ts extrae ticker deterministico y jamas pregunta activo ya indicado; probado en vivo con Yahoo 429 -> responde honesto citando GGAL
+- Deploy: vercel.json revertido a d149f08 (crons previos); deploy via git
