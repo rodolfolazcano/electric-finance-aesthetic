@@ -150,11 +150,8 @@ export function detectarCredencialesIOL(
 
 
 /**
- * Detector complementario de intención para elegir las SKILLS que se inyectan
- * al prompt del redactor/planner (NO reemplaza a enrutar()).
- * - enrutar() decide qué AGENTES trabajan (y por ende qué herramientas se ejecutan).
- * - detectarIntencionSkill() decide qué framework de razonamiento se usa para
- *   interpretar esos resultados (marco metodológico específico por tipo de análisis).
+ * Detector de intención para elegir las SKILLS que se inyectan al prompt del
+ * modelo en cada turno (marco metodológico específico por tipo de análisis).
  */
 function detectarIntencionSkill(pregunta: string): string[] {
   const p = pregunta.toLowerCase();
@@ -295,6 +292,7 @@ function detectarIntencionSkill(pregunta: string): string[] {
     /analisis\s+completo|an[áa]lisis\s+integral|ficha\s+coronar|coronar\s+bases|valuaci[óo]n\s+integral|jerarqu[íi]a\s+metodol[óo]gica|f0.*f10|pipeline\s+maestro/i.test(p)
   ) {
     skills.push("razonamiento-profundo");
+    skills.push("analisis-completo-f0-f10");
     skills.push("analisis-fundamental-6d");
     skills.push("analisis-tecnico-senal");
     skills.push("razonamiento-autonomo-financiero");
@@ -304,22 +302,24 @@ function detectarIntencionSkill(pregunta: string): string[] {
     skills.push("carteras-elbaum");
     skills.push("macro-latam-ciclo");
   }
+  // Skills huérfanas conectadas (antes sin selector)
+  if (/predicci[oó]n|probabilidad de subida|sube o baja|direcci[oó]n de .*(acci[oó]n|ticker)|call o put/.test(p)) {
+    skills.push("ml-prediccion-labadie");
+  }
+  if (/opciones.*(bcba|argentinas?)|cadena de opciones.*(ggal|ypfd|pamp|come|bma)|lanzar cubierta|covered call/i.test(p)) {
+    skills.push("opciones-bcja");
+  }
+  if (/pairs?.*(crypto|cripto)|stat.?arb.*(crypto|cripto)|cointegra.*(btc|eth|binance)|arbitraje.*(binance|cripto)/i.test(p)) {
+    skills.push("crypto-statarb-labadie");
+  }
+  if (/sectorial|an[aá]lisis de sector|roic.*sector|margen.*sector|bustamante/i.test(p)) {
+    skills.push("analisis-sectorial-bustamante");
+  }
 
   return skills;
 }
 
 export { detectarIntencionSkill };
-
-// --- Recorte de herramientas por pregunta -----------------------------------
-//
-// Enviar siempre las ~48 definiciones de herramientas infla el prompt de cada
-// ronda del coordinador y del redactor (prefill lento = más latencia por llamada).
-// Acá se arma un subconjunto relevante: base + grupos activados por roles del
-// router, palabras clave o skills detectadas. Las redes de seguridad del turno
-// ejecutan igual las herramientas críticas aunque no estén en la lista.
-
-
-
 
 const URL_COMPLETIONS = "https://integrate.api.nvidia.com/v1/chat/completions";
 

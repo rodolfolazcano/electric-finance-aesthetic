@@ -1,6 +1,16 @@
 {
   "ciclos": [
     {
+      "fecha": "2026-08-25T14:50:26.600Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
       "fecha": "2026-08-25T14:00:20.675Z",
       "disparo": "scheduler",
       "estrategias": [

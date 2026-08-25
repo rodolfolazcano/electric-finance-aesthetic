@@ -1,0 +1,2 @@
+- [2026-08-25T14:59:03.740Z] (usuario) cuanto esta el dolar blue?
+- [2026-08-25T14:59:35.076Z] (agente) El **dólar blue** cotiza a **$1.545,00 (compra) / $1.565,00 (venta)**, según los datos más recientes de CriptoYa (actualización: 25/08 08:58 hs).    Tené en cuenta que estos precios son informativos y pueden variar ligeramente según la casa de cambio. Si necesitás confirmar la cotización antes de operar, te recomiendo revisarla directamente en la fuente oficial o en tu broker.    ¿En qué más te puedo ayudar?

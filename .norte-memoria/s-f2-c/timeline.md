@@ -1,0 +1,2 @@
+- [2026-08-25T14:59:46.305Z] (usuario) como esta el riesgo pais?
+- [2026-08-25T14:59:52.544Z] (agente) El riesgo país de Argentina se sitúa en **508 puntos básicos** (aprox. 5,08 %).   - **Cierre anterior:** 505 pbs.   - **Variación reciente:** +3 pbs, lo que representa un **incremento del 0,59 %**.    Estos datos provienen de la fuente oficial de mercado (Ámbito) y están actualizados al 25 de agosto de 2026. Si necesitás más detalle o una mirada más profunda al contexto macro, avísame y lo ampliamos.

@@ -155,21 +155,7 @@ export class MemoriaDeSesion {
   }
 
   /** Un agente escribe en la pizarra compartida (visible para el coordinador y el redactor). */
-  escribirPizarra(entrada: PizarraEntrada) {
-    this.pizarra.push(entrada);
-    if (this.pizarra.length > 80) this.pizarra = this.pizarra.slice(-80);
-    this.dirty = true;
-  }
-
   /** Deja que un agente lea lo que otros escribieron en la pizarra (interacción entre agentes). */
-  leerPizarra(): PizarraEntrada[] {
-    return [...this.pizarra];
-  }
-
-  leerHechos(): Hecho[] {
-    return [...this.estado.hechos];
-  }
-
   setEstado(patch: Partial<EstadoSesion>) {
     this.estado = { ...this.estado, ...patch };
     this.dirty = true;
@@ -194,13 +180,6 @@ export class MemoriaDeSesion {
   }
 
   /** Resumen del timeline reciente para el coordinador. */
-  resumenTimeline(max = 6): string {
-    return this.timeline
-      .slice(-max)
-      .map((t) => `[${t.rol}] ${t.texto.replace(/\n/g, " ").slice(0, 220)}`)
-      .join("\n");
-  }
-
   /** Limpia toda la memoria de la sesión (botón "nueva conversación"). */
   async reiniciar() {
     this.estado = { turno: 0, hechos: [] };
