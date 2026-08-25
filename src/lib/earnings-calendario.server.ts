@@ -107,7 +107,14 @@ function num(v: unknown): number | null {
     return typeof r === "number" && isFinite(r) ? r : null;
   }
   if (typeof v === "string") {
-    const n = Number(v);
+    const s = v.trim();
+    if (!s) return null;
+    // ISO datetime ("2026-08-26T20:00:00Z")
+    if (/[TZ]/.test(s)) {
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : Math.floor(d.getTime() / 1000);
+    }
+    const n = Number(s);
     return isFinite(n) ? n : null;
   }
   return null;
@@ -190,6 +197,7 @@ export async function generarEarnings(opts?: {
   modo?: ModoEarnings;
   topPorDia?: number;
   minCapUsd?: number;
+  limiteUniverso?: number;
 }): Promise<ResultadoEarnings> {
   const modo = opts?.modo ?? "semanal";
   const topPorDia = Math.min(15, Math.max(3, opts?.topPorDia ?? TOP_POR_DIA_DEFAULT));
@@ -201,7 +209,8 @@ export async function generarEarnings(opts?: {
   const tsHasta = Math.floor(new Date(`${hasta}T23:59:59Z`).getTime() / 1000);
 
   // 1) Universo + escaneo batch de quotes (marketCap + earningsTimestamp*)
-  const universo = await cargarUniversoUs();
+  const universo0 = await cargarUniversoUs();
+  const universo = opts?.limiteUniverso ? universo0.slice(0, opts.limiteUniverso) : universo0;
   if (!universo.length) {
     return vacio(modo, desde, hasta, "Catálogo de tickers no disponible.");
   }
@@ -217,31 +226,76 @@ export async function generarEarnings(opts?: {
 
   let chunkIdx = 0;
   let consecutivosVacios = 0;
+
+  // Fallback B: yahoo-finance2 (sesión propia que atraviesa bloqueos donde el
+  // fetch crudo recibe 429). allowAdditionalProps relaja el schema de batches.
+  let _yf: any = null;
+  const getYF = async (): Promise<any> => {
+    if (_yf) return _yf;
+    const mod: any = await import("yahoo-finance2");
+    const YF = mod.default ?? mod;
+    try {
+      _yf = new YF({
+        suppressNotices: ["yahooSurvey", "ripHistorical"],
+        validation: { allowAdditionalProps: true, logErrors: false, logOptionsErrors: false },
+      });
+    } catch {
+      _yf = typeof YF === "function" ? new YF() : YF;
+    }
+    return _yf;
+  };
+  const yfQuoteSeguro = async (parte: string[]): Promise<any[]> => {
+    if (!parte.length) return [];
+    const yf = await getYF();
+    try {
+      const res = await yf.quote(parte);
+      return Array.isArray(res) ? res : [res];
+    } catch {
+      if (parte.length === 1) return [];
+      const mid = Math.ceil(parte.length / 2);
+      const [a, b] = await Promise.all([yfQuoteSeguro(parte.slice(0, mid)), yfQuoteSeguro(parte.slice(mid))]);
+      return [...a, ...b];
+    }
+  };
+
+  let primerError: string | null = null;
+  let debugQuotes = 0; let debugConTs = 0; let debugEnVentana = 0; let debugCapOk = 0; let debugKeys = "";
   async function scanWorker(): Promise<void> {
     while (chunkIdx < chunks.length) {
       if (Date.now() > deadline) return;
-      if (consecutivosVacios >= 2) return; // IP bloqueada: abortar TODOS los workers ya
+      if (consecutivosVacios >= 8) return; // fallos sistemáticos: abortar ya
       const chunk = chunks[chunkIdx++]!;
-      const quotes = await fetchYahooQuotesBatch(chunk);
+      // Vía A: fetch crudo con sesión; Vía B: lib con bisect. Gana la primera que devuelva datos.
+      let quotes = await fetchYahooQuotesBatch(chunk);
+      if (!quotes.length) quotes = await yfQuoteSeguro(chunk);
+      // Pacing: ráfagas sin pausa re-disparan el rate limit de Yahoo.
+      await new Promise((r) => setTimeout(r, 180 + Math.random() * 220));
       if (!quotes.length) {
         batchesVacios++;
         consecutivosVacios++;
       } else {
         consecutivosVacios = 0;
+        debugQuotes += quotes.length;
+        if (!debugKeys && quotes[0]) debugKeys = Object.keys(quotes[0]).slice(0, 40).join(",");
       }
       for (const q of quotes) {
         escaneados++;
         const sym = String(q?.symbol ?? "").toUpperCase();
         if (!sym || candidatos.has(sym)) continue;
+        // yf.quote devuelve ISO strings ("2026-08-26T20:00:00Z"); num() los convierte.
         const tsStart = num(q?.earningsTimestampStart) ?? num(q?.earningsTimestamp);
         const tsEnd = num(q?.earningsTimestampEnd);
         const ts = tsStart != null ? tsStart : tsEnd;
-        if (ts == null || ts < tsDesde || ts > tsHasta) continue;
+        if (ts == null) continue;
+        debugConTs++;
+        if (ts < tsDesde || ts > tsHasta) continue;
+        debugEnVentana++;
         const cap = num(q?.marketCap);
         if (cap != null && cap < minCap) {
           omitidasPorCapScan++;
           continue;
         }
+        debugCapOk++;
         candidatos.set(sym, {
           symbol: sym,
           fecha: new Date(ts * 1000).toISOString().slice(0, 10),
@@ -258,13 +312,13 @@ export async function generarEarnings(opts?: {
     }
   }
 
-  await Promise.all(Array.from({ length: 3 }, () => scanWorker()));
+  await Promise.all(Array.from({ length: 2 }, () => scanWorker()));
 
   if (!candidatos.size) {
     const motivo =
       batchesVacios >= 2
-        ? "Yahoo Finance está limitando las consultas desde esta IP (rate limit). Reintentá en unos minutos."
-        : `No hay reportes con capitalización > USD ${Math.round(minCap / 1e9)}B en la ventana.`;
+        ? `Yahoo Finance está limitando las consultas desde esta IP (rate limit). Reintentá en unos minutos.${primerError ? ` [debug: ${primerError}]` : ""}`
+        : `No hay reportes con capitalización > USD ${Math.round(minCap / 1e9)}B en la ventana. [debugQuotes=${debugQuotes} conTs=${debugConTs} enVentana=${debugEnVentana} capOk=${debugCapOk} ventana=${desde}..${hasta} | keys: ${debugKeys}]`;
     return vacio(modo, desde, hasta, motivo);
   }
 
@@ -278,6 +332,24 @@ export async function generarEarnings(opts?: {
       if (Date.now() > deadline) return;
       const c = lista[idx++]!;
       let stats: EarningsEstimateResult | null = null;
+
+      // Cap real vía lib (v7 ya no devuelve marketCap): price del quoteSummary.
+      if (c.marketCap == null) {
+        try {
+          const mod: any = await import("yahoo-finance2");
+          const YF = mod.default ?? mod;
+          const yf = new YF({ suppressNotices: ["yahooSurvey", "ripHistorical"] });
+          const qsP = await yf.quoteSummary(c.symbol, { modules: ["price"] });
+          if (qsP?.price?.marketCap != null) c.marketCap = Number(qsP.price.marketCap);
+        } catch {
+          /* cap opcional */
+        }
+        if (c.marketCap != null && c.marketCap < minCap) {
+          omitidasPorCapScan++;
+          continue;
+        }
+      }
+
       try {
         const full = await analizarEarningsTicker(c.symbol);
         if (full.nTrimestres >= 2) stats = full;

@@ -267,6 +267,71 @@ export async function ejecutarEstimacionesEarnings(argsRaw: string): Promise<{
   }
 }
 
+/** Ética profesional AFC 2022: principios, verificación de cumplimiento y guía.
+ *  Fuente: corpus AFC_2022_* indexado (knowledge base + corpus académico). */
+export async function ejecutarEtica(
+  argsRaw: string,
+  modo: "principios" | "verificar" | "guia",
+): Promise<{ texto: string; fuentes: FuenteMercado[]; ok: boolean }> {
+  let categoria = "";
+  let recomendacion = "";
+  try {
+    const a = JSON.parse(argsRaw) as { categoria?: string; recomendacion?: string };
+    categoria = String(a.categoria ?? "").trim();
+    recomendacion = String(a.recomendacion ?? "").trim();
+  } catch {
+    /* sin args */
+  }
+  try {
+    const query =
+      modo === "verificar"
+        ? `ética asesor financiero principios conducta conflicto de interés riesgo perfil cliente: ${recomendacion.slice(0, 300)}`
+        : modo === "guia"
+          ? "guía comportamiento ético asesoramiento financiero integridad independencia confidencialidad cumplimiento normativo"
+          : `principios éticos asesoramiento financiero ${categoria || "integridad objetividad conflictos confidencialidad"}`.trim();
+    const [base, academico] = await Promise.all([
+      buscarEnBase(query, 4).catch(() => []),
+      buscarAcademico(query, 5).catch(() => []),
+    ]);
+    const bloques: string[] = [];
+    if (academico.length) {
+      bloques.push(
+        "CORPUS AFC/ACADÉMICO:",
+        ...academico
+          .slice(0, 5)
+          .map((c: any) => `- [${c.categoria ?? "AFC"} · ${c.archivo ?? c.source ?? ""}${c.pagina ? ` pág. ${c.pagina}` : ""}] ${(c.texto ?? "").slice(0, 500)}`),
+      );
+    }
+    if (base.length) {
+      bloques.push(
+        "BASE DE CONOCIMIENTO DEL SITIO:",
+        ...base.slice(0, 3).map((b) => `- ${b.texto.slice(0, 400)}`),
+      );
+    }
+    if (!bloques.length) {
+      return {
+        texto:
+          "SIN RESULTADOS: no se encontró material ético indexado para esa consulta. Respondé con los principios generales del Código de Conducta IAEF/IAEF sin inventar citas textuales.",
+        fuentes: [],
+        ok: false,
+      };
+    }
+    const encabezado =
+      modo === "verificar"
+        ? `VERIFICACIÓN ÉTICA — puntos del código aplicables a la recomendación evaluada:`
+        : modo === "guia"
+          ? "GUÍA DE COMPORTAMIENTO ÉTICO (AFC 2022):"
+          : `PRINCIPIOS ÉTICOS${categoria ? ` — ${categoria}` : ""} (AFC 2022):`;
+    return { texto: `${encabezado}\n\n${bloques.join("\n")}`, fuentes: [], ok: true };
+  } catch (e) {
+    return {
+      texto: `SIN RESULTADOS: consulta ética falló (${e instanceof Error ? e.message : String(e)}).`,
+      fuentes: [],
+      ok: false,
+    };
+  }
+}
+
 /** Semáforo técnico + fundamental con datos reales (Yahoo Finance) + noticias de validación. */
 export async function ejecutarSemaforo(argsRaw: string): Promise<{
   texto: string;

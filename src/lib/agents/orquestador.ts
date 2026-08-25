@@ -1186,6 +1186,16 @@ export async function ejecutarTool(
         const out = await enviarGraficoTradingviewTelegram(argsRaw);
         return { texto: out.texto, fuentes: [], ok: out.ok };
       }
+      case "telegram_estado": {
+        const { getTelegramConfig, agentGetMe } = await import("@/lib/telegram.server");
+        const cfg = getTelegramConfig();
+        const me = await agentGetMe().catch((e: unknown) => `[ERROR] ${e instanceof Error ? e.message : String(e)}`);
+        return {
+          texto: `ESTADO TELEGRAM (bot señales):\n- enabled=${cfg.enabled} token=${cfg.token ? "configurado" : "FALTA"} chatIds=${cfg.chatIds.join(",") || "(ninguno)"}\n- getMe: ${me}`,
+          fuentes: [],
+          ok: true,
+        };
+      }
       case "publicar_slide_mercado": {
         const { publicarSlideMercado } = await import("@/lib/publicacion.server");
         const out = await publicarSlideMercado(argsRaw);
@@ -1343,6 +1353,23 @@ export async function ejecutarTool(
         const { ejecutarCadenaOpciones } = await import("@/lib/agents/ejecutores");
         const res = await ejecutarCadenaOpciones(argsRaw);
         return { texto: res.texto, fuentes: res.fuentes, ok: true };
+      }
+      case "calcular_tir_bono": {
+        // Alias real de YTM (antes caía al default de búsqueda web con query vacía).
+        const { ejecutarYTM } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarYTM(argsRaw, sessionId)) };
+      }
+      case "consultar_principios_etico": {
+        const { ejecutarEtica } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarEtica(argsRaw, "principios")) };
+      }
+      case "verificar_cumplimiento_etico": {
+        const { ejecutarEtica } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarEtica(argsRaw, "verificar")) };
+      }
+      case "obtener_guia_comportamiento": {
+        const { ejecutarEtica } = await import("@/lib/agents/ejecutores");
+        return { ...(await ejecutarEtica(argsRaw, "guia")) };
       }
       default:
       return { ...(await ejecutarBusqueda(query)), ok: true };

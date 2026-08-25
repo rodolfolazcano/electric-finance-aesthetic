@@ -139,6 +139,8 @@ export class MemoriaDeSesion {
 
   agregarTimeline(entrada: Omit<EntradaTimeline, "cuando">) {
     this.timeline.push({ ...entrada, cuando: new Date().toISOString() });
+    // Cap anti-crecimiento-ilimitado: conservamos las últimas 500 entradas.
+    if (this.timeline.length > 500) this.timeline = this.timeline.slice(-500);
     this.dirty = true;
   }
 
@@ -213,8 +215,9 @@ export class MemoriaDeSesion {
     }
   }
 
-  /** Persiste si hay cambios pendientes. Llamar al cerrar el turno. */
-  cerrarTurno() {
-    void this.guardar();
+  /** Persiste si hay cambios pendientes. Llamar al cerrar el turno.
+   *  Awaitable: evita perder el turno si el runtime se congela tras responder. */
+  async cerrarTurno() {
+    await this.guardar();
   }
 }

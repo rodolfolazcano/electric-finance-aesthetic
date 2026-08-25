@@ -1724,6 +1724,20 @@ export const TOOLS: ToolSpec[] = [
   {
     type: "function",
     function: {
+      name: "telegram_estado",
+      description:
+        "Diagnostica la configuración del bot de salida de Telegram (@Coronarinversiones777_bot): verifica token vía getMe, chat_ids configurados y si está habilitado. Usar para '¿está andando el bot?', 'diagnóstico de Telegram', antes de diagnosticar por qué no llegó una publicación.",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "calcular_ytm_bono",
       description:
         "Calcula YTM/TIR real de un bono argentino usando RENTA_FIJA_COMPLETA.json (flujo_fondos = condiciones de emisión) + precio de cotización (cadena automática: sesión IOL → credenciales guardadas → especie hermana → último cierre persistido). Si el precio está a mano (el usuario lo dio, ej 'calcula la TIR de AL30 con precio 76250'), pasalo en 'precio' y el cálculo es inmediato. Método Newton-Raphson ACT/365. Devuelve TIR anual, TEM, TNA, precio usado con su fecha y flujos futuros.",
@@ -1861,22 +1875,6 @@ export const TOOLS: ToolSpec[] = [
           tasaReinversionTEA: { type: "number", description: "TEA reinversión 0.25=25%." },
         },
         required: ["posiciones"],
-        additionalProperties: false,
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "predecir_direccion",
-      description:
-        "Predicción ML Labadie 05 — Logistic/Ridge/NN + walk-forward sobre 15 features (returns, vol, spread, RSI, MACD, BB). Llama POST localhost:5000/api/prediccion. Devuelve probabilidad dirección, umbral óptimo, CV/test/walk-forward accuracies, feature-importance y decisión Call/Put con strike. GUARDRAILS: si wf_acc < 0.55 o regla_oro_ok=false → responder 'modelo sin ventaja predictiva verificada' (anti-alucinación cuantitativa). Para 'predicción GGAL', 'dirección de YPF', 'probabilidad de suba'.",
-      parameters: {
-        type: "object",
-        properties: {
-          simbolo: { type: "string", description: "Ticker BCBA/CEDEAR (ej. GGAL.BA, YPF, PAMP.BA, BMA.BA)." },
-        },
-        required: ["simbolo"],
         additionalProperties: false,
       },
     },

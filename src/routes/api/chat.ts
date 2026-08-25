@@ -91,7 +91,7 @@ PROHIBIDO: responder con un muro de "no encontré nada", listar "fuentes consult
 - Ante resultados ambiguos o contradictorios, decilo tal cual: "Busqué pero no encontré una fuente oficial clara para eso, te recomiendo confirmarlo directamente." Nunca rellenes ese vacío con una suposición.
 
 [ACCIONES EXTERNAS - SÍ PODÉS EJECUTAR — AUTONOMIA]
-- SÍ podés ejecutar acciones externas de forma AUTONOMA sin pedir confirmación cuando el usuario pide señales/datos: enviar señales/mensajes a Telegram (telegram_enviar_senal, telegram_enviar_mensaje, generar_senales_cedear), consultar vía IOL (iol_cuenta, iol_mercado), ejecutar run_command para bots, y usar financial_query/fetch_stock_data. Invocá la herramienta en este mismo turno y reportá el resultado. Para operaciones con dinero real (iol_operar con Compra/Venta real) SÍ requerís confirmación explícita; para señales informativas a Telegram NO.
+- SÍ podés ejecutar acciones externas de forma AUTONOMA sin pedir confirmación cuando el usuario pide señales/datos: enviar señales/mensajes a Telegram (telegram_enviar_senal, telegram_enviar_mensaje, generar_senales_cedear) y consultar vía IOL (iol_cuenta, iol_mercado). Invocá la herramienta en este mismo turno y reportá el resultado. Para operaciones con dinero real (iol_operar con Compra/Venta real) SÍ requerís confirmación explícita; para señales informativas a Telegram NO.
 
 [MARCAJE AUTOMÁTICO - NO AUTOCORRIGES]
 Si detectás alguna de estas situaciones, no la corrijas vos mismo: dejá el comentario interno correspondiente:
@@ -363,7 +363,7 @@ export const Route = createFileRoute("/api/chat")({
 
             let resultado: Awaited<ReturnType<typeof respuestaDirecta>>;
             try {
-              recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "start", payload: { pregunta: pregunta.slice(0, 80), hint, modoAutomatico } });
+              recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: modoAutomatico ? orquestacion.modeloPlanner.id : orquestacion.modeloSalida.id, status: "start", payload: { pregunta: pregunta.slice(0, 80), hint, modoAutomatico } });
               const t0 = Date.now();
               const effectiveSystemPrompt = modoAutomatico ? `${SYSTEM_PROMPT}\n\n${MODO_AUTOMATICO_PROMPT}` : SYSTEM_PROMPT;
               const effectivePlannerPrompt = modoAutomatico ? `${MODO_AUTOMATICO_PROMPT}\n\n${PLANNER_PROMPT}` : PLANNER_PROMPT;
@@ -392,7 +392,7 @@ export const Route = createFileRoute("/api/chat")({
               recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "success", durationMs: Date.now() - t0 });
             } catch (err) {
               console.error("chat error", err);
-              recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: orquestacion.modeloPlanner.id, status: "error", payload: String(err) });
+              recordEvent({ scopeId: rootScope.id, scopeName: rootScope.name, kind: "llm", name: modoAutomatico ? orquestacion.modeloPlanner.id : orquestacion.modeloSalida.id, status: "error", payload: String(err) });
               send({
                 t: "text",
                 v: "_El asistente tuvo un problema transitorio. Podés volver a intentar en unos segundos o escribirle directo a Cintia por WhatsApp._",
@@ -412,7 +412,7 @@ export const Route = createFileRoute("/api/chat")({
             send({ t: "observability", v: getAdaptiveStateSnapshot() });
 
             memoria.agregarTimeline({ rol: "agente", texto: final.slice(0, 500) });
-            memoria.cerrarTurno();
+            await memoria.cerrarTurno();
             closeScope(rootScope);
             controller.close();
           },

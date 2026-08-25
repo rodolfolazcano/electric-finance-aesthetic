@@ -57,6 +57,15 @@ const MAX_RONDAS_POST_VALIDACION = 8;
 const MAX_TOOL_CALLS = 40;
 const MAX_CICLOS_VALIDACION = 2;
 
+/** Núcleo de compliance que antes solo existía en modo manual (SYSTEM_PROMPT).
+ *  Desde acá también gobierna el modo automático en la síntesis final. */
+const NUCLEO_COMPLIANCE = `[NÚCLEO DE COMPLIANCE — NO NEGOCIABLE]
+- Sos IA, asistente virtual del sitio de Cintia Boos, Agente Productora registrada en la CNV (Matrícula N° 2192), con base en Buenos Aires. Nunca respondas en primera persona como Cintia ni firmes como ella.
+- Español rioplatense con voseo, conversacional, cálido y calmo. Sin listas-menú de presentación salvo primer mensaje de la sesión.
+- PROHIBIDO prometer rentabilidades garantizadas o dar recomendación personalizada puntual sin conocer perfil (objetivo, horizonte, tolerancia al riesgo). Presentá alternativas comparadas con sus riesgos y derivá la decisión final a Cintia (WhatsApp o Test del Inversor). Un solo siguiente paso por respuesta.
+- Solo afirmá cifras presentes en DATOS REALES OBTENIDOS de las herramientas; lo faltante se declara explícitamente con honestidad.
+- La plataforma está en desarrollo (beta): aclaralo si preguntan y advertí verificar datos críticos antes de decidir.`;
+
 /** Detecta pedidos de flujo completo en lenguaje natural (chat UI o Telegram). */
 export function esTareaAutonoma(pregunta: string): boolean {
   const p = (pregunta ?? "").toLowerCase();
@@ -215,6 +224,7 @@ export async function orquestarTurnoAutonomo(opts: OpcionesOrquestador): Promise
   const {
     pregunta,
     historial,
+    memoria,
     orquestacion,
     apiKey,
     baseUrl,
@@ -223,6 +233,14 @@ export async function orquestarTurnoAutonomo(opts: OpcionesOrquestador): Promise
     ragMsg,
     sessionId = "anon",
   } = opts;
+
+  // Contexto de sesiones previas (antes SOLO existía en modo manual).
+  let ctxMemoria = "";
+  try {
+    ctxMemoria = memoria?.contextoMemoria?.() ?? "";
+  } catch {
+    /* memoria opcional */
+  }
 
   const modelo = orquestacion.modeloPlanner;
   // AMBOS con prioridad: razonamiento planifica/valida, EJECUTOR RÁPIDO orquesta tools.
@@ -284,6 +302,9 @@ export async function orquestarTurnoAutonomo(opts: OpcionesOrquestador): Promise
   const messages: ApiMsg[] = [
     { role: "system", content: PROMPT_AGENTE_AUTONOMO },
     { role: "system", content: siteContext },
+    ...(ctxMemoria
+      ? [{ role: "system" as const, content: `Contexto de sesiones previas con este usuario (usalo solo si aporta al turno actual):\n${ctxMemoria}` }]
+      : []),
     ...(ragMsg ? [ragMsg] : []),
     ...historial.slice(-6).map((m) => ({ role: m.role, content: m.content })),
     { role: "user", content: `META DEL USUARIO: ${pregunta}\n\n${guionPlan}\n\nComenzá la ejecución ahora.` },
@@ -308,10 +329,13 @@ export async function orquestarTurnoAutonomo(opts: OpcionesOrquestador): Promise
       }
       if (!salida.tool_calls.length) break;
 
+      // Recorte PRIMERO: toda tool_call anunciada al modelo recibe su resultado
+      // (evita tool_call_ids colgados que rompen el protocolo del proveedor).
+      const calls = salida.tool_calls.slice(0, Math.max(0, MAX_TOOL_CALLS - totalCalls));
       const msgAsistente: ApiMsg = {
         role: "assistant",
         content: salida.content ?? "",
-        tool_calls: salida.tool_calls.map((c) => ({
+        tool_calls: calls.map((c) => ({
           id: c.id,
           function: { name: c.name, arguments: c.arguments },
         })),
@@ -320,7 +344,6 @@ export async function orquestarTurnoAutonomo(opts: OpcionesOrquestador): Promise
 
       // --- Ejecución paralela de todas las tool_calls de la ronda ---
       // Mantiene el orden lógico para el historial LLM vinculando por tool_call_id.
-      const calls = salida.tool_calls.slice(0, Math.max(0, MAX_TOOL_CALLS - totalCalls));
       const cola = new ColaDeTareas(paralelismoAutonomo());
       // Pre-anunciar estado para cada call (sin bloquear carga)
       for (const c of calls) {
@@ -422,9 +445,11 @@ Ejecutá estos pasos ahora con las herramientas y continuá.`,
     {
       role: "system",
       content:
+        `${NUCLEO_COMPLIANCE}\n\n${orquestacion.promptSkillsSalida ?? ""}` +
+        (ctxMemoria ? `\n\n[MEMORIA DE SESIONES PREVIAS — usala solo si aporta]:\n${ctxMemoria}` : "") +
+        "\n\n" +
         "Sos el redactor final del análisis financiero en MODO AUTOMÁTICO. Recibís la meta del usuario (en lenguaje natural humano) y los datos REALES obtenidos por las herramientas orquestadas autónomamente (ya validados por un agente validador). Razonás la instrucción como humano: inferís intención, activo, horizonte y preguntas implícitas. Asumís el rol de la base de conocimiento (55 PDFs Pascale/Fowler Newton/Dumrauf/Blanchard/Biondi + corpus Labadie + regulación CNV/BCRA) y sabés qué rol asignarte (Mercado/Valoración/Semáforo/Cuantitativo/Conocimiento/Motor Unificado) según la instrucción; si hay múltiples capas, orquestás y citás todas. Redactás la respuesta definitiva en español rioplatense, formato markdown de chat: directo, con cifras citadas tal cual fueron obtenidas, señalando explícitamente qué falló o no pudo obtenerse (honestidad ante todo). Al cierre, proponé SIEMPRE 2-3 instrucciones siguientes inteligentes en lenguaje natural humano como sugerencias para que el usuario haga clic. PROHIBIDO inventar cifras o prometer rendimientos. No repitas el plan técnico ni nombres de herramientas.\n\n[ESTRUCTURA CONDICIONAL — NO ES UN MOLDE OBLIGATORIO]\nLa estructura 'contexto macro → datos clave → valuación → riesgos → conclusión' SOLO aplica si hay DATOS REALES de herramientas sobre un activo/tema concreto en DATOS REALES OBTENIDOS. Si el bloque viene vacío o '(no se obtuvieron datos)': respondé BREVE y conversacional reconociendo que no pudiste ejecutar nada, pedí el dato que falta o sugerí qué analizar; NUNCA rellenes la estructura con un análisis inventado, ni cambies de tema para justificar el molde.\n\n[ATRIBUCIONES — PROHIBIDO FABRICAR FUENTES INSTITUCIONALES]\nNunca atribuyas 'estudios', datos ni conclusiones a Cintia Boos, universidades (ej. Universidad de La Plata), institutos ni organismos si esa atribución no aparece textualmente en los resultados de herramientas de este turno. El corpus académico es tu marco metodológico interno para INTERPRETAR resultados: citá el documento/archivo cuando aporte teoría, jamás como fuente numérica de un activo puntual.\n\nREGLA ANTI-ALUCINACIÓN TERMINANTE: el bloque DATOS REALES OBTENIDOS es tu ÚNICA fuente de cifras. Si la meta pide algo que no está en ese bloque (ej. flujos de fondos proyectados, TIR con restricciones, razones en moneda constante sin datos IPC), NO lo fabriques ni armes ejemplos ilustrativos con números inventados: declará explícitamente 'no se pudo calcular X con datos confirmados en este turno'.",
     },
-    ...historial.slice(-4).map((m) => ({ role: m.role, content: m.content })),
     {
       role: "user",
       content: `META: ${pregunta}\n\nDATOS REALES OBTENIDOS (fuente única de verdad):\n${resumenFinal || "(no se obtuvieron datos; comunicalo con honestidad)"}`,

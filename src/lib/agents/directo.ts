@@ -57,15 +57,42 @@ function extraerTickerDeTexto(pregunta: string, historial?: ApiMsg[]): string | 
 const RE_PIDE_ACLARACION =
   /(ind[ií]came|indicame|indic[aá]|decime|dime|decirme)\s+(?:el\s+|la\s+|qué\s+|que\s+)?(nombre|s[ií]mbolo|simbolo|ticker|empresa|activo)|qu[eé]\s+(tipo\s+de\s+)?(activo|empresa|instrumento|cripto)|cu[aá]l\s+(empresa|acci[oó]n|activo)|a\s+qu[eé]\s+(activo|empresa)|en\s+qu[eé]\s+(tipo\s+de\s+)?activo/i;
 
+/** Ticker de ALTA confianza (para la guardia determinística): exige patrón
+ *  explícito de mercado (.BA/.US), par cripto, bono AR, índice ^, o respuesta
+ *  monovalente del usuario. Los tokens sueltos en mayúsculas NO alcanzan:
+ *  "IA", "ETF", "FMI" no son tickers. */
+function extraerTickerConfiable(pregunta: string, historial?: ApiMsg[]): string | null {
+  const candidatos: string[] = [pregunta ?? ""];
+  if (historial?.length) {
+    for (let i = historial.length - 1; i >= 0 && candidatos.length < 4; i--) {
+      if (historial[i]!.role === "user") candidatos.push(historial[i]!.content);
+    }
+  }
+  for (const texto of candidatos) {
+    const t = (texto ?? "").trim();
+    if (!t) continue;
+    // Respuesta monovalente ("GGAL", "ggal.ba") — máxima confianza.
+    if (/^[a-z0-9][a-z0-9.\-]{1,11}$/i.test(t)) return t.toUpperCase();
+    const mayus = t.toUpperCase();
+    const m =
+      mayus.match(/\b([A-Z0-9]{2,8}\.(?:BA|US))\b/) ||
+      mayus.match(/\b([A-Z0-9]{2,10}(?:USDT|-USD))\b/) ||
+      mayus.match(/\b((?:AL|GD|AE|TX|BON)\s?\d{2})\b/) ||
+      mayus.match(/(\^[A-Z]{3,5})\b/);
+    if (m) return m[1]!;
+  }
+  return null;
+}
+
 function mensajeIndisponibilidad(ticker: string): string {
   return `Los datos en vivo de **${ticker}** no están disponibles en este momento (el proveedor de mercado está saturado o sin respuesta). Ya me indicaste el activo, así que no te voy a preguntar de nuevo: reintentá en unos minutos y lo calculo con datos reales.`;
 }
 
 function esResultadoVacio(texto: string): boolean {
   const t = (texto ?? "").trim();
-  if (t.length < 60) return true;
-  if (/^(ERROR|error)/.test(t)) return true;
-  return /SIN RESULTADOS|sin datos|no se encontr[oó]|not found/i.test(t.slice(0, 500));
+  if (!t) return true;
+  // Solo marcadores explícitos de fallo: datos reales concisos NO son vacíos.
+  return /^(ERROR ejecutando )/.test(t) || /SIN RESULTADOS|not found/i.test(t.slice(0, 300));
 }
 
 export async function respuestaDirecta(
@@ -110,9 +137,14 @@ export async function respuestaDirecta(
   }
 
   for (const m of historial) mensajes.push({ role: m.role, content: m.content });
-  mensajes.push({ role: "user", content: pregunta });
+  // Dedupe: los clientes ya envían el historial terminando en el mensaje actual.
+  const ultima = historial[historial.length - 1];
+  const yaIncluido =
+    ultima && ultima.role === "user" && String(ultima.content ?? "").trim() === pregunta.trim();
+  if (!yaIncluido) mensajes.push({ role: "user", content: pregunta });
 
   let final = "";
+  let algunaToolOk = false;
   for (let ronda = 0; ronda < MAX_RONDAS_TOOLS; ronda++) {
     const res = await llamarModelo(apiKey, modelId, mensajes, NOMBRE_HERRAMIENTAS, {
       maxTokens: 2048,
@@ -140,12 +172,6 @@ export async function respuestaDirecta(
       tool_calls: toolCalls,
     });
 
-    mensajes.push({
-      role: "system",
-      content:
-        "Ya ejecutaste herramientas en este turno: cuando redactes la respuesta final, basate ÚNICAMENTE en esos resultados citando la fuente. PROHIBIDO sugerirle al usuario que revise noticias/análisis por su cuenta o derivarlo a otros servicios para un dato que ya podés dar vos. Si falta un dato, invocá otra herramienta ahora.",
-    });
-
     let todaVacia = true;
     for (const tc of toolCalls) {
       const name = String(tc?.function?.name ?? "");
@@ -160,7 +186,10 @@ export async function respuestaDirecta(
         const out = await ejecutarTool(name, argsRaw, baseUrl, sessionId);
         for (const ev of out.eventos ?? []) enviar(ev);
         fuentes.push(...(out.fuentes ?? []));
-        if (!esResultadoVacio(out.texto)) todaVacia = false;
+        if (!esResultadoVacio(out.texto)) {
+          todaVacia = false;
+          algunaToolOk = true;
+        }
         mensajes.push({
           role: "tool",
           tool_call_id: idTool,
@@ -177,6 +206,16 @@ export async function respuestaDirecta(
       }
     }
 
+    // Recordatorio UNA sola vez y DESPUÉS de los resultados de herramientas
+    // (respetar el protocolo: assistant.tool_calls → role:"tool" → system).
+    if (ronda === MAX_RONDAS_TOOLS - 1) {
+      mensajes.push({
+        role: "system",
+        content:
+          "Ya ejecutaste herramientas en este turno: cuando redactes la respuesta final, basate ÚNICAMENTE en esos resultados citando la fuente. PROHIBIDO sugerirle al usuario que revise noticias/análisis por su cuenta o derivarlo a otros servicios para un dato que ya podés dar vos. Si falta un dato, invocá otra herramienta ahora.",
+      });
+    }
+
     if (todaVacia && ronda < MAX_RONDAS_TOOLS - 1) {
       const tickerYaDado = extraerTickerDeTexto(pregunta, historial);
       mensajes.push({
@@ -190,9 +229,10 @@ export async function respuestaDirecta(
 
   // Guardia determinística anti-bucle: aunque el modelo ignore las
   // instrucciones, jamás se le escapa una pregunta de aclaración cuando el
-  // usuario ya dio el activo.
-  const tickerUsuario = extraerTickerDeTexto(pregunta, historial);
-  if (final && RE_PIDE_ACLARACION.test(final)) {
+  // usuario ya dio el activo. SOLO se aplica si NINGUNA herramienta devolvió
+  // datos útiles en el turno (si hubo datos, una aclaración puede ser legítima).
+  const tickerUsuario = extraerTickerConfiable(pregunta, historial);
+  if (final && RE_PIDE_ACLARACION.test(final) && !algunaToolOk) {
     if (tickerUsuario) {
       final = mensajeIndisponibilidad(tickerUsuario);
     } else {

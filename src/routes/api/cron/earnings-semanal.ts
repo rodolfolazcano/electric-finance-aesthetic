@@ -62,9 +62,11 @@ async function manejar(request: Request): Promise<Response> {
   const topPorDia = Number(url.searchParams.get("topPorDia") ?? "8") || 8;
   const minCapParam = Number(url.searchParams.get("minCapUsd") ?? "");
   const minCapUsd = isFinite(minCapParam) && minCapParam > 0 ? minCapParam : undefined;
+  const limiteParam = Number(url.searchParams.get("limite") ?? "");
+  const limiteUniverso = isFinite(limiteParam) && limiteParam > 0 ? limiteParam : undefined;
 
   try {
-    const r = await generarEarnings({ modo, topPorDia, minCapUsd });
+    const r = await generarEarnings({ modo, topPorDia, minCapUsd, limiteUniverso });
 
     if (!r.ok || !r.empresas.length) {
       return Response.json({ ok: false, motivo: r.texto, modo, desde: r.desde, hasta: r.hasta });

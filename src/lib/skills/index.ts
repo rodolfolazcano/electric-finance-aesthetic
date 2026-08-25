@@ -366,7 +366,18 @@ const SKILLS: Skill[] = [
 - Si el usuario NO mencionó Telegram pero la señal es COMPRA/VENTA con prob>=0.55 y variación significativa, IGUAL generá la señal y MOSTRALA en chat con tabla; no requieras frase exacta "enviar a Telegram" para calcularla.
 - No inventes precios: todo viene de yfinance/screeners en este turno. Si no hay dato, omitir ticker con advertencia.
 - Formato: tabla Markdown Ticker BCBA | Subyacente US | Precio ARS | Var% | Señal | Prob | Motivo. Ofrecer grafico_chat TradingView del líder.
-- Compliance: información educativa, no recomendación; citar fuente y disclaimer; no prometer rentabilidad.`,
+ - Compliance: información educativa, no recomendación; citar fuente y disclaimer; no prometer rentabilidad.`,
+  },
+  {
+    id: "senal-unificada",
+    nombre: "Motor Unificado CORONAR (4 capas)",
+    descripcion:
+      "Señales del motor unificado (Intermarket Pring + Fundamental Pascale + Semáforo + CAPM/Riesgo) sobre el universo BCBA/CEDEAR, con top N y envío opcional a Telegram.",
+    instrucciones: `[SKILL · Señales Unificadas Motor CORONAR] — MODO AUTONOMO OBLIGATORIO
+- TRIGGER AUTOMATICO: ante "señal unificada", "señales unificadas", "motor unificado", "qué compro hoy", "qué comprar", "top señales", "generar señal" → EJECUTÁ INMEDIATAMENTE generar_senales_unificadas({topN:6, filtro:"todos"}) o generar_senal_unificada(simbolo) en este mismo turno. SIN confirmación previa.
+- Cada señal trae score total /10 con 4 sub-scores (I Intermarket · F Fundamental · T Técnico · C Cuantitativo), confianza, entrada/SL/TP1/R-R y motivo. Presentá la tabla tal cual, sin inventar valores.
+- Si el usuario pide enviarla a Telegram → encadená telegram_enviar_senal o telegram_enviar_mensaje en este turno.
+- Si una capa falla, mostrá las que sí obtuvieron datos e indicá cuál faltó. PROHIBIDO inventar scores.`,
   },
   {
     id: "portfolio-paste-parser",

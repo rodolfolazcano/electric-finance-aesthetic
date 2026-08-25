@@ -1,0 +1,2 @@
+- [2026-08-25T01:58:49.443Z] (usuario) calculame la tir del AL30
+- [2026-08-25T01:59:27.819Z] (agente) No tengo el precio actual del AL30 para calcular su TIR. ¿Podrías indicarme el precio de cotización que estás consultando? Con ese dato puedo calcular la TIR de inmediato.

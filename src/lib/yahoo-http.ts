@@ -8,10 +8,20 @@ import { getCached, setCache } from "./cache";
 const YAHOO_UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
+/** Pool de User-Agents: Yahoo limita por fingerprint de UA; si uno se quema
+ *  (429 persistente), la siguiente sesión rota al siguiente. */
+const YAHOO_UAS = [
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.2903.86",
+  YAHOO_UA,
+];
+let uaRotador = Math.floor(Math.random() * YAHOO_UAS.length);
+
 interface YahooSession {
   cookie: string;
   crumb: string;
   expiresAt: number;
+  ua: string;
 }
 
 let sessionCache: YahooSession | null = null;
@@ -111,6 +121,9 @@ export async function getYahooSession(forceRefresh = false): Promise<YahooSessio
 
 async function getYahooSessionInner(): Promise<YahooSession | null> {
   const now = Date.now();
+  // UA elegido POR ADQUISICIÓN: cookie+crumb quedan ligados a ese fingerprint.
+  // Si un UA está quemado (429), el próximo refresh rota al siguiente.
+  const ua = YAHOO_UAS[uaRotador++ % YAHOO_UAS.length]!;
 
   async function tryCrumb(
     host: string,
@@ -118,7 +131,7 @@ async function getYahooSessionInner(): Promise<YahooSession | null> {
   ): Promise<{ cookie: string; crumb: string } | null> {
     const crumbRes = await fetchWithRetry(`https://${host}/v1/test/getcrumb`, {
       headers: {
-        "User-Agent": YAHOO_UA,
+        "User-Agent": ua,
         Accept: "text/plain",
         ...(cookieJar ? { Cookie: cookieJar } : {}),
       },
@@ -133,7 +146,7 @@ async function getYahooSessionInner(): Promise<YahooSession | null> {
   async function tryPage(url: string): Promise<{ cookie: string; crumb: string } | null> {
     const res = await fetchWithRetry(url, {
       headers: {
-        "User-Agent": YAHOO_UA,
+        "User-Agent": ua,
         Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
       },
@@ -151,13 +164,13 @@ async function getYahooSessionInner(): Promise<YahooSession | null> {
   }
 
   const r1 = await tryCrumb("query2.finance.yahoo.com", "");
-  if (r1) return { ...r1, expiresAt: now + 20 * 60 * 1000 };
+  if (r1) return { ...r1, expiresAt: now + 20 * 60 * 1000, ua };
 
   const r2 = await tryCrumb("query1.finance.yahoo.com", "");
-  if (r2) return { ...r2, expiresAt: now + 20 * 60 * 1000 };
+  if (r2) return { ...r2, expiresAt: now + 20 * 60 * 1000, ua };
 
   const seed = await fetchWithRetry("https://fc.yahoo.com", {
-    headers: { "User-Agent": YAHOO_UA, Accept: "text/html", "Accept-Language": "en-US,en;q=0.9" },
+    headers: { "User-Agent": ua, Accept: "text/html", "Accept-Language": "en-US,en;q=0.9" },
     redirect: "manual",
   });
   if (seed && seed.ok) {
@@ -166,14 +179,14 @@ async function getYahooSessionInner(): Promise<YahooSession | null> {
       .filter(Boolean)
       .join("; ");
     const r3 = await tryCrumb("query2.finance.yahoo.com", cookie);
-    if (r3) return { ...r3, expiresAt: now + 20 * 60 * 1000 };
+    if (r3) return { ...r3, expiresAt: now + 20 * 60 * 1000, ua };
   }
 
   const r4 = await tryPage("https://finance.yahoo.com");
-  if (r4) return { ...r4, expiresAt: now + 20 * 60 * 1000 };
+  if (r4) return { ...r4, expiresAt: now + 20 * 60 * 1000, ua };
 
   const r5 = await tryPage("https://finance.yahoo.com/quote/AAPL");
-  if (r5) return { ...r5, expiresAt: now + 20 * 60 * 1000 };
+  if (r5) return { ...r5, expiresAt: now + 20 * 60 * 1000, ua };
 
   return null;
 }
@@ -206,7 +219,7 @@ async function yahooQuoteSummaryInner<T>(
         const res = await fetch(url, {
           signal: qsController.signal,
           headers: {
-            "User-Agent": YAHOO_UA,
+            "User-Agent": session?.ua ?? YAHOO_UA,
             Accept: "application/json",
             ...(hasSession && session.cookie ? { Cookie: session.cookie } : {}),
           },
@@ -283,7 +296,7 @@ async function yahooChartInner(
         const res = await fetch(url, {
           signal: controller.signal,
           headers: {
-            "User-Agent": YAHOO_UA,
+            "User-Agent": session?.ua ?? YAHOO_UA,
             Accept: "application/json",
             ...(session?.cookie ? { Cookie: session.cookie } : {}),
           },
@@ -461,7 +474,7 @@ async function yahooQuoteInner(
   const url = `https://query1.finance.yahoo.com/v7/finance/quote?${params}`;
   const res = await fetch(url, {
     headers: {
-      "User-Agent": YAHOO_UA,
+      "User-Agent": session?.ua ?? YAHOO_UA,
       Accept: "application/json",
       ...(session?.cookie ? { Cookie: session.cookie } : {}),
     },
@@ -484,6 +497,40 @@ export async function fetchYahooQuote(symbol: string): Promise<any> {
   return withConcurrencyLimit(() => yahooQuoteInner(symbol, cacheKey, false));
 }
 
+/** Sesión AUTOCONTENIDA para el batch: secuencia mínima fc.yahoo.com → getcrumb.
+ *  Independiente de getYahooSession (cuya danza completa puede fallar en algunos
+ *  runtimes de SSR y devolver null silenciosamente). */
+let sesionBatch: YahooSession | null = null;
+async function obtenerSesionBatch(force = false): Promise<YahooSession | null> {
+  if (!force && sesionBatch && sesionBatch.expiresAt > Date.now()) return sesionBatch;
+  for (let intento = 0; intento < 2; intento++) {
+    const ua = YAHOO_UAS[uaRotador++ % YAHOO_UAS.length]!;
+    try {
+      const seed = await fetch("https://fc.yahoo.com", {
+        headers: { "User-Agent": ua, Accept: "text/html" },
+        redirect: "manual",
+        signal: AbortSignal.timeout(8_000),
+      });
+      const cookie = getSetCookies(seed.headers)
+        .map((v) => v.split(";")[0])
+        .filter(Boolean)
+        .join("; ");
+      const cRes = await fetch("https://query2.finance.yahoo.com/v1/test/getcrumb", {
+        headers: { "User-Agent": ua, Accept: "text/plain", ...(cookie ? { Cookie: cookie } : {}) },
+        signal: AbortSignal.timeout(8_000),
+      });
+      const crumb = (await cRes.text()).trim();
+      if (cRes.ok && crumb && !crumb.startsWith("{")) {
+        sesionBatch = { cookie, crumb, expiresAt: Date.now() + 20 * 60 * 1000, ua };
+        return sesionBatch;
+      }
+    } catch {
+      /* probar siguiente UA */
+    }
+  }
+  return null;
+}
+
 /** Quote BATCH (multi-símbolo, hasta ~50 por llamada) — usado por el calendario
  *  de earnings para mapear el universo con pocas llamadas. Devuelve los quotes
  *  crudos de v7/finance/quote (incluye marketCap y earningsTimestampStart/End).
@@ -504,7 +551,7 @@ export async function fetchYahooQuotesBatch(symbols: string[]): Promise<any[]> {
   outer: for (const host of ["query1.finance.yahoo.com", "query2.finance.yahoo.com"]) {
     for (let intento = 0; intento < 2; intento++) {
       try {
-        const session = await getYahooSession(false); // bajo 429 no re-danzar sesión
+        const session = await obtenerSesionBatch(intento > 0);
         const params = new URLSearchParams({
           symbols: lista.join(","),
           crumb: session?.crumb ?? "",
@@ -514,8 +561,9 @@ export async function fetchYahooQuotesBatch(symbols: string[]): Promise<any[]> {
         });
         const url = `https://${host}/v7/finance/quote?${params}`;
         const res = await fetch(url, {
+          signal: AbortSignal.timeout(12_000),
           headers: {
-            "User-Agent": YAHOO_UA,
+            "User-Agent": session?.ua ?? YAHOO_UA,
             Accept: "application/json",
             ...(session?.cookie ? { Cookie: session.cookie } : {}),
           },
@@ -527,6 +575,9 @@ export async function fetchYahooQuotesBatch(symbols: string[]): Promise<any[]> {
         if (res.status === 429 || res.status === 403) {
           ultimo429Batch = Date.now();
           intentos429++;
+          // 429 con esta sesión → UA quemado: invalidar para rotar al siguiente.
+          sesionBatch = null;
+          sessionCache = null;
           lastError = new Error(`Yahoo quote batch ${res.status}`);
           if (intentos429 >= 2) break outer; // IP bloqueada: no insistir
           await new Promise((r) => setTimeout(r, 800 + Math.random() * 700));
