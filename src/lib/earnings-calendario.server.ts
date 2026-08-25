@@ -444,6 +444,7 @@ function armarMensaje(
         trozos.push(`acierto ${Math.round(s.tasaHistorica * 100)}%`);
         trozos.push(`sorp. prom. ${fmtPct(s.avgSorpresa)}`);
         if (s.probSPositiva != null) trozos.push(`P(+)=${Math.round(s.probSPositiva * 100)}%`);
+        if (s.volClasificacion && s.volClasificacion !== "S/D") trozos.push(`mov. esp. ${s.volClasificacion}`);
       }
       lineas.push(trozos.join(" · "));
     }

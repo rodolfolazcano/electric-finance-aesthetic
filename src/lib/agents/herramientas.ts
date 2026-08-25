@@ -204,6 +204,15 @@ export const TOOLS: ToolSpec[] = [
   {
     type: "function",
     function: {
+      name: "diagnostico_integrado",
+      description:
+        "EJECUTALA INMEDIATAMENTE ante cualquier pregunta sobre la postura global del mercado — NO requiere parámetros ni activo: analiza el mercado COMPLETO. Fusiona en una postura final de 5 niveles (AGRESIVO RISK-ON / RISK-ON MODERADO / CAUTELA DEFENSIVA / DEFENSIVO / RISK-OFF CAJA) la fase Murphy-Pring del ciclo, el modificador crediticio (percentiles IG/HY vs GFC/COVID), consumidor XLY/XLP, VIX, curva invertida y flight-to-quality HYG-TLT. Devuelve balance bull/bear con factores y plan COMPRAR/VENDER por sector ETF. Triggers: '¿dónde posicionarse?', 'postura integrada', 'diagnóstico del mercado', 'risk-on o risk-off', 'en qué fase del ciclo estamos'.",
+      parameters: { type: "object", properties: {}, required: [], additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "analizar_semaforo",
       description:
         "Analiza un activo con un semáforo técnico + fundamental usando datos reales en vivo de Yahoo Finance: indicadores técnicos (RSI14, MACD, SMA20/50/200, soportes y resistencias, anomalía de precio, posición en el rango de 52 semanas) y métricas fundamentales (P/E, crecimiento de ingresos, margen, ROE, upside vs consenso de analistas, deuda/patrimonio). Calcula scores en [-2, 2] con pesos tendencia 40% / momentum 30% / S/R 20% / anomalía 10%, clasifica con umbrales (>1.5 COMPRA, >0.3 COMPRA CON CAUTELA, >-0.3 MANTENER, >-1.5 REDUCIR, VENTA) y valida el resultado con noticias recientes sobre el activo. Para preguntas como 'analizá el semáforo de X', 'análisis técnico de X', 'indicadores técnicos', 'soportes y resistencias de X', 'conviene comprar o vender X', 'RSI/MACD de X'. Acepta ticker o nombre (ej. AAPL, YPF, GGAL.BA, MercadoLibre, Banco Galicia).",

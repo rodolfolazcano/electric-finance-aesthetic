@@ -220,6 +220,59 @@ export async function analizarEarningsTicker(
       }
     } catch {}
 
+    // Volatilidad esperada: swing medio (max−min)/min en ventana ±5 días
+    // alrededor de los últimos 8 reportes (metodología ESTIMACIONES.txt pt).
+    let volPostEarnings: number | null = null;
+    let volClasificacion = "S/D";
+    let sesgoPostEarnings: number | null = null;
+    try {
+      const fechasHist = historial.slice(-8);
+      if (fechasHist.length >= 3) {
+        const t0 = new Date(fechasHist[0]!.fecha).getTime() - 7 * 86400000;
+        const chartRes = await yf.chart(ticker, {
+          period1: new Date(t0),
+          period2: new Date(),
+          interval: "1d",
+        });
+        const stamps: number[] = (chartRes as any)?.timestamp ?? [];
+        const closes: (number | null)[] =
+          (chartRes as any)?.indicators?.quote?.[0]?.close ?? [];
+        const serie: Array<{ d: string; c: number }> = [];
+        for (let i = 0; i < stamps.length && i < closes.length; i++) {
+          const c = closes[i];
+          if (typeof c === "number" && isFinite(c)) {
+            serie.push({ d: new Date(stamps[i]! * 1000).toISOString().slice(0, 10), c });
+          }
+        }
+        const swings: number[] = [];
+        const direcciones: number[] = [];
+        for (const h of fechasHist) {
+          const base = new Date(h.fecha).getTime();
+          if (isNaN(base)) continue;
+          const ini = new Date(base - 5 * 86400000).toISOString().slice(0, 10);
+          const fin = new Date(base + 5 * 86400000).toISOString().slice(0, 10);
+          const ventana = serie.filter((p) => p.d >= ini && p.d <= fin);
+          if (ventana.length < 3) continue;
+          const precios = ventana.map((p) => p.c);
+          const mx = Math.max(...precios);
+          const mn = Math.min(...precios);
+          if (mn <= 0) continue;
+          swings.push((mx - mn) / mn);
+          // dirección neta del evento: cierre post vs pre evento
+          const pre = precios[0]!;
+          const post = precios[precios.length - 1]!;
+          direcciones.push((post - pre) / pre);
+        }
+        if (swings.length) {
+          volPostEarnings = (swings.reduce((a, b) => a + b, 0) / swings.length) * 100;
+          volClasificacion = `±${volPostEarnings.toFixed(1)}%`;
+          sesgoPostEarnings = (direcciones.reduce((a, b) => a + b, 0) / direcciones.length) * 100;
+        }
+      }
+    } catch {
+      /* swing-vol opcional */
+    }
+
     return {
       ticker,
       companyName,
@@ -237,9 +290,9 @@ export async function analizarEarningsTicker(
       icInf,
       icSup,
       cohenD,
-      volPostEarnings: null,
-      volClasificacion: "S/D",
-      sesgoPostEarnings: null,
+      volPostEarnings,
+      volClasificacion,
+      sesgoPostEarnings,
       proximoReporte,
       proximoReporteEpoch,
       epsEstimadoProximo,

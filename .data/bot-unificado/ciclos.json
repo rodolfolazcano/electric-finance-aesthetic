@@ -1,6 +1,16 @@
 {
   "ciclos": [
     {
+      "fecha": "2026-08-25T15:09:58.218Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "basis-cedear-us"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
       "fecha": "2026-08-25T14:50:26.600Z",
       "disparo": "scheduler",
       "estrategias": [

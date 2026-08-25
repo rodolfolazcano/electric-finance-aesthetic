@@ -1,0 +1,2 @@
+- [2026-08-25T15:47:36.380Z] (usuario) postura integrada del mercado
+- [2026-08-25T15:47:39.372Z] (agente) Para orientarte sobre la postura integrada del mercado, necesito saber cuál es el activo o sector que te interesa analizar. Por ejemplo, podrías preguntar: "¿Cuál es la postura integrada del mercado para tecnología?" o "¿Qué indica la postura integrada del mercado para energía?"    Si me indicas el activo o sector específico, podré ejecutar el análisis correspondiente y compartirte la información detallada.

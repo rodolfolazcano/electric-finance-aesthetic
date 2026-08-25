@@ -1,0 +1,2 @@
+- [2026-08-25T15:45:11.432Z] (usuario) dame el diagnostico integrado del mercado, donde me posiciono?
+- [2026-08-25T15:45:40.250Z] (agente) Ahora mismo no pude completar la consulta con datos reales. Probá de nuevo en unos segundos o escribile directo a Cintia por WhatsApp.

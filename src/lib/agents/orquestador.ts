@@ -316,6 +316,12 @@ function detectarIntencionSkill(pregunta: string): string[] {
     skills.push("analisis-sectorial-bustamante");
   }
 
+  if (
+    /postura\s+(integrada|del\s+mercado)|d[óo]nde\s+posicionarse?|diagn[oó]stico\s+(intermarket|integrado|del\s+mercado)|risk.?-?on|risk.?-?off|en qu[eé]\s+fase\s+del\s+ciclo/i.test(p)
+  ) {
+    skills.push("postura-integrada");
+  }
+
   return skills;
 }
 
@@ -747,6 +753,13 @@ export async function ejecutarTool(
           fuentes: [],
           ok: true,
         };
+      }
+      case "diagnostico_integrado": {
+        const { getDiagnosticoIntegrado } = await import(
+          "@/lib/herramientas/sectores/postura-integrada.functions"
+        );
+        const r = await (getDiagnosticoIntegrado as any)();
+        return { texto: r?.texto ?? "SIN RESULTADOS", fuentes: [], ok: Boolean(r?.ok) };
       }
       case "publicar_slide_mercado": {
         const { publicarSlideMercado } = await import("@/lib/publicacion.server");

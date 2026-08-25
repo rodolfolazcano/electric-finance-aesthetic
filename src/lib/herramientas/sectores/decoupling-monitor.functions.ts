@@ -78,7 +78,45 @@ export interface DecouplingResult {
   rotationSignals: RotationSignal[];
   sectorMomentum: SectorMomentum[];
   compuesto: CompositeScore;
+  /** Reciclado intermarket_cycle_detector.py §7: régimen deflacionario y FTQ. */
+  riesgosRegimen?: {
+    correlacionTLTSPY252: number | null;
+    desacopleDeflacionario: boolean;
+    correlacionHYGTLT126: number | null;
+    flightToQuality: boolean;
+  };
   generatedAt: string;
+}
+
+/** Correlación rolling entre dos series de cierres alineadas por cola. */
+function corrRolling(a: number[], b: number[], ventana: number, minPeriodos: number): number | null {
+  const n = Math.min(a.length, b.length);
+  if (n < minPeriodos) return null;
+  const ra: number[] = [];
+  const rb: number[] = [];
+  for (let i = n - Math.min(n, ventana); i < n; i++) {
+    if (i < 1) continue;
+    if (a[i - 1] > 0 && b[i - 1] > 0 && a[i] > 0 && b[i] > 0) {
+      ra.push(a[i] / a[i - 1] - 1);
+      rb.push(b[i] / b[i - 1] - 1);
+    }
+  }
+  const m = Math.min(ra.length, rb.length);
+  if (m < minPeriodos) return null;
+  const xa = ra.slice(ra.length - m);
+  const xb = rb.slice(rb.length - m);
+  const ma = xa.reduce((s, v) => s + v, 0) / m;
+  const mb = xb.reduce((s, v) => s + v, 0) / m;
+  let num = 0;
+  let da = 0;
+  let db = 0;
+  for (let i = 0; i < m; i++) {
+    num += (xa[i]! - ma) * (xb[i]! - mb);
+    da += (xa[i]! - ma) ** 2;
+    db += (xb[i]! - mb) ** 2;
+  }
+  const den = Math.sqrt(da * db);
+  return den > 0 ? num / den : null;
 }
 
 //  Helpers 
@@ -576,6 +614,20 @@ export const getDecouplingMonitor = createServerFn({ method: "GET" }).handler(
       fuente: "INDEC / BCRA",
     };
 
+    // Reciclado §7 intermarket_cycle_detector.py: régimen deflacionario (TLT-SPY
+    // 252d < -0.3 invalida el modelo estándar) y flight-to-quality (HYG-TLT 126d).
+    const tltCloses = tltData.map((c) => c.close);
+    const spyCloses = spyData.map((c) => c.close);
+    const hygClosesAll = hygData.map((c) => c.close);
+    const corrTLTSPY252 = corrRolling(tltCloses, spyCloses, 252, 100);
+    const corrHYGTLT126 = corrRolling(hygClosesAll, tltCloses, 126, 60);
+    const riesgosRegimen = {
+      correlacionTLTSPY252: corrTLTSPY252 != null ? Math.round(corrTLTSPY252 * 100) / 100 : null,
+      desacopleDeflacionario: corrTLTSPY252 != null && corrTLTSPY252 < -0.3,
+      correlacionHYGTLT126: corrHYGTLT126 != null ? Math.round(corrHYGTLT126 * 100) / 100 : null,
+      flightToQuality: corrHYGTLT126 != null && corrHYGTLT126 < -0.3,
+    };
+
     const result: DecouplingResult = {
       correlacionTLTSPY,
       ratioCRBBonds,
@@ -586,6 +638,7 @@ export const getDecouplingMonitor = createServerFn({ method: "GET" }).handler(
       rotationSignals,
       sectorMomentum,
       compuesto,
+      riesgosRegimen,
       generatedAt: new Date().toISOString(),
     };
 
