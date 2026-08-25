@@ -7,6 +7,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getDecouplingMonitor, type CreditAlertLevel } from "./decoupling-monitor.functions";
 import { getIntermarketRatios } from "@/lib/sectores/internarket-ratios.functions";
+import { consultarNoticias } from "@/lib/noticias.server";
+
+export interface ValidacionNoticias {
+  titulos: number;
+  apoyos: number;
+  contradicciones: number;
+  pctApoyo: number | null;
+  veredicto: string;
+}
 
 export interface FactorPostura {
   direccion: "bull" | "bear";
@@ -30,6 +39,7 @@ export interface PosturaIntegradaResult {
   vender: string[];
   factores: FactorPostura[];
   riesgosRegimen?: { desacopleDeflacionario: boolean; flightToQuality: boolean };
+  validacion?: ValidacionNoticias;
   texto: string;
 }
 
@@ -95,6 +105,67 @@ async function vixActual(): Promise<number | null> {
     return null;
   }
 }
+
+const KW_BULL = [
+  "sube", "suben", "rally", "alza", "alzas", "record", "récord", "máximos", "optimismo",
+  "expansión", "ganancias", "compra", "soars", "jumps", "rises", "gains", "bullish",
+  "optimism", "recovery", "crecimiento", "fortalece", "repunte",
+];
+const KW_BEAR = [
+  "cae", "caen", "caída", "desploma", "corrección", "mínimos", "miedos", "recesión",
+  "venta", "sell-off", "selloff", "plunges", "tumbles", "falls", "fears", "bearish",
+  "recession", "weakness", "crisis", "default", "riesgo", "stress", "colapso",
+];
+
+function clasificarTitulo(title: string): "apoyo" | "contradiccion" | "neutral" {
+  const t = title.toLowerCase();
+  let b = 0;
+  let x = 0;
+  for (const k of KW_BULL) if (t.includes(k)) b++;
+  for (const k of KW_BEAR) if (t.includes(k)) x++;
+  if (b > x) return "apoyo";
+  if (x > b) return "contradiccion";
+  return "neutral";
+}
+
+/** Capa anti-sesgo (reciclado §9 detector): ¿los titulares confirman la postura? */
+async function validarConNoticias(neto: number): Promise<ValidacionNoticias> {
+  const vacio: ValidacionNoticiaS = { titulos: 0, apoyos: 0, contradicciones: 0, pctApoyo: null, veredicto: "sin datos" };
+  try {
+    const sesgo = neto >= 0 ? "mercado accionario rally expansión" : "mercado corrección riesgo recesión crédito";
+    const consultas = [sesgo, "bolsa indices credit spreads"];
+    const titulosSet = new Set<string>();
+    for (const c of consultas) {
+      const r = await consultarNoticias(c, "semana").catch(() => null);
+      for (const f of r?.fuentes ?? []) {
+        const t = (f.title ?? "").trim();
+        if (t.length > 25) titulosSet.add(t);
+      }
+      if (titulosSet.size >= 20) break;
+    }
+    let apoyos = 0;
+    let contra = 0;
+    for (const t of titulosSet) {
+      const c = clasificarTitulo(t);
+      if (c === "apoyo") apoyos++;
+      else if (c === "contradiccion") contra++;
+    }
+    const denom = apoyos + contra;
+    const pct = denom > 0 ? Math.round((apoyos / denom) * 100) : null;
+    let veredicto = "titulares neutrales — sin señal clara";
+    if (pct != null) {
+      veredicto =
+        pct >= 80 ? "las noticias CONFIRMAN la postura"
+        : pct >= 60 ? "mayormente alineada con la postura"
+        : pct >= 40 ? "señal MIXTA — cautela adicional"
+        : "las noticias CONTRADICEN la postura — revisar premisas";
+    }
+    return { titulos: titulosSet.size, apoyos, contradicciones: contra, pctApoyo: pct, veredicto };
+  } catch {
+    return vacio;
+  }
+}
+type ValidacionNoticiaS = ValidacionNoticias;
 
 export const getDiagnosticoIntegrado = createServerFn({ method: "GET" }).handler(
   async (): Promise<PosturaIntegradaResult> => {
@@ -190,6 +261,7 @@ export const getDiagnosticoIntegrado = createServerFn({ method: "GET" }).handler
       const neto = bull - bear;
       const p = posturaPorNeto(neto);
       const meta = POSTURAS[p.key]!;
+      const validacion = await validarConNoticias(neto);
 
       const lineas: string[] = [];
       lineas.push("DIAGNÓSTICO INTEGRADO — ¿dónde posicionarse?");
@@ -223,6 +295,11 @@ export const getDiagnosticoIntegrado = createServerFn({ method: "GET" }).handler
         lineas.push("AVISO DE RÉGIMEN: desacople deflacionario (TLT-SPY corr < -0.3) — el modelo intermarket estándar pierde validez.");
       }
       lineas.push("");
+      if (validacion.titulos > 0) {
+        lineas.push("VALIDACIÓN POR NOTICIAS (" + validacion.titulos + " titulares): " + validacion.veredicto +
+          (validacion.pctApoyo != null ? " — " + validacion.pctApoyo + "% apoyan el sesgo" : ""));
+        lineas.push("");
+      }
       lineas.push("Educativo — no recomendación personalizada. Fuente: Yahoo Finance + motor intermarket CORONAR.");
 
       return {
@@ -239,6 +316,7 @@ export const getDiagnosticoIntegrado = createServerFn({ method: "GET" }).handler
         comprar: meta.comprar,
         vender: meta.vender,
         factores,
+        validacion,
         riesgosRegimen: rr
           ? { desacopleDeflacionario: rr.desacopleDeflacionario, flightToQuality: rr.flightToQuality }
           : undefined,
