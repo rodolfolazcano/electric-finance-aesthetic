@@ -1,6 +1,170 @@
 {
   "ciclos": [
     {
+      "fecha": "2026-08-25T14:00:20.675Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "momentum-tendencia"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T13:20:20.368Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T12:52:20.098Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "basis-cedear-us"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T12:13:19.847Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "mean-reversion-atr"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T11:50:19.680Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T10:36:19.116Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "basis-cedear-us"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T10:20:18.973Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T10:04:18.847Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "statarb-pares"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T08:36:18.232Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T08:20:18.093Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "basis-cedear-us"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T08:04:17.963Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "mean-reversion-atr"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T07:04:17.516Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T06:04:16.997Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "basis-cedear-us"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T05:34:16.767Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T05:16:16.634Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "value-fundamental",
+        "rotacion-sectorial"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
+      "fecha": "2026-08-25T03:11:35.645Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "statarb-pares",
+        "basis-cedear-us",
+        "mean-reversion-atr",
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
       "fecha": "2026-08-24T19:16:43.707Z",
       "disparo": "scheduler",
       "estrategias": [
