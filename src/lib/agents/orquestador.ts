@@ -754,6 +754,20 @@ export async function ejecutarTool(
           ok: true,
         };
       }
+      case "curva_dolar_futuro": {
+        const { getCurvaDolarFuturo } = await import(
+          "@/lib/herramientas/api/dolar-futuro.functions"
+        );
+        const r = await (getCurvaDolarFuturo as any)({ data: {} });
+        return { texto: r?.texto ?? "SIN RESULTADOS", fuentes: [], ok: Boolean(r?.ok) };
+      }
+      case "capm_batch_bcba": {
+        const { getCapmBatchBcba } = await import(
+          "@/lib/herramientas/capm-batch-bcba.functions"
+        );
+        const r = await (getCapmBatchBcba as any)({ data: argsRaw?.trim() ? JSON.parse(argsRaw) : {} });
+        return { texto: r?.texto ?? "SIN RESULTADOS", fuentes: [], ok: Boolean(r?.ok) };
+      }
       case "diagnostico_integrado": {
         const { getDiagnosticoIntegrado } = await import(
           "@/lib/herramientas/sectores/postura-integrada.functions"

@@ -1,6 +1,17 @@
 {
   "ciclos": [
     {
+      "fecha": "2026-08-25T16:20:51.534Z",
+      "disparo": "scheduler",
+      "estrategias": [
+        "statarb-pares",
+        "noticias-eventos"
+      ],
+      "candidatos": 0,
+      "enviadas": 0,
+      "ok": true
+    },
+    {
       "fecha": "2026-08-25T15:09:58.218Z",
       "disparo": "scheduler",
       "estrategias": [

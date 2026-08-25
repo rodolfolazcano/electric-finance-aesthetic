@@ -213,6 +213,35 @@ export const TOOLS: ToolSpec[] = [
   {
     type: "function",
     function: {
+      name: "curva_dolar_futuro",
+      description:
+        "CURVA DE DOLAR FUTURO de IOL con devaluacion implicita vs MEP spot (CriptoYa): contratos DLR/FDI por vencimiento con precio, TNA implicita % y dev. implicita %, mas la devaluacion anualizada ~12m. Triggers: 'curva de dolar futuro', 'devaluacion implicita', 'cuanto cotiza el DLR25', 'expectativa de devaluacion'. Panel completo requiere sesion IOL (iol_login); el MEP publico funciona sin login.",
+      parameters: { type: "object", properties: {}, required: [], additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "capm_batch_bcba",
+      description:
+        "CAPM BATCH de acciones BCBA liquidas vs ^MERV (2y) con guardrails anti-datos-malos: beta, alfa anual, R2 y significancia por ticker; flags |beta|>5, sanity-check GGAL y detector >20% sin datos. Triggers: 'beta de todas las lideres', 'CAPM batch BCBA', 'compara betas contra Merval'. Acepta hasta 30 tickers propios o usa los 20 liquidos por defecto.",
+      parameters: {
+        type: "object",
+        properties: {
+          tickers: {
+            type: "array",
+            items: { type: "string" },
+            description: "Opcional: tickers BCBA sin .BA (default 20 liquidas). Ej ['GGAL','YPF','PAMP'].",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "analizar_semaforo",
       description:
         "Analiza un activo con un semáforo técnico + fundamental usando datos reales en vivo de Yahoo Finance: indicadores técnicos (RSI14, MACD, SMA20/50/200, soportes y resistencias, anomalía de precio, posición en el rango de 52 semanas) y métricas fundamentales (P/E, crecimiento de ingresos, margen, ROE, upside vs consenso de analistas, deuda/patrimonio). Calcula scores en [-2, 2] con pesos tendencia 40% / momentum 30% / S/R 20% / anomalía 10%, clasifica con umbrales (>1.5 COMPRA, >0.3 COMPRA CON CAUTELA, >-0.3 MANTENER, >-1.5 REDUCIR, VENTA) y valida el resultado con noticias recientes sobre el activo. Para preguntas como 'analizá el semáforo de X', 'análisis técnico de X', 'indicadores técnicos', 'soportes y resistencias de X', 'conviene comprar o vender X', 'RSI/MACD de X'. Acepta ticker o nombre (ej. AAPL, YPF, GGAL.BA, MercadoLibre, Banco Galicia).",
