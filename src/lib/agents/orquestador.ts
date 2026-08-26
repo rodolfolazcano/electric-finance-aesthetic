@@ -321,6 +321,12 @@ function detectarIntencionSkill(pregunta: string): string[] {
   ) {
     skills.push("postura-integrada");
   }
+  if (/scanner|se[ñn]ales intermarket|estado del scanner|fase actual del ciclo|qu[eé] dice el scanner|corre.*scan|scan.*intermarket/i.test(p)) {
+    skills.push("scanner-intermarket");
+  }
+  if (/presenta.*earning|earning.*esta semana|calendario.*earning|quienes reportan|que empresas.*earning|balances.*semana/i.test(p)) {
+    skills.push("calendario-earnings");
+  }
 
   return skills;
 }
@@ -766,6 +772,34 @@ export async function ejecutarTool(
           "@/lib/herramientas/capm-batch-bcba.functions"
         );
         const r = await (getCapmBatchBcba as any)({ data: argsRaw?.trim() ? JSON.parse(argsRaw) : {} });
+        return { texto: r?.texto ?? "SIN RESULTADOS", fuentes: [], ok: Boolean(r?.ok) };
+      }
+      case "scanner_intermarket": {
+        const { leerEstado, dispararScan, formatearEstadoTexto } = await import(
+          "@/lib/scanner-intermarket.server"
+        );
+        let accion = "estado";
+        try {
+          const a = JSON.parse(argsRaw || "{}") as { accion?: string };
+          if (a.accion && String(a.accion).toLowerCase().includes("scan")) accion = "scan";
+        } catch { /* sin args */ }
+        if (accion === "scan") {
+          const s = await dispararScan();
+          if (!s) return { texto: "SIN RESULTADOS: no se pudo ejecutar el scan (verificá que python y SCANNER_INTERMARKET/scanner.py estén disponibles).", fuentes: [], ok: false };
+          return { texto: formatearEstadoTexto(s), fuentes: [], ok: true };
+        }
+        const s = leerEstado();
+        if (!s) return { texto: "SIN RESULTADOS: el scanner no tiene estado (ejecutá python SCANNER_INTERMARKET/scanner.py).", fuentes: [], ok: false };
+        return { texto: formatearEstadoTexto(s), fuentes: [], ok: true };
+      }
+      case "calendario_earnings": {
+        const { generarEarnings } = await import("@/lib/earnings-calendario.server");
+        let modo = "semanal";
+        try {
+          const a = JSON.parse(argsRaw || "{}") as { modo?: string };
+          if (a.modo && String(a.modo).toLowerCase().includes("diario")) modo = "diario";
+        } catch { /* sin args */ }
+        const r = await (generarEarnings as any)({ modo });
         return { texto: r?.texto ?? "SIN RESULTADOS", fuentes: [], ok: Boolean(r?.ok) };
       }
       case "diagnostico_integrado": {

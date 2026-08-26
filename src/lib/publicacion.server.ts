@@ -9,6 +9,8 @@
  *   → sendPhoto + sendMessage al bot de publicaciones.
  */
 
+import { normalizarUtf8 } from "./telegram-format";
+
 type Noticia = { titulo: string; fuente?: string; link?: string; hace?: string };
 
 export type DatosPublicacion = {
@@ -33,6 +35,50 @@ export type DatosPublicacion = {
   sparkline: Array<{ f: string; v: number }>;
   noticias: Noticia[];
 };
+
+// ── Dedupe 6h (evita spam del mismo ticker) ──────────────────────────────
+const DEDUPE_TTL_MS = 6 * 60 * 60 * 1000;
+const DEDUPE_FILE = ".data/publicaciones/dedupe.json";
+
+function loadDedupe(): Record<string, number> {
+  try {
+    const fs = require("node:fs");
+    if (!fs.existsSync(DEDUPE_FILE)) return {};
+    return JSON.parse(fs.readFileSync(DEDUPE_FILE, "utf8"));
+  } catch {
+    return {};
+  }
+}
+
+function saveDedupe(map: Record<string, number>): void {
+  try {
+    const fs = require("node:fs");
+    const path = require("node:path");
+    fs.mkdirSync(path.dirname(DEDUPE_FILE), { recursive: true });
+    fs.writeFileSync(DEDUPE_FILE, JSON.stringify(map, null, 2));
+  } catch { /* ignore */ }
+}
+
+function dedupeKey(ticker: string, tipo: string): string {
+  return `${ticker.toUpperCase()}::${tipo}`;
+}
+
+function shouldSkipPorDedupe(ticker: string, tipo: string): boolean {
+  const map = loadDedupe();
+  const k = dedupeKey(ticker, tipo);
+  const ts = map[k];
+  if (typeof ts === "number" && Date.now() - ts < DEDUPE_TTL_MS) return true;
+  return false;
+}
+
+function marcarDedupe(ticker: string, tipo: string): void {
+  const map = loadDedupe();
+  map[dedupeKey(ticker, tipo)] = Date.now();
+  // Limpieza: borrar entradas viejas > 24h
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  for (const [k, v] of Object.entries(map)) if (v < cutoff) delete map[k];
+  saveDedupe(map);
+}
 
 // ── Sharpe y helpers ────────────────────────────────────────────────────────
 
@@ -399,36 +445,61 @@ function escapeHtml(s: string): string {
   return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// ── Texto editorial (formato publicación larga) ────────────────────────────
+// ── Texto editorial (formato moderno compacto) ───────────────────────────
 
 export function armarTextoPublicacion(d: DatosPublicacion, senal?: string, motivo?: string): string {
-  const fecha = new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" });
+  const fecha = new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
   const lineas: string[] = [];
-  lineas.push(`<b>${escapeHtml(d.ticker)}${d.nombre ? " — " + escapeHtml(d.nombre) : ""}: ${senal ?? "lectura de mercado"} al ${fecha}</b>`);
+
+  // Header limpio
+  const nombreCorto = d.nombre ? d.nombre.replace(/\s+(Inc\.?|Corp\.?|Ltd\.?|S\.A\.?)$/i, "").slice(0, 28) : "";
+  lineas.push(`<b>📊 ${escapeHtml(d.ticker)}${nombreCorto ? " · " + escapeHtml(nombreCorto) : ""}</b> <i>· ${fecha}</i>`);
+  if (senal && senal !== "lectura de mercado") lineas.push(`<i>${escapeHtml(senal)}</i>`);
   lineas.push("");
-  lineas.push(
-    `La acción opera en <b>${fmtMoneda(d.precio)}</b>${d.var1d != null ? ` con una variación de <b>${pctNumStr(d.var1d)}</b> en la jornada` : ""}${d.var1m != null ? ` y <b>${pctNumStr(d.var1m)}</b> en el último mes` : ""}. El ratio de Sharpe de los últimos seis meses se ubica en <b>${d.sharpe != null ? d.sharpe.toFixed(2) : "N/D"}</b>, con volatilidad anualizada de ${pctNumStr(d.volAnual != null ? d.volAnual! * 100 : null)} y beta ${d.beta != null ? d.beta.toFixed(2) : "N/D"} frente al mercado.`,
-  );
-  if (d.peForward != null || d.roe != null || d.upsideAnalistas != null) {
-    lineas.push("");
-    lineas.push(
-      `🔹 <b>Fundamentales.</b> P/E forward ${d.peForward != null ? d.peForward.toFixed(1) : "N/D"}, ROE ${pctNumStr(d.roe)}, capitalización ${fmtMoneda(d.marketCap)}${d.upsideAnalistas != null ? `, precio objetivo de analistas implica un upside de <b>${pctNumStr(d.upsideAnalistas)}</b>` : ""}.`,
-    );
+
+  // Precio y variaciones — solo si hay dato
+  const precioTxt = d.precio != null ? `<b>${escapeHtml(fmtMoneda(d.precio, d.moneda === "ARS" ? "ARS" : "USD"))}</b>` : "";
+  const varTxt: string[] = [];
+  if (d.var1d != null) varTxt.push(`${d.var1d >= 0 ? "▲" : "▼"} ${pctNumStr(d.var1d)} hoy`);
+  if (d.var1m != null) varTxt.push(`${d.var1m >= 0 ? "▲" : "▼"} ${pctNumStr(d.var1m)} 1M`);
+  if (precioTxt || varTxt.length) {
+    lineas.push(`💰 ${precioTxt}${varTxt.length ? " · " + varTxt.join(" · ") : ""}`);
   }
+
+  // Stats clave — compacto, solo valores disponibles (sin N/D)
+  const stats: string[] = [];
+  if (d.sharpe != null) stats.push(`Sharpe ${d.sharpe.toFixed(2)}`);
+  if (d.volAnual != null) stats.push(`Vol ${pctNumStr(d.volAnual * 100)}`);
+  if (d.beta != null) stats.push(`β ${d.beta.toFixed(2)}`);
+  if (stats.length) lineas.push(`📈 ${stats.join(" · ")}`);
+
+  // Fundamentales — solo si hay al menos uno
+  const fund: string[] = [];
+  if (d.peForward != null) fund.push(`P/E ${d.peForward.toFixed(1)}`);
+  if (d.roe != null) fund.push(`ROE ${pctNumStr(d.roe)}`);
+  if (d.marketCap != null) fund.push(`Cap ${fmtMoneda(d.marketCap)}`);
+  if (d.upsideAnalistas != null) fund.push(`Upside <b>${pctNumStr(d.upsideAnalistas)}</b>`);
+  if (fund.length) {
+    lineas.push(`🏦 ${fund.join(" · ")}`);
+  }
+
+  // Noticias — bullets cortos
   if (d.noticias.length) {
     lineas.push("");
-    lineas.push(`🔹 <b>Lo que se está leyendo hoy.</b>`);
-    for (const n of d.noticias.slice(0, 3)) {
-      lineas.push(`— ${escapeHtml(n.titulo)} (<i>${escapeHtml(n.fuente ?? "fuente")}</i>).`);
+    lineas.push(`📰 <b>Hoy</b>`);
+    for (const n of d.noticias.slice(0, 2)) {
+      lineas.push(`• ${escapeHtml(n.titulo.slice(0, 90))} <i>— ${escapeHtml(n.fuente ?? "")}</i>`);
     }
   }
+
   if (motivo) {
     lineas.push("");
-    lineas.push(`✅ <b>Síntesis.</b> ${escapeHtml(motivo)}`);
+    lineas.push(`💡 ${escapeHtml(motivo)}`);
   }
+
   lineas.push("");
-  lineas.push(`<i>Educativo — no recomendación personalizada. Verificá en tu broker. Fuente: Yahoo Finance / TradingView.</i>`);
-  return lineas.join("\n");
+  lineas.push(`<i>Educativo — no recomendación. Fuente: Yahoo Finance.</i>`);
+  return normalizarUtf8(lineas.join("\n"));
 }
 
 // ── Formato OPORTUNIDADES (🚀 estilo editorial corto) ─────────────────────
@@ -662,8 +733,27 @@ export async function publicarSlideMercado(argsRaw: string): Promise<{ ok: boole
   const ticker = String(a.ticker ?? "").trim();
   if (!ticker) return { ok: false, texto: "[ERROR] publicar_slide_mercado requiere ticker (ej. AAPL)" };
 
+  // Guard: no publicar si faltan datos clave (todo N/D)
   // 1) Datos completos en paralelo
   const datos = await obtenerDatosPublicacion(ticker);
+
+  const datosVacios =
+    datos.precio == null &&
+    datos.sharpe == null &&
+    datos.volAnual == null &&
+    datos.beta == null &&
+    datos.peForward == null &&
+    datos.marketCap == null;
+  if (datosVacios) {
+    return {
+      ok: false,
+      texto: `[SKIP] ${ticker}: sin datos suficientes (precio/Sharpe/beta N/D) — no se publica para evitar spam.`,
+    };
+  }
+
+  if (shouldSkipPorDedupe(ticker, "slide")) {
+    return { ok: false, texto: `[SKIP dedupe] ${ticker} ya publicado hace <6h — omitido.` };
+  }
 
   // 2) Slide PNG + texto editorial en paralelo
   const [png, textoPub] = await Promise.all([
@@ -694,12 +784,14 @@ export async function publicarSlideMercado(argsRaw: string): Promise<{ ok: boole
       let fotoOk = false;
       if (png) {
         const { sendSignalsPhotoBuffer } = await import("@/lib/telegram.server");
-        fotoOk = await sendSignalsPhotoBuffer(cid, png, { caption: (captionBase || `${datos.ticker} · Sharpe ${datos.sharpe?.toFixed(2) ?? "N/D"}`).slice(0, 1024) });
+        const captionCorta = captionBase || `${datos.ticker}${datos.sharpe != null ? ` · Sharpe ${datos.sharpe.toFixed(2)}` : ""}${datos.var1d != null ? ` · ${datos.var1d >= 0 ? "+" : ""}${datos.var1d.toFixed(1)}%` : ""}`;
+        fotoOk = await sendSignalsPhotoBuffer(cid, png, { caption: captionCorta.slice(0, 1024) });
       }
       const msgOk = await sendTelegramMessage({ text: textoPub, chatId: cid, parseMode: "HTML" }).then(() => true).catch(() => false);
       detalles.push(`publicaciones→${cid} foto=${fotoOk ? "OK" : "SKIP"} msg=${msgOk ? "OK" : "FAIL"}`);
       if (fotoOk || msgOk) { okAny = true; enviados++; }
     }
+    if (okAny) marcarDedupe(ticker, "slide");
     return okAny;
   };
 
@@ -712,12 +804,14 @@ export async function publicarSlideMercado(argsRaw: string): Promise<{ ok: boole
     for (const cid of cfgAgente.allowedChats) {
       let fotoOk = false;
       if (png) {
-        fotoOk = await sendAgentPhotoBuffer(cid, png, { caption: (captionBase || `${datos.ticker} · Sharpe ${datos.sharpe?.toFixed(2) ?? "N/D"}`).slice(0, 1024) });
+        const captionCorta = captionBase || `${datos.ticker}${datos.sharpe != null ? ` · Sharpe ${datos.sharpe.toFixed(2)}` : ""}${datos.var1d != null ? ` · ${datos.var1d >= 0 ? "+" : ""}${datos.var1d.toFixed(1)}%` : ""}`;
+        fotoOk = await sendAgentPhotoBuffer(cid, png, { caption: captionCorta.slice(0, 1024) });
       }
       await sendAgentMessage(cid, textoPub);
       detalles.push(`agente→${cid} foto=${fotoOk ? "OK" : "SKIP"}`);
       okAny = true; enviados++;
     }
+    if (okAny) marcarDedupe(ticker, "slide");
     return okAny;
   };
 

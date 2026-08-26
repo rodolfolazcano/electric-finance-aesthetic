@@ -31,18 +31,39 @@ function autorizado(req: Request): boolean {
   return false;
 }
 
-async function enviarChunked(texto: string): Promise<{ chatIds: string[]; partes: number }> {
+async function enviarBloques(bloques: string[]): Promise<{ chatIds: string[]; partes: number }> {
   const { token, chatIds, enabled } = getTelegramConfig();
   if (!enabled || !token) return { chatIds: [], partes: 0 };
   const partes: string[] = [];
-  for (let i = 0; i < texto.length; i += 3800) partes.push(texto.slice(i, i + 3800));
+  let current = "";
+  for (const b of bloques) {
+    const candidate = current ? current + "\n\n" + b : b;
+    if (candidate.length <= 3800) {
+      current = candidate;
+    } else {
+      if (current) partes.push(current);
+      if (b.length > 3800) {
+        const lines = b.split("\n");
+        let sub = "";
+        for (const line of lines) {
+          const cand2 = sub ? sub + "\n" + line : line;
+          if (cand2.length <= 3800) sub = cand2;
+          else {
+            if (sub) partes.push(sub);
+            sub = line;
+          }
+        }
+        if (sub) partes.push(sub);
+        current = "";
+      } else {
+        current = b;
+      }
+    }
+  }
+  if (current) partes.push(current);
   for (const chatId of chatIds) {
-    for (let p = 0; p < partes.length; p++) {
-      await sendTelegramMessage({
-        text: partes[p]!,
-        chatId,
-        ...(p === 0 ? { parseMode: "HTML" as const } : {}),
-      });
+    for (const parte of partes) {
+      await sendTelegramMessage({ text: parte, chatId, parseMode: "HTML" });
     }
   }
   return { chatIds, partes: partes.length };
@@ -72,7 +93,7 @@ async function manejar(request: Request): Promise<Response> {
       return Response.json({ ok: false, motivo: r.texto, modo, desde: r.desde, hasta: r.hasta });
     }
 
-    const enviados = await enviarChunked(r.texto);
+    const enviados = await enviarBloques(r.bloques);
 
     return Response.json({
       ok: enviados.chatIds.length > 0,

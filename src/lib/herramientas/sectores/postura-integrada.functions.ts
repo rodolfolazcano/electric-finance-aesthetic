@@ -8,6 +8,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getDecouplingMonitor, type CreditAlertLevel } from "./decoupling-monitor.functions";
 import { getIntermarketRatios } from "@/lib/sectores/internarket-ratios.functions";
 import { consultarNoticias } from "@/lib/noticias.server";
+import { leerEstado } from "@/lib/scanner-intermarket.server";
 
 export interface ValidacionNoticias {
   titulos: number;
@@ -300,6 +301,14 @@ export const getDiagnosticoIntegrado = createServerFn({ method: "GET" }).handler
           (validacion.pctApoyo != null ? " — " + validacion.pctApoyo + "% apoyan el sesgo" : ""));
         lineas.push("");
       }
+      try {
+        const sc = leerEstado();
+        if (sc && sc.vivo) {
+          lineas.push("SCANNER INTERMARKET (vivo, " + (sc.fase?.name ?? "s/d") + " conf " + (sc.fase?.conf ?? "?") + ") — " + sc.senales.length + " señales activas");
+          if (sc.credito) lineas.push(" Scanner crédito: IG " + (sc.credito.IG?.pct ?? "?") + "% [" + (sc.credito.IG?.nivel ?? "?") + "] · HY " + (sc.credito.HY?.pct ?? "?") + "% [" + (sc.credito.HY?.nivel ?? "?") + "]");
+          lineas.push("");
+        }
+      } catch { /* scanner opcional */ }
       lineas.push("Educativo — no recomendación personalizada. Fuente: Yahoo Finance + motor intermarket CORONAR.");
 
       return {

@@ -380,6 +380,35 @@ const SKILLS: Skill[] = [
 - Si una capa falla, mostrá las que sí obtuvieron datos e indicá cuál faltó. PROHIBIDO inventar scores.`,
   },
   {
+    id: "postura-integrada",
+    nombre: "Diagnóstico Integrado Intermarket",
+    descripcion: "Postura global de mercado en 5 niveles fusionando ciclo Murphy-Pring, crédito, consumidor, VIX, curva y FTQ.",
+    instrucciones: `[SKILL · Diagnóstico Integrado Intermarket] — EJECUCIÓN INMEDIATA
+- TRIGGER AUTOMATICO: ante "¿dónde posicionarse?", "postura integrada", "diagnóstico del mercado", "risk-on/risk-off", "en qué fase del ciclo estamos" → EJECUTÁ diagnostico_integrado() EN ESTE TURNO. NO requiere parámetros NI activo: analiza el mercado COMPLETO. PROHIBIDO pedir aclaraciones o activos.
+- Presentá la postura de 5 niveles con el balance bull/bear y los factores tal cual devuelve la tool; luego el plan COMPRAR/VENDER por ETF sectorial.
+- Si aparecen avisos de régimen (desacople deflacionario / flight to quality), destácalos ANTES del plan: invalidan el modelo estándar.
+- Educativo, no recomendación personalizada.`,
+  },
+  {
+    id: "calendario-earnings",
+    nombre: "Calendario de Earnings Completo",
+    descripcion: "Calendario completo de balances escaneando todo el universo del catalogo.",
+    instrucciones: `[SKILL · Calendario de Earnings] — EJECUCION INMEDIATA
+- TRIGGER AUTOMATICO: ante "que empresas presentan earnings", "quienes reportan esta semana", "calendario de balances", "earnings de manana" → EJECUTA calendario_earnings({modo: "semanal"}) o modo "diario" si especifica hoy/manana.
+- Presenta fecha, hora ART, capitalizacion y sesgo estadistico historico tal cual devuelve la tool.
+- Si no hay reportes en ventana, dilo con honestidad.`,
+  },
+  {
+    id: "scanner-intermarket",
+    nombre: "Scanner Intermarket Continuo",
+    descripcion: "Snapshot vivo del scanner Python (fase 0-5, confianza, 10 ratios con tendencia/ROC63/MA, crédito IG/HY percentiles, VIX, sentimiento noticias y próximos earnings).",
+    instrucciones: `[SKILL · Scanner Intermarket Continuo] — EJECUCIÓN INMEDIATA
+- TRIGGER AUTOMATICO: ante "scanner", "señales intermarket", "estado del scanner", "qué dice el scanner", "fase actual del ciclo", "corre un scan" → EJECUTÁ scanner_intermarket() EN ESTE TURNO.
+- Sin parámetros lee el snapshot vivo (estado_actual.json). Con accion="scan" ejecuta un scan fresco bajo demanda (python scanner.py --quiet, ~20s).
+- Presentá: fase Pring/Murphy con confianza, top ratios con flechas, crédito IG/HY pct, VIX, eventos próximos earnings y señales activas con nivel 🔴/🟡/⚪.
+- Si el scanner está stale (>45 min), avisá y ofrecé correr un scan fresco.`,
+  },
+  {
     id: "portfolio-paste-parser",
     nombre: "Portfolio Paste Parser",
     descripcion: "Detecta paste IOL con patrimonio/tenencias y clasifica activos por tipo/moneda/mercado usando unificado_completo.json + cedears universe, replica Optimizador tab.",

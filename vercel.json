@@ -39,6 +39,14 @@
     {
       "path": "/api/cron/tuning-senales",
       "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/cron/earnings-semanal?modo=semanal",
+      "schedule": "0 12 * * 1"
+    },
+    {
+      "path": "/api/cron/earnings-semanal?modo=diario",
+      "schedule": "30 12 * * 1-5"
     }
   ]
 }

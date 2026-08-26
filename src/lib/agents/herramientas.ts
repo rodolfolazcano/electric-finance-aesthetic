@@ -242,6 +242,44 @@ export const TOOLS: ToolSpec[] = [
   {
     type: "function",
     function: {
+      name: "scanner_intermarket",
+      description:
+        "SCANNER INTERMARKET continuo (Murphy/Pring/Stovall + crédito corporativo + VIX + sentimiento noticias): lee el snapshot vivo del scanner Python (fase 0-5, confianza, 10 ratios con tendencia/ROC63/MA, crédito IG/HY percentiles, VIX, sentimiento por clusters y próximos earnings de tu watchlist). Si le pedís accion='scan' ejecuta un scan fresco bajo demanda. Triggers: 'qué dice el scanner', 'señales intermarket', 'fase actual del ciclo', 'estado del scanner', 'corre un scan'.",
+      parameters: {
+        type: "object",
+        properties: {
+          accion: {
+            type: "string",
+            description: "Opcional: 'estado' (solo leer snapshot, default) o 'scan' (ejecutar un scan fresco ahora, ~20s).",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "calendario_earnings",
+      description:
+        "CALENDARIO DE EARNINGS completo: escanea todo el universo del catalogo y lista quien reporta EPS en la ventana pedida con fecha, hora ART, capitalizacion y sesgo historico. Triggers: que empresas presentan earnings, quien reporta esta semana, earnings de manana, calendario de balances. Parametro modo semanal o diario.",
+      parameters: {
+        type: "object",
+        properties: {
+          modo: {
+            type: "string",
+            description: "Ventana: semanal (esta y proxima semana) o diario (hoy y manana). Default semanal.",
+          },
+        },
+        required: [],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "analizar_semaforo",
       description:
         "Analiza un activo con un semáforo técnico + fundamental usando datos reales en vivo de Yahoo Finance: indicadores técnicos (RSI14, MACD, SMA20/50/200, soportes y resistencias, anomalía de precio, posición en el rango de 52 semanas) y métricas fundamentales (P/E, crecimiento de ingresos, margen, ROE, upside vs consenso de analistas, deuda/patrimonio). Calcula scores en [-2, 2] con pesos tendencia 40% / momentum 30% / S/R 20% / anomalía 10%, clasifica con umbrales (>1.5 COMPRA, >0.3 COMPRA CON CAUTELA, >-0.3 MANTENER, >-1.5 REDUCIR, VENTA) y valida el resultado con noticias recientes sobre el activo. Para preguntas como 'analizá el semáforo de X', 'análisis técnico de X', 'indicadores técnicos', 'soportes y resistencias de X', 'conviene comprar o vender X', 'RSI/MACD de X'. Acepta ticker o nombre (ej. AAPL, YPF, GGAL.BA, MercadoLibre, Banco Galicia).",

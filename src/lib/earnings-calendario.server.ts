@@ -13,6 +13,15 @@ import {
   analizarEarningsTicker,
   type EarningsEstimateResult,
 } from "./estimaciones-earnings.server";
+import {
+  escapeHtml,
+  fmtCapUsd,
+  nombreCorto,
+  horaCorta,
+  SEPARADOR_FINO,
+  etiquetaFechaCorta,
+  esSorpresaExtremaNegativa,
+} from "./telegram-format";
 
 const CAP_MIN_DEFAULT = 2_000_000_000; // USD 2B
 const TOP_POR_DIA_DEFAULT = 8;
@@ -44,6 +53,7 @@ export interface ResultadoEarnings {
   universoEscaneado: number;
   omitidasPorCap: number;
   texto: string;
+  bloques: string[];
 }
 
 function esHabil(d: Date): boolean {
@@ -380,7 +390,8 @@ export async function generarEarnings(opts?: {
 
   empresas.sort((a, b) => a.fecha.localeCompare(b.fecha) || (b.marketCap ?? 0) - (a.marketCap ?? 0));
 
-  const texto = armarMensaje(empresas, modo, desde, hasta, topPorDia);
+  const bloques = buildEarningsBloques(empresas, modo, desde, hasta, topPorDia);
+  const texto = bloques.join("\n\n");
   return {
     ok: empresas.length > 0,
     modo,
@@ -390,6 +401,7 @@ export async function generarEarnings(opts?: {
     universoEscaneado: escaneados,
     omitidasPorCap: omitidasPorCapScan,
     texto,
+    bloques,
   };
 }
 
@@ -403,24 +415,24 @@ function vacio(modo: ModoEarnings, desde: string, hasta: string, motivo: string)
     universoEscaneado: 0,
     omitidasPorCap: 0,
     texto: motivo,
+    bloques: [motivo],
   };
 }
 
-function armarMensaje(
+export function buildEarningsBloques(
   empresas: EmpresaEarnings[],
   modo: ModoEarnings,
   desde: string,
   hasta: string,
   topPorDia: number,
-): string {
+): string[] {
+  const bloques: string[] = [];
   const titulo =
     modo === "semanal"
-      ? `<b>\u{1F4C5} EARNINGS — SEMANA ACTUAL Y PRÓXIMA (${escapar(etiquetaFecha(desde))} → ${escapar(etiquetaFecha(hasta))})</b>`
-      : `<b>\u{1F4C5} EARNINGS DE HOY Y MAÑANA</b>`;
-  const lineas: string[] = [
-    titulo,
-    `<i>Sesgo estadístico: \u{1F7E9} positivo · \u{1F7E5} negativo · \u{26AA} neutro (histórico ~8 trim.: % acierto vs consenso + sorpresa promedio)</i>`,
-  ];
+      ? `<b>\u{1F4CA} EARNINGS WEEK \u00B7 ${escapeHtml(etiquetaFechaCorta(desde))} \u2192 ${escapeHtml(etiquetaFechaCorta(hasta))}</b>`
+      : `<b>\u{1F4C5} EARNINGS \u00B7 ${escapeHtml(etiquetaFechaCorta(desde))}</b>`;
+  const subtitulo = `<i>\u{1F7E9} positivo \u00B7 \u{1F7E5} negativo \u00B7 \u26AA neutro</i>`;
+  bloques.push(titulo + "\n" + subtitulo);
 
   const fechasOrden = [...new Set(empresas.map((e) => e.fecha))].sort();
   let totalMostradas = 0;
@@ -430,33 +442,50 @@ function armarMensaje(
       .sort((a, b) => (b.marketCap ?? 0) - (a.marketCap ?? 0))
       .slice(0, topPorDia);
     if (!delDia.length) continue;
-    lineas.push(`\n<b>— ${escapar(etiquetaFecha(fecha))} —</b>`);
+    const lineasDia = [];
+    lineasDia.push(`<b>\u2014 ${escapeHtml(etiquetaFechaCorta(fecha))} \u2014</b>`);
+    lineasDia.push(SEPARADOR_FINO);
     for (const e of delDia) {
       totalMostradas++;
-      const trozos = [
-        `${emojiSesion(e.sesgo)} <b>${escapar(e.symbol)}</b>${fmtCap(e.marketCap)} — ${escapar(e.nombre.slice(0, 42))}`,
-      ];
-      const cuando = e.horaArt ? `${e.horaArt} ART` : "hora s/d";
-      trozos.push(`${escapar(cuando)}${e.momento ? ` (${e.momento})` : ""}`);
-      trozos.push(`EPS est. ${fmtNum(e.epsEstimado)}`);
+      const cap = fmtCapUsd(e.marketCap);
+      const capTxt = cap ? ` \u00B7 ${cap}` : "";
+      const hora = horaCorta(e.horaArt, e.momento);
+      const horaTxt = hora ? ` \u00B7 ${escapeHtml(hora)}` : "";
+      const emoji = e.sesgo === "positivo" ? "\u{1F7E9}" : e.sesgo === "negativo" ? "\u{1F7E5}" : "\u26AA";
+      lineasDia.push(`${emoji} <b>${escapeHtml(e.symbol)}</b>${capTxt}${horaTxt}`);
+      lineasDia.push(`   ${escapeHtml(nombreCorto(e.nombre))}`);
       if (e.stats) {
         const s = e.stats;
-        trozos.push(`acierto ${Math.round(s.tasaHistorica * 100)}%`);
-        trozos.push(`sorp. prom. ${fmtPct(s.avgSorpresa)}`);
-        if (s.probSPositiva != null) trozos.push(`P(+)=${Math.round(s.probSPositiva * 100)}%`);
-        if (s.volClasificacion && s.volClasificacion !== "S/D") trozos.push(`mov. esp. ${s.volClasificacion}`);
+        const partes = [];
+        if (s.tasaHistorica != null) partes.push(`acierto ${Math.round(s.tasaHistorica * 100)}%`);
+        if (s.avgSorpresa != null && isFinite(s.avgSorpresa)) {
+          const v = `${s.avgSorpresa >= 0 ? "+" : ""}${s.avgSorpresa.toFixed(1)}%`;
+          partes.push(`sorp ${v}` + (esSorpresaExtremaNegativa(s.avgSorpresa) ? " \u26A0\uFE0F" : ""));
+        }
+        if (s.volClasificacion && s.volClasificacion !== "S/D") partes.push(`mov esp ${escapeHtml(s.volClasificacion)}`);
+        if (partes.length) lineasDia.push("   " + partes.join(" \u00B7 "));
       }
-      lineas.push(trozos.join(" · "));
     }
     const ocultas = empresas.filter((e) => e.fecha === fecha).length - delDia.length;
-    if (ocultas > 0) lineas.push(`<i>+${ocultas} más ese día</i>`);
+    if (ocultas > 0) lineasDia.push(`<i>+${ocultas} m\u00E1s ese d\u00EDa</i>`);
+    bloques.push(lineasDia.join("\n"));
   }
 
   if (!totalMostradas) {
-    lineas.push("\nNo hay reportes que cumplan el filtro de capitalización en la ventana.");
+    bloques.push("No hay reportes que cumplan el filtro en la ventana.");
   }
-  lineas.push(
-    `\n<i>Educativo — no recomendación. Fuente: Yahoo Finance. Generado ${new Intl.DateTimeFormat("es-AR", { timeZone: "America/Argentina/Buenos_Aires", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date())} ART.</i>`,
-  );
-  return lineas.join("\n");
+  const footer = `<i>Educativo \u2014 no recomendaci\u00F3n. Fuente: Yahoo Finance. Generado ${new Intl.DateTimeFormat("es-AR", { timeZone: "America/Argentina/Buenos_Aires", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date())} ART.</i>`;
+  bloques.push(footer);
+  return bloques;
 }
+
+function armarMensaje(
+  empresas: EmpresaEarnings[],
+  modo: ModoEarnings,
+  desde: string,
+  hasta: string,
+  topPorDia: number,
+): string {
+  return buildEarningsBloques(empresas, modo, desde, hasta, topPorDia).join("\n\n");
+}
+

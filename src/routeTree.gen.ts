@@ -28,6 +28,7 @@ import { Route as ApiCronAlertaPublicacionesRouteImport } from './routes/api/cro
 import { Route as ApiCronContextoTelegramRouteImport } from './routes/api/cron/contexto-telegram'
 import { Route as ApiCronEarningsSemanalRouteImport } from './routes/api/cron/earnings-semanal'
 import { Route as ApiCronOportunidadesPublicacionesRouteImport } from './routes/api/cron/oportunidades-publicaciones'
+import { Route as ApiCronScannerSenalesRouteImport } from './routes/api/cron/scanner-senales'
 import { Route as ApiCronSenalesUnificadasRouteImport } from './routes/api/cron/senales-unificadas'
 import { Route as ApiCronTuningSenalesRouteImport } from './routes/api/cron/tuning-senales'
 import { Route as ApiIolStatusRouteImport } from './routes/api/iol.status'
@@ -133,6 +134,11 @@ const ApiCronOportunidadesPublicacionesRoute =
     path: '/api/cron/oportunidades-publicaciones',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiCronScannerSenalesRoute = ApiCronScannerSenalesRouteImport.update({
+  id: '/api/cron/scanner-senales',
+  path: '/api/cron/scanner-senales',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCronSenalesUnificadasRoute =
   ApiCronSenalesUnificadasRouteImport.update({
     id: '/api/cron/senales-unificadas',
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/api/cron/contexto-telegram': typeof ApiCronContextoTelegramRoute
   '/api/cron/earnings-semanal': typeof ApiCronEarningsSemanalRoute
   '/api/cron/oportunidades-publicaciones': typeof ApiCronOportunidadesPublicacionesRoute
+  '/api/cron/scanner-senales': typeof ApiCronScannerSenalesRoute
   '/api/cron/senales-unificadas': typeof ApiCronSenalesUnificadasRoute
   '/api/cron/tuning-senales': typeof ApiCronTuningSenalesRoute
   '/api/iol/status': typeof ApiIolStatusRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/api/cron/contexto-telegram': typeof ApiCronContextoTelegramRoute
   '/api/cron/earnings-semanal': typeof ApiCronEarningsSemanalRoute
   '/api/cron/oportunidades-publicaciones': typeof ApiCronOportunidadesPublicacionesRoute
+  '/api/cron/scanner-senales': typeof ApiCronScannerSenalesRoute
   '/api/cron/senales-unificadas': typeof ApiCronSenalesUnificadasRoute
   '/api/cron/tuning-senales': typeof ApiCronTuningSenalesRoute
   '/api/iol/status': typeof ApiIolStatusRoute
@@ -240,6 +248,7 @@ export interface FileRoutesById {
   '/api/cron/contexto-telegram': typeof ApiCronContextoTelegramRoute
   '/api/cron/earnings-semanal': typeof ApiCronEarningsSemanalRoute
   '/api/cron/oportunidades-publicaciones': typeof ApiCronOportunidadesPublicacionesRoute
+  '/api/cron/scanner-senales': typeof ApiCronScannerSenalesRoute
   '/api/cron/senales-unificadas': typeof ApiCronSenalesUnificadasRoute
   '/api/cron/tuning-senales': typeof ApiCronTuningSenalesRoute
   '/api/iol/status': typeof ApiIolStatusRoute
@@ -269,6 +278,7 @@ export interface FileRouteTypes {
     | '/api/cron/contexto-telegram'
     | '/api/cron/earnings-semanal'
     | '/api/cron/oportunidades-publicaciones'
+    | '/api/cron/scanner-senales'
     | '/api/cron/senales-unificadas'
     | '/api/cron/tuning-senales'
     | '/api/iol/status'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/api/cron/contexto-telegram'
     | '/api/cron/earnings-semanal'
     | '/api/cron/oportunidades-publicaciones'
+    | '/api/cron/scanner-senales'
     | '/api/cron/senales-unificadas'
     | '/api/cron/tuning-senales'
     | '/api/iol/status'
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/api/cron/contexto-telegram'
     | '/api/cron/earnings-semanal'
     | '/api/cron/oportunidades-publicaciones'
+    | '/api/cron/scanner-senales'
     | '/api/cron/senales-unificadas'
     | '/api/cron/tuning-senales'
     | '/api/iol/status'
@@ -351,6 +363,7 @@ export interface RootRouteChildren {
   ApiCronContextoTelegramRoute: typeof ApiCronContextoTelegramRoute
   ApiCronEarningsSemanalRoute: typeof ApiCronEarningsSemanalRoute
   ApiCronOportunidadesPublicacionesRoute: typeof ApiCronOportunidadesPublicacionesRoute
+  ApiCronScannerSenalesRoute: typeof ApiCronScannerSenalesRoute
   ApiCronSenalesUnificadasRoute: typeof ApiCronSenalesUnificadasRoute
   ApiCronTuningSenalesRoute: typeof ApiCronTuningSenalesRoute
   ApiIolStatusRoute: typeof ApiIolStatusRoute
@@ -493,6 +506,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCronOportunidadesPublicacionesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cron/scanner-senales': {
+      id: '/api/cron/scanner-senales'
+      path: '/api/cron/scanner-senales'
+      fullPath: '/api/cron/scanner-senales'
+      preLoaderRoute: typeof ApiCronScannerSenalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/cron/senales-unificadas': {
       id: '/api/cron/senales-unificadas'
       path: '/api/cron/senales-unificadas'
@@ -571,6 +591,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCronEarningsSemanalRoute: ApiCronEarningsSemanalRoute,
   ApiCronOportunidadesPublicacionesRoute:
     ApiCronOportunidadesPublicacionesRoute,
+  ApiCronScannerSenalesRoute: ApiCronScannerSenalesRoute,
   ApiCronSenalesUnificadasRoute: ApiCronSenalesUnificadasRoute,
   ApiCronTuningSenalesRoute: ApiCronTuningSenalesRoute,
   ApiIolStatusRoute: ApiIolStatusRoute,
