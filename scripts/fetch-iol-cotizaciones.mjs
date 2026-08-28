@@ -2,14 +2,14 @@
 /**
  * Fetch IOL cotizaciones → src/data/cotizaciones-iol.json
  *
- * Ejecutado por GitHub Actions (cron-job.org webhook).
- * Autentica con IOL API v2, obtiene cotizaciones de TP + ON,
- * normaliza y escribe el JSON estático que RentaFijaPanel consume
- * en el build/SSR sin necesidad de auth en runtime.
+ * Flujo local:
+ *   node scripts/fetch-iol-cotizaciones.mjs
+ *   git add src/data/cotizaciones-iol.json
+ *   git commit -m "chore: refresh cotizaciones IOL"
+ *   git push
+ *   → Lovable redeploya automáticamente
  *
- * Env vars (GitHub Secrets):
- *   IOL_USERNAME — usuario IOL
- *   IOL_PASSWORD — contraseña IOL
+ * Credenciales en .env (IOL_USERNAME / IOL_PASSWORD)
  */
 
 import { writeFileSync, readFileSync, existsSync } from "fs";
@@ -136,6 +136,10 @@ async function main() {
   console.log(
     `  Total: ${payload.titulosPublicos.length + payload.obligacionesNegociables.length} cotizaciones`,
   );
+  console.log("\nSiguiente paso:");
+  console.log("  git add src/data/cotizaciones-iol.json");
+  console.log('  git commit -m "chore: refresh cotizaciones IOL"');
+  console.log("  git push");
 }
 
 main().catch((err) => {
