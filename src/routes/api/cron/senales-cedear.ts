@@ -1,4 +1,4 @@
-import { eventHandler } from "h3";
+import { createFileRoute } from "@tanstack/react-router";
 import { generarSenalesCedear, guardarSenalesDelDia } from "../../../lib/senales-cedear.functions";
 
 function fechaART(): string {
@@ -14,10 +14,9 @@ function fechaART(): string {
   return `${y}-${m}-${d}`;
 }
 
-export default eventHandler(async () => {
+async function manejar(): Promise<Response> {
   const fecha = fechaART();
   try {
-    // generar mix todos top 6 (liquidos+movers+noticias)
     const res: any = await (generarSenalesCedear as any)({ data: { filtro: "todos", topN: 6 } });
     const payload = {
       fecha,
@@ -26,13 +25,11 @@ export default eventHandler(async () => {
       generadoEn: res.generadoEn ?? new Date().toISOString(),
     };
     const path = await guardarSenalesDelDia(fecha, payload);
-    // enviar a Telegram: usa telegram.server.ts (sendTelegramSignal / sendTelegramMessage)
-    const fuertes = payload.senales.filter((s: any) => (s.senal === "COMPRA" || s.senal === "VENTA") && (s.prob ?? 0) >= 0.50);
+    const fuertes = payload.senales.filter((s: any) => (s.senal === "COMPRA" || s.senal === "VENTA") && (s.prob ?? 0) >= 0.5);
     const aEnviar = fuertes.length > 0 ? fuertes : payload.senales.filter((s: any) => s.senal === "COMPRA").slice(0, 3);
     if (aEnviar.length > 0) {
       try {
         const { sendTelegramSignal, sendTelegramMessage } = await import("../../../lib/telegram.server");
-        // enviar 1 mensaje por señal fuerte (evita spam: max 4)
         for (const s of aEnviar.slice(0, 4)) {
           await sendTelegramSignal({
             ticker: s.tickerBCBA,
@@ -43,7 +40,6 @@ export default eventHandler(async () => {
             fuente: "yfinance + senales-cedear cron",
           });
         }
-        // si no hubo fuertes, enviar resumen
         if (fuertes.length === 0) {
           const txt = `Señales CEDEAR/BCBA ${fecha} (${payload.criterio}):\n` + payload.senales.slice(0, 4).map((s: any) => `${s.senal} ${s.tickerBCBA} (${s.tickerUS} ${s.variacionUS?.toFixed(2) ?? "--"}%)`).join("\n") + `\nVer detalle en /herramientas?tab=sectores`;
           await sendTelegramMessage({ text: txt });
@@ -52,11 +48,20 @@ export default eventHandler(async () => {
         console.error("[cron senales-cedear] telegram error", e);
       }
     }
-    return { ok: true, fecha, path, count: payload.senales.length };
+    return Response.json({ ok: true, fecha, path, count: payload.senales.length });
   } catch (e) {
     return new Response(JSON.stringify({ ok: false, motivo: e instanceof Error ? e.message : String(e) }), {
       status: 500,
       headers: { "content-type": "application/json" },
     });
   }
+}
+
+export const Route = createFileRoute("/api/cron/senales-cedear")({
+  server: {
+    handlers: {
+      GET: async () => manejar(),
+      POST: async () => manejar(),
+    },
+  },
 });

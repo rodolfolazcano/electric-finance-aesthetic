@@ -29,7 +29,13 @@ function envBool(name: string, def = true): boolean {
 
 export function arrancarPollingTelegram(): void {
   if (corriendo) return;
-  if (process.env.VERCEL === "1" || process.env.NITRO_PRESET === "vercel") return;
+  // HARCODEADO: en Vercel NUNCA polling — solo webhook. En local sí polling.
+  // TELEGRAM_POLLING=false en Vercel desactiva, true solo local.
+  const enVercel = process.env.VERCEL === "1" || process.env.NITRO_PRESET === "vercel";
+  if (enVercel) {
+    console.log("[TG POLLING] Vercel detectado: polling desactivado, solo webhook");
+    return;
+  }
   if (!envBool("TELEGRAM_POLLING")) return;
   const { token } = getAgentBotConfig();
   if (!token) return;

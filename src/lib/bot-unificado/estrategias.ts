@@ -22,6 +22,7 @@ import {
   zScoreUltimo,
 } from "./indicadores";
 import { PARES_STATARB, SECTORES_ETF, accionesOperables, cedearesOperables } from "./universo";
+import { escanearCedearsEntrada, escanearCedearsOversold } from "./scanner-senales-cedear";
 import type { CandidatoSenal } from "./tipos";
 
 export type Scanner = () => Promise<CandidatoSenal[]>;
@@ -457,6 +458,26 @@ export const ESTRATEGIAS: DefinicionEstrategia[] = [
     fuenteAcademica: "Event-driven + confirmación técnica",
     cadaMinutos: 90,
     escanear: escanearNoticiasEventos,
+  },
+  {
+    id: "cedears-entrada",
+    nombre: "CEDEARs — Señales de Entrada",
+    descripcion: "Scanner multi-indicador sobre 369 CEDEARs del JSON unificado. RSI+MACD+SMA+Bollinger+Volumen.",
+    fuenteAcademica: "Análisis técnico compuesto (Wilder RSI, Bollinger, MACD, SMA crossover)",
+    cadaMinutos: 180,
+    desde: "11:00",
+    hasta: "23:00",
+    escanear: escanearCedearsEntrada,
+  },
+  {
+    id: "cedears-oversold",
+    nombre: "CEDEARs — Oversold Extremo",
+    descripcion: "Filtro agresivo de CEDEARs con RSI < 30 para entrada en sobreventa extrema.",
+    fuenteAcademica: "Mean-reversion RSI (Wilder) + stops por ATR",
+    cadaMinutos: 120,
+    desde: "11:00",
+    hasta: "23:00",
+    escanear: escanearCedearsOversold,
   },
 ];
 

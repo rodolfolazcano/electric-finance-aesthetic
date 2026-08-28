@@ -4,9 +4,16 @@
  */
 
 import { ACCIONES_BCBA_TOP, CEDEARS_LIQUIDOS } from "@/lib/mapeo-cedear";
+import { CEDEARS_JSON } from "./cedears-universo";
 
 const EXCLUIDOS = new Set(["AAL", "CAR", "C"]);
 
+/** CEDEARs del JSON unificado (369 activos) — para scanners de alto alcance */
+export function cedearesUniverso(): string[] {
+  return CEDEARS_JSON.filter((t) => t && !EXCLUIDOS.has(t) && t.length > 1);
+}
+
+/** CEDEARs líquidos verificados (lista curada original, ~36 tickers) */
 export function cedearesOperables(): string[] {
   return [...new Set(CEDEARS_LIQUIDOS)].filter((t) => !EXCLUIDOS.has(t));
 }

@@ -47,6 +47,18 @@
     {
       "path": "/api/cron/earnings-semanal?modo=diario",
       "schedule": "30 12 * * 1-5"
+    },
+    {
+      "path": "/api/cron/bot-unificado?estrategias=cedears-entrada&forzar=1",
+      "schedule": "0 14,16,18,20,22 * * 1-5"
+    },
+    {
+      "path": "/api/cron/bot-unificado?estrategias=cedears-oversold&forzar=1",
+      "schedule": "30 14,16,18,20,22 * * 1-5"
+    },
+    {
+      "path": "/api/cron/bot-unificado?estrategias=cedears-entrada,cedears-oversold&forzar=1",
+      "schedule": "0 0,1,2 * * 2-6"
     }
   ]
 }

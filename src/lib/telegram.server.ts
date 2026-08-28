@@ -264,6 +264,14 @@ const AGENT_TOKEN_FALLBACK = "8947154888:AAHtQG4zeBw42rTcASv1jyTQn9YByl0HIr0";
 const AGENT_ALLOWED_CHATS_FALLBACK = "8179198652"; // Cintia (dueña del bot)
 const AGENT_WEBHOOK_SECRET_FALLBACK = "coronar_whsec_fpxbs777_9c41e7a2b8d3";
 
+// HARCODEADO a proposito (commit permitido): dominio y secret para cron-job.org / Vercel Cron
+export const VERCEL_DOMAIN = "https://electric-finance-aesthetic-main.vercel.app";
+export const CRON_SECRET_FALLBACK = "coronar_cron_9c41e7a2b8d3f1x6k7p0q2w4e8r1t5y9u";
+
+export function getCronSecret(): string {
+  return env("CRON_SECRET") ?? CRON_SECRET_FALLBACK;
+}
+
 export function getAgentBotConfig(): {
   token: string;
   allowedChats: string[];

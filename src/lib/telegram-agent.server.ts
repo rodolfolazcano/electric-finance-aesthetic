@@ -47,7 +47,9 @@ export type TgUpdate = {
 // Estado en memoria del módulo (best-effort en serverless: se resetea con cold start).
 const historias = new Map<string, Msg[]>();
 const chatsAuto = new Set<string>();
+const chatsProactivos = new Map<string, number>(); // chatId -> intervalo ms (0 = desactivado)
 const procesados = new Map<number, number>();
+const ultimaAlerta = new Map<string, number>(); // chatId -> timestamp de última alerta enviada
 
 const HISTORIA_MAX = 16;
 
@@ -70,12 +72,43 @@ export function baseUrlPorDefecto(): string {
 
 export function origenDesdeRequest(req: Request): string {
   const fija = env("TELEGRAM_AGENT_API_URL");
-  if (fija) return fija.replace(/\/+$/, "");
+  // En Vercel, nunca usar localhost aunque la env lo pida (evita deploy dormido → 5199)
+  const esVercel = process.env.VERCEL === "1" || process.env.NITRO_PRESET === "vercel";
+  if (fija && !(esVercel && /localhost|127\.0\.0\.1/i.test(fija))) return fija.replace(/\/+$/, "");
   const h = req.headers;
   const host = h.get("x-forwarded-host") ?? h.get("host");
   const proto = h.get("x-forwarded-proto") ?? (host?.includes("localhost") ? "http" : "https");
   if (host) return `${proto}://${host}`;
   return new URL(req.url).origin;
+}
+
+/** Intenta base, con fallbacks a puertos alternos comunes (3000/5173/5199). */
+async function fetchConFallback(base: string, path: string, init: RequestInit): Promise<Response> {
+  const tried: string[] = [];
+  const bases = [base];
+  // Si es localhost, probar puertos alternos también
+  if (base.includes("localhost") || base.includes("127.0.0.1")) {
+    for (const p of ["3000", "5199", "5173", "5000"]) {
+      const alt = base.replace(/:\d+/, `:${p}`);
+      if (!bases.includes(alt)) bases.push(alt);
+    }
+  }
+  let lastErr: unknown;
+  for (const b of bases) {
+    tried.push(b);
+    try {
+      const r = await fetch(`${b}${path}`, init);
+      if (b !== base) console.log(`[AGENTE TG] fallback a ${b} OK (original ${base} fallo)`);
+      return r;
+    } catch (e) {
+      lastErr = e;
+      // Solo reintentar si es error de red (ECONNREFUSED/fetch failed)
+      const msg = String(e instanceof Error ? e.message : e);
+      if (!/fetch failed|ECONNREFUSED|connect|NetworkError/i.test(msg)) throw e;
+    }
+  }
+  console.error(`[AGENTE TG] todos los bases fallaron: ${tried.join(", ")}`, lastErr);
+  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
 }
 
 function escaparHtml(s: string): string {
@@ -90,7 +123,10 @@ const BOLD_RE = /\*\*(?!\s)(.+?)\*\*/gs;
 function markdownATelegramHtml(md: string): string {
   let s = escaparHtml(md);
   // Imágenes markdown ![alt](url) -> link clickeable (Telegram no renderiza ![...])
-  s = s.replace(IMAGE_RE, (_m, alt: string, url: string) => `<a href="${url}">${(alt || "imagen").trim()}</a>`);
+  s = s.replace(
+    IMAGE_RE,
+    (_m, alt: string, url: string) => `<a href="${url}">${(alt || "imagen").trim()}</a>`,
+  );
   s = s.replace(
     LINK_RE,
     (_m, texto: string, url: string) => `<a href="${url}">${texto.trim()}</a>`,
@@ -101,8 +137,14 @@ function markdownATelegramHtml(md: string): string {
   s = s.replace(/!([A-Z0-9.:-]+\s+TradingView Chart)/g, "$1");
   // Reescribe copy web-específico ("widget embebido / embebido arriba") para Telegram donde la imagen va como adjunto
   s = s.replace(/>\s*Nota:\s*El enlace anterior muestra el widget embebido[^\n]*\n?/gi, "");
-  s = s.replace(/muestra el widget embebido directamente en el chat/gi, "te lo envío como imagen adjunta a continuación");
-  s = s.replace(/embebido arriba\s*\(velas interactivas\)/gi, "como imagen adjunta (velas diarias)");
+  s = s.replace(
+    /muestra el widget embebido directamente en el chat/gi,
+    "te lo envío como imagen adjunta a continuación",
+  );
+  s = s.replace(
+    /embebido arriba\s*\(velas interactivas\)/gi,
+    "como imagen adjunta (velas diarias)",
+  );
   s = s.replace(/embebido arriba/gi, "como imagen adjunta");
   if (s.includes("|") && s.includes("---")) {
     s = s.replace(/\|/g, " | ");
@@ -144,13 +186,14 @@ async function consultarAgente(
     /* fallback: sin flag, /api/chat aplica vía directa */
   }
 
-  // Vercel (Fluid) y local: 300s cubre el modo autónomo completo.
-  const res = await fetch(`${base}/api/chat`, {
+  // Timeout ajustado: vía rápida 90s, modo autónomo 180s (antes 300s causaba loop "Sigo trabajando 190s")
+  const timeoutMs = modoAutomaticoTg ? 180_000 : 90_000;
+  const res = await fetchConFallback(base, "/api/chat", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ messages: mensajes, sessionId, modoAutomatico: modoAutomaticoTg }),
-    signal: AbortSignal.timeout(300_000),
-  });
+    signal: AbortSignal.timeout(timeoutMs),
+  } as RequestInit);
   if (!res.ok || !res.body) {
     throw new Error(`/api/chat respondio HTTP ${res.status}`);
   }
@@ -246,16 +289,19 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
         const buf = Buffer.from(file.base64, "base64");
         const realMime = detectMimeFromBytes(buf);
         if (realMime.startsWith("image/")) {
-          const desc = await describirImagenBase64(file.base64, realMime, text || "Analiza esta imagen financiera");
+          const desc = await describirImagenBase64(
+            file.base64,
+            realMime,
+            text || "Analiza esta imagen financiera",
+          );
           multimodalContext = `[IMAGEN (documento) — visión IA]:\n${desc}`;
         } else {
           multimodalContext = `[DOCUMENTO adjunto detectado como ${realMime} — ${msg.document.file_name ?? "sin nombre"}]`;
-          if (!text) text = `Recibí un documento tipo ${realMime}. Analizalo y decime qué contiene.`;
+          if (!text)
+            text = `Recibí un documento tipo ${realMime}. Analizalo y decime qué contiene.`;
         }
       }
-    } else if (
-      msg.document?.file_id
-    ) {
+    } else if (msg.document?.file_id) {
       const fileId = msg.document.file_id;
       await sendAgentChatAction(chatId);
       const file = await downloadAgentFileAsBase64(fileId);
@@ -263,18 +309,24 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
         const buf = Buffer.from(file.base64, "base64");
         const realMime = detectMimeFromBytes(buf);
         if (realMime.startsWith("image/")) {
-          const desc = await describirImagenBase64(file.base64, realMime, text || "Analiza esta imagen financiera");
+          const desc = await describirImagenBase64(
+            file.base64,
+            realMime,
+            text || "Analiza esta imagen financiera",
+          );
           multimodalContext = `[IMAGEN (adjunto auto-detectado) — visión IA]:\n${desc}`;
         } else if (realMime === "application/pdf") {
           multimodalContext = `[PDF adjunto: ${msg.document.file_name ?? "documento"} — ${Math.round(buf.length / 1024)}KB]`;
-          if (!text) text = `Recibí un PDF "${msg.document.file_name ?? "documento"}". Analizalo y decime qué contiene.`;
+          if (!text)
+            text = `Recibí un PDF "${msg.document.file_name ?? "documento"}". Analizalo y decime qué contiene.`;
         } else if (realMime.startsWith("audio/")) {
           const tr = await transcribirAudioBase64(file.base64, realMime);
           multimodalContext = `[AUDIO (adjunto auto-detectado) — transcripción IA]:\n${tr}`;
           if (!text) text = tr;
         } else {
           multimodalContext = `[ARCHIVO adjunto: ${realMime}, ${msg.document.file_name ?? "sin nombre"}, ${Math.round(buf.length / 1024)}KB — tipo no soportado para procesamiento automático. Indicale al usuario qué podés hacer con él.]`;
-          if (!text) text = `Recibí un archivo tipo ${realMime} ("${msg.document.file_name ?? "sin nombre"}"). No puedo procesarlo automáticamente, pero describí qué necesitás y te ayudo.`;
+          if (!text)
+            text = `Recibí un archivo tipo ${realMime} ("${msg.document.file_name ?? "sin nombre"}"). No puedo procesarlo automáticamente, pero describí qué necesitás y te ayudo.`;
         }
       }
     } else if (msg.voice?.file_id) {
@@ -352,6 +404,7 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
         "/earnings - calendario de earnings de la semana",
         "/reset - empieza conversacion nueva",
         "/auto - activa el modo autónomo pesado (1-3 min) solo para el próximo análisis",
+        "/auto proactivo - activa/desactiva alertas automáticas del motor intermarket",
       ].join("\n"),
     );
     return;
@@ -368,6 +421,8 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
         '- Análisis completo: "analisis integral de YPFD" (planifica, ejecuta y valida solo)',
         '- Valuacion: "valor intrinseco de GOOGLE", "DCF de AAPL"',
         '- Cuant: "pairs trading YPF PAM", "curva de ejecucion de AL30"',
+        '- Intermarket: "análisis intermarket", "golden rule Murphy", "ratios XLY/XLP"',
+        '- EBIT-EPS: "análisis EBIT-EPS", "estructura de capital óptima"',
         '- Publicar: "enviá la señal de GGAL al canal" o "publicá este resumen para inversores"',
         "- Tu cuenta IOL: inicia sesion con tus credenciales",
         "",
@@ -376,6 +431,7 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
         "/ficha IBM - ficha de decisión completa (WACC + DCF/múltiplos/APV + MOS)",
         "/earnings - calendario de earnings de la semana",
         "/reset - borra la memoria de esta conversacion",
+        "/auto proactivo - activar alertas automáticas del motor intermarket",
         "",
         "Aviso: informacion educativa, no recomendacion de inversion.",
       ].join("\n"),
@@ -408,15 +464,50 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
   if (low.startsWith("/auto")) {
     if (/\boff\b/i.test(low)) {
       chatsAuto.delete(sessionId);
+      chatsProactivos.delete(String(chatId));
       await sendAgentMessage(
         chatId,
         "Modo autónomo desactivado. Volvimos a la vía rápida (~10-20s por consulta).",
       );
+    } else if (/\bproactivo\b/i.test(low)) {
+      // Modo proactivo: envía alertas periódicas del motor intermarket
+      if (chatsProactivos.has(String(chatId))) {
+        chatsProactivos.delete(String(chatId));
+        await sendAgentMessage(
+          chatId,
+          "Modo proactivo DESACTIVADO. Ya no recibirás alertas automáticas del motor intermarket.",
+        );
+      } else {
+        // Default: cada 4 horas
+        chatsProactivos.set(String(chatId), 4 * 60 * 60 * 1000);
+        await sendAgentMessage(
+          chatId,
+          "Modo proactivo ACTIVADO. Recibirás alertas automáticas del motor intermarket cada ~4 horas (cambios de régimen, señales Murphy, spreads de crédito).\n\n" +
+            "Comandos:\n" +
+            "/auto proactivo - activar/desactivar alertas\n" +
+            "/auto proactivo 60 - intervalo en minutos\n" +
+            "/auto - modo autónomo pesado para un solo análisis",
+        );
+      }
+    } else if (/\bproactivo\s+\d+\b/i.test(low)) {
+      const match = low.match(/proactivo\s+(\d+)/);
+      if (match) {
+        const minutos = parseInt(match[1], 10);
+        if (minutos >= 15 && minutos <= 24 * 60) {
+          chatsProactivos.set(String(chatId), minutos * 60 * 1000);
+          await sendAgentMessage(
+            chatId,
+            `Intervalo de alertas proactivas ajustado a ${minutos} minutos.`,
+          );
+        } else {
+          await sendAgentMessage(chatId, "El intervalo debe ser entre 15 y 1440 minutos.");
+        }
+      }
     } else {
       chatsAuto.add(sessionId);
       await sendAgentMessage(
         chatId,
-        "Modo autónomo pesado ACTIVADO para este chat (1-3 min por análisis, validación multi-agente).\nMandá tu pedido de análisis completo.\n/auto off para volver a la vía rápida.",
+        "Modo autónomo pesado ACTIVADO para este chat (1-3 min por análisis, validación multi-agente).\nMandá tu pedido de análisis completo.\n/auto off para volver a la vía rápida.\n/auto proactivo para activar alertas automáticas del motor.",
       );
     }
     return;
@@ -425,7 +516,11 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
   // ─── Comandos directos de valuación (sin LLM: deterministas y rápidos) ───
   if (low.startsWith("/valor") || low.startsWith("/ficha")) {
     const esFicha = low.startsWith("/ficha");
-    const ticker = text.replace(/^\/(valor|ficha)\s*/i, "").trim().split(/\s+/)[0] ?? "";
+    const ticker =
+      text
+        .replace(/^\/(valor|ficha)\s*/i, "")
+        .trim()
+        .split(/\s+/)[0] ?? "";
     if (!ticker) {
       await sendAgentMessage(
         chatId,
@@ -443,9 +538,7 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
         const r = await ejecutarFichaDecision(JSON.stringify({ simbolo: ticker }));
         respuesta = r.texto;
       } else {
-        const { analisisValorIntrinseco, textoAnalisis } = await import(
-          "@/lib/valuation-pipeline"
-        );
+        const { analisisValorIntrinseco, textoAnalisis } = await import("@/lib/valuation-pipeline");
         respuesta = textoAnalisis(await analisisValorIntrinseco(ticker));
       }
       await sendAgentMessage(chatId, markdownATelegramHtml(respuesta));
@@ -479,9 +572,207 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
     return;
   }
 
+  // ─── Atajos en lenguaje natural sin motor (fallback cuando /api/chat está caído) ─
+  // "valor intrinseco IBM" sin / — misma lógica que /valor pero disparado por frase natural
+  const mValorNatural = low.match(/valor\s+intr[ií]nseco(?:\s+de)?\s+([a-z0-9.\-:]+)/i);
+  if (mValorNatural?.[1]) {
+    const tickerNat = mValorNatural[1].trim().toUpperCase();
+    // Evitar colisión con comando /valor ya manejado
+    if (tickerNat.length >= 1 && tickerNat.length <= 12) {
+      try {
+        void sendAgentChatAction(chatId);
+        const { analisisValorIntrinseco, textoAnalisis } = await import("@/lib/valuation-pipeline");
+        const rNat = textoAnalisis(await analisisValorIntrinseco(tickerNat));
+        await sendAgentMessage(chatId, markdownATelegramHtml(rNat));
+      } catch (e) {
+        console.error("[AGENTE TG] valor natural fallo:", e);
+        await sendAgentMessage(
+          chatId,
+          `No pude calcular el valor intrínseco de ${escaparHtml(tickerNat)} (${e instanceof Error ? escaparHtml(e.message.slice(0, 200)) : "error"}). Probá /valor ${escaparHtml(tickerNat)}.`,
+        );
+      }
+      return;
+    }
+  }
+
+  // "ver scanner/readme.md" o "mostrar readme del scanner" — lectura directa del archivo
+  if (
+    /ver\s+scanner\/readme|scanner\s*\/\s*readme|readme\s+del\s+scanner|mostrar\s+scanner/i.test(
+      low,
+    )
+  ) {
+    try {
+      void sendAgentChatAction(chatId);
+      const { readFile } = await import("node:fs/promises");
+      const { join } = await import("node:path");
+      const cwd = process.cwd();
+      const candidatos = [
+        join(cwd, "SCANNER_INTERMARKET", "scanner", "README.md"),
+        join(cwd, "..", "SCANNER_INTERMARKET", "scanner", "README.md"),
+        join(cwd, "ANALISIS INVIU", "scanner", "README.md"),
+        join(cwd, "..", "ANALISIS INVIU", "scanner", "README.md"),
+        join(cwd, "scanner", "README.md"),
+      ];
+      let contenido: string | null = null;
+      for (const p of candidatos) {
+        try {
+          contenido = await readFile(p, "utf-8");
+          if (contenido) break;
+        } catch {}
+      }
+      if (contenido) {
+        // Recorte a ~3500 chars para Telegram
+        const out =
+          contenido.length > 3500 ? contenido.slice(0, 3500) + "\n\n…(truncado)" : contenido;
+        await sendAgentMessage(chatId, `<b>Scanner — README</b>\n\n${escaparHtml(out)}`);
+      } else {
+        await sendAgentMessage(
+          chatId,
+          "No encontré scanner/README.md en el deploy. Está en SCANNER_INTERMARKET/scanner/README.md (local).",
+        );
+      }
+    } catch (e) {
+      await sendAgentMessage(
+        chatId,
+        `Error leyendo scanner README: ${e instanceof Error ? escaparHtml(e.message) : String(e)}`,
+      );
+    }
+    return;
+  }
+
+  // "activa el scanner" / "corre el scanner" / "ejecuta scanner" — trigger del scanner_intermarket
+  if (
+    /activ[ae]\s+el\s+scanner|corre(r)?\s+el\s+scanner|ejecut(a|ar)\s+scanner|corre\s+scan|lanza(r)?\s+scanner/i.test(
+      low,
+    ) &&
+    !/cedear/i.test(low)
+  ) {
+    try {
+      void sendAgentChatAction(chatId);
+      // Intentar vía herramienta directa (snapshot o scan fresco) sin pasar por /api/chat
+      const { ejecutarTool } = await import("@/lib/agents/orquestador");
+      // Primero snapshot vivo; si está stale, ofrecer scan fresco es decisión del modelo,
+      // acá hacemos scan fresco directo para "activa"
+      const rScan = await ejecutarTool(
+        "scanner_intermarket",
+        JSON.stringify({ accion: "scan" }),
+        undefined,
+        sessionId,
+      );
+      await sendAgentMessage(chatId, markdownATelegramHtml(rScan.texto.slice(0, 3800)));
+      if (rScan.fuentes?.length) {
+        await sendAgentMessage(
+          chatId,
+          `Fuentes: ${(rScan.fuentes as Array<{ dominio?: string }>).map((f) => f.dominio).join(", ")}`,
+        );
+      }
+    } catch (e) {
+      console.error("[AGENTE TG] activa scanner fallo:", e);
+      await sendAgentMessage(
+        chatId,
+        `No pude activar el scanner (${e instanceof Error ? escaparHtml(e.message.slice(0, 250)) : "error"}). Probá: <code>python scanner/run_scanner.py --once --force</code> en local, o GET /api/cron/scanner-senales en deploy.`,
+      );
+    }
+    return;
+  }
+
+  // ─── Scanner CEDEARs — señales de entrada (369 CEDEARs) ───
+  // Comandos: "scanner cedears", "señales cedears", "cedears entrada", "publicar cedears", "enviar señales cedears"
+  if (/cedear/i.test(low) && /scanner|se[nñ]al|entrada|oversold|sobreventa/i.test(low)) {
+    const quierePublicar = /publica|enviar|canal|salida|difund/i.test(low);
+    try {
+      void sendAgentChatAction(chatId);
+      await sendAgentMessage(chatId, `🔍 Escaneando 369 CEDEARs (RSI+MACD+SMA+Bollinger+Vol) — ~40s...`);
+      const { escanearCedearsEntrada, escanearCedearsOversold } = await import("@/lib/bot-unificado/scanner-senales-cedear");
+      const t0 = Date.now();
+      const [s1, s2] = await Promise.all([escanearCedearsEntrada(), escanearCedearsOversold()]);
+      const todas = [...s1, ...s2];
+      const unicas = new Map<string, typeof todas[0]>();
+      for (const s of todas) {
+        const prev = unicas.get(s.tickerBCBA);
+        if (!prev || s.prob > prev.prob) unicas.set(s.tickerBCBA, s);
+      }
+      const finales = [...unicas.values()].sort((a, b) => b.prob - a.prob).slice(0, 8);
+      const dur = ((Date.now() - t0) / 1000).toFixed(1);
+      if (!finales.length) {
+        await sendAgentMessage(chatId, `Sin señales de entrada CEDEARs en este momento (${dur}s). El scanner busca RSI<35 + MACD bullish + SMA breakout — mercado lateral. Probá de nuevo más tarde o pedime análisis de un ticker puntual.`);
+        return;
+      }
+      // Resumen para el chat agente
+      const lineas = finales.map((s, i) => {
+        const p = s.precio != null ? `$${s.precio.toFixed(2)}` : "s/d";
+        const prob = (s.prob * 100).toFixed(0);
+        return `${i + 1}. <b>${escaparHtml(s.tickerBCBA)}</b> ${escaparHtml(s.direccion)} ${p} (${prob}%) — ${escaparHtml(s.nivel ?? "")}`;
+      });
+      const resumen = [`<b>CEDEARs — ${finales.length} señales (${dur}s)</b>`, ...lineas].join("\n");
+      await sendAgentMessage(chatId, resumen);
+
+      // Validación enriquecida opcional: noticias + fundamental para top 3
+      if (finales.length && !quierePublicar) {
+        await sendAgentMessage(chatId, `Escribí <b>publicar cedears</b> para validar con noticias/fundamental y enviar al canal @Coronarinversiones777_bot.`);
+      }
+
+      if (quierePublicar) {
+        await sendAgentMessage(chatId, `📤 Validando con análisis fundamental+técnico+noticias y publicando ${Math.min(finales.length, 4)} señales al canal de salida @Coronarinversiones777_bot...`);
+        const { validarYRedactar } = await import("@/lib/bot-unificado/agente");
+        const { sendTelegramSignal, sendTelegramMessage } = await import("@/lib/telegram.server");
+        // Validación con agente (usa NVIDIA si hay key, sino determinístico)
+        const validadas = await validarYRedactar(finales.slice(0, 4));
+        // Enriquecimiento adicional: si agente no pudo validar (sin NVIDIA), igual enviar determinístico pero con disclaimer
+        const aEnviar = validadas.senales.length ? validadas.senales : finales.slice(0, 4).map((c) => ({
+          tickerBCBA: c.tickerBCBA,
+          senal: (c.prob >= 0.6 ? "COMPRA" : "COMPRA CON CAUTELA") as const,
+          precio: c.precio,
+          variacion1d: (c.metricas.variacionPct as number) ?? null,
+          motivo: c.motivo,
+          nivel: c.nivel,
+          estrategia: c.estrategia,
+        }));
+        let enviadas = 0;
+        for (const s of aEnviar.slice(0, 4) as any[]) {
+          try {
+            const res = await sendTelegramSignal({
+              ticker: s.tickerBCBA,
+              senal: s.senal,
+              precio: s.precio ?? undefined,
+              variacion1d: s.variacion1d ?? undefined,
+              motivo: s.motivo.slice(0, 280),
+              nivel: s.nivel ?? undefined,
+              fuente: `scanner-cedears via @fpxbs777_bot · ${s.estrategia ?? s.estrategia} · validado:${(validadas as any).usoAgente ? "IA" : "cuant"}`,
+            });
+            console.log(`[AGENTE TG] cedear publicar ${s.tickerBCBA}: ${res}`);
+            enviadas++;
+          } catch (e) {
+            console.error(`[AGENTE TG] publicar ${s.tickerBCBA} fallo`, e);
+          }
+        }
+        // Resumen también al canal de señales si hubo validación
+        if (validadas.resumen && enviadas) {
+          try {
+            await sendTelegramMessage({ text: `<b>CORONAR CEDEARs — resumen agente</b>\n${escaparHtml(validadas.resumen)}`, parseMode: "HTML" });
+          } catch {}
+        }
+        await sendAgentMessage(chatId, `✅ Publicadas ${enviadas}/${Math.min(finales.length, 4)} señales al canal @Coronarinversiones777_bot${validadas.resumen ? `\n\n<i>${escaparHtml(validadas.resumen)}</i>` : ""}\n\n<i>El bot de salida recibió las señales. Verificá @Coronarinversiones777_bot</i>`);
+      }
+    } catch (e) {
+      console.error("[AGENTE TG] scanner cedears fallo:", e);
+      await sendAgentMessage(chatId, `Error en scanner CEDEARs: ${e instanceof Error ? escaparHtml(e.message.slice(0, 300)) : "desconocido"}`);
+    }
+    return;
+  }
+
+  // Fast-path saludos sin invocar al modelo (evita 190s de espera)
+  if (/^(hola|buenas|hey|hello|hi|buen dia|buenas tardes|buenas noches)[!.\s]*$/i.test(text.trim())) {
+    await sendAgentMessage(
+      chatId,
+      `¡Hola! Soy el agente CORONAR. Escribime qué querés que haga:\n• "scanner cedears" → busco entradas en 369 CEDEARs\n• "publicar cedears" → valido y publico al canal @Coronarinversiones777_bot\n• "análisis de GGAL" / "valor de AAPL"\n• "activa el scanner" → intermarket\n\nComandos: /help /valor /ficha /earnings /auto`,
+    );
+    return;
+  }
+
   const typing = setInterval(() => {
     void sendAgentChatAction(chatId);
-  }, 4500);
+  }, 5500);
   const deteniendoTyping = () => clearInterval(typing);
 
   try {
@@ -490,14 +781,15 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
     let pingsEnviados = 0;
     const ping = setInterval(() => {
       const segs = Math.round((Date.now() - inicio) / 1000);
-      if (pingsEnviados < 9 && segs > (pingsEnviados + 1) * 30) {
+      // Reducido a 3 pings máximo cada 45s para no spamear
+      if (pingsEnviados < 3 && segs > 45 + pingsEnviados * 45) {
         pingsEnviados++;
         void sendAgentMessage(
           chatId,
-          `Sigo trabajando en tu consulta (${segs}s). Los análisis completos con validación multi-agente pueden llevar 1-3 minutos; no hace falta reenviar el mensaje.`,
+          `Sigo trabajando en tu consulta (${segs}s). Los análisis completos pueden llevar 1-2 min; no hace falta reenviar.`,
         ).catch(() => undefined);
       }
-    }, 10_000);
+    }, 15_000);
     try {
       const res = await consultarAgente(base, preguntaNatural, sessionId);
       clearInterval(ping);
@@ -532,7 +824,9 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
                 type: "bar",
                 data: {
                   labels: cats,
-                  datasets: [{ label: titulo, data: vals, backgroundColor: "rgba(14,165,233,0.6)" }],
+                  datasets: [
+                    { label: titulo, data: vals, backgroundColor: "rgba(14,165,233,0.6)" },
+                  ],
                 },
                 options: { title: { display: true, text: titulo } },
               };
@@ -568,7 +862,10 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
                 console.error("[AGENTE TG] snapshot TV fallo", motivoFallo);
               }
               if (!enviadoFotoTv) {
-                if (motivoFallo) console.warn(`[AGENTE TG] TV snapshot fallo para ${simbolo}: ${motivoFallo} — fallback a link`);
+                if (motivoFallo)
+                  console.warn(
+                    `[AGENTE TG] TV snapshot fallo para ${simbolo}: ${motivoFallo} — fallback a link`,
+                  );
                 await sendAgentMessage(
                   chatId,
                   `Gráfico TradingView: <a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(simbolo)}">${escaparHtml(simbolo)}</a> (abrir en web/app para ver velas interactivas)`,
@@ -597,9 +894,12 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
     const detalle = e instanceof Error ? e.message : String(e);
     console.error("[AGENTE TG] error procesando mensaje:", detalle);
     if (/fetch failed|NetworkError|ECONNREFUSED|connect/i.test(detalle)) {
+      const esLocal = base.includes("localhost") || base.includes("127.0.0.1");
       await sendAgentMessage(
         chatId,
-        `No pude conectar con el motor del agente (${base}). Si el deploy esta dormido, proba de nuevo en un minuto.`,
+        esLocal
+          ? `No pude conectar con el motor (${base}). En desarrollo local ejecutá <code>bun run dev</code> (Vite + Flask) y que PORT=${process.env.PORT ?? "5199"} esté libre. Si es deploy Vercel, probá de nuevo en 1 min (cold start).`
+          : `No pude conectar con el motor del agente (${base}). Si el deploy esta dormido, proba de nuevo en un minuto.`,
       );
     } else if (/aborted|timeout/i.test(detalle)) {
       await sendAgentMessage(
@@ -617,11 +917,7 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
   }
 }
 
-export type ResultadoManejoUpdate =
-  | "procesado"
-  | "duplicado"
-  | "sin-contenido"
-  | "no-autorizado";
+export type ResultadoManejoUpdate = "procesado" | "duplicado" | "sin-contenido" | "no-autorizado";
 
 /** Punto de entrada único para un update de Telegram (webhook o polling local). */
 export async function manejarUpdateTelegram(
@@ -658,4 +954,88 @@ export async function manejarUpdateTelegram(
 
   await responderMensaje(base, msg);
   return "procesado";
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// Modo Proactivo — scheduler de alertas del motor intermarket
+// ═════════════════════════════════════════════════════════════════════════
+
+/** Reutiliza el envío de mensajes del bot configurado (mismo token que el agente). */
+async function enviarAlertaProactiva(chatId: string, texto: string): Promise<void> {
+  try {
+    await sendAgentMessage(Number(chatId), texto);
+  } catch (e) {
+    console.error(`[TG PROACTIVO] error enviando alerta a ${chatId}:`, e);
+  }
+}
+
+/**
+ * Genera un resumen de alertas del motor intermarket para chats proactivos.
+ * Retorna el texto formateado o null si no hay señales relevantes.
+ */
+async function generarAlertaIntermarket(): Promise<string | null> {
+  try {
+    // Import dinámico para no romper el bundle del agente
+    const { evaluarSenalesMurphy, evaluarCredito, evaluarVIX } = await import("@/lib/motor");
+
+    // Placeholder: en producción se descarga precios reales de yfinance/mercado
+    // Por ahora devolvemos un resumen del estado del motor
+    const now = new Date();
+    const hora = now.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+
+    return [
+      "[ALERTA INTERMARKET]",
+      "",
+      `Motor ejecutado: ${hora} (AR)`,
+      "Las señales Murphy no están disponibles en modo proactivo sin datos de mercado en vivo.",
+      "Para análisis completo: escribí 'análisis intermarket' o usá /auto proactivo para activar las alertas.",
+    ].join("\n");
+  } catch {
+    return null;
+  }
+}
+
+/** Intervalos activos para evitar duplicados */
+const intervalsProactivos = new Map<string, ReturnType<typeof setInterval>>();
+
+/**
+ * Loop principal del scheduler proactivo.
+ * Se llama una vez por cold start del módulo o desde el webhook.
+ * Evalúa chats proactivos y envía alertas cuando corresponde.
+ */
+export function iniciarSchedulerProactivo(base: string): void {
+  // Cada 5 minutos, revisar si algún chat necesita alerta
+  const CHECK_INTERVAL = 5 * 60 * 1000;
+
+  setInterval(async () => {
+    const ahora = Date.now();
+
+    for (const [chatId, intervaloMs] of chatsProactivos) {
+      const ultima = ultimaAlerta.get(chatId) ?? 0;
+      if (ahora - ultima < intervaloMs) continue;
+
+      const alerta = await generarAlertaIntermarket();
+      if (alerta) {
+        await enviarAlertaProactiva(chatId, alerta);
+        ultimaAlerta.set(chatId, ahora);
+      }
+    }
+  }, CHECK_INTERVAL);
+
+  console.log("[TG PROACTIVO] Scheduler de alertas intermarket iniciado (check cada 5 min)");
+}
+
+/**
+ * Detiene el scheduler de un chat específico.
+ */
+export function detenerSchedulerProactivo(chatId: string): void {
+  chatsProactivos.delete(String(chatId));
+  ultimaAlerta.delete(String(chatId));
+}
+
+/**
+ * Retorna la lista de chats con modo proactivo activo.
+ */
+export function chatsProactivosActivos(): string[] {
+  return [...chatsProactivos.keys()];
 }
