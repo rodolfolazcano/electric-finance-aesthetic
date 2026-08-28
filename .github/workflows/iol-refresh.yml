@@ -1,0 +1,46 @@
+# Cron refresh de cotizaciones IOL
+# Triggered by cron-job.org webhook → repository_dispatch
+# También se puede ejecutar manualmente desde Actions tab
+# Credenciales IOL hardcodeadas en .env (repo privado)
+
+name: "IOL Cotizaciones Refresh"
+
+on:
+  repository_dispatch:
+    types: [iol-refresh]
+  workflow_dispatch:
+  schedule:
+    # Fallback: ejecuta lun-vie 13:00 UTC (10:00 ART)
+    - cron: "0 13 * * 1-5"
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-cotizaciones:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Fetch cotizaciones IOL
+        run: node scripts/fetch-iol-cotizaciones.mjs
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/cotizaciones-iol.json
+          if git diff --cached --quiet; then
+            echo "No hay cambios — skip commit"
+          else
+            git commit -m "chore: refresh cotizaciones IOL $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi

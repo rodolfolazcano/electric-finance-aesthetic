@@ -16,7 +16,13 @@ import {
   type SerieHistoricaResult,
   type SerieHistoricaPoint,
 } from "@/lib/renta-fija.functions";
-import { BONOS_DB, BONOS_LIST, BONOS_TICKERS, type TipoBono } from "@/lib/bonos-data";
+import {
+  BONOS_DB,
+  BONOS_LIST,
+  BONOS_TICKERS,
+  CATEGORIAS_TAXONOMIA,
+  type TipoBono,
+} from "@/lib/bonos-data";
 import { searchYahooNews } from "@/lib/yahoo-search.functions";
 import type { LecapData } from "@/lib/renta-fija.functions";
 import { LecapFciPanel } from "@/components/sections/LecapFciPanel";
@@ -24,8 +30,10 @@ import { ComparadoresSubTab } from "@/components/renta-fija/ComparadoresSubTab";
 import { FlujoFondosCalculator } from "@/components/renta-fija/FlujoFondosCalculator";
 import { ONLadderSubTab } from "@/components/sections/ONLadderSubTab";
 import { RebalanceadorSubTab } from "@/components/sections/RebalanceadorSubTab";
+import { ArmadorPortafolio } from "@/components/renta-fija/ArmadorPortafolio";
 import { OnsLadderPanel } from "@/components/renta-fija/OnsLadderPanel";
 import { iolTitulosPublicos, iolObligacionesNegociables } from "@/lib/iol-cotizaciones.functions";
+import cotizacionesCache from "@/data/cotizaciones-iol.json";
 import type { IOLCotizacion } from "@/lib/iol-cotizaciones.functions";
 import { getDashboardDiario, type DashboardRow } from "@/lib/dashboard-diario.functions";
 import {
@@ -49,7 +57,17 @@ import {
 
 type RfGroup = "curva" | "instrumentos" | "cartera" | "comparadores";
 
-type RfSubTab = "lecaps" | "fcis" | "titulosPublicos" | "ons" | "portafolio" | "calculadora" | "flujos" | "dashboard" | "rebalanceador";
+type RfSubTab =
+  | "lecaps"
+  | "fcis"
+  | "titulosPublicos"
+  | "ons"
+  | "portafolio"
+  | "armador"
+  | "calculadora"
+  | "flujos"
+  | "dashboard"
+  | "rebalanceador";
 
 const GROUP_TABS: { key: RfGroup; label: string }[] = [
   { key: "curva", label: "Curva de Rendimientos" },
@@ -61,7 +79,11 @@ const GROUP_TABS: { key: RfGroup; label: string }[] = [
 const GROUP_SUBTABS: Record<RfGroup, { key: RfSubTab; label: string; subtitle?: string }[]> = {
   curva: [],
   instrumentos: [
-    { key: "dashboard", label: "Dashboard Diario", subtitle: "Soberanos y Bopreales en Moneda Extranjera" },
+    {
+      key: "dashboard",
+      label: "Dashboard Diario",
+      subtitle: "Soberanos y Bopreales en Moneda Extranjera",
+    },
     { key: "lecaps", label: "LECAPs", subtitle: "Tasa fija a corto plazo" },
     { key: "fcis", label: "FCIs", subtitle: "Fondo común diversificado" },
     { key: "titulosPublicos", label: "Títulos Públicos", subtitle: "Bonos soberanos" },
@@ -69,6 +91,7 @@ const GROUP_SUBTABS: Record<RfGroup, { key: RfSubTab; label: string; subtitle?: 
   ],
   cartera: [
     { key: "portafolio", label: "Portafolio" },
+    { key: "armador", label: "Armador", subtitle: "Construí tu portafolio ideal" },
     { key: "calculadora", label: "¿Cuánto rinde esto?" },
     { key: "flujos", label: "Flujo de Fondos" },
     { key: "ons", label: "ONs Corporativas" },
@@ -248,9 +271,13 @@ export function RentaFijaPanel({ accessToken, refreshToken, onTokenRefresh }: Re
   const rfRefreshToken = refreshToken || undefined;
 
   // Calcular TIR desde precios IOL reales (bulk endpoint) para Títulos Públicos
-  // El bulk endpoint devuelve precios ya por 100 VN (NO dividir por escala)
+  // El bulk endpoint devuelve precios por 1000 VN para bonos soberanos USD (escala 10)
+  // y por 100 VN para el resto. Usar escalaPrecioIOL del bono para normalizar.
   useEffect(() => {
-    if (!accessToken || rfTPs.length === 0) { setRfTPsTirMap({}); return; }
+    if (!accessToken || rfTPs.length === 0) {
+      setRfTPsTirMap({});
+      return;
+    }
     let cancelled = false;
     (async () => {
       const map: Record<string, number | null> = {};
@@ -260,7 +287,8 @@ export function RentaFijaPanel({ accessToken, refreshToken, onTokenRefresh }: Re
         const ticker = tp.simbolo.toUpperCase();
         if (tp.precio <= 0) continue;
         const baseTicker = ticker.replace(/[DC]$/, "");
-        if (!BONOS_DB[baseTicker]) continue;
+        const bono = BONOS_DB[baseTicker];
+        if (!bono || bono.activo === false) continue;
         const esUsd = ticker.endsWith("D") || ticker.endsWith("C");
         const existing = basePrices.get(baseTicker);
         if (existing === undefined || esUsd) {
@@ -271,32 +299,45 @@ export function RentaFijaPanel({ accessToken, refreshToken, onTokenRefresh }: Re
       const entries = [...basePrices.entries()];
       for (let i = 0; i < entries.length; i += batchSize) {
         if (cancelled) return;
-        await Promise.allSettled(entries.slice(i, i + batchSize).map(async ([baseTicker, precio]) => {
-          const bono = BONOS_DB[baseTicker];
-          if (!bono) return;
-          let precioPorCada100VN = precio;
-          // Si cotiza en ARS y es Hard Dollar, convertir a USD
-          if (bono.tipo === "Hard Dollar" || bono.tipo === "ON Hard Dollar") {
-            // Si precio está en miles (ARS), convertir vía MEP
-            if (precio > 300) {
-              const tcEst = rfMonitor?.tcOficial ? rfMonitor.tcOficial * 1.2 : 1500;
-              precioPorCada100VN = precio / tcEst;
+        await Promise.allSettled(
+          entries.slice(i, i + batchSize).map(async ([baseTicker, precio]) => {
+            const bono = BONOS_DB[baseTicker];
+            if (!bono || bono.activo === false) return;
+            // Normalizar precio a por 100 VN
+            const escala = bono.escalaPrecioIOL ?? 10;
+            let precioPorCada100VN = precio / escala;
+            // Para bonos Hard Dollar cotizados en Pesos (sin sufijo D/C), el precio viene en ARS
+            // Convertir a USD vía MEP si el precio sugiere ARS (mayor a ~50 para bonos HD)
+            if (
+              (bono.tipo === "Hard Dollar" || bono.tipo === "ON Hard Dollar") &&
+              !baseTicker.endsWith("D") &&
+              !baseTicker.endsWith("C")
+            ) {
+              if (precioPorCada100VN > 50) {
+                const tcEst =
+                  rfMonitor?.tcMep || (rfMonitor?.tcOficial ? rfMonitor.tcOficial * 1.2 : 1500);
+                precioPorCada100VN = precioPorCada100VN / tcEst;
+              }
             }
-          }
-          if (precioPorCada100VN <= 0 || precioPorCada100VN > 500) return;
-          try {
-            const result = await fnCalc({ data: { ticker: baseTicker, precioPorCada100VN } });
-            if (result && !("error" in result)) {
-              const rb = result as RendimientoBono;
-              map[baseTicker] = rb.tir;
+            if (precioPorCada100VN <= 0 || precioPorCada100VN > 300) return;
+            try {
+              const result = await fnCalc({ data: { ticker: baseTicker, precioPorCada100VN } });
+              if (result && !("error" in result)) {
+                const rb = result as RendimientoBono;
+                map[baseTicker] = rb.tir;
+              }
+            } catch {
+              /* ignore */
             }
-          } catch { /* ignore */ }
-        }));
+          }),
+        );
       }
       if (!cancelled) setRfTPsTirMap(map);
     })();
-    return () => { cancelled = true; };
-  }, [rfTPs, accessToken, rfMonitor?.tcOficial]);
+    return () => {
+      cancelled = true;
+    };
+  }, [rfTPs, accessToken, rfMonitor?.tcOficial, rfMonitor?.tcMep]);
 
   function toggleSort(key: string) {
     if (rfSortKey === key) setRfSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -335,6 +376,42 @@ export function RentaFijaPanel({ accessToken, refreshToken, onTokenRefresh }: Re
       .catch(() => {})
       .finally(() => setRfTPsLoading(false));
   }
+
+  // Cargar cotizaciones desde cache estático (cron refresh) cuando NO hay auth IOL
+  useEffect(() => {
+    if (accessToken) return; // Si hay auth, loadTPs() se encarga
+    if (rfTPs.length > 0) return; // Ya cargado
+    if (!cotizacionesCache.actualizado) return; // Sin datos del cron
+
+    const all = [
+      ...cotizacionesCache.titulosPublicos.map((t) => ({
+        simbolo: t.simbolo,
+        nombre: t.nombre,
+        precio: t.precio,
+        puntas: { compra: t.compra, venta: t.venta },
+        cierre: t.cierre,
+        variacion: t.precio - t.cierre,
+        variacionPct: t.variacionPct,
+        volumen: t.volumen,
+        plazo: undefined as string | undefined,
+        tipo: "titulosPublicos" as string,
+      })),
+      ...cotizacionesCache.obligacionesNegociables.map((t) => ({
+        simbolo: t.simbolo,
+        nombre: t.nombre,
+        precio: t.precio,
+        puntas: { compra: t.compra, venta: t.venta },
+        cierre: t.cierre,
+        variacion: t.precio - t.cierre,
+        variacionPct: t.variacionPct,
+        volumen: t.volumen,
+        plazo: undefined as string | undefined,
+        tipo: "obligacionesNegociables" as string,
+      })),
+    ];
+
+    if (all.length > 0) setRfTPs(all);
+  }, [accessToken, rfTPs.length]);
 
   function loadDashboard() {
     if (rfDashboardLoading) return;
@@ -484,7 +561,14 @@ export function RentaFijaPanel({ accessToken, refreshToken, onTokenRefresh }: Re
                 sessionId={sessionId}
               />
             )}
-            {rfSubTab === "flujos" && <FlujoFondosCalculator />}
+            {rfSubTab === "flujos" && <FlujoFondosCalculator sessionId={sessionId} />}
+            {rfSubTab === "armador" && (
+              <ArmadorPortafolio
+                sessionId={sessionId}
+                posiciones={rfPosiciones}
+                setPosiciones={setRfPosiciones}
+              />
+            )}
             {rfSubTab === "rebalanceador" && <RebalanceadorSubTab />}
             {rfSubTab === "lecaps" && (
               <LecapFciPanel
@@ -578,8 +662,6 @@ export function RentaFijaPanel({ accessToken, refreshToken, onTokenRefresh }: Re
           </>
         )}
       </div>
-
-
     </div>
   );
 }
@@ -615,7 +697,10 @@ function MonitorSubTab({
 
   const sortedBonos = useMemo(() => {
     if (!data?.bonos) return [];
-    const list = [...data.bonos];
+    const list = data.bonos.filter((b) => {
+      const info = BONOS_DB[b.ticker];
+      return info?.activo !== false;
+    });
     const order = ["LECAP", "CER", "Hard Dollar", "Dollar-Linked", "Tasa Fija ARS", "TAMAR"];
     const tipoRank: Record<string, number> = {};
     order.forEach((t, i) => {
@@ -910,6 +995,9 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
     }> = [];
 
     for (const b of data.bonos) {
+      // Skip inactive bonds (stubs sin vencimiento ni flujos)
+      const bonoInfo = BONOS_DB[b.ticker];
+      if (bonoInfo?.activo === false) continue;
       // Dumrauf: TEM = (1+TIR)^(1/12) - 1 (metadata.motor_calculo.tem de RENTA_FIJA_COMPLETA.json)
       const temReal = b.tir != null ? Math.pow(1 + b.tir, 1 / 12) - 1 : null;
       rows.push({
@@ -953,43 +1041,52 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
 
   const toggleSort = (key: string) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else { setSortKey(key); setSortDir("asc"); }
+    else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
   };
 
   const allRows = useMemo(() => {
-    const order = ["Hard Dollar", "Dollar-Linked", "CER", "LECAP", "Tasa Fija ARS", "TAMAR"];
+    const catOrder = CATEGORIAS_TAXONOMIA.map((c) => c.id);
     const all: (typeof items)[string] = [];
-    for (const cat of order) { if (items[cat]) all.push(...items[cat]); }
+    for (const cat of catOrder) {
+      if (items[cat]) all.push(...items[cat]);
+    }
     return all;
   }, [items]);
 
   const sortedRows = useMemo(() => {
-    return [...allRows].filter((r) => filterCat === "Todas" || r.categoria === filterCat).sort((a, b) => {
-      const av = a[sortKey as keyof typeof a] ?? 0;
-      const bv = b[sortKey as keyof typeof b] ?? 0;
-      return sortDir === "asc" ? (av > bv ? 1 : -1) : av < bv ? 1 : -1;
-    });
+    const catRank = Object.fromEntries(CATEGORIAS_TAXONOMIA.map((c, i) => [c.id, i]));
+    return [...allRows]
+      .filter((r) => filterCat === "Todas" || r.categoria === filterCat)
+      .sort((a, b) => {
+        // Primero por categoría (orden del gráfico), luego por sortKey
+        const catA = catRank[a.categoria] ?? 99;
+        const catB = catRank[b.categoria] ?? 99;
+        if (catA !== catB && sortKey !== "categoria") return catA - catB;
+        const av = a[sortKey as keyof typeof a] ?? 0;
+        const bv = b[sortKey as keyof typeof b] ?? 0;
+        return sortDir === "asc" ? (av > bv ? 1 : -1) : av < bv ? 1 : -1;
+      });
   }, [allRows, filterCat, sortKey, sortDir]);
 
   const sortIcon = (k: string) => (sortKey === k ? (sortDir === "asc" ? "\u2191" : "\u2193") : "");
 
   const categorias = Object.keys(items);
-  const colores: Record<string, string> = {
-    "Hard Dollar": "#4ade80",
-    "Dollar-Linked": "#60a5fa",
-    CER: "#facc15",
-    LECAP: "#c084fc",
-    "Tasa Fija ARS": "#fb923c",
-    TAMAR: "#f472b6",
-  };
+  const colores: Record<string, string> = Object.fromEntries(
+    CATEGORIAS_TAXONOMIA.map((c) => [c.id, c.hexColor]),
+  );
 
-  const FILTROS = ["Todas", "Hard Dollar", "Dollar-Linked", "CER", "LECAP", "Tasa Fija ARS", "TAMAR"];
+  const FILTROS = ["Todas", ...CATEGORIAS_TAXONOMIA.map((c) => c.id)];
 
   // Obtener noticias para activos con mayor/menor TIR
   useEffect(() => {
     if (!data) return;
     let cancelled = false;
-    const validos = allRows.filter((r) => r.tir != null).sort((a, b) => (b.tir ?? 0) - (a.tir ?? 0));
+    const validos = allRows
+      .filter((r) => r.tir != null)
+      .sort((a, b) => (b.tir ?? 0) - (a.tir ?? 0));
     const top = validos.slice(0, 3);
     const bottom = validos.slice(-3);
     const targets = [...top, ...bottom];
@@ -998,35 +1095,44 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
         try {
           const results = await fnYahooSearch({ data: { q: r.ticker, count: 1 } });
           return results?.[0] ?? null;
-        } catch { return null; }
+        } catch {
+          return null;
+        }
       }),
     ).then((results) => {
       if (!cancelled) setNews(results.filter(Boolean) as typeof news);
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [data, allRows, fnYahooSearch]);
 
   if (!data) return <EmptyState text="Cargando datos del monitor..." />;
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-border/40 bg-muted/10 p-3 text-[13px] text-muted-foreground leading-relaxed">
-        <span className="font-medium text-foreground">¿Qué es la curva de rendimientos?</span>{" "}
-        Muestra la relación entre el tiempo al vencimiento (eje horizontal) y la tasa de rendimiento
-        (eje vertical) para distintos tipos de bonos. Una curva con pendiente positiva indica que
-        los bonos más largos pagan más tasa. Cada color representa una categoría de bono.
+      {/* Header estilo home */}
+      <div className="mx-auto max-w-3xl text-center">
+        <p className="eyebrow">Curva de Rendimientos</p>
+        <h2 className="mt-3 font-display text-[clamp(1.6rem,3.5vw,2.6rem)] font-semibold leading-tight tracking-tight">
+          Curva de Rendimiento por categoría
+        </h2>
+        <p className="mx-auto mt-3 max-w-2xl text-[14px] leading-relaxed text-muted-foreground">
+          Relación entre tiempo al vencimiento y tasa de rendimiento. Cada color representa una
+          categoría de bono. Filtrá por categoría y hacé hover para ver detalles.
+        </p>
       </div>
 
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-1.5">
+      {/* Filtros estilo home — pills redondeados */}
+      <div className="flex flex-wrap justify-center gap-1.5">
         {FILTROS.map((f) => (
           <button
             key={f}
             onClick={() => setFilterCat(f)}
-            className={`rounded px-2 py-1 font-mono text-[13px] transition-colors ${
+            className={`rounded-full px-3.5 py-1.5 text-[11.5px] font-semibold transition-colors ${
               filterCat === f
                 ? "border border-primary/60 bg-primary/10 text-foreground"
-                : "border border-border/60 text-muted-foreground hover:text-foreground"
+                : "border border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground"
             }`}
           >
             {f}
@@ -1034,28 +1140,46 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
         ))}
       </div>
 
-      {/* Scatter chart con tooltip mejorado */}
-      <div className="rounded-lg border border-border/40 bg-background/40 p-3">
-        <h3 className="mb-2 font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
-          Curva de Rendimiento (TIR / TEA) por categoría
-          <span className="ml-2 font-normal text-[13px] text-muted-foreground">
-            ({filterCat === "Todas" ? "todos los activos" : filterCat}) &middot; {sortedRows.length} instrumentos
+      {/* Gráfico scatter con surface-card */}
+      <div className="surface-card overflow-hidden rounded-2xl p-4">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h3 className="font-mono text-[12px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            TIR / TEA por categoría
+          </h3>
+          <span className="text-[12px] text-muted-foreground">
+            {filterCat === "Todas" ? "todos los activos" : filterCat} · {sortedRows.length}{" "}
+            instrumentos
           </span>
-        </h3>
-        <ResponsiveContainer width="100%" height={360}>
-          <ComposedChart margin={{ top: 8, right: 16, bottom: 8, left: 8 }}>
+        </div>
+        <ResponsiveContainer width="100%" height={400}>
+          <ComposedChart margin={{ top: 8, right: 20, bottom: 24, left: 12 }}>
             <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
             <XAxis
               dataKey="dias"
+              type="number"
               tick={{ fontSize: 10, fontFamily: "monospace", fill: "#9aa6bd" }}
               stroke="#2b3242"
-              label={{ value: "Días al vencimiento", position: "bottom", style: { fontSize: 10, fill: "#9aa6bd" } }}
+              label={{
+                value: "Días al vencimiento",
+                position: "bottom",
+                offset: 8,
+                style: { fontSize: 10, fill: "#9aa6bd" },
+              }}
             />
             <YAxis
+              type="number"
+              dataKey="tir"
               tick={{ fontSize: 10, fontFamily: "monospace", fill: "#9aa6bd" }}
               stroke="#2b3242"
               tickFormatter={(v: number) => (v * 100).toFixed(1) + "%"}
-              label={{ value: "TIR / TEA", angle: -90, position: "insideLeft", style: { fontSize: 10, fill: "#9aa6bd" } }}
+              label={{
+                value: "TIR / TEA",
+                angle: -90,
+                position: "insideLeft",
+                offset: 4,
+                style: { fontSize: 10, fill: "#9aa6bd" },
+              }}
+              domain={["auto", "auto"]}
             />
             <Tooltip
               content={({ active, payload }: any) => {
@@ -1063,53 +1187,84 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
                 const d = payload[0]?.payload;
                 if (!d) return null;
                 return (
-                  <div className="bg-surface border border-border/60 rounded-lg p-2.5 font-mono text-[14px] space-y-1 shadow-xl">
+                  <div className="bg-surface border border-border/60 rounded-xl p-3 font-mono text-[13px] space-y-1.5 shadow-2xl">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-foreground">{d.ticker}</span>
-                      <span className="text-[13px] rounded border border-current px-1" style={{ color: colores[d.categoria] ?? "#888", borderColor: (colores[d.categoria] ?? "#888") + "60" }}>
+                      <span className="font-semibold text-foreground text-[14px]">{d.ticker}</span>
+                      <span
+                        className="rounded-full border px-1.5 py-0.5 text-[11px]"
+                        style={{
+                          color: colores[d.categoria] ?? "#888",
+                          borderColor: (colores[d.categoria] ?? "#888") + "60",
+                        }}
+                      >
                         {d.categoria}
                       </span>
                     </div>
-                    <div className="text-[13px] text-muted-foreground max-w-[200px] truncate">{d.nombre}</div>
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[13px]">
+                    <div className="text-[12px] text-muted-foreground max-w-[200px] truncate">
+                      {d.nombre}
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-[12px]">
                       <span className="text-muted-foreground">TIR</span>
-                      <span className="text-right font-semibold">{d.tir != null ? (d.tir * 100).toFixed(2) + "%" : "\u2014"}</span>
+                      <span className="text-right font-semibold">
+                        {d.tir != null ? (d.tir * 100).toFixed(2) + "%" : "\u2014"}
+                      </span>
+                      <span className="text-muted-foreground">TEM</span>
+                      <span className="text-right text-yellow-400">
+                        {d.tem != null ? d.tem.toFixed(2) + "%" : "\u2014"}
+                      </span>
                       <span className="text-muted-foreground">Paridad</span>
-                      <span className="text-right">{d.paridad != null ? d.paridad.toFixed(2) + "%" : "\u2014"}</span>
+                      <span className="text-right">
+                        {d.paridad != null ? d.paridad.toFixed(1) + "%" : "\u2014"}
+                      </span>
                       <span className="text-muted-foreground">Precio</span>
-                      <span className="text-right">${d.precio != null ? d.precio.toFixed(2) : "\u2014"}</span>
+                      <span className="text-right">
+                        ${d.precio != null ? d.precio.toFixed(2) : "\u2014"}
+                      </span>
                       <span className="text-muted-foreground">Vencimiento</span>
-                      <span className="text-right text-[13px]">{d.vencimiento ?? "\u2014"}</span>
+                      <span className="text-right">{d.vencimiento ?? "\u2014"}</span>
                       <span className="text-muted-foreground">Días</span>
                       <span className="text-right">{d.dias ?? "\u2014"}</span>
                       <span className="text-muted-foreground">Duration</span>
-                      <span className="text-right">{d.duration != null ? d.duration.toFixed(1) + "a" : "\u2014"}</span>
+                      <span className="text-right">
+                        {d.duration != null ? d.duration.toFixed(1) + "a" : "\u2014"}
+                      </span>
                     </div>
                   </div>
                 );
               }}
             />
-            {categorias.filter((cat) => filterCat === "Todas" || cat === filterCat).map((cat) => (
-              <Line
-                key={cat}
-                type="monotone"
-                data={items[cat].filter((r) => r.tir != null).map((r) => ({ ...r, tirVal: r.tir }))}
-                dataKey="tirVal"
-                name={cat}
-                stroke={colores[cat] ?? "#888"}
-                dot={{ r: 5, stroke: colores[cat] ?? "#888", strokeWidth: 1.5 }}
-                strokeWidth={2}
-                connectNulls={false}
-              />
-            ))}
+            {categorias
+              .filter((cat) => filterCat === "Todas" || cat === filterCat)
+              .map((cat) => (
+                <Line
+                  key={cat}
+                  type="monotone"
+                  data={items[cat]
+                    .filter((r) => r.tir != null)
+                    .map((r) => ({ ...r, tirVal: r.tir }))}
+                  dataKey="tirVal"
+                  name={cat}
+                  stroke={colores[cat] ?? "#888"}
+                  dot={{
+                    r: 5,
+                    stroke: colores[cat] ?? "#888",
+                    strokeWidth: 1.5,
+                    fill: colores[cat] ?? "#888",
+                    fillOpacity: 0.3,
+                  }}
+                  activeDot={{ r: 7, strokeWidth: 2 }}
+                  strokeWidth={2}
+                  connectNulls={false}
+                />
+              ))}
           </ComposedChart>
         </ResponsiveContainer>
       </div>
 
       {/* Noticias de mayor y menor TIR */}
       {news.length > 0 && (
-        <div className="rounded-lg border border-border/40 bg-background/40 p-3">
-          <h3 className="mb-2 font-mono text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
+        <div className="surface-card overflow-hidden rounded-2xl p-4">
+          <h3 className="mb-2 font-mono text-[12px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
             Noticias destacadas
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1119,9 +1274,9 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
                 href={n.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block rounded border border-border/30 bg-muted/5 p-2 hover:border-primary/40 transition-colors"
+                className="block rounded-xl border border-border/30 bg-muted/5 p-2.5 hover:border-primary/40 hover:bg-primary/[0.04] transition-colors"
               >
-                <span className="text-[13px] font-mono text-primary">{n.ticker}</span>
+                <span className="text-[12px] font-mono text-primary">{n.ticker}</span>
                 <p className="text-[13px] text-foreground line-clamp-2 mt-0.5">{n.title}</p>
               </a>
             ))}
@@ -1129,73 +1284,108 @@ function CurvaSubTab({ data }: { data: MonitorResult | null }) {
         </div>
       )}
 
-      {/* Tabla comparativa */}
-      <div className="overflow-x-auto">
-        <table className="mono w-full text-xs">
-          <thead className="text-[13px] uppercase tracking-wider text-muted-foreground">
-            <tr className="border-b border-border/60">
-              <th className="px-2 py-2 text-left">
-                <button onClick={() => toggleSort("categoria")} className="font-medium hover:text-foreground">
-                  Categoría {sortIcon("categoria")}
-                </button>
-              </th>
-              <th className="px-2 py-2 text-left">
-                <button onClick={() => toggleSort("ticker")} className="font-medium hover:text-foreground">
-                  Ticker {sortIcon("ticker")}
-                </button>
-              </th>
-              <th className="px-2 py-2 text-left">Nombre</th>
-              <th className="px-2 py-2 text-right">
-                <button onClick={() => toggleSort("tir")} className="font-medium hover:text-foreground">
-                  <TooltipHeader label="TIR" tooltip="Tasa Interna de Retorno" /> {sortIcon("tir")}
-                </button>
-              </th>
-              <th className="px-2 py-2 text-right">
-                <button onClick={() => toggleSort("tem")} className="font-medium hover:text-foreground">
-                  TEM {sortIcon("tem")}
-                </button>
-              </th>
-              <th className="px-2 py-2 text-right">Paridad</th>
-              <th className="px-2 py-2 text-right">Precio</th>
-              <th className="px-2 py-2 text-right">Plazo</th>
-              <th className="px-2 py-2 text-right">Riesgo</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedRows.map((r) => {
-              const bonoInfo = BONOS_DB[r.ticker];
-              return (
-                <tr key={r.ticker} className="border-b border-border/30 hover:bg-muted/20">
-                  <td className="px-2 py-2">
-                    <span className="inline-block rounded-md border px-1 py-0.5 text-[13px]" style={{ borderColor: colores[r.categoria] + "60", color: colores[r.categoria] }}>
-                      {r.categoria}
-                    </span>
-                  </td>
-                  <td className="px-2 py-2 font-medium">{r.ticker}</td>
-                  <td className="px-2 py-2 text-muted-foreground text-[13px] max-w-[120px] truncate">
-                    {bonoInfo?.descripcion?.slice(0, 30) ?? (r.categoria === "LECAP" ? "Letra del Tesoro" : "\u2014")}
-                  </td>
-                  <td className={`px-2 py-2 text-right ${colorPorTIR(r.tir)}`}>
-                    {r.tir != null ? (r.tir * 100).toFixed(2) + "%" : "\u2014"}
-                  </td>
-                  <td className="px-2 py-2 text-right text-yellow-400">
-                    {r.tem != null ? r.tem.toFixed(2) + "%" : "\u2014"}
-                  </td>
-                  <td className="px-2 py-2 text-right text-muted-foreground">
-                    {r.paridad != null ? r.paridad.toFixed(1) + "%" : "\u2014"}
-                  </td>
-                  <td className="px-2 py-2 text-right text-muted-foreground">
-                    ${r.precio != null ? r.precio.toFixed(2) : "\u2014"}
-                  </td>
-                  <td className="px-2 py-2 text-right text-[13px]">{plazoRestante(r.dias)}</td>
-                  <td className="px-2 py-2 text-right">
-                    {(() => { const val = r.tir != null ? r.tir * 100 : r.tem; const rl = riesgoNivel(val); return rl ? <span className={`inline-block rounded border px-1 py-0.5 text-[12px] leading-tight ${rl.clase}`}>{rl.label}</span> : null; })()}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      {/* Tabla comparativa estilo surface-card */}
+      <div className="surface-card overflow-hidden rounded-2xl">
+        <div className="overflow-x-auto">
+          <table className="mono w-full text-xs">
+            <thead className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+              <tr className="border-b border-border/60">
+                <th className="px-3 py-3 text-left">
+                  <button
+                    onClick={() => toggleSort("categoria")}
+                    className="font-medium hover:text-foreground transition-colors"
+                  >
+                    Categoría {sortIcon("categoria")}
+                  </button>
+                </th>
+                <th className="px-3 py-3 text-left">
+                  <button
+                    onClick={() => toggleSort("ticker")}
+                    className="font-medium hover:text-foreground transition-colors"
+                  >
+                    Ticker {sortIcon("ticker")}
+                  </button>
+                </th>
+                <th className="px-3 py-3 text-left">Nombre</th>
+                <th className="px-3 py-3 text-right">
+                  <button
+                    onClick={() => toggleSort("tir")}
+                    className="font-medium hover:text-foreground transition-colors"
+                  >
+                    <TooltipHeader label="TIR" tooltip="Tasa Interna de Retorno" />{" "}
+                    {sortIcon("tir")}
+                  </button>
+                </th>
+                <th className="px-3 py-3 text-right">
+                  <button
+                    onClick={() => toggleSort("tem")}
+                    className="font-medium hover:text-foreground transition-colors"
+                  >
+                    TEM {sortIcon("tem")}
+                  </button>
+                </th>
+                <th className="px-3 py-3 text-right">Paridad</th>
+                <th className="px-3 py-3 text-right">Precio</th>
+                <th className="px-3 py-3 text-right">Plazo</th>
+                <th className="px-3 py-3 text-right">Riesgo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedRows.map((r) => {
+                const bonoInfo = BONOS_DB[r.ticker];
+                return (
+                  <tr
+                    key={r.ticker}
+                    className="border-b border-border/30 hover:bg-primary/[0.04] transition-colors"
+                  >
+                    <td className="px-3 py-2.5">
+                      <span
+                        className="inline-block rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+                        style={{
+                          borderColor: (colores[r.categoria] ?? "#888") + "60",
+                          color: colores[r.categoria] ?? "#888",
+                        }}
+                      >
+                        {r.categoria}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 font-medium text-[13px]">{r.ticker}</td>
+                    <td className="px-3 py-2.5 text-muted-foreground text-[12px] max-w-[140px] truncate">
+                      {bonoInfo?.descripcion?.slice(0, 35) ??
+                        (r.categoria === "LECAP" ? "Letra del Tesoro" : "\u2014")}
+                    </td>
+                    <td className={`px-3 py-2.5 text-right font-medium ${colorPorTIR(r.tir)}`}>
+                      {r.tir != null ? (r.tir * 100).toFixed(2) + "%" : "\u2014"}
+                    </td>
+                    <td className="px-3 py-2.5 text-right text-yellow-400">
+                      {r.tem != null ? r.tem.toFixed(2) + "%" : "\u2014"}
+                    </td>
+                    <td className="px-3 py-2.5 text-right text-muted-foreground">
+                      {r.paridad != null ? r.paridad.toFixed(1) + "%" : "\u2014"}
+                    </td>
+                    <td className="px-3 py-2.5 text-right text-muted-foreground">
+                      ${r.precio != null ? r.precio.toFixed(2) : "\u2014"}
+                    </td>
+                    <td className="px-3 py-2.5 text-right text-[12px]">{plazoRestante(r.dias)}</td>
+                    <td className="px-3 py-2.5 text-right">
+                      {(() => {
+                        const val = r.tir != null ? r.tir * 100 : r.tem;
+                        const rl = riesgoNivel(val);
+                        return rl ? (
+                          <span
+                            className={`inline-block rounded border px-1.5 py-0.5 text-[11px] leading-tight ${rl.clase}`}
+                          >
+                            {rl.label}
+                          </span>
+                        ) : null;
+                      })()}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -1806,7 +1996,9 @@ function DetalleSubTab({
     return () => clearInterval(interval);
   }, [ticker, loadDetalle]);
 
-  const [detalleTab, setDetalleTab] = useState<"general" | "rendimiento" | "tecnico" | "historico">("general");
+  const [detalleTab, setDetalleTab] = useState<"general" | "rendimiento" | "tecnico" | "historico">(
+    "general",
+  );
   const [historicoData, setHistoricoData] = useState<SerieHistoricaResult | null>(null);
   const [historicoLoading, setHistoricoLoading] = useState(false);
   const [historicoRange, setHistoricoRange] = useState("6M");
@@ -1819,11 +2011,20 @@ function DetalleSubTab({
     const hasta = new Date().toISOString().split("T")[0];
     let desde: string;
     switch (historicoRange) {
-      case "1M": desde = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0]; break;
-      case "3M": desde = new Date(Date.now() - 90 * 86400000).toISOString().split("T")[0]; break;
-      case "6M": desde = new Date(Date.now() - 180 * 86400000).toISOString().split("T")[0]; break;
-      case "1A": desde = new Date(Date.now() - 365 * 86400000).toISOString().split("T")[0]; break;
-      default: desde = new Date(Date.now() - 180 * 86400000).toISOString().split("T")[0];
+      case "1M":
+        desde = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0];
+        break;
+      case "3M":
+        desde = new Date(Date.now() - 90 * 86400000).toISOString().split("T")[0];
+        break;
+      case "6M":
+        desde = new Date(Date.now() - 180 * 86400000).toISOString().split("T")[0];
+        break;
+      case "1A":
+        desde = new Date(Date.now() - 365 * 86400000).toISOString().split("T")[0];
+        break;
+      default:
+        desde = new Date(Date.now() - 180 * 86400000).toISOString().split("T")[0];
     }
     fnSerie({ data: { ticker, fechaDesde: desde, fechaHasta: hasta, sessionId } })
       .then((r) => setHistoricoData(r as unknown as SerieHistoricaResult))
@@ -1965,17 +2166,13 @@ function DetalleSubTab({
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
               <div className="text-[13px] text-muted-foreground">TNA</div>
               <div className="mono mt-1 text-lg">
-                {resultado.tna != null
-                  ? fmtPct(resultado.tna * 100, 2)
-                  : "—"}
+                {resultado.tna != null ? fmtPct(resultado.tna * 100, 2) : "—"}
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
               <div className="text-[13px] text-muted-foreground">TEA</div>
               <div className="mono mt-1 text-lg">
-                {resultado.tea != null
-                  ? fmtPct(resultado.tea * 100, 2)
-                  : "—"}
+                {resultado.tea != null ? fmtPct(resultado.tea * 100, 2) : "—"}
               </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
@@ -2049,7 +2246,9 @@ function DetalleSubTab({
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
               <div className="text-[13px] text-muted-foreground">Intereses acumulados</div>
-              <div className="mono mt-1">{resultado.interesesCorridos != null ? fmtNum(resultado.interesesCorridos, 4) : "—"}</div>
+              <div className="mono mt-1">
+                {resultado.interesesCorridos != null ? fmtNum(resultado.interesesCorridos, 4) : "—"}
+              </div>
             </div>
             <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
               <div className="text-[13px] text-muted-foreground">Días al Vto.</div>
@@ -2087,16 +2286,20 @@ function DetalleSubTab({
           {historicoData && historicoData.serie.length > 0 && (
             <div className="rounded-lg border border-border/40 bg-background/40 p-3">
               <ResponsiveContainer width="100%" height={280}>
-                <ComposedChart data={(() => {
-                  const sorted = [...historicoData.serie].sort((a, b) => a.fecha.localeCompare(b.fecha));
-                  return sorted.map((p) => ({
-                    fecha: p.fecha,
-                    tir: p.tir != null ? +(p.tir * 100).toFixed(2) : null,
-                    paridad: p.paridad != null ? +p.paridad.toFixed(2) : null,
-                    precio: p.precio,
-                    intCorridos: p.precio,
-                  }));
-                })()}>
+                <ComposedChart
+                  data={(() => {
+                    const sorted = [...historicoData.serie].sort((a, b) =>
+                      a.fecha.localeCompare(b.fecha),
+                    );
+                    return sorted.map((p) => ({
+                      fecha: p.fecha,
+                      tir: p.tir != null ? +(p.tir * 100).toFixed(2) : null,
+                      paridad: p.paridad != null ? +p.paridad.toFixed(2) : null,
+                      precio: p.precio,
+                      intCorridos: p.precio,
+                    }));
+                  })()}
+                >
                   <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
                   <XAxis
                     dataKey="fecha"
@@ -2159,36 +2362,43 @@ function DetalleSubTab({
           )}
 
           {/* Interpretación dinámica */}
-          {historicoData && historicoData.serie.length > 24 && (() => {
-            const tirs = historicoData.serie
-              .filter((p) => p.tir !== null)
-              .map((p) => p.tir as number);
-            if (tirs.length < 10) return null;
-            const tirsSorted = [...tirs].sort((a, b) => a - b);
-            const p25 = tirsSorted[Math.floor(tirsSorted.length * 0.25)];
-            const p75 = tirsSorted[Math.floor(tirsSorted.length * 0.75)];
-            const ultimaTIR = tirs[tirs.length - 1];
-            const paridadActual = historicoData.serie[historicoData.serie.length - 1]?.paridad ?? 100;
-            // Tendencia últimas 4 semanas (~20 trading days)
-            const ultimas20 = tirs.slice(-20);
-            const tendenciaBaja = ultimas20.length >= 5 && ultimas20[ultimas20.length - 1] < ultimas20[0];
-            let interpretacion = "";
-            if (ultimaTIR > p75) {
-              interpretacion = "La TIR está en la zona más alta del período — el mercado le exige más rendimiento a este bono (precio deprimido).";
-            } else if (ultimaTIR < p25) {
-              interpretacion = "La TIR está en la zona más baja del período — el bono comprimió rendimiento (subió de precio).";
-            } else if (paridadActual < 100 && tendenciaBaja) {
-              interpretacion = "El bono cotiza bajo la par y su rendimiento viene comprimiendo — puede ser indicio de mayor apetito.";
-            } else {
-              interpretacion = "La TIR se mantiene en rangos normales para el período analizado.";
-            }
-            return (
-              <div className="rounded-lg border border-border/40 bg-muted/10 p-3 text-[14px] text-muted-foreground leading-relaxed">
-                <span className="font-medium text-foreground">Interpretación: </span>
-                {interpretacion}
-              </div>
-            );
-          })()}
+          {historicoData &&
+            historicoData.serie.length > 24 &&
+            (() => {
+              const tirs = historicoData.serie
+                .filter((p) => p.tir !== null)
+                .map((p) => p.tir as number);
+              if (tirs.length < 10) return null;
+              const tirsSorted = [...tirs].sort((a, b) => a - b);
+              const p25 = tirsSorted[Math.floor(tirsSorted.length * 0.25)];
+              const p75 = tirsSorted[Math.floor(tirsSorted.length * 0.75)];
+              const ultimaTIR = tirs[tirs.length - 1];
+              const paridadActual =
+                historicoData.serie[historicoData.serie.length - 1]?.paridad ?? 100;
+              // Tendencia últimas 4 semanas (~20 trading days)
+              const ultimas20 = tirs.slice(-20);
+              const tendenciaBaja =
+                ultimas20.length >= 5 && ultimas20[ultimas20.length - 1] < ultimas20[0];
+              let interpretacion = "";
+              if (ultimaTIR > p75) {
+                interpretacion =
+                  "La TIR está en la zona más alta del período — el mercado le exige más rendimiento a este bono (precio deprimido).";
+              } else if (ultimaTIR < p25) {
+                interpretacion =
+                  "La TIR está en la zona más baja del período — el bono comprimió rendimiento (subió de precio).";
+              } else if (paridadActual < 100 && tendenciaBaja) {
+                interpretacion =
+                  "El bono cotiza bajo la par y su rendimiento viene comprimiendo — puede ser indicio de mayor apetito.";
+              } else {
+                interpretacion = "La TIR se mantiene en rangos normales para el período analizado.";
+              }
+              return (
+                <div className="rounded-lg border border-border/40 bg-muted/10 p-3 text-[14px] text-muted-foreground leading-relaxed">
+                  <span className="font-medium text-foreground">Interpretación: </span>
+                  {interpretacion}
+                </div>
+              );
+            })()}
         </div>
       )}
 
@@ -2583,16 +2793,23 @@ function PortafolioSubTab({
               </div>
               <div className="rounded-md border border-border/40 bg-muted/20 p-2.5">
                 <div className="text-[13px] text-muted-foreground">Convexity</div>
-                <TooltipHeader label="" tooltip="Elbaum 10.13: convexidad REAL ponderada por valor de mercado sobre flujos descontados (no aproximación D²×1.5)" />
+                <TooltipHeader
+                  label=""
+                  tooltip="Elbaum 10.13: convexidad REAL ponderada por valor de mercado sobre flujos descontados (no aproximación D²×1.5)"
+                />
                 <div className="mono mt-0.5 text-base font-medium">
-                  {resultado.metricas.convexityPonderada != null && resultado.metricas.convexityPonderada > 0
+                  {resultado.metricas.convexityPonderada != null &&
+                  resultado.metricas.convexityPonderada > 0
                     ? fmtNum(resultado.metricas.convexityPonderada, 1)
                     : "\u2014"}
                 </div>
               </div>
               <div className="rounded-md border border-border/40 bg-muted/20 p-2.5">
                 <div className="text-[13px] text-muted-foreground">DV01</div>
-                <TooltipHeader label="" tooltip="Elbaum 10.14: DV01 real por posición = ModDur × ValorMercado × 1bp, sumado sobre cartera" />
+                <TooltipHeader
+                  label=""
+                  tooltip="Elbaum 10.14: DV01 real por posición = ModDur × ValorMercado × 1bp, sumado sobre cartera"
+                />
                 <div className="mono mt-0.5 text-base font-medium">
                   USD{" "}
                   {resultado.metricas.dv01Real != null
@@ -3271,7 +3488,7 @@ function HistoricoSubTab({
   );
 }
 
-//  Títulos Públicos 
+//  Títulos Públicos
 
 interface TitulosPublicosSubTabProps {
   data: IOLCotizacion[];
@@ -3337,38 +3554,41 @@ function TitulosPublicosSubTab({
                 const tir = tirMap?.[tp.simbolo.toUpperCase()];
                 const tirDefined = tir !== undefined && tir !== null;
                 return (
-                <tr key={tp.simbolo} className="border-b border-border/30 hover:bg-muted/20">
-                  <td className="px-2 py-2 font-medium">{tp.simbolo}</td>
-                  <td
-                    className="px-2 py-2 max-w-[200px] truncate text-muted-foreground"
-                    title={tp.nombre}
-                  >
-                    {tp.nombre}
-                  </td>
-                  <td className="px-2 py-2 text-right">{fmtNum(tp.precio, 2)}</td>
-                  <td className={`px-2 py-2 text-right ${tirDefined ? colorPorTIR(tir) : "text-muted-foreground"}`}>
-                    {tirDefined ? fmtPct(tir * 100, 2) : "sin datos"}
-                  </td>
-                  <td className="px-2 py-2 text-right text-green-400">
-                    {tp.puntas.compra > 0 ? fmtNum(tp.puntas.compra, 2) : "\u2014"}
-                  </td>
-                  <td className="px-2 py-2 text-right text-red-400">
-                    {tp.puntas.venta > 0 ? fmtNum(tp.puntas.venta, 2) : "\u2014"}
-                  </td>
-                  <td className="px-2 py-2 text-right">
-                    {tp.cierre > 0 ? fmtNum(tp.cierre, 2) : "\u2014"}
-                  </td>
-                  <td
-                    className={`px-2 py-2 text-right ${tp.variacion >= 0 ? "text-green-400" : "text-red-400"}`}
-                  >
-                    {tp.variacionPct !== 0
-                      ? `${tp.variacion >= 0 ? "+" : ""}${tp.variacionPct.toFixed(2)}%`
-                      : "\u2014"}
-                  </td>
-                  <td className="px-2 py-2 text-right">
-                    {tp.volumen > 0 ? fmtNum(tp.volumen, 0) : "\u2014"}
-                  </td>
-                </tr>);
+                  <tr key={tp.simbolo} className="border-b border-border/30 hover:bg-muted/20">
+                    <td className="px-2 py-2 font-medium">{tp.simbolo}</td>
+                    <td
+                      className="px-2 py-2 max-w-[200px] truncate text-muted-foreground"
+                      title={tp.nombre}
+                    >
+                      {tp.nombre}
+                    </td>
+                    <td className="px-2 py-2 text-right">{fmtNum(tp.precio, 2)}</td>
+                    <td
+                      className={`px-2 py-2 text-right ${tirDefined ? colorPorTIR(tir) : "text-muted-foreground"}`}
+                    >
+                      {tirDefined ? fmtPct(tir * 100, 2) : "sin datos"}
+                    </td>
+                    <td className="px-2 py-2 text-right text-green-400">
+                      {tp.puntas.compra > 0 ? fmtNum(tp.puntas.compra, 2) : "\u2014"}
+                    </td>
+                    <td className="px-2 py-2 text-right text-red-400">
+                      {tp.puntas.venta > 0 ? fmtNum(tp.puntas.venta, 2) : "\u2014"}
+                    </td>
+                    <td className="px-2 py-2 text-right">
+                      {tp.cierre > 0 ? fmtNum(tp.cierre, 2) : "\u2014"}
+                    </td>
+                    <td
+                      className={`px-2 py-2 text-right ${tp.variacion >= 0 ? "text-green-400" : "text-red-400"}`}
+                    >
+                      {tp.variacionPct !== 0
+                        ? `${tp.variacion >= 0 ? "+" : ""}${tp.variacionPct.toFixed(2)}%`
+                        : "\u2014"}
+                    </td>
+                    <td className="px-2 py-2 text-right">
+                      {tp.volumen > 0 ? fmtNum(tp.volumen, 0) : "\u2014"}
+                    </td>
+                  </tr>
+                );
               })}
             </tbody>
           </table>
@@ -3378,7 +3598,7 @@ function TitulosPublicosSubTab({
   );
 }
 
-//  Dashboard Diario 
+//  Dashboard Diario
 
 interface DashboardDiarioSubTabProps {
   data: DashboardRow[];
@@ -3387,13 +3607,21 @@ interface DashboardDiarioSubTabProps {
   accessToken: string | null;
 }
 
-function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: DashboardDiarioSubTabProps) {
+function DashboardDiarioSubTab({
+  data,
+  loading,
+  onRefresh,
+  accessToken,
+}: DashboardDiarioSubTabProps) {
   const [sortKey, setSortKey] = useState<string>("ticker");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   function toggleSort(key: string) {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else { setSortKey(key); setSortDir("asc"); }
+    else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
   }
 
   const sorted = useMemo(() => {
@@ -3401,16 +3629,35 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
     arr.sort((a, b) => {
       let cmp = 0;
       switch (sortKey) {
-        case "ticker": cmp = a.ticker.localeCompare(b.ticker); break;
-        case "vencimiento": cmp = a.vencimiento.localeCompare(b.vencimiento); break;
-        case "precio": cmp = (a.precio ?? 0) - (b.precio ?? 0); break;
-        case "yield": cmp = (a.yieldVal ?? 0) - (b.yieldVal ?? 0); break;
-        case "modDuration": cmp = (a.modDuration ?? 0) - (b.modDuration ?? 0); break;
-        case "paridad": cmp = (a.paridad ?? 0) - (b.paridad ?? 0); break;
-        case "currentYield": cmp = (a.currentYield ?? 0) - (b.currentYield ?? 0); break;
-        case "outstanding": cmp = (a.outstanding ?? 0) - (b.outstanding ?? 0); break;
-        case "tasaCupon": cmp = a.tasaCupon - b.tasaCupon; break;
-        default: cmp = a.ticker.localeCompare(b.ticker);
+        case "ticker":
+          cmp = a.ticker.localeCompare(b.ticker);
+          break;
+        case "vencimiento":
+          cmp = a.vencimiento.localeCompare(b.vencimiento);
+          break;
+        case "precio":
+          cmp = (a.precio ?? 0) - (b.precio ?? 0);
+          break;
+        case "yield":
+          cmp = (a.yieldVal ?? 0) - (b.yieldVal ?? 0);
+          break;
+        case "modDuration":
+          cmp = (a.modDuration ?? 0) - (b.modDuration ?? 0);
+          break;
+        case "paridad":
+          cmp = (a.paridad ?? 0) - (b.paridad ?? 0);
+          break;
+        case "currentYield":
+          cmp = (a.currentYield ?? 0) - (b.currentYield ?? 0);
+          break;
+        case "outstanding":
+          cmp = (a.outstanding ?? 0) - (b.outstanding ?? 0);
+          break;
+        case "tasaCupon":
+          cmp = a.tasaCupon - b.tasaCupon;
+          break;
+        default:
+          cmp = a.ticker.localeCompare(b.ticker);
       }
       return sortDir === "asc" ? cmp : -cmp;
     });
@@ -3421,7 +3668,15 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
   const sopranos = sorted.filter((r) => r.ticker.startsWith("GD"));
   const bopreales = sorted.filter((r) => r.ticker.startsWith("BP"));
 
-  function SortableHeader({ label, sortKey: sk, className }: { label: string; sortKey: string; className?: string }) {
+  function SortableHeader({
+    label,
+    sortKey: sk,
+    className,
+  }: {
+    label: string;
+    sortKey: string;
+    className?: string;
+  }) {
     const active = sortKey === sk;
     return (
       <th
@@ -3441,7 +3696,9 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
         <div className="flex items-center gap-2 text-sm font-medium">
           <span>{icon}</span>
           <span>{title}</span>
-          <span className="text-[13px] text-muted-foreground font-normal">{rows.length} instrumentos</span>
+          <span className="text-[13px] text-muted-foreground font-normal">
+            {rows.length} instrumentos
+          </span>
         </div>
         <div className="overflow-x-auto">
           <table className="mono w-full text-[14px]">
@@ -3460,7 +3717,11 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
                 <SortableHeader label="Paridad" sortKey="paridad" className="text-right" />
                 <th className="px-2 py-2 text-right">Var %</th>
                 <SortableHeader label="Outstanding" sortKey="outstanding" className="text-right" />
-                <SortableHeader label="Current yield" sortKey="currentYield" className="text-right" />
+                <SortableHeader
+                  label="Current yield"
+                  sortKey="currentYield"
+                  className="text-right"
+                />
                 <th className="px-2 py-2 text-left">ISIN</th>
                 <th className="px-2 py-2 text-center">Src</th>
               </tr>
@@ -3472,24 +3733,39 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
                 const modDur = row.modDuration;
                 const currYield = row.currentYield;
                 return (
-                  <tr key={row.ticker} className="border-b border-border/20 hover:bg-muted/20 transition-colors">
+                  <tr
+                    key={row.ticker}
+                    className="border-b border-border/20 hover:bg-muted/20 transition-colors"
+                  >
                     <td className="px-2 py-2 font-semibold text-foreground">{row.ticker}</td>
                     <td className="px-2 py-2 text-muted-foreground">{row.vencimiento}</td>
                     <td className="px-2 py-2">
-                      <span className={`rounded px-1 py-0.5 text-[13px] font-medium ${
-                        row.emisor === "BCRA" ? "bg-blue-900/30 text-blue-300" : "bg-amber-900/30 text-amber-300"
-                      }`}>
+                      <span
+                        className={`rounded px-1 py-0.5 text-[13px] font-medium ${
+                          row.emisor === "BCRA"
+                            ? "bg-blue-900/30 text-blue-300"
+                            : "bg-amber-900/30 text-amber-300"
+                        }`}
+                      >
                         {row.emisor}
                       </span>
                     </td>
                     <td className="px-2 py-2 text-muted-foreground">{row.tipoCupon}</td>
-                    <td className="px-2 py-2 text-muted-foreground">{row.frecuencia === "Semiannually" ? "Semestral" : row.frecuencia}</td>
-                    <td className="px-2 py-2 text-right font-medium">{row.tasaCupon.toFixed(2)}%</td>
+                    <td className="px-2 py-2 text-muted-foreground">
+                      {row.frecuencia === "Semiannually" ? "Semestral" : row.frecuencia}
+                    </td>
+                    <td className="px-2 py-2 text-right font-medium">
+                      {row.tasaCupon.toFixed(2)}%
+                    </td>
                     <td className="px-2 py-2 text-right text-muted-foreground">{row.proxPago}</td>
-                    <td className={`px-2 py-2 text-right font-medium ${precio ? "" : "text-muted-foreground"}`}>
+                    <td
+                      className={`px-2 py-2 text-right font-medium ${precio ? "" : "text-muted-foreground"}`}
+                    >
                       {precio ? fmtNum(precio, 2) : "\u2014"}
                     </td>
-                    <td className={`px-2 py-2 text-right ${yieldVal != null ? colorPorTIR(yieldVal / 100) : "text-muted-foreground"}`}>
+                    <td
+                      className={`px-2 py-2 text-right ${yieldVal != null ? colorPorTIR(yieldVal / 100) : "text-muted-foreground"}`}
+                    >
                       {yieldVal != null ? fmtPct(yieldVal, 2) : "\u2014"}
                     </td>
                     <td className="px-2 py-2 text-right text-muted-foreground">
@@ -3498,22 +3774,39 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
                     <td className="px-2 py-2 text-right text-muted-foreground">
                       {row.paridad != null ? `${row.paridad.toFixed(2)}%` : "\u2014"}
                     </td>
-                    <td className={`px-2 py-2 text-right font-medium ${
-                      row.variacion != null ? (row.variacion >= 0 ? "text-green-400" : "text-red-400") : "text-muted-foreground"
-                    }`}>
-                      {row.variacion != null ? `${row.variacion >= 0 ? "+" : ""}${row.variacion.toFixed(2)}%` : "\u2014"}
+                    <td
+                      className={`px-2 py-2 text-right font-medium ${
+                        row.variacion != null
+                          ? row.variacion >= 0
+                            ? "text-green-400"
+                            : "text-red-400"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {row.variacion != null
+                        ? `${row.variacion >= 0 ? "+" : ""}${row.variacion.toFixed(2)}%`
+                        : "\u2014"}
                     </td>
                     <td className="px-2 py-2 text-right">
-                      <span className="text-[13px]">{row.moneda}</span> {row.outstanding != null ? fmtNum(row.outstanding, 2) : "\u2014"}
+                      <span className="text-[13px]">{row.moneda}</span>{" "}
+                      {row.outstanding != null ? fmtNum(row.outstanding, 2) : "\u2014"}
                     </td>
-                    <td className={`px-2 py-2 text-right ${currYield != null ? colorPorTIR(currYield / 100) : "text-muted-foreground"}`}>
+                    <td
+                      className={`px-2 py-2 text-right ${currYield != null ? colorPorTIR(currYield / 100) : "text-muted-foreground"}`}
+                    >
                       {currYield != null ? fmtPct(currYield, 2) : "\u2014"}
                     </td>
-                    <td className="px-2 py-2 text-[13px] text-muted-foreground max-w-[120px] truncate" title={row.isin}>
+                    <td
+                      className="px-2 py-2 text-[13px] text-muted-foreground max-w-[120px] truncate"
+                      title={row.isin}
+                    >
                       {row.isin || "\u2014"}
                     </td>
                     <td className="px-2 py-2 text-center">
-                      <span className={`inline-block w-1.5 h-1.5 rounded-full ${row.fuente === "iol" ? "bg-green-400" : "bg-amber-400"}`} title={row.fuente === "iol" ? "Dato IOL" : "Referencia"} />
+                      <span
+                        className={`inline-block w-1.5 h-1.5 rounded-full ${row.fuente === "iol" ? "bg-green-400" : "bg-amber-400"}`}
+                        title={row.fuente === "iol" ? "Dato IOL" : "Referencia"}
+                      />
                     </td>
                   </tr>
                 );
@@ -3537,7 +3830,9 @@ function DashboardDiarioSubTab({ data, loading, onRefresh, accessToken }: Dashbo
           <p className="text-[13px] text-muted-foreground mt-0.5">
             Soberanos y Bopreales en Moneda Extranjera · Fuente: Refinitiv Eikon
             {data.length > 0 && (
-              <span className="ml-2">{iolCount > 0 ? `· ${iolCount} cotizaciones IOL` : "· cotizaciones de referencia"}</span>
+              <span className="ml-2">
+                {iolCount > 0 ? `· ${iolCount} cotizaciones IOL` : "· cotizaciones de referencia"}
+              </span>
             )}
           </p>
         </div>

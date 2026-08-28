@@ -14,7 +14,9 @@ export async function getBonosData(): Promise<any> {
 // Fallback sincrónico para imports que aún no migraron a async
 // DEPRECATED: migrar a getBonosData() con await
 let _bonosJson: any = null;
-export function setBonosData(data: any) { _bonosJson = data; }
+export function setBonosData(data: any) {
+  _bonosJson = data;
+}
 
 import localBonosJson from "@/data/bonos.json";
 _bonosJson = localBonosJson;
@@ -91,6 +93,11 @@ export interface BonoConfig {
   origenCupon?: "prospecto_cnv" | "calibrado_inverso" | "docta_api";
   escalaPrecioIOL?: number;
   tipoBono?: string;
+  activo?: boolean;
+  subcategoria?: string;
+  ley?: "argentina" | "extranjera";
+  especie?: "Pesos" | "Dolar" | "Cable";
+  especies_relacionadas?: Record<string, string>;
   fixtureValidacion?: {
     fechaSnapshot: string;
     precioIOLSnapshot: number;
@@ -144,12 +151,23 @@ type BonosJson = Record<
     origenCupon?: "prospecto_cnv" | "calibrado_inverso" | "docta_api";
     escalaPrecioIOL?: number;
     tipoBono?: string;
+    activo?: boolean;
+    subcategoria?: string;
+    ley?: string;
+    especie?: string;
+    especies_relacionadas?: Record<string, string>;
     fixtureValidacion?: {
       fechaSnapshot: string;
       precioIOLSnapshot: number;
       metricasPublicadas: Record<string, number>;
     };
-    historico?: Array<{ fecha: string; precio: number; tirCalculada: number | null; paridad: number | null; fuente: string }>;
+    historico?: Array<{
+      fecha: string;
+      precio: number;
+      tirCalculada: number | null;
+      paridad: number | null;
+      fuente: string;
+    }>;
   }
 >;
 
@@ -157,7 +175,9 @@ type BonosJson = Record<
 // HELPERS
 // ============================================================================
 
-function parseJsonFlujos(flujos: { fecha: string; monto: number; tipoFlujo?: string }[]): FlujoFuturo[] {
+function parseJsonFlujos(
+  flujos: { fecha: string; monto: number; tipoFlujo?: string }[],
+): FlujoFuturo[] {
   return flujos.map((f) => {
     const tf = f.tipoFlujo ?? "Cupon+Amortizacion";
     let tipo: "cupon" | "amortizacion" | "cupon+amortizacion";
@@ -178,7 +198,9 @@ function parseJsonFlujos(flujos: { fecha: string; monto: number; tipoFlujo?: str
   });
 }
 
-function parseFlujosDetallados(flujos: { fecha: string; monto: number; tipoFlujo?: string }[]): FlujoEntry[] {
+function parseFlujosDetallados(
+  flujos: { fecha: string; monto: number; tipoFlujo?: string }[],
+): FlujoEntry[] {
   return flujos.map((f) => ({
     fecha: f.fecha,
     monto: f.monto,
@@ -212,7 +234,8 @@ function buildBonosDB(): Record<string, BonoConfig> {
     const yieldConvention = (entry.yieldConvention ?? "TRUE") as YieldConvention;
     const tipoTasa = (entry.tipoTasa ?? "fixed") as TipoTasa;
     const ajuste = entry.ajuste !== undefined ? (entry.ajuste as Ajuste) : null;
-    const valorResidualActual = entry.valorResidualActual ?? (entry.valorPar != null ? entry.valorPar * 100 : 100);
+    const valorResidualActual =
+      entry.valorResidualActual ?? (entry.valorPar != null ? entry.valorPar * 100 : 100);
     const fechaEmision = entry.fechaEmision ?? entry.vencimiento;
     const monedaPago = entry.monedaPago ?? entry.moneda ?? "USD";
 
@@ -236,6 +259,11 @@ function buildBonosDB(): Record<string, BonoConfig> {
       cuponAnual: entry.cuponAnual,
       cuponDerivado: entry.cuponDerivado ?? false,
       valorPar: entry.valorPar ?? 100,
+      activo: entry.activo,
+      subcategoria: entry.subcategoria,
+      ley: entry.ley as "argentina" | "extranjera" | undefined,
+      especie: entry.especie as "Pesos" | "Dolar" | "Cable" | undefined,
+      especies_relacionadas: entry.especies_relacionadas,
       // Nuevos campos
       instrumento,
       monedaPago,
@@ -257,7 +285,9 @@ function buildBonosDB(): Record<string, BonoConfig> {
 }
 
 export const BONOS_DB = buildBonosDB();
-export const BONOS_LIST = Object.values(BONOS_DB).sort((a, b) => a.ticker.localeCompare(b.ticker));
+export const BONOS_LIST = Object.values(BONOS_DB)
+  .filter((b) => b.activo !== false)
+  .sort((a, b) => a.ticker.localeCompare(b.ticker));
 export const BONOS_TICKERS = BONOS_LIST.map((b) => b.ticker);
 
 // ============================================================================
@@ -288,14 +318,103 @@ export function filtrarPorInstrumento(instrumento: TipoInstrumento): BonoConfig[
   return BONOS_LIST.filter((b) => b.instrumento === instrumento);
 }
 
+// ============================================================================
+// BONOS ACTIVOS (excluye stubs sin vencimiento ni flujos)
+// ============================================================================
+
+export function bonosActivos(): BonoConfig[] {
+  return BONOS_LIST.filter(
+    (b) => b.activo !== false && b.vencimiento && b.flujosPorCada100VN.length > 0,
+  );
+}
+
+export function getBonosActivosPorTipo(tipo: TipoBono): BonoConfig[] {
+  return bonosActivos().filter((b) => b.tipo === tipo);
+}
+
+// ============================================================================
+// TAXONOMÍA — Categorías madre del gráfico
+// ============================================================================
+
+export interface CategoriaTaxonomia {
+  id: string;
+  label: string;
+  badge: string;
+  color: string;
+  hexColor: string;
+}
+
+export const CATEGORIAS_TAXONOMIA: CategoriaTaxonomia[] = [
+  {
+    id: "Hard Dollar",
+    label: "Hard Dollar",
+    badge: "bg-green-900/40 text-green-300 border-green-800",
+    color: "text-green-400",
+    hexColor: "#4ade80",
+  },
+  {
+    id: "Dollar-Linked",
+    label: "Dollar-Linked",
+    badge: "bg-blue-900/40 text-blue-300 border-blue-800",
+    color: "text-blue-400",
+    hexColor: "#60a5fa",
+  },
+  {
+    id: "CER",
+    label: "CER",
+    badge: "bg-yellow-900/40 text-yellow-300 border-yellow-800",
+    color: "text-yellow-400",
+    hexColor: "#facc15",
+  },
+  {
+    id: "LECAP",
+    label: "LECAP",
+    badge: "bg-purple-900/40 text-purple-300 border-purple-800",
+    color: "text-purple-400",
+    hexColor: "#c084fc",
+  },
+  {
+    id: "Tasa Fija ARS",
+    label: "Tasa Fija ARS",
+    badge: "bg-orange-900/40 text-orange-300 border-orange-800",
+    color: "text-orange-400",
+    hexColor: "#fb923c",
+  },
+  {
+    id: "TAMAR",
+    label: "TAMAR",
+    badge: "bg-pink-900/40 text-pink-300 border-pink-800",
+    color: "text-pink-400",
+    hexColor: "#f472b6",
+  },
+];
+
+export function getCategoriaTaxonomia(tipo: TipoBono): CategoriaTaxonomia {
+  return (
+    CATEGORIAS_TAXONOMIA.find((c) => c.id === tipo) ?? {
+      id: tipo,
+      label: tipo,
+      badge: "bg-muted text-muted-foreground border-border",
+      color: "text-muted-foreground",
+      hexColor: "#888",
+    }
+  );
+}
+
 export function getFrecuenciaNumerica(frecuencia?: string): number {
   switch (frecuencia) {
-    case "Semiannual": return 2;
-    case "Quarterly": return 4;
-    case "Monthly": return 12;
-    case "Annual": return 1;
-    case "AtMaturity": return 1;
-    default: return 1;
+    case "Semiannual":
+      return 2;
+    case "Quarterly":
+      return 4;
+    case "Monthly":
+      return 12;
+    case "Annual":
+      return 1;
+    case "AtMaturity":
+      return 1;
+    default:
+      return 1;
   }
 }
 
