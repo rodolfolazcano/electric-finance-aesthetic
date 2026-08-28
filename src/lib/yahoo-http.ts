@@ -539,7 +539,7 @@ let ultimo429Batch = 0;
 export async function fetchYahooQuotesBatch(symbols: string[]): Promise<any[]> {
   if (!symbols.length) return [];
   const lista = symbols.slice(0, 60).map((s) => s.trim().toUpperCase()).filter(Boolean);
-  const cacheKey = yahooCacheKey("quotebatch", lista.length.toString(), lista.join(","));
+  const cacheKey = yahooCacheKey("quotebatch-v2", lista.length.toString(), lista.join(","));
   const cached = getCached<any[]>(cacheKey, YAHOO_CACHE_TTL);
   if (cached) return cached;
 
@@ -556,7 +556,7 @@ export async function fetchYahooQuotesBatch(symbols: string[]): Promise<any[]> {
           symbols: lista.join(","),
           crumb: session?.crumb ?? "",
           formatted: "false",
-          fields: "earningsTimestamp,earningsTimestampStart,earningsTimestampEnd",
+          fields: "regularMarketVolume,regularMarketPrice,volume,earningsTimestamp,earningsTimestampStart,earningsTimestampEnd",
           corsDomain: "finance.yahoo.com",
         });
         const url = `https://${host}/v7/finance/quote?${params}`;

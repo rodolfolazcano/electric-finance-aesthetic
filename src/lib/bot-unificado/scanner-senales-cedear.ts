@@ -23,7 +23,41 @@ const MAX_SENALES = 8;
 const MIN_SCORE = 3; // mínimo 3/5 indicadores para generar señal
 const BATCH_SIZE = 8;
 const TIMEOUT_PER_TICKER_MS = 6000;
-const MAX_TICKERS_SCAN = 80; // limitar para que no tarde demasiado
+const MAX_TICKERS_SCAN = 20; // solo top volumen del día (líquidos) — pedido explícito
+let cacheTopVol: { ts: number; tickers: string[] } | null = null;
+const CACHE_TTL_MS = 30 * 60 * 1000;
+
+async function topVolumenHoy(limit = MAX_TICKERS_SCAN): Promise<string[]> {
+  if (cacheTopVol && Date.now() - cacheTopVol.ts < CACHE_TTL_MS) return cacheTopVol.tickers.slice(0, limit);
+  const base = CEDEARS_JSON.filter((t) => t && !t.endsWith("D") && t.length > 1);
+  try {
+    const { fetchYahooQuotesBatch } = await import("@/lib/yahoo-http");
+    const volMap = new Map<string, number>();
+    // Batch de 50 para no saturar: query plain ticker (subyacente US) — proxy de liquidez; BCBA .BA tiene volumen muy bajo y sesgado
+    for (let i = 0; i < base.length; i += 50) {
+      const chunk = base.slice(i, i + 50);
+      const quotes: any[] = await fetchYahooQuotesBatch(chunk);
+      for (const q of quotes) {
+        const sym = String(q.symbol ?? "").toUpperCase();
+        const vol = Number(q.regularMarketVolume ?? q.volume ?? 0);
+        if (sym) volMap.set(sym, vol);
+      }
+      if (i + 50 < base.length) await new Promise((r) => setTimeout(r, 400));
+    }
+    // Fallback si batch bloqueado (429): usar orden original
+    if (!volMap.size) return base.slice(0, limit);
+    const ranking = base
+      .map((t) => ({ t, v: volMap.get(t) ?? 0 }))
+      .sort((a, b) => b.v - a.v)
+      .filter((x) => x.v > 0);
+    const top = (ranking.length ? ranking : base.map((t) => ({ t, v: 0 }))).slice(0, limit).map((x: any) => x.t);
+    cacheTopVol = { ts: Date.now(), tickers: top };
+    console.log(`[scanner-cedear] top volumen hoy (${top.length}): ${top.join(", ")}`);
+    return top;
+  } catch {
+    return base.slice(0, limit);
+  }
+}
 
 /* ────────────── Indicadores auxiliares ────────────── */
 
@@ -173,7 +207,7 @@ function calcularScoreEntrada(closes: number[], highs: number[], lows: number[])
 
 export const escanearCedearsEntrada: ScannerCedear = async () => {
   const candidatos: CandidatoSenal[] = [];
-  const universo = CEDEARS_JSON.filter((t) => t && !t.endsWith("D") && t.length > 1).slice(0, MAX_TICKERS_SCAN);
+  const universo = await topVolumenHoy();
 
   await enLotes(universo, BATCH_SIZE, async (ticker) => {
     if (candidatos.length >= MAX_SENALES) return;
@@ -225,7 +259,7 @@ export const escanearCedearsEntrada: ScannerCedear = async () => {
 
 export const escanearCedearsOversold: ScannerCedear = async () => {
   const candidatos: CandidatoSenal[] = [];
-  const universo = CEDEARS_JSON.filter((t) => t && !t.endsWith("D") && t.length > 1).slice(0, MAX_TICKERS_SCAN);
+  const universo = await topVolumenHoy();
 
   await enLotes(universo, BATCH_SIZE, async (ticker) => {
     if (candidatos.length >= MAX_SENALES) return;
