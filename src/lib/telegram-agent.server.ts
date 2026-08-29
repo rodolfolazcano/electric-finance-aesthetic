@@ -676,13 +676,13 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
     return;
   }
 
-  // ─── Scanner CEDEARs — señales de entrada (369 CEDEARs) ───
+  // ─── Scanner CEDEARs — señales de entrada (top 20 volumen hoy) ───
   // Comandos: "scanner cedears", "señales cedears", "cedears entrada", "publicar cedears", "enviar señales cedears"
   if (/cedear/i.test(low) && /scanner|se[nñ]al|entrada|oversold|sobreventa/i.test(low)) {
     const quierePublicar = /publica|enviar|canal|salida|difund/i.test(low);
     try {
       void sendAgentChatAction(chatId);
-      await sendAgentMessage(chatId, `🔍 Escaneando 369 CEDEARs (RSI+MACD+SMA+Bollinger+Vol) — ~40s...`);
+      await sendAgentMessage(chatId, `🔍 Escaneando top 20 CEDEARs por volumen hoy (RSI+MACD+SMA+Bollinger+Vol) — ~25s...`);
       const { escanearCedearsEntrada, escanearCedearsOversold } = await import("@/lib/bot-unificado/scanner-senales-cedear");
       const t0 = Date.now();
       const [s1, s2] = await Promise.all([escanearCedearsEntrada(), escanearCedearsOversold()]);
@@ -761,11 +761,60 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
     return;
   }
 
+  // ─── Noticias directas sin LLM (evita 90s timeout cuando NVIDIA keys = 0) ───
+  // "pasame noticias de ura" / "noticias ura" / "de ura" (respuesta al bot)
+  {
+    const t = text.trim();
+    const lowT = t.toLowerCase();
+    let temaNoticias: string | null = null;
+    const m1 = t.match(/(?:pasame|pasáme|mandame|mándame|dame|buscar|ver)\s+noticias?\s*(?:de|sobre)?\s+(.+)/i);
+    const m2 = t.match(/noticias?\s*(?:de|sobre)?\s+(.+)/i);
+    const m3 = t.match(/^(?:de|sobre)\s+(.+)/i);
+    if (m1?.[1]) temaNoticias = m1[1].trim();
+    else if (lowT.includes("noticias") && m2?.[1]) temaNoticias = m2[1].trim();
+    else if (/^(de|sobre)\s+\S+/i.test(t) && t.length < 30) temaNoticias = m3?.[1]?.trim() ?? null;
+    // Mapeo alias: ura = uranium ETF/setor
+    if (temaNoticias) {
+      temaNoticias = temaNoticias.replace(/^ura$/i, "uranium URA").replace(/^de\s+/i, "").trim();
+      // Evitar falsos positivos: "noticias" solo sin tema
+      if (temaNoticias.length >= 2 && !/^(noticias?)?$/i.test(temaNoticias)) {
+        try {
+          void sendAgentChatAction(chatId);
+          await sendAgentMessage(chatId, `📰 Buscando noticias de <b>${escaparHtml(temaNoticias)}</b>...`);
+          const { ejecutarNoticias } = await import("@/lib/agents/ejecutores");
+          const res = await ejecutarNoticias(temaNoticias, "hoy");
+          const out = res.texto?.slice(0, 3500) || "Sin noticias encontradas para ese tema hoy.";
+          await sendAgentMessage(chatId, out);
+          if (res.fuentes?.length) {
+            const fl = res.fuentes.slice(0, 3).map((f: any) => `• ${f.dominio ?? f.url}`).join("\n");
+            await sendAgentMessage(chatId, `Fuentes:\n${fl}`);
+          }
+        } catch (e) {
+          await sendAgentMessage(chatId, `No pude traer noticias de ${escaparHtml(temaNoticias)}: ${e instanceof Error ? escaparHtml(e.message.slice(0, 200)) : "error"}`);
+        }
+        return;
+      }
+    }
+    // "pasame noticias" sin tema → noticias generales mercado
+    if (/^\s*(pasame|pasáme|mandame|mándame|dame)?\s*noticias\s*[.!]*\s*$/i.test(t)) {
+      try {
+        void sendAgentChatAction(chatId);
+        await sendAgentMessage(chatId, `📰 Buscando noticias del mercado hoy...`);
+        const { ejecutarNoticias } = await import("@/lib/agents/ejecutores");
+        const res = await ejecutarNoticias("mercado argentino", "hoy");
+        await sendAgentMessage(chatId, (res.texto || "Sin noticias hoy.").slice(0, 3500));
+      } catch (e) {
+        await sendAgentMessage(chatId, `Error noticias: ${e instanceof Error ? e.message : String(e)}`);
+      }
+      return;
+    }
+  }
+
   // Fast-path saludos sin invocar al modelo (evita 190s de espera)
   if (/^(hola|buenas|hey|hello|hi|buen dia|buenas tardes|buenas noches)[!.\s]*$/i.test(text.trim())) {
     await sendAgentMessage(
       chatId,
-      `¡Hola! Soy el agente CORONAR. Escribime qué querés que haga:\n• "scanner cedears" → busco entradas en 369 CEDEARs\n• "publicar cedears" → valido y publico al canal @Coronarinversiones777_bot\n• "análisis de GGAL" / "valor de AAPL"\n• "activa el scanner" → intermarket\n\nComandos: /help /valor /ficha /earnings /auto`,
+      `¡Hola! Soy el agente CORONAR. Escribime qué querés que haga:\n• "scanner cedears" → busco entradas en top 20 por volumen\n• "publicar cedears" → valido y publico al canal @Coronarinversiones777_bot\n• "noticias de URA" / "noticias de NVDA" → titulares hoy\n• "análisis de GGAL" / "valor de AAPL"\n• "activa el scanner" → intermarket\n\nComandos: /help /valor /ficha /earnings /auto`,
     );
     return;
   }
