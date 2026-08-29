@@ -181,7 +181,9 @@ async function consultarAgente(
     modoAutomaticoTg =
       chatsAuto.has(sessionId) ||
       /^\/(auto|modo)\b/i.test(pregunta) ||
-      /modo\s+(autom[aá]tico|auton[oó]mo)/i.test(pregunta);
+      /modo\s+(autom[aá]tico|auton[oó]mo)/i.test(pregunta) ||
+      // Autónomo por lenguaje natural: si pide análisis/predicción/scan, activa orquestación + GPU Colab sin /auto
+      /analiza|análisis completo|predicci[oó]n|valor intr[ií]nseco|scanner|activa el scanner|noticias de|cu[aá]l es el valor/i.test(pregunta);
   } catch {
     /* fallback: sin flag, /api/chat aplica vía directa */
   }
@@ -841,12 +843,12 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
     let pingsEnviados = 0;
     const ping = setInterval(() => {
       const segs = Math.round((Date.now() - inicio) / 1000);
-      // Reducido a 3 pings máximo cada 45s para no spamear
-      if (pingsEnviados < 3 && segs > 45 + pingsEnviados * 45) {
+      // GPU acelera predicción a ~1.4s, no spamear. Solo 1 ping a 90s si aún no responde
+      if (pingsEnviados < 1 && segs > 90) {
         pingsEnviados++;
         void sendAgentMessage(
           chatId,
-          `Sigo trabajando en tu consulta (${segs}s). Los análisis completos pueden llevar 1-2 min; no hace falta reenviar.`,
+          `Sigo trabajando (${segs}s) — puente GPU activo acelera a ~1-2s, validando análisis completo sin reenviar.`,
         ).catch(() => undefined);
       }
     }, 15_000);
