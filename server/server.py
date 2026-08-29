@@ -14,6 +14,10 @@ import scipy.optimize as op
 import requests
 import warnings
 import os
+import sys
+# Asegura que `prediccion_service.py` en la misma carpeta sea importable
+# tanto si se ejecuta como `python server/server.py` como via `python -m`
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from datetime import datetime, timedelta
 warnings.filterwarnings("ignore")
 
@@ -208,6 +212,13 @@ def get_semaforo_data(ticker):
                 "tech_score": 0, "fund_score": 0, "signals": {}, "error": str(e)}
 
 # ─── Optimización ─────────────────────────────────────────────────────────────
+
+# ⚠️ DEPRECATED (motor canónico en TypeScript): la optimización de portafolios del
+# tab Optimizador vive ahora en src/lib/portfolio/ (estimation.ts: RMT Marchenko-
+# Pastur + Ledoit-Wolf; solvers.ts: min-var QP, max-sharpe homogéneo de Merton 1972,
+# frontera por aversión η de Markowitz 1956). Este SLSQP se conserva solo como
+# cross-check manual. DIVERGENCIA DE CONVENCIÓN: acá la covarianza entra ANUALIZADA
+# (×252, ver /api/quantitative); el motor TS trabaja DIARIA y anualiza solo en outputs.
 
 def optimize_portfolio(ptype, mean_vec, vol_vec, mtx_cov, tickers):
     n = len(tickers)
@@ -2779,10 +2790,25 @@ try:
         calcular_sesgo, calcular_volatilidad_historica_serie,
         calcular_volatilidad_dinamica,
     )
-    from server.prediccion_service import ejecutar_prediccion
+    from server.prediccion_service import ejecutar_prediccion, get_aceleracion_info, comparar_cpu_gpu
     OPCIONES_LOADED = True
 except ImportError:
-    OPCIONES_LOADED = False
+    try:
+        from iol_service import (
+            autenticar, obtener_tasas_caucion, obtener_opciones,
+        )
+        from opciones_service import (
+            black_scholes, binomial_pricing, procesar_cadena_opciones,
+            calcular_sesgo, calcular_volatilidad_historica_serie,
+            calcular_volatilidad_dinamica,
+        )
+        from prediccion_service import ejecutar_prediccion, get_aceleracion_info, comparar_cpu_gpu
+        OPCIONES_LOADED = True
+    except ImportError as _e2:
+        OPCIONES_LOADED = False
+        get_aceleracion_info = None
+        comparar_cpu_gpu = None
+        print(f"[WARN] prediccion_service no cargado: {_e2}")
 
 
 
@@ -3059,6 +3085,68 @@ def api_prediccion():
         import traceback
         return jsonify({"error": str(e), "detail": traceback.format_exc()}), 500
 
+
+# ─── GPU Bridge — túnel Colab (RAPIDS cuDF/cuML) ──────────────────────────
+# Expone la aceleración GPU para el agente Telegram y el orquestador autónomo.
+# Si corre en Colab con GPU, usa cuDF/cuML; si no, fallback CPU 100% compatible Vercel.
+
+@app.route("/gpu/health")
+def gpu_health():
+    try:
+        try:
+            from server.prediccion_service import get_aceleracion_info as _gai
+        except ImportError:
+            from prediccion_service import get_aceleracion_info as _gai
+        info = _gai()
+        return jsonify({"ok": True, **info})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e), "has_cudf": False, "has_cuml": False})
+
+@app.route("/gpu/predict", methods=["POST"])
+def gpu_predict():
+    try:
+        body = request.get_json(force=True) or {}
+        simbolo = str(body.get("simbolo", "GGAL")).upper()
+        horizonte = int(body.get("horizonte", 5))
+        use_gpu = body.get("use_gpu", "auto")  # auto | true | false | gpu | cpu
+        if not OPCIONES_LOADED:
+            return jsonify({"error": "servicios de predicción no disponibles"}), 503
+        _, _, _, hist = _datos_subyacente(simbolo)
+        if hist is None:
+            return jsonify({"error": f"sin datos del subyacente {simbolo}.BA"}), 404
+        spot = float(hist["Close"].iloc[-1])
+        # soporta nuevo param use_gpu, fallback si vieja firma
+        try:
+            resultado = ejecutar_prediccion(hist, spot, horizonte=horizonte, use_gpu=use_gpu)
+        except TypeError:
+            resultado = ejecutar_prediccion(hist, spot, horizonte=horizonte)
+        if "error" in resultado:
+            return jsonify(resultado), 400
+        resultado["simbolo"] = simbolo
+        resultado["spot"] = round(spot, 2)
+        return jsonify(resultado)
+    except Exception as e:
+        import traceback
+        return jsonify({"error": str(e), "detail": traceback.format_exc()}), 500
+
+@app.route("/gpu/comparar", methods=["POST"])
+def gpu_comparar():
+    try:
+        body = request.get_json(force=True) or {}
+        simbolo = str(body.get("simbolo", "GGAL")).upper()
+        horizonte = int(body.get("horizonte", 5))
+        if not OPCIONES_LOADED or comparar_cpu_gpu is None:
+            return jsonify({"error": "comparar no disponible"}), 503
+        _, _, _, hist = _datos_subyacente(simbolo)
+        if hist is None:
+            return jsonify({"error": f"sin datos {simbolo}"}), 404
+        spot = float(hist["Close"].iloc[-1])
+        res = comparar_cpu_gpu(hist, spot, horizonte=horizonte)
+        res["simbolo"] = simbolo
+        return jsonify(res)
+    except Exception as e:
+        import traceback
+        return jsonify({"error": str(e), "detail": traceback.format_exc()}), 500
 
 @app.route("/health")
 def health():

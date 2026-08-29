@@ -11,6 +11,11 @@ const enVercel = process.env.VERCEL === "1";
 export default defineConfig({
   nitro: enVercel ? { preset: "vercel" } : undefined,
   vite: {
+    server: {
+      port: 5199,
+      strictPort: true,
+      host: true,
+    },
     define: {
       // Polyfill para `process` en cliente: server code usa `process.env`/`process.cwd()` y se cuela al bundle cliente
       // via studio.functions → studio.server. En server usa el real, en cliente fallback vacío pero definido.

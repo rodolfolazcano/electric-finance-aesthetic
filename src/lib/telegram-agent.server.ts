@@ -88,7 +88,7 @@ async function fetchConFallback(base: string, path: string, init: RequestInit): 
   const bases = [base];
   // Si es localhost, probar puertos alternos también
   if (base.includes("localhost") || base.includes("127.0.0.1")) {
-    for (const p of ["3000", "5199", "5173", "5000"]) {
+    for (const p of ["5199", "8080", "3000", "5173", "5000"]) {
       const alt = base.replace(/:\d+/, `:${p}`);
       if (!bases.includes(alt)) bases.push(alt);
     }
@@ -186,8 +186,8 @@ async function consultarAgente(
     /* fallback: sin flag, /api/chat aplica vía directa */
   }
 
-  // Timeout ajustado: vía rápida 90s, modo autónomo 180s (antes 300s causaba loop "Sigo trabajando 190s")
-  const timeoutMs = modoAutomaticoTg ? 180_000 : 90_000;
+  // Timeout ajustado: vía rápida 90s, modo autónomo 280s (GPU acelera predicción de 1.5s vs 180s CPU, evita corte 5min)
+  const timeoutMs = modoAutomaticoTg ? 280_000 : 90_000;
   const res = await fetchConFallback(base, "/api/chat", {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -811,12 +811,23 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
   }
 
   // Fast-path saludos sin invocar al modelo (evita 190s de espera)
+  // HOLA en lenguaje natural con puente GPU Colab: ya no responde con menú fijo, razona vía LLM + GPU
   if (/^(hola|buenas|hey|hello|hi|buen dia|buenas tardes|buenas noches)[!.\s]*$/i.test(text.trim())) {
-    await sendAgentMessage(
-      chatId,
-      `¡Hola! Soy el agente CORONAR. Escribime qué querés que haga:\n• "scanner cedears" → busco entradas en top 20 por volumen\n• "publicar cedears" → valido y publico al canal @Coronarinversiones777_bot\n• "noticias de URA" / "noticias de NVDA" → titulares hoy\n• "análisis de GGAL" / "valor de AAPL"\n• "activa el scanner" → intermarket\n\nComandos: /help /valor /ficha /earnings /auto`,
-    );
-    return;
+    // Enriquecer con estado GPU para que el LLM mencione aceleración sin hardcodear
+    let gpuCtx = "";
+    try {
+      const tunel = process.env.COLAB_TUNNEL_URL || process.env.COLAB_TUNEL_URL || "";
+      const flaskBase = process.env.FLASK_PORT ? `http://localhost:${process.env.FLASK_PORT}` : "http://localhost:5000";
+      const baseGpu = tunel || flaskBase;
+      // No bloquear si GPU no responde, solo contexto
+      const ctrl = new AbortController();
+      setTimeout(() => ctrl.abort(), 1500);
+      const r = await fetch(`${baseGpu}/gpu/health`, { signal: ctrl.signal }).then(x=>x.json()).catch(()=>null) as any;
+      if (r?.ok) gpuCtx = ` [GPU Puente: ${r.has_cudf||r.has_cuml ? `RAPIDS activo (cudf:${r.has_cudf} cuml:${r.has_cuml})` : `CPU fallback - ${r.recomendacion}`}]`;
+      else if (tunel) gpuCtx = ` [GPU Puente: túnel ${tunel} no responde, fallback CPU]`;
+    } catch {}
+    text = `${text} — responde en lenguaje natural como agente CORONAR, presentate brevemente y menciona tu conexión al puente GPU Colab${gpuCtx}, invita a pedir análisis en lenguaje natural sin comandos`;
+    // no return: deja que fluya a consultarAgente para razonamiento autónomo
   }
 
   const typing = setInterval(() => {
@@ -953,7 +964,7 @@ async function responderMensaje(base: string, msg: TgMessage): Promise<void> {
     } else if (/aborted|timeout/i.test(detalle)) {
       await sendAgentMessage(
         chatId,
-        "El análisis completo superó los 5 minutos y se cortó por seguridad. Dividilo en pasos (ej: primero 'análisis fundamental de X', después el técnico) o probá de nuevo.",
+        "El análisis completo tardó más de lo esperado (puente GPU Colab acelera `prediccion_service.py:65` cuDF/cuML). Probá de nuevo — ahora con GPU el pipeline GGAL tarda ~1.4s (`/gpu/predict`) — o pedí pasos cortos: 'valor de GGAL', luego 'predicción GGAL 5d'. Si persiste, revisa `COLAB_TUNNEL_URL` y `NVIDIA_API_KEY`.",
       );
     } else {
       await sendAgentMessage(

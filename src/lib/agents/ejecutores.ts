@@ -3165,6 +3165,46 @@ export async function ejecutarMatrizBenchmarks(): Promise<ResTool> {
 // --- iol_asesor (cuentas asesoradas) ---------------------------------------
 
 import { analisisTecnico } from "@/lib/herramientas/analisis-tecnico.functions";
+import { analisisCuantitativo } from "@/lib/herramientas/analisis-cuantitativo.functions";
+
+/** Análisis cuantitativo (modelos funcionales + marginal) de un activo. */
+export async function ejecutarAnalisisCuantitativo(
+  argsRaw: string,
+): Promise<ResultadoToolConEventos> {
+  const args = (() => {
+    try {
+      return (JSON.parse(argsRaw) ?? {}) as Record<string, unknown>;
+    } catch {
+      return {} as Record<string, unknown>;
+    }
+  })();
+  const simbolo = String(args["simbolo"] ?? "").trim();
+  if (!simbolo)
+    return {
+      texto: "SIN RESULTADOS: falta el símbolo. Reinvocá con simbolo (ej. AAPL, GGAL.BA).",
+      fuentes: [],
+      ok: false,
+    };
+  const r = await analisisCuantitativo(simbolo);
+  if (!r)
+    return {
+      texto: `SIN RESULTADOS: sin datos suficientes de ${simbolo} en Yahoo Finance (se requieren al menos 60 sesiones).`,
+      fuentes: [],
+      ok: false,
+    };
+  const eventos: ResultadoToolConEventos["eventos"] = [
+    {
+      t: "chart",
+      v: {
+        tipo: "linea",
+        titulo: `${r.simbolo} · cuantitativo`,
+        unidad: r.moneda,
+        serie: r.serie.map((p) => ({ f: p.fecha, v: p.cierre })),
+      },
+    },
+  ];
+  return { texto: r.texto, fuentes: [], ok: true, eventos };
+}
 
 /** Análisis técnico completo (portado de clarity/insight-hub): MA/EMA/RSI/MACD/S-R/52w. */
 export async function ejecutarAnalisisTecnico(argsRaw: string): Promise<ResultadoToolConEventos> {
@@ -4256,6 +4296,53 @@ export async function ejecutarPrediccionSubyacente(argsRaw: string): Promise<{
     };
   }
 
+  // Puente GPU Colab: sin localhost en prod (Vercel). Solo usa COLAB_TUNNEL_URL externo; local usa localhost:5000 fallback
+  const isVercel = process.env.VERCEL === "1" || process.env.NITRO_PRESET === "vercel";
+  const colabBaseRaw = process.env.COLAB_TUNNEL_URL || process.env.COLAB_TUNEL_URL || "";
+  const colabBase = (isVercel ? colabBaseRaw : (colabBaseRaw || "http://localhost:5000")).replace(/\/+$/, "");
+  let rGpu: any = null;
+  let usaGpu = false;
+  if (colabBase) {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 8000);
+      const resp = await fetch(`${colabBase}/gpu/predict`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ simbolo, horizonte, use_gpu: "auto" }),
+        signal: ctrl.signal,
+      });
+      clearTimeout(t);
+      if (resp.ok) {
+        rGpu = await resp.json();
+        if (rGpu && !rGpu.error && rGpu.prob_actual != null && rGpu.decision) usaGpu = true;
+      }
+    } catch {}
+  }
+
+  if (usaGpu && rGpu) {
+    // Usa datos GPU directos, no necesita velas TS
+    const pct = (v: number | null) => (v != null ? `${(v * 100).toFixed(1)}%` : "n/d");
+    const textoGpu = `**Predicción direccional ML — ${simbolo}** (horizonte ${horizonte} días) — vía GPU Colab
+
+- Precio spot: $${rGpu.spot?.toFixed(2) ?? "?"}
+- Probabilidad de subida: **${(rGpu.prob_actual * 100).toFixed(1)}%** (umbral ${(rGpu.log_threshold * 100).toFixed(0)}%)
+- Señal: **${rGpu.decision.direccion}** — confianza ${(rGpu.decision.confianza * 100).toFixed(0)}%
+- Estrategia: ${rGpu.decision.estrategia}
+
+Validación:
+- CV acc/F1: ${pct(rGpu.logistic_cv?.cv_acc)} / ${rGpu.logistic_cv?.cv_f1?.toFixed(2) ?? "n/d"}
+- Test acc/F1: ${pct(rGpu.test_acc)} / ${rGpu.test_f1?.toFixed(2) ?? "n/d"}
+- Features: ${(rGpu.features_importancia ?? []).slice(0,3).map(([k,v]: any)=>`${k}(${v>0?"+":""}${v})`).join(", ")}
+
+Aceleración GPU Colab: backend ${rGpu.backend_logistic} ${rGpu.aceleracion?.has_cuml ? 'RAPIDS' : 'CPU'} timing ${rGpu.timing?.total_sec ?? '?'}s`;
+    return {
+      texto: textoGpu,
+      fuentes: [{ dominio: "finance.yahoo.com", url: `https://finance.yahoo.com/quote/${simbolo}.BA`, title: `Historial ${simbolo}.BA via GPU` }],
+      ok: true,
+    };
+  }
+
   const subyacente = await obtenerVelas(simbolo.endsWith(".BA") ? simbolo : `${simbolo}.BA`, "2y");
   if (!subyacente.ok || subyacente.velas.length < 120) {
     return {
@@ -4265,7 +4352,29 @@ export async function ejecutarPrediccionSubyacente(argsRaw: string): Promise<{
     };
   }
 
-  const r = ejecutarPrediccion(subyacente.velas, simbolo, horizonte);
+  // Fallback CPU TS por defecto
+  const r = (() => {
+    if (usaGpu && rGpu) {
+      // Mapea Flask GPU JSON -> forma TS para texto unificado
+      return {
+        probActual: rGpu.prob_actual,
+        logThreshold: rGpu.log_threshold ?? 0.5,
+        decision: rGpu.decision,
+        logisticCv: { acc: rGpu.logistic_cv?.cv_acc ?? rGpu.test_acc, f1: rGpu.logistic_cv?.cv_f1 ?? 0, accRaw: rGpu.logistic_cv?.cv_acc },
+        testAcc: rGpu.test_acc,
+        testF1: rGpu.test_f1,
+        wfAcc: rGpu.wf_acc,
+        wfF1: rGpu.wf_f1,
+        wfVentanas: rGpu.wf_ventanas ?? 0,
+        reglaOroOk: rGpu.regla_oro_ok ?? true,
+        featuresImportancia: rGpu.features_importancia ?? [],
+        error: null,
+        // extras GPU
+        _gpu: rGpu,
+      } as any;
+    }
+    return ejecutarPrediccion(subyacente.velas, simbolo, horizonte);
+  })();
   if (r.error || r.probActual == null || !r.decision) {
     return { texto: `Predicción no disponible para ${simbolo}: ${r.error ?? "datos insuficientes"}`, fuentes: [], ok: false };
   }
@@ -4292,7 +4401,7 @@ Validación del modelo:
 - Regla de oro features ≤ n/10: ${r.reglaOroOk ? "OK" : "violada"}
 - Features más influyentes: ${r.featuresImportancia.slice(0, 3).map(([k, v]) => `${k} (${v > 0 ? "+" : ""}${v})`).join(", ")}
 
-Fuente de precios: Yahoo Finance (${subyacente.velas.length} velas diarias). Modelo logístico L2 entrenado con split temporal 60/20/20 sin mezcla de información. Esto es una estimación estadística, no recomendación de inversión.`;
+Fuente de precios: Yahoo Finance (${subyacente.velas.length} velas diarias). Modelo logístico L2 entrenado con split temporal 60/20/20 sin mezcla de información. Esto es una estimación estadística, no recomendación de inversión.${usaGpu && r._gpu ? `\n\nAceleración GPU Colab: backend ${r._gpu.backend_logistic} ${r._gpu.aceleracion?.has_cuml ? 'RAPIDS' : 'CPU'} timing ${r._gpu.timing?.total_sec ?? '?'}s` : ''}`;
 
   return {
     texto,
@@ -4600,5 +4709,130 @@ export async function ejecutarInterpretarOportunidades(argsRaw: string): Promise
       if (txt) return { texto: txt, fuentes: [], ok: true };
     } catch {}
     return { texto: `SIN RESULTADOS interpretar_oportunidades: ${e instanceof Error ? e.message : String(e)}`, fuentes: [], ok: false };
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// Motor Intermarket — análisis completo de ratios Murphy
+// ═════════════════════════════════════════════════════════════════════════
+
+export async function ejecutarAnalisisIntermarketCompleto(argsRaw: string): Promise<ResultadoTool> {
+  try {
+    const { evaluarSenalesMurphy } = await import("@/lib/motor");
+    const args = JSON.parse(argsRaw) as {
+      pares: Record<string, number[]>;
+    };
+    const { pares } = args;
+    const resultado = evaluarSenalesMurphy({
+      XLY: pares?.XLY,
+      XLP: pares?.XLP,
+      IWM: pares?.IWM,
+      SPY: pares?.SPY,
+      QQQ: pares?.QQQ,
+      GSG: pares?.GSG,
+      TLT: pares?.TLT,
+    });
+
+    const lineas: string[] = ["ANÁLISIS INTERMARKET — REGLA DE ORO MURPHY", ""];
+
+    if (resultado.ratioXLYXLP) {
+      lineas.push(`XLY/XLP (Discrecional vs Defensivos):`);
+      lineas.push(`  Regla: ${resultado.ratioXLYXLP.regla} → Acción: ${resultado.ratioXLYXLP.accion}`);
+      lineas.push(`  Signo ratio: ${resultado.ratioXLYXLP.signoRatio ?? "N/D"}`);
+      for (const r of resultado.ratioXLYXLP.reglasDescriptivas) {
+        lineas.push(`  • ${r}`);
+      }
+      lineas.push("");
+    }
+    if (resultado.ratioIWMSPY) {
+      lineas.push(`IWM/SPY (Small vs Large Caps):`);
+      lineas.push(`  Regla: ${resultado.ratioIWMSPY.regla} → Acción: ${resultado.ratioIWMSPY.accion}`);
+      lineas.push(`  Signo ratio: ${resultado.ratioIWMSPY.signoRatio ?? "N/D"}`);
+      for (const r of resultado.ratioIWMSPY.reglasDescriptivas) {
+        lineas.push(`  • ${r}`);
+      }
+      lineas.push("");
+    }
+    if (resultado.ratioGSGTLT) {
+      lineas.push(`GSG/TLT (Commodities vs Bonos):`);
+      lineas.push(`  Regla: ${resultado.ratioGSGTLT.regla} → Acción: ${resultado.ratioGSGTLT.accion}`);
+      lineas.push(`  Signo ratio: ${resultado.ratioGSGTLT.signoRatio ?? "N/D"}`);
+      for (const r of resultado.ratioGSGTLT.reglasDescriptivas) {
+        lineas.push(`  • ${r}`);
+      }
+      lineas.push("");
+    }
+
+    if (resultado.resumen.length === 0) {
+      lineas.push("Sin datos suficientes para evaluar ratios. Se requieren arrays de precios de al menos 50 barras.");
+    }
+
+    return { texto: lineas.join("\n"), fuentes: [] };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS analisis_intermarket: ${e instanceof Error ? e.message : String(e)}`, fuentes: [] };
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// EBIT-EPS — análisis de estructura de capital óptima
+// ═════════════════════════════════════════════════════════════════════════
+
+export async function ejecutarAnalisisEBITEPS(argsRaw: string): Promise<ResultadoTool> {
+  try {
+    const { analisisEBITEPS } = await import("@/lib/motor/ebit-eps");
+    const args = JSON.parse(argsRaw) as {
+      planA: { nombre?: string; intereses: number; dividendosPref?: number; acciones: number };
+      planB: { nombre?: string; intereses: number; dividendosPref?: number; acciones: number };
+      tasaImpuesto: number;
+      ebitEstimado?: number;
+    };
+
+    const resultado = analisisEBITEPS({
+      planA: {
+        nombre: args.planA.nombre ?? "Plan A — Alto Apalancamiento",
+        intereses: args.planA.intereses,
+        dividendosPref: args.planA.dividendosPref ?? 0,
+        acciones: args.planA.acciones,
+      },
+      planB: {
+        nombre: args.planB.nombre ?? "Plan B — Bajo Apalancamiento",
+        intereses: args.planB.intereses,
+        dividendosPref: args.planB.dividendosPref ?? 0,
+        acciones: args.planB.acciones,
+      },
+      tasaImpuesto: args.tasaImpuesto,
+      ebitEstimado: args.ebitEstimado,
+    });
+
+    const lineas: string[] = [
+      "ANÁLISIS EBIT-EPS — ESTRUCTURA DE CAPITAL ÓPTIMA",
+      `Fuente: Pascale, "Dirección Financiera", Cap. 8`,
+      "",
+      `Plan A: ${resultado.planA.nombre}`,
+      `  Intereses: $${args.planA.intereses.toLocaleString()} | Div. Pref.: $${(args.planA.dividendosPref ?? 0).toLocaleString()} | Acciones: ${args.planA.acciones.toLocaleString()}`,
+      "",
+      `Plan B: ${resultado.planB.nombre}`,
+      `  Intereses: $${args.planB.intereses.toLocaleString()} | Div. Pref.: $${(args.planB.dividendosPref ?? 0).toLocaleString()} | Acciones: ${args.planB.acciones.toLocaleString()}`,
+      "",
+      `Tasa impositiva: ${(args.tasaImpuesto * 100).toFixed(0)}%`,
+    ];
+
+    if (resultado.puntoIndiferencia.existe) {
+      lineas.push(
+        "",
+        `PUNTO DE INDIFERENCIA: EBIT = $${resultado.puntoIndiferencia.ebit.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+        `  EPS en indiferencia: $${resultado.puntoIndiferencia.epsEnIndiferencia.toFixed(2)}`,
+      );
+    } else {
+      lineas.push("", "No existe punto de indiferencia (mismas acciones en ambos planes).");
+    }
+
+    if (resultado.veredicto) {
+      lineas.push("", "VEREDICTO:", resultado.veredicto.motivo);
+    }
+
+    return { texto: lineas.join("\n"), fuentes: [] };
+  } catch (e) {
+    return { texto: `SIN RESULTADOS analisis_ebit_eps: ${e instanceof Error ? e.message : String(e)}`, fuentes: [] };
   }
 }
