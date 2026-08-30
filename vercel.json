@@ -3,62 +3,6 @@
     {
       "path": "/api/cron/informe-matutino?broadcast=true",
       "schedule": "0 11 * * 1-5"
-    },
-    {
-      "path": "/api/cron/contexto-telegram",
-      "schedule": "30 9 * * 1-5"
-    },
-    {
-      "path": "/api/cron/contexto-telegram",
-      "schedule": "30 13 * * 1-5"
-    },
-    {
-      "path": "/api/cron/contexto-telegram",
-      "schedule": "30 20 * * 1-5"
-    },
-    {
-      "path": "/api/cron/senales-unificadas?topN=6&filtro=todos",
-      "schedule": "0 13 * * 1-5"
-    },
-    {
-      "path": "/api/cron/alerta-publicaciones?umbral=6&max=2",
-      "schedule": "30 15 * * 1-5"
-    },
-    {
-      "path": "/api/cron/oportunidades-publicaciones?tema=cripto&max=4",
-      "schedule": "0 14 * * 1-5"
-    },
-    {
-      "path": "/api/cron/oportunidades-publicaciones?tema=auto&max=5",
-      "schedule": "0 21 * * 1-5"
-    },
-    {
-      "path": "/api/cron/actualiza-renta-fija",
-      "schedule": "0 21 * * 1-5"
-    },
-    {
-      "path": "/api/cron/tuning-senales",
-      "schedule": "0 3 * * 0"
-    },
-    {
-      "path": "/api/cron/earnings-semanal?modo=semanal",
-      "schedule": "0 12 * * 1"
-    },
-    {
-      "path": "/api/cron/earnings-semanal?modo=diario",
-      "schedule": "30 12 * * 1-5"
-    },
-    {
-      "path": "/api/cron/bot-unificado?estrategias=cedears-entrada&forzar=1",
-      "schedule": "0 14,16,18,20,22 * * 1-5"
-    },
-    {
-      "path": "/api/cron/bot-unificado?estrategias=cedears-oversold&forzar=1",
-      "schedule": "30 14,16,18,20,22 * * 1-5"
-    },
-    {
-      "path": "/api/cron/bot-unificado?estrategias=cedears-entrada,cedears-oversold&forzar=1",
-      "schedule": "0 0,1,2 * * 2-6"
     }
   ]
 }
